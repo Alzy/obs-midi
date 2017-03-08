@@ -96,12 +96,12 @@ void test_set_colors() {
 
 	midiout->openPort( 0 );
 
-	message.push_back( 90 );
+	message.push_back( 0x90 );
 	message.push_back( 0 );
 	message.push_back( 1 );
 	midiout->sendMessage( &message );
 
-	message[0] = 90;
+	message[0] = 0x90;
 	message[1] = 1;
 	message[2] = 2;
 	midiout->sendMessage( &message );

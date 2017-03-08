@@ -23,7 +23,15 @@ if(APPLE)
             ${COREMIDI}
             ${COREAUDIO}
             ${COREFOUNDATION})
-endif(APPLE)
+elseif(WIN32)
+    find_library(WINMM winmm)
+    find_library(MULTITHREADED multithreaded)
+
+    set(obs-midi_DEPS
+            ${obs-midi_DEPS}
+            ${WINMM}
+            ${MULTITHREADED})
+endif()
 
 set(obs-midi_SOURCES
         obs-midi.cpp)

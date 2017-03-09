@@ -24,13 +24,9 @@ if(APPLE)
             ${COREAUDIO}
             ${COREFOUNDATION})
 elseif(WIN32)
-    find_library(WINMM winmm)
-    find_library(MULTITHREADED multithreaded)
-
     set(obs-midi_DEPS
             ${obs-midi_DEPS}
-            ${WINMM}
-            ${MULTITHREADED})
+            winmm.lib)
 endif()
 
 set(obs-midi_SOURCES

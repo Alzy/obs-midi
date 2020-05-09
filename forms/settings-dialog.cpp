@@ -14,7 +14,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 */
 
 #include <obs-frontend-api.h>
-
+#include <string>
+#include <map>
+#include <iostream>
+#include <utility>
 #include "settings-dialog.h"
 #include <QtWidgets\qdialogbuttonbox.h>
 
@@ -53,12 +56,14 @@ void SettingsDialog::SetAvailableDevices(std::vector<std::string> &midiDevices)
 }
 
 
-void SettingsDialog::pushDebugMidiMessage(std::string time, std::string message)
+void SettingsDialog::pushDebugMidiMessage(std::string time, std::string message, int control, int value)
 {
 	int rowCount = this->ui->tbl_debug->rowCount();
 	this->ui->tbl_debug->insertRow(rowCount);
 	this->ui->tbl_debug->setItem(rowCount - 1, 0, new QTableWidgetItem (tr(time.c_str())));
 	this->ui->tbl_debug->setItem(rowCount - 1, 1, new QTableWidgetItem(tr(message.c_str())));
+	this->ui->tbl_debug->setItem(rowCount - 1, 2, new QTableWidgetItem(tr(std::to_string(control).c_str())));
+	this->ui->tbl_debug->setItem(rowCount - 1, 3, new QTableWidgetItem(tr(std::to_string(value).c_str())));
 }
 
 

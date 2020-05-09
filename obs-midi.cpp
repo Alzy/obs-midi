@@ -1,30 +1,38 @@
-#include <iostream>
 
+#include <iostream>
 #include <obs-module.h>
 #include <obs-frontend-api.h>
 #include <obs-data.h>
-
+#include <string>
+#include <map>
+#include <iostream>
+#include <utility>
 #include "RtMidi.h"
-
 #include "forms/settings-dialog.h"
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMainWindow>
-
+using namespace std;
 OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE("obs-midi", "en-US")
 
-
+std::string getMessageType(int in)
+{
+	map<int, string> MsgType;
+	MsgType.insert(std::pair<int, string>(176, "control_change"));
+	MsgType.insert(std::pair<int, string>(128, "note_off"));
+	MsgType.insert(std::pair<int, string>(144, "note_on"));
+	MsgType.insert(std::pair<int, string>(192, "program_change"));
+	std::string a = MsgType[in];
+	return a;
+}
 void midiin_callback(double deltatime, std::vector<unsigned char> *message, void *userData)
 {
 	unsigned int nBytes = message->size();
 	SettingsDialog *sd = static_cast<SettingsDialog *> (userData);
-	sd->pushDebugMidiMessage("deltatime", "message");
-
-	for (unsigned int i = 0; i < nBytes; i++) {
-		blog(LOG_INFO, "Byte %d = %d", i, (int)message->at(i));
-	}
-	if (nBytes > 0)
-		std::cout << "stamp = " << deltatime << std::endl;
+	std::string byte1 = getMessageType((int)message->at(0));
+	sd->pushDebugMidiMessage(std::to_string(deltatime), byte1,
+				 (int)message->at(1), (int)message->at(2));
+	//sd->pushDebugMidiMessage(deltatime, "duh");	std::cout << "stamp = " << deltatime << std::endl;
 }
 
 

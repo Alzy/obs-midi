@@ -73,6 +73,7 @@ include_directories(
 set(obs-midi_SOURCES
         utils.cpp
 	config.cpp
+	midi-agent.cpp
         forms/settings-dialog.cpp
         forms/settings-midi-map.cpp
         obs-midi.cpp)
@@ -80,6 +81,7 @@ set(obs-midi_SOURCES
 list(APPEND obs-midi_HEADERS
         utils.h
 	config.h
+	midi-agent.h
         forms/settings-dialog.h
         forms/settings-midi-map.h
         obs-midi.h)

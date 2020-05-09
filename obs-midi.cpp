@@ -14,10 +14,12 @@ OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE("obs-midi", "en-US")
 
 
-
 void midiin_callback(double deltatime, std::vector<unsigned char> *message, void *userData)
 {
 	unsigned int nBytes = message->size();
+	SettingsDialog *sd = static_cast<SettingsDialog *> (userData);
+	sd->pushDebugMidiMessage("deltatime", "message");
+
 	for (unsigned int i = 0; i < nBytes; i++) {
 		blog(LOG_INFO, "Byte %d = %d", i, (int)message->at(i));
 	}
@@ -53,10 +55,6 @@ bool obs_module_load(void)
 		}
 	}
 
-	midiin->openPort(0);
-	midiin->setCallback(&midiin_callback);
-
-
 	// UI SETUP
 	QMainWindow *mainWindow = (QMainWindow *)obs_frontend_get_main_window();
 	SettingsDialog *settingsDialog = new SettingsDialog(mainWindow);
@@ -70,5 +68,7 @@ bool obs_module_load(void)
 	});
 	settingsDialog->SetAvailableDevices(midiDevices);
 	
+	midiin->openPort(0);
+	midiin->setCallback(&midiin_callback, settingsDialog);
 	return true;
 }

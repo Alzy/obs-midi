@@ -53,6 +53,15 @@ void SettingsDialog::SetAvailableDevices(std::vector<std::string> &midiDevices)
 }
 
 
+void SettingsDialog::pushDebugMidiMessage(std::string time, std::string message)
+{
+	int rowCount = this->ui->tbl_debug->rowCount();
+	this->ui->tbl_debug->insertRow(rowCount);
+	this->ui->tbl_debug->setItem(rowCount - 1, 0, new QTableWidgetItem (tr(time.c_str())));
+	this->ui->tbl_debug->setItem(rowCount - 1, 1, new QTableWidgetItem(tr(message.c_str())));
+}
+
+
 void SettingsDialog::FormAccepted() {
 	return;
 }

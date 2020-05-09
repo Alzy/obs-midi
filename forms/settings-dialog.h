@@ -28,6 +28,7 @@ public:
 	~SettingsDialog();
 	void ToggleShowHide();
 	void SetAvailableDevices(std::vector<std::string> &midiDevices);
+	void pushDebugMidiMessage(std::string time, std::string message);
 
 private Q_SLOTS:
 	void FormAccepted();

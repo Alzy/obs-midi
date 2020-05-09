@@ -71,11 +71,15 @@ include_directories(
         "${CMAKE_SOURCE_DIR}/UI/obs-frontend-api")
 
 set(obs-midi_SOURCES
+        utils.cpp
+	config.cpp
         forms/settings-dialog.cpp
         forms/settings-midi-map.cpp
         obs-midi.cpp)
 
 list(APPEND obs-midi_HEADERS
+        utils.h
+	config.h
         forms/settings-dialog.h
         forms/settings-midi-map.h
         obs-midi.h)

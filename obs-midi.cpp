@@ -7,32 +7,42 @@
 #include <map>
 #include <iostream>
 #include <utility>
+#include "obs-midi.h"
 #include "RtMidi.h"
 #include "forms/settings-dialog.h"
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMainWindow>
+#include "config.h"
+#include "utils.h"
+
 using namespace std;
+
+void ___source_dummy_addref(obs_source_t *) {}
+void ___sceneitem_dummy_addref(obs_sceneitem_t *) {}
+void ___data_dummy_addref(obs_data_t *) {}
+void ___data_array_dummy_addref(obs_data_array_t *) {}
+void ___output_dummy_addref(obs_output_t *) {}
+
+void ___data_item_dummy_addref(obs_data_item_t *) {}
+void ___data_item_release(obs_data_item_t *dataItem)
+{
+	obs_data_item_release(&dataItem);
+}
+
 OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE("obs-midi", "en-US")
 
-std::string getMessageType(int in)
-{
-	map<int, string> MsgType;
-	MsgType.insert(std::pair<int, string>(176, "control_change"));
-	MsgType.insert(std::pair<int, string>(128, "note_off"));
-	MsgType.insert(std::pair<int, string>(144, "note_on"));
-	MsgType.insert(std::pair<int, string>(192, "program_change"));
-	std::string a = MsgType[in];
-	return a;
-}
+ConfigPtr _config;
+
+
+
 void midiin_callback(double deltatime, std::vector<unsigned char> *message, void *userData)
 {
 	unsigned int nBytes = message->size();
 	SettingsDialog *sd = static_cast<SettingsDialog *> (userData);
-	std::string byte1 = getMessageType((int)message->at(0));
+	std::string byte1 = Utils::getMidiMessageType((int)message->at(0));
 	sd->pushDebugMidiMessage(std::to_string(deltatime), byte1,
 				 (int)message->at(1), (int)message->at(2));
-	//sd->pushDebugMidiMessage(deltatime, "duh");	std::cout << "stamp = " << deltatime << std::endl;
 }
 
 
@@ -79,4 +89,10 @@ bool obs_module_load(void)
 	midiin->openPort(0);
 	midiin->setCallback(&midiin_callback, settingsDialog);
 	return true;
+}
+
+
+ConfigPtr GetConfig()
+{
+	return _config;
 }

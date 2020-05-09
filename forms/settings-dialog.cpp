@@ -68,20 +68,19 @@ void SettingsDialog::pushDebugMidiMessage(std::string time, std::string message,
 }
 
 
-void SettingsDialog::FormAccepted() {
-	return;
-}
-
-
-
-
-SettingsDialog::~SettingsDialog() {
-	delete ui;
-}
-
 void SettingsDialog::on_btn_configure_clicked()
 {
     SettingsMidiMap mDialog;
     mDialog.setModal(true);
     mDialog.exec();
+}
+
+
+void SettingsDialog::FormAccepted() {
+	return;
+}
+
+
+SettingsDialog::~SettingsDialog() {
+	delete ui;
 }

@@ -72,10 +72,12 @@ include_directories(
 
 set(obs-midi_SOURCES
         forms/settings-dialog.cpp
+        forms/settings-midi-map.cpp
         obs-midi.cpp)
 
 list(APPEND obs-midi_HEADERS
         forms/settings-dialog.h
+        forms/settings-midi-map.h
         obs-midi.h)
 
 add_library(obs-midi MODULE

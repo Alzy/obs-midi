@@ -17,6 +17,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #include <obs-frontend-api.h>
 #include <QtCore/QTime>
+#include "obs-midi.h"
 
 #include "utils.h"
 #include "midi-agent.h"
@@ -32,7 +33,7 @@ MidiAgent::~MidiAgent()
 	//
 }
 
-void MidiAgent::SetVolume(QString source, float volume)
+ void MidiAgent::SetVolume(QString source, float volume)
 {
 	OBSSourceAutoRelease obsSource = obs_get_source_by_name(source.toUtf8());
 	if (!obsSource) {

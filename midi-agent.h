@@ -25,5 +25,5 @@ class MidiAgent {
 	public:
 		MidiAgent();
 		~MidiAgent();
-		void SetVolume(QString source, float volume);
+		static void MidiAgent::SetVolume (QString source, float volume);
 };

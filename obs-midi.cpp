@@ -14,7 +14,7 @@
 #include <QtWidgets/QMainWindow>
 #include "config.h"
 #include "utils.h"
-
+#include "midi-agent.h"
 using namespace std;
 
 void ___source_dummy_addref(obs_source_t *) {}
@@ -34,15 +34,30 @@ OBS_MODULE_USE_DEFAULT_LOCALE("obs-midi", "en-US")
 
 ConfigPtr _config;
 
+float mapper (float x, float in_min=0, float in_max=127, float out_min=0, float out_max=1)
+{
+	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
 
 
-void midiin_callback(double deltatime, std::vector<unsigned char> *message, void *userData)
+
+	void midiin_callback(double deltatime, std::vector<unsigned char> *message, void *userData)
 {
 	unsigned int nBytes = message->size();
 	SettingsDialog *sd = static_cast<SettingsDialog *> (userData);
 	std::string byte1 = Utils::getMidiMessageType((int)message->at(0));
-	sd->pushDebugMidiMessage(std::to_string(deltatime), byte1,
-				 (int)message->at(1), (int)message->at(2));
+
+	int x = (int)message->at(1);
+	int y = (int)message->at(2);
+
+		sd->pushDebugMidiMessage(std::to_string(deltatime), byte1,
+				 x, mapper(y));
+	if  (x == 1) {
+		MidiAgent::SetVolume("Mic/Aux", mapper(y) );
+	}
+	if (x == 2) {
+		MidiAgent::SetVolume("Desktop Audio", mapper(y));
+	}
 }
 
 
@@ -87,6 +102,8 @@ bool obs_module_load(void)
 	settingsDialog->SetAvailableDevices(midiDevices);
 	
 	midiin->openPort(0);
+	midiin->setCallback(&midiin_callback, settingsDialog);
+	midiin->openPort(1);
 	midiin->setCallback(&midiin_callback, settingsDialog);
 	return true;
 }

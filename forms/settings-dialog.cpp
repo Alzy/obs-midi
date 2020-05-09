@@ -20,6 +20,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <map>
 #include <iostream>
 #include <utility>
+#include "midi-agent.h"
+
 #include "settings-dialog.h"
 #include "settings-midi-map.h"
 #include <QtWidgets\qdialogbuttonbox.h>
@@ -73,8 +75,10 @@ void SettingsDialog::pushDebugMidiMessage(std::string time, std::string message,
 
 void SettingsDialog::on_btn_configure_clicked()
 {
+	
 	pushDebugMidiMessage("time", "button clicked", 0, 0);
 	blog(LOG_INFO, "Configure button clicked");
+	
 	SettingsMidiMap mDialog;
 	mDialog.setModal(true);
 	mDialog.exec();

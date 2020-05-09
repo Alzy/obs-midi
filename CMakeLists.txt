@@ -52,13 +52,30 @@ elseif(WIN32)
 endif()
 
 
+
+
 # OBS MIDI
-include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/UI/obs-frontend-api")
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
+
+include_directories(
+        SYSTEM
+	${Qt5Core_INCLUDES}
+	${Qt5Widgets_INCLUDES}
+        "${CMAKE_SOURCE_DIR}/UI/obs-frontend-api")
 
 set(obs-midi_SOURCES
+        forms/settings-dialog.cpp
         obs-midi.cpp)
 
 list(APPEND obs-midi_HEADERS
+        forms/settings-dialog.h
         obs-midi.h)
 
 add_library(obs-midi MODULE
@@ -66,8 +83,10 @@ add_library(obs-midi MODULE
         ${obs-midi_HEADERS})
 
 target_link_libraries(obs-midi
-      ${obs-midi_DEPS}
-      obs-frontend-api
-      libobs)
+        ${obs-midi_DEPS}
+        obs-frontend-api
+        Qt5::Core
+        Qt5::Widgets
+        libobs)
 
 install_obs_plugin_with_data(obs-midi data)

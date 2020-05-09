@@ -1,31 +1,19 @@
 #include <iostream>
+
 #include <obs-module.h>
-#include <util/base.h>
+#include <obs-frontend-api.h>
+#include <obs-data.h>
+
 #include "RtMidi.h"
-#include <string>
-#include <map>
-#include <iostream>
 
-#include <utility>
-using namespace std;
+#include "forms/settings-dialog.h"
+#include <QtWidgets/QAction>
+#include <QtWidgets/QMainWindow>
+
 OBS_DECLARE_MODULE()
-map<int, string> Employees;
-std::string getMessageType(int in)
-{
+OBS_MODULE_USE_DEFAULT_LOCALE("obs-midi", "en-US")
 
-	std::string a = Employees[in];
-	return a;
-}
-void init() {
-	Employees.insert(std::pair<int, string>(176, "control_change"));
-	Employees.insert(std::pair<int, string>(128, "note_off"));
-	Employees.insert(std::pair<int, string>(144, "note_on"));
-	Employees.insert(std::pair<int, string>(192, "program_change"));
 
-	blog(LOG_INFO, "midi init");
-
-	blog(LOG_INFO, "getMessageType==: %s ", getMessageType(128).c_str());
-}
 
 void midiin_callback(double deltatime, std::vector<unsigned char> *message, void *userData)
 {
@@ -42,7 +30,6 @@ void midiin_callback(double deltatime, std::vector<unsigned char> *message, void
 bool obs_module_load(void)
 {
 	blog(LOG_INFO, "MIDI LOADED ");
-	init();
 
 	RtMidiIn *midiin = 0;
 	// RtMidiIn constructor
@@ -54,11 +41,13 @@ bool obs_module_load(void)
 	}
 
 	unsigned int nPorts = midiin->getPortCount();
+	std::vector<std::string> midiDevices;
 	blog(LOG_INFO, "Number of MIDI ports found: %d", nPorts);
 	for (unsigned int i = 0; i < nPorts; i++) {
 		try {
-			std::string portName = midiin->getPortName(i);
-			blog(LOG_INFO, "MIDI DEVICE FOUND: %s", portName.c_str());
+			std::string portName = midiin->getPortName(i).c_str();
+			blog(LOG_INFO, "MIDI DEVICE FOUND: %s", portName);
+			midiDevices.push_back(portName);
 		} catch (RtMidiError &error) {
 			error.printMessage();
 		}
@@ -67,5 +56,19 @@ bool obs_module_load(void)
 	midiin->openPort(0);
 	midiin->setCallback(&midiin_callback);
 
+
+	// UI SETUP
+	QMainWindow *mainWindow = (QMainWindow *)obs_frontend_get_main_window();
+	SettingsDialog *settingsDialog = new SettingsDialog(mainWindow);
+
+	const char* menuActionText = obs_module_text("OBSMIDI.Settings.DialogTitle");
+	QAction* menuAction = (QAction*)obs_frontend_add_tools_menu_qaction(menuActionText);
+	QObject::connect(menuAction, &QAction::triggered, [settingsDialog] {
+		// The settings dialog belongs to the main window. Should be ok
+		// to pass the pointer to this QAction belonging to the main window
+		settingsDialog->ToggleShowHide();
+	});
+	settingsDialog->SetAvailableDevices(midiDevices);
+	
 	return true;
 }

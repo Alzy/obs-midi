@@ -1,7 +1,4 @@
 /*
-obs-websocket
-Copyright (C) 2016-2017	Stéphane Lepin <stephane.lepin@gmail.com>
-
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -43,9 +40,15 @@ void SettingsDialog::ToggleShowHide() {
 
 void SettingsDialog::SetAvailableDevices(std::vector<std::string> &midiDevices)
 {
+	this->ui->list_midi_dev->clear();
+
+	if (midiDevices.size() == 0){
+		this->ui->list_midi_dev->addItem("No Devices Available");
+		return;
+	}
+
 	for (int i = 0; i < midiDevices.size(); i++) {
 		this->ui->list_midi_dev->addItem(midiDevices.at(i).c_str());
-		return;
 	}
 }
 

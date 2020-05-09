@@ -36,7 +36,7 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QListView" name="list_midi_dev"/>
+      <widget class="QListWidget" name="list_midi_dev"/>
      </item>
     </layout>
    </item>

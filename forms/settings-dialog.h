@@ -30,6 +30,7 @@ public:
 	explicit SettingsDialog(QWidget* parent = 0);
 	~SettingsDialog();
 	void ToggleShowHide();
+	void SetAvailableDevices(std::vector<std::string> &midiDevices);
 
 private Q_SLOTS:
 	void FormAccepted();

@@ -39,11 +39,13 @@ bool obs_module_load(void)
 	}
 
 	unsigned int nPorts = midiin->getPortCount();
+	std::vector<std::string> midiDevices;
 	blog(LOG_INFO, "Number of MIDI ports found: %d", nPorts);
 	for (unsigned int i = 0; i < nPorts; i++) {
 		try {
-			std::string portName = midiin->getPortName(i);
-			blog(LOG_INFO, "MIDI DEVICE FOUND: %s", &portName);
+			std::string portName = midiin->getPortName(i).c_str();
+			blog(LOG_INFO, "MIDI DEVICE FOUND: %s", portName);
+			midiDevices.push_back(portName);
 		} catch (RtMidiError &error) {
 			error.printMessage();
 		}
@@ -64,6 +66,7 @@ bool obs_module_load(void)
 		// to pass the pointer to this QAction belonging to the main window
 		settingsDialog->ToggleShowHide();
 	});
+	settingsDialog->SetAvailableDevices(midiDevices);
 	
 	return true;
 }

@@ -16,8 +16,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #pragma once
 
 #include <QtWidgets/QDialog>
-
+#include "settings-midi-map.h"
 #include "ui_settings-dialog.h"
+#include "ui_settings-midi-map.h"
+
 
 class SettingsDialog : public QDialog
 {
@@ -29,10 +31,12 @@ public:
 	void ToggleShowHide();
 	void SetAvailableDevices(std::vector<std::string> &midiDevices);
         void pushDebugMidiMessage(std::string time, std::string message, int control, int value);
+	void on_btn_configure_clicked();
 
 private Q_SLOTS:
 	void FormAccepted();
 
 private:
 	Ui::SettingsDialog* ui;
+	SettingsMidiMap *mDialog;
 };

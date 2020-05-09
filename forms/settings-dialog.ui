@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>679</width>
-    <height>564</height>
+    <width>848</width>
+    <height>589</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,7 +25,8 @@
    </property>
    <property name="font">
     <font>
-     <pointsize>16</pointsize>
+     <family>Tahoma</family>
+     <pointsize>12</pointsize>
     </font>
    </property>
    <property name="text">
@@ -55,7 +56,7 @@
     <rect>
      <x>310</x>
      <y>220</y>
-     <width>351</width>
+     <width>531</width>
      <height>281</height>
     </rect>
    </property>
@@ -81,6 +82,16 @@
      <string>Message</string>
     </property>
    </column>
+   <column>
+    <property name="text">
+     <string>Control</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Value</string>
+    </property>
+   </column>
   </widget>
   <widget class="QCheckBox" name="check_enabled">
    <property name="geometry">
@@ -93,7 +104,8 @@
    </property>
    <property name="font">
     <font>
-     <pointsize>14</pointsize>
+     <family>Tahoma</family>
+     <pointsize>12</pointsize>
     </font>
    </property>
    <property name="text">
@@ -114,7 +126,8 @@
    </property>
    <property name="font">
     <font>
-     <pointsize>14</pointsize>
+     <family>Tahoma</family>
+     <pointsize>12</pointsize>
     </font>
    </property>
    <property name="autoFillBackground">
@@ -138,14 +151,15 @@
    </property>
    <property name="font">
     <font>
-     <pointsize>16</pointsize>
+     <family>Tahoma</family>
+     <pointsize>12</pointsize>
     </font>
    </property>
    <property name="text">
     <string>Devices</string>
    </property>
    <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    <set>Qt::AlignCenter</set>
    </property>
   </widget>
   <widget class="QDialogButtonBox" name="buttonBox">
@@ -153,7 +167,7 @@
     <rect>
      <x>310</x>
      <y>510</y>
-     <width>351</width>
+     <width>531</width>
      <height>23</height>
     </rect>
    </property>
@@ -166,5 +180,22 @@
   </widget>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>clicked(QAbstractButton*)</signal>
+   <receiver>SettingsDialog</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>575</x>
+     <y>521</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>423</x>
+     <y>294</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

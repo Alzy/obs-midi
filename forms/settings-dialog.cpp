@@ -19,6 +19,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <iostream>
 #include <utility>
 #include "settings-dialog.h"
+#include "settings-midi-map.h"
 #include <QtWidgets\qdialogbuttonbox.h>
 
 #define CHANGE_ME "changeme"
@@ -71,6 +72,16 @@ void SettingsDialog::FormAccepted() {
 	return;
 }
 
+
+
+
 SettingsDialog::~SettingsDialog() {
 	delete ui;
+}
+
+void SettingsDialog::on_btn_configure_clicked()
+{
+    SettingsMidiMap mDialog;
+    mDialog.setModal(true);
+    mDialog.exec();
 }

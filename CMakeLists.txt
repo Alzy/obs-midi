@@ -53,6 +53,8 @@ endif()
 
 
 # OBS MIDI
+include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/UI/obs-frontend-api")
+
 set(obs-midi_SOURCES
         obs-midi.cpp)
 
@@ -65,6 +67,7 @@ add_library(obs-midi MODULE
 
 target_link_libraries(obs-midi
       ${obs-midi_DEPS}
+      obs-frontend-api
       libobs)
 
 install_obs_plugin_with_data(obs-midi data)

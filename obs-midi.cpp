@@ -66,7 +66,7 @@ bool obs_module_load(void)
 	for (unsigned int i = 0; i < nPorts; i++) {
 		try {
 			std::string portName = midiin->getPortName(i).c_str();
-			blog(LOG_INFO, "MIDI DEVICE FOUND: %s", portName);
+			blog(LOG_INFO, "MIDI DEVICE FOUND: %s", portName.c_str());
 			midiDevices.push_back(portName);
 		} catch (RtMidiError &error) {
 			error.printMessage();

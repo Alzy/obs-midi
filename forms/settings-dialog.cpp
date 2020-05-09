@@ -14,6 +14,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 */
 
 #include <obs-frontend-api.h>
+#include <obs-module.h>
+#include <obs-data.h>
 #include <string>
 #include <map>
 #include <iostream>
@@ -29,6 +31,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) :
 	ui(new Ui::SettingsDialog)
 {
 	ui->setupUi(this);
+	connect(ui->btn_configure, &QPushButton::clicked, this,&SettingsDialog::on_btn_configure_clicked);
 
 	connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::FormAccepted);
 }
@@ -70,9 +73,11 @@ void SettingsDialog::pushDebugMidiMessage(std::string time, std::string message,
 
 void SettingsDialog::on_btn_configure_clicked()
 {
-    SettingsMidiMap mDialog;
-    mDialog.setModal(true);
-    mDialog.exec();
+	pushDebugMidiMessage("time", "button clicked", 0, 0);
+	blog(LOG_INFO, "Configure button clicked");
+	SettingsMidiMap mDialog;
+	mDialog.setModal(true);
+	mDialog.exec();
 }
 
 

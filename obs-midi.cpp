@@ -2,9 +2,30 @@
 #include <obs-module.h>
 #include <util/base.h>
 #include "RtMidi.h"
+#include <string>
+#include <map>
+#include <iostream>
 
+#include <utility>
+using namespace std;
 OBS_DECLARE_MODULE()
+map<int, string> Employees;
+std::string getMessageType(int in)
+{
 
+	std::string a = Employees[in];
+	return a;
+}
+void init() {
+	Employees.insert(std::pair<int, string>(176, "control_change"));
+	Employees.insert(std::pair<int, string>(128, "note_off"));
+	Employees.insert(std::pair<int, string>(144, "note_on"));
+	Employees.insert(std::pair<int, string>(192, "program_change"));
+
+	blog(LOG_INFO, "midi init");
+
+	blog(LOG_INFO, "getMessageType==: %s ", getMessageType(128).c_str());
+}
 
 void midiin_callback(double deltatime, std::vector<unsigned char> *message, void *userData)
 {
@@ -21,6 +42,8 @@ void midiin_callback(double deltatime, std::vector<unsigned char> *message, void
 bool obs_module_load(void)
 {
 	blog(LOG_INFO, "MIDI LOADED ");
+	init();
+
 	RtMidiIn *midiin = 0;
 	// RtMidiIn constructor
 	try {
@@ -35,7 +58,7 @@ bool obs_module_load(void)
 	for (unsigned int i = 0; i < nPorts; i++) {
 		try {
 			std::string portName = midiin->getPortName(i);
-			blog(LOG_INFO, "MIDI DEVICE FOUND: %s", &portName);
+			blog(LOG_INFO, "MIDI DEVICE FOUND: %s", portName.c_str());
 		} catch (RtMidiError &error) {
 			error.printMessage();
 		}

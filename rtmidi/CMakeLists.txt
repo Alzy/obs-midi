@@ -9,7 +9,7 @@ elseif(UNIX)
     add_definitions(-D__LINUX_ALSA__ -fPIC -lalsa)
 endif()
 
-endif()
+
 set(RTMIDI_SOURCES
         RtMidi.cpp
         rtmidi_c.cpp)

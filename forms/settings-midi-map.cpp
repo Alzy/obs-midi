@@ -90,7 +90,12 @@ void SettingsMidiMap::MakeInputTypeCombo(int row)
 	ui->tbl_midimap->setItem(row, 2, new QTableWidgetItem);
 	ui->tbl_midimap->setCellWidget(row, 2, combo);
 }
-void SettingsMidiMap::MakeBidirectional(int row) {}
+void SettingsMidiMap::MakeBidirectional(int row) {
+	QCheckBox *box = new QCheckBox();
+	box->setStyleSheet("margin-left:50%; margin-right:50%;");
+	ui->tbl_midimap->setItem(row, 3, new QTableWidgetItem);
+	ui->tbl_midimap->setCellWidget(row, 3, box);
+}
 void SettingsMidiMap::MakeFaderActionsCombo(int row, int existing)
 {
 	QComboBox *combo = new QComboBox;
@@ -147,9 +152,21 @@ void SettingsMidiMap::MakeButtonActionsCombo(int row, int existing)
 	ui->tbl_midimap->setItem(row, 4, new QTableWidgetItem);
 	ui->tbl_midimap->setCellWidget(row, 4, combo);
 }
-void SettingsMidiMap::MakeOption1(int row) {}
-void SettingsMidiMap::MakeOption2(int row) {}
-void SettingsMidiMap::MakeOption3(int row) {}
+void SettingsMidiMap::MakeOption1(int row) {
+	QComboBox *combo = new QComboBox;
+	ui->tbl_midimap->setItem(row, 5, new QTableWidgetItem);
+	ui->tbl_midimap->setCellWidget(row, 5, combo);
+}
+void SettingsMidiMap::MakeOption2(int row) {
+	QComboBox *combo = new QComboBox;
+	ui->tbl_midimap->setItem(row, 6, new QTableWidgetItem);
+	ui->tbl_midimap->setCellWidget(row, 6, combo);
+}
+void SettingsMidiMap::MakeOption3(int row) {
+	QComboBox *combo = new QComboBox;
+	ui->tbl_midimap->setItem(row, 7, new QTableWidgetItem);
+	ui->tbl_midimap->setCellWidget(row, 7, combo);
+}
 
 void SettingsMidiMap::AddRow(std::string mtype, int channel) {
 	//default Addrow
@@ -158,7 +175,7 @@ void SettingsMidiMap::AddRow(std::string mtype, int channel) {
 	SettingsMidiMap::MakeMtype(startrow, mtype);
 	SettingsMidiMap::MakeChannel(startrow, channel);
 	SettingsMidiMap::MakeBidirectional(startrow);
-	if (mtype == "control_channel") {
+	if (mtype == "control_change") {
 		SettingsMidiMap::MakeInputTypeCombo(startrow, 1);
 		SettingsMidiMap::MakeFaderActionsCombo(startrow, 0);	
 	} else if (mtype == "note_on" || mtype == "note_off") {

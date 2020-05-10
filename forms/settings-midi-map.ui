@@ -61,11 +61,6 @@
      <height>471</height>
     </rect>
    </property>
-   <row>
-    <property name="text">
-     <string>Default</string>
-    </property>
-   </row>
    <column>
     <property name="text">
      <string>Message Type</string>
@@ -74,6 +69,9 @@
    <column>
     <property name="text">
      <string>Channel</string>
+    </property>
+    <property name="textAlignment">
+     <set>AlignCenter</set>
     </property>
    </column>
    <column>
@@ -84,6 +82,9 @@
    <column>
     <property name="text">
      <string>Bidirectional</string>
+    </property>
+    <property name="textAlignment">
+     <set>AlignCenter</set>
     </property>
    </column>
    <column>
@@ -106,26 +107,6 @@
      <string>Options 3</string>
     </property>
    </column>
-   <item row="0" column="0">
-    <property name="text">
-     <string>control change</string>
-    </property>
-   </item>
-   <item row="0" column="1">
-    <property name="text">
-     <string>101</string>
-    </property>
-   </item>
-   <item row="0" column="2">
-    <property name="text">
-     <string>fader</string>
-    </property>
-   </item>
-   <item row="0" column="3">
-    <property name="checkState">
-     <enum>Checked</enum>
-    </property>
-   </item>
   </widget>
  </widget>
  <resources/>

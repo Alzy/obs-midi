@@ -15,10 +15,12 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #pragma once
 
+#include <vector>
 #include <QtWidgets/QDialog>
 #include "settings-midi-map.h"
 #include "ui_settings-dialog.h"
 #include "ui_settings-midi-map.h"
+#include "midi-agent.h"
 
 
 class SettingsDialog : public QDialog
@@ -26,7 +28,7 @@ class SettingsDialog : public QDialog
 	Q_OBJECT
 
 public:
-	explicit SettingsDialog(QWidget* parent = 0);
+	SettingsDialog(QWidget* parent, std::vector<MidiAgent *> activeMidiAgents);
 	~SettingsDialog();
 	void ToggleShowHide();
 	void SetAvailableDevices(std::vector<std::string> &midiDevices);

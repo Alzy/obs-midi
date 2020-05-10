@@ -28,11 +28,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #define CHANGE_ME "changeme"
 
-SettingsDialog::SettingsDialog(QWidget* parent) :
+SettingsDialog::SettingsDialog(QWidget *parent, vector<MidiAgent *> activeMidiAgents)
+	:
 	QDialog(parent, Qt::Dialog),
 	ui(new Ui::SettingsDialog)
 {
 	ui->setupUi(this);
+
 	connect(ui->btn_configure, &QPushButton::clicked, this,&SettingsDialog::on_btn_configure_clicked);
 
 	connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::FormAccepted);

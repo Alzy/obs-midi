@@ -35,6 +35,7 @@ MidiAgent::MidiAgent()
 MidiAgent::~MidiAgent()
 {
 	UnsetMidiDevice();
+	delete midiin;
 }
 
 void MidiAgent::SetMidiDevice(int port)

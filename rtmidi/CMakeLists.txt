@@ -15,9 +15,8 @@ elseif(UNIX)
     list(APPEND LINKLIBS ${ALSA_LIBRARY})
     list(APPEND PKGCONFIG_REQUIRES "alsa")
     list(APPEND API_DEFS "-D__LINUX_ALSA__")
-    list(APPEND API_DEFS "-fPIC")
-
     list(APPEND API_LIST "alsa")
+    add_definitions(-fPIC)
 
 endif()
 

@@ -71,12 +71,20 @@ bool obs_module_load(void)
 		// The settings dialog belongs to the main window. Should be ok
 		// to pass the pointer to this QAction belonging to the main window
 		settingsDialog->ToggleShowHide();
-	});
-	//settingsDialog->SetAvailableDevices(midiDevices);
-	
-	//midiin->openPort(0);
-	//midiin->setCallback(&midiin_callback, settingsDialog);
+		if (settingsDialog->isVisible()) {
+			RtMidi *sdMidi = new RtMidiIn();
 
+			int nDevices = sdMidi->getPortCount();
+			if (nDevices == 0 ) { return; }
+
+			vector<string> devNames;
+			for (int i = 0; i < nDevices; i++) {
+				devNames.push_back(sdMidi->getPortName(i));
+			}
+			settingsDialog->SetAvailableDevices(devNames);
+		}
+	});
+	
 	return true;
 }
 

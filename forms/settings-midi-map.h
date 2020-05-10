@@ -27,13 +27,18 @@ public:
 	explicit SettingsMidiMap(QWidget *parent = 0);
 	~SettingsMidiMap();
 	void ToggleShowHide();
-	void MakeTypeCombo(int row);
-	void MakeTypeCombo(int row, int existing);
+	void MakeMtype(int row, std::string Mtype);
+	void MakeChannel(int row,int Mtype);
+	void MakeInputTypeCombo(int row);
+	void MakeInputTypeCombo(int row, int existing);
+	void MakeBidirectional(int row);
 	void MakeFaderActionsCombo(int row);
 	void MakeFaderActionsCombo(int row, int existing);
-
 	void MakeButtonActionsCombo(int row);
 	void MakeButtonActionsCombo(int row, int existing);
+	void MakeOption1(int row);
+	void MakeOption2(int row);
+	void MakeOption3(int row);
 	void AddRow(std::string mtype, int channel);
 	void AddRow(std::string mtype, int channel, int input_type,
 		    bool bidirectional, int action);

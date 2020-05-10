@@ -19,6 +19,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <QtWidgets\qdialogbuttonbox.h>
 #include <QDialog>
 #include <qcombobox.h>
+#include <qlabel.h>
+#include <qcheckbox.h>
 #include <QMessageBox>
 #define CHANGE_ME "changeme"
 
@@ -28,10 +30,10 @@ SettingsMidiMap::SettingsMidiMap(QWidget *parent)
 {
 
 	ui->setupUi(this);
-	SettingsMidiMap::MakeTypeCombo(0);
+	
 	SettingsMidiMap::AddRow("control_change", 1);
-	SettingsMidiMap::AddRow("control_change", 2);
 	SettingsMidiMap::AddRow("control_change", 3);
+	SettingsMidiMap::AddRow("control_change", 2);
 	
 }
 
@@ -56,7 +58,7 @@ SettingsMidiMap::~SettingsMidiMap()
 	delete ui;
 }
 
-void SettingsMidiMap::MakeTypeCombo(int row, int existing) {
+void SettingsMidiMap::MakeInputTypeCombo(int row, int existing) {
 	QComboBox* combo = new QComboBox;
 	combo->insertItem(0,"button");
 	combo->insertItem(1,"fader");
@@ -66,7 +68,20 @@ void SettingsMidiMap::MakeTypeCombo(int row, int existing) {
 	ui->tbl_midimap->setItem(row, 2, new QTableWidgetItem);
 	ui->tbl_midimap->setCellWidget(row, 2, combo);
 }
-void SettingsMidiMap::MakeTypeCombo(int row)
+void SettingsMidiMap::MakeMtype(int row, std::string Mtype) {
+	QLabel *label = new QLabel();
+	label->setText(QString::fromStdString(Mtype));
+	ui->tbl_midimap->setItem(row, 0, new QTableWidgetItem);
+	ui->tbl_midimap->setCellWidget(row, 0, label);
+}
+void SettingsMidiMap::MakeChannel(int row,int channel) {
+	QLabel *label = new QLabel();
+	label->setText(QString::number(channel));
+	ui->tbl_midimap->setItem(row, 1, new QTableWidgetItem);
+	ui->tbl_midimap->setCellWidget(row, 1, label);
+	
+}
+void SettingsMidiMap::MakeInputTypeCombo(int row)
 {
 	QComboBox *combo = new QComboBox;
 	combo->insertItem(0, "button");
@@ -75,7 +90,9 @@ void SettingsMidiMap::MakeTypeCombo(int row)
 	ui->tbl_midimap->setItem(row, 2, new QTableWidgetItem);
 	ui->tbl_midimap->setCellWidget(row, 2, combo);
 }
-void SettingsMidiMap::MakeFaderActionsCombo(int row, int existing) {
+void SettingsMidiMap::MakeBidirectional(int row) {}
+void SettingsMidiMap::MakeFaderActionsCombo(int row, int existing)
+{
 	QComboBox *combo = new QComboBox;
 	combo->insertItem(0, "SetVolume");
 	combo->insertItem(1, "SetSyncOffset");
@@ -90,7 +107,8 @@ void SettingsMidiMap::MakeFaderActionsCombo(int row, int existing) {
 	ui->tbl_midimap->setItem(row, 4, new QTableWidgetItem);
 	ui->tbl_midimap->setCellWidget(row, 4, combo);
 }
-void SettingsMidiMap::MakeButtonActionsCombo(int row, int existing) {
+void SettingsMidiMap::MakeButtonActionsCombo(int row, int existing)
+{
 	QComboBox *combo = new QComboBox;
 	combo->insertItem(0, "SetCurrentScene");
 	combo->insertItem(1, "SetPreviewScene");
@@ -129,32 +147,28 @@ void SettingsMidiMap::MakeButtonActionsCombo(int row, int existing) {
 	ui->tbl_midimap->setItem(row, 4, new QTableWidgetItem);
 	ui->tbl_midimap->setCellWidget(row, 4, combo);
 }
+void SettingsMidiMap::MakeOption1(int row) {}
+void SettingsMidiMap::MakeOption2(int row) {}
+void SettingsMidiMap::MakeOption3(int row) {}
+
 void SettingsMidiMap::AddRow(std::string mtype, int channel) {
 	//default Addrow
 	int startrow = ui->tbl_midimap->rowCount();
 	ui->tbl_midimap->insertRow(startrow);
-	ui->tbl_midimap->setItem(startrow, 0, new QTableWidgetItem);
-	ui->tbl_midimap->setItem(startrow, 1, new QTableWidgetItem);
-	ui->tbl_midimap->setCurrentCell(startrow, 1);
-	QTableWidgetItem *x = ui->tbl_midimap->currentItem();
+	SettingsMidiMap::MakeMtype(startrow, mtype);
+	SettingsMidiMap::MakeChannel(startrow, channel);
+	SettingsMidiMap::MakeBidirectional(startrow);
+	if (mtype == "control_channel") {
+		SettingsMidiMap::MakeInputTypeCombo(startrow, 1);
+		SettingsMidiMap::MakeFaderActionsCombo(startrow, 0);	
+	} else if (mtype == "note_on" || mtype == "note_off") {
+		SettingsMidiMap::MakeInputTypeCombo(startrow, 0);
+		SettingsMidiMap::MakeButtonActionsCombo(startrow, 0);	
 	
-	x = new QTableWidgetItem(QString::fromStdString(mtype));
-	ui->tbl_midimap->setCurrentCell(startrow, 2);
-	QTableWidgetItem *y = ui->tbl_midimap->currentItem();
-	y = new QTableWidgetItem(QString::number(channel));
-	
-	
-	
-	ui->tbl_midimap->setItem(startrow, 2, new QTableWidgetItem);
-	ui->tbl_midimap->setItem(startrow, 3, new QTableWidgetItem);
-
-	SettingsMidiMap::MakeTypeCombo(startrow, 1);
-	ui->tbl_midimap->setItem(startrow, 4, new QTableWidgetItem);
-	SettingsMidiMap::MakeFaderActionsCombo(startrow, 0);
-	ui->tbl_midimap->setItem(startrow, 5, new QTableWidgetItem);
-	ui->tbl_midimap->setItem(startrow, 6, new QTableWidgetItem);
-	ui->tbl_midimap->setItem(startrow, 7, new QTableWidgetItem);
-
+	}
+	SettingsMidiMap::MakeOption1(startrow);
+	SettingsMidiMap::MakeOption2(startrow);
+	SettingsMidiMap::MakeOption3(startrow);
 
 }
 
@@ -163,25 +177,20 @@ void SettingsMidiMap::AddRow(std::string mtype, int channel, int input_type, boo
 	    int action)
 {
 	//addrow for use from saves
-	int startrow = ui->tbl_midimap->rowCount() ;
+	//default Addrow
+	int startrow = ui->tbl_midimap->rowCount();
 	ui->tbl_midimap->insertRow(startrow);
-	ui->tbl_midimap->setItem(startrow, 0, new QTableWidgetItem);
-	ui->tbl_midimap->setItem(startrow, 1, new QTableWidgetItem);
-	ui->tbl_midimap->setCurrentCell(startrow, 0);
-	QTableWidgetItem *x = ui->tbl_midimap->currentItem();
-
-	x = new QTableWidgetItem(mtype.c_str());
-	ui->tbl_midimap->setCurrentCell(startrow, 1);
-	QTableWidgetItem *y = ui->tbl_midimap->currentItem();
-	y = new QTableWidgetItem(QString::number(channel));
-
-	ui->tbl_midimap->setItem(startrow, 2, new QTableWidgetItem);
-	ui->tbl_midimap->setItem(startrow, 3, new QTableWidgetItem);
-
-	SettingsMidiMap::MakeTypeCombo(startrow, 1);
-	ui->tbl_midimap->setItem(startrow, 4, new QTableWidgetItem);
-	SettingsMidiMap::MakeFaderActionsCombo(startrow, 0);
-	ui->tbl_midimap->setItem(startrow, 5, new QTableWidgetItem);
-	ui->tbl_midimap->setItem(startrow, 6, new QTableWidgetItem);
-	ui->tbl_midimap->setItem(startrow, 7, new QTableWidgetItem);
+	SettingsMidiMap::MakeMtype(startrow, mtype);
+	SettingsMidiMap::MakeChannel(startrow, channel);
+	SettingsMidiMap::MakeBidirectional(startrow);
+	if (mtype == "control_channel") {
+		SettingsMidiMap::MakeInputTypeCombo(startrow, 1);
+		SettingsMidiMap::MakeFaderActionsCombo(startrow, 0);
+	} else if (mtype == "note_on" || mtype == "note_off") {
+		SettingsMidiMap::MakeInputTypeCombo(startrow, 0);
+		SettingsMidiMap::MakeButtonActionsCombo(startrow, 0);
+	}
+	SettingsMidiMap::MakeOption1(startrow);
+	SettingsMidiMap::MakeOption2(startrow);
+	SettingsMidiMap::MakeOption3(startrow);
 }

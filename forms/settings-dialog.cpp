@@ -70,10 +70,10 @@ void SettingsDialog::pushDebugMidiMessage(std::string time, std::string message,
 {
 	int rowCount = this->ui->tbl_debug->rowCount();
 	this->ui->tbl_debug->insertRow(rowCount);
-	this->ui->tbl_debug->setItem(rowCount - 1, 0, new QTableWidgetItem (tr(time.c_str())));
-	this->ui->tbl_debug->setItem(rowCount - 1, 1, new QTableWidgetItem(tr(message.c_str())));
-	this->ui->tbl_debug->setItem(rowCount - 1, 2, new QTableWidgetItem(tr(std::to_string(control).c_str())));
-	this->ui->tbl_debug->setItem(rowCount - 1, 3, new QTableWidgetItem(tr(std::to_string(value).c_str())));
+	this->ui->tbl_debug->setItem(rowCount , 0, new QTableWidgetItem (tr(time.c_str())));
+	this->ui->tbl_debug->setItem(rowCount , 1, new QTableWidgetItem(tr(message.c_str())));
+	this->ui->tbl_debug->setItem(rowCount , 2, new QTableWidgetItem(tr(std::to_string(control).c_str())));
+	this->ui->tbl_debug->setItem(rowCount , 3, new QTableWidgetItem(tr(std::to_string(value).c_str())));
 }
 
 
@@ -97,7 +97,7 @@ int SettingsDialog::on_check_enabled_stateChanged(int state)
 void SettingsDialog::on_item_select()
 {
 	QString current = this->ui->list_midi_dev->currentItem()->text();
-	blog(LOG_INFO, "item clicked: %s", current.toLocal8Bit());
+	blog(LOG_INFO, "item clicked: %s", current.toLocal8Bit().data());
 	pushDebugMidiMessage("item clicked",current.toLocal8Bit().data(), 0, 0);
 	ui->check_enabled->setChecked(true);
 }

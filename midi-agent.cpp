@@ -20,21 +20,39 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #include "utils.h"
 #include "midi-agent.h"
-
+#include "obs-midi.h"
 
 MidiAgent::MidiAgent()
 {
-	//
+	midiin = new RtMidiIn();
+	midiin->setCallback(&MidiAgent::HandleInput);
 }
 
 MidiAgent::~MidiAgent()
 {
-	//
+	UnsetMidiDevice();
+}
+
+void MidiAgent::SetMidiDevice(int port)
+{
+	midiin->openPort(port);
+}
+
+void MidiAgent::UnsetMidiDevice()
+{
+	midiin->closePort();
+}
+
+void MidiAgent::HandleInput(double deltatime,
+			    std::vector<unsigned char> *message, void *userData)
+{
+	blog(LOG_INFO, "MIDI LOADED ");
 }
 
 void MidiAgent::SetVolume(QString source, float volume)
 {
-	OBSSourceAutoRelease obsSource = obs_get_source_by_name(source.toUtf8());
+	OBSSourceAutoRelease obsSource =
+		obs_get_source_by_name(source.toUtf8());
 	if (!obsSource) {
 		return; // source does not exist
 	}

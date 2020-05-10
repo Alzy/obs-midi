@@ -14,6 +14,7 @@
 #include <QtWidgets/QMainWindow>
 #include "config.h"
 #include "utils.h"
+#include "midi-agent.h"
 
 using namespace std;
 
@@ -51,27 +52,10 @@ bool obs_module_load(void)
 {
 	blog(LOG_INFO, "MIDI LOADED ");
 
-	RtMidiIn *midiin = 0;
-	// RtMidiIn constructor
-	try {
-		midiin = new RtMidiIn();
-	} catch (RtMidiError &error) {
-		// Handle the exception here
-		error.printMessage();
-	}
 
-	unsigned int nPorts = midiin->getPortCount();
-	std::vector<std::string> midiDevices;
-	blog(LOG_INFO, "Number of MIDI ports found: %d", nPorts);
-	for (unsigned int i = 0; i < nPorts; i++) {
-		try {
-			std::string portName = midiin->getPortName(i).c_str();
-			blog(LOG_INFO, "MIDI DEVICE FOUND: %s", portName);
-			midiDevices.push_back(portName);
-		} catch (RtMidiError &error) {
-			error.printMessage();
-		}
-	}
+	MidiAgent *midiA = new MidiAgent();
+	midiA->SetMidiDevice(0);
+	
 
 	// UI SETUP
 	QMainWindow *mainWindow = (QMainWindow *)obs_frontend_get_main_window();
@@ -84,10 +68,10 @@ bool obs_module_load(void)
 		// to pass the pointer to this QAction belonging to the main window
 		settingsDialog->ToggleShowHide();
 	});
-	settingsDialog->SetAvailableDevices(midiDevices);
+	//settingsDialog->SetAvailableDevices(midiDevices);
 	
-	midiin->openPort(0);
-	midiin->setCallback(&midiin_callback, settingsDialog);
+	//midiin->openPort(0);
+	//midiin->setCallback(&midiin_callback, settingsDialog);
 	return true;
 }
 

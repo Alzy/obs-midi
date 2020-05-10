@@ -49,6 +49,7 @@ class MidiAgent {
 		void TriggerInputCommand(MidiHook *hook, int midiVal);
 		void AddMidiHook(string mType, MidiHook *hook);
 		void RemoveMidiHook(string mType, MidiHook *hook);
+		void callCommand(int mtype, int commandint);
 
 		void SetVolume(QString source, float volume);
 

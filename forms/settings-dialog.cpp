@@ -90,6 +90,7 @@ void SettingsDialog::on_btn_configure_clicked()
 
 int SettingsDialog::on_check_enabled_stateChanged(int state)
 {
+	pushDebugMidiMessage("time", "Check State", state, 0);
 	return state;
 }
 
@@ -97,6 +98,7 @@ void SettingsDialog::on_item_select()
 {
 	QString current = this->ui->list_midi_dev->currentItem()->text();
 	blog(LOG_INFO, "item clicked: %s", current.toLocal8Bit());
+	pushDebugMidiMessage("item clicked",current.toLocal8Bit().data(), 0, 0);
 	ui->check_enabled->setChecked(true);
 }
 

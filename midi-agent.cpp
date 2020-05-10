@@ -17,6 +17,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #include <obs-frontend-api.h>
 #include <QtCore/QTime>
+//#include <Python.h>
 
 #include "utils.h"
 #include "midi-agent.h"
@@ -28,8 +29,8 @@ MidiAgent::MidiAgent()
 	midiin = new RtMidiIn();
 	midiin->setCallback(&MidiAgent::HandleInput, this);
 
-	MidiHook *mh = new MidiHook(36, "SetVolume", "Desktop Audio");
-	AddMidiHook("note_on", mh);
+	MidiHook *mh = new MidiHook(1, "SetVolume", "Desktop Audio");
+	AddMidiHook("control_change", mh);
 }
 
 MidiAgent::~MidiAgent()
@@ -70,6 +71,7 @@ void MidiAgent::TriggerInputCommand(MidiHook* hook, int midiVal)
 {
 	blog(LOG_INFO, "Triggered: %d [%d] %s %s", hook->index, midiVal, hook->command.c_str(),
 	     hook->param.c_str());
+
 }
 
 
@@ -112,3 +114,50 @@ void MidiAgent::SetVolume(QString source, float volume)
 
 	obs_source_set_volume(obsSource, volume);
 }
+
+
+/*ActionsType = {
+	"button": [
+		case 0: //"SetCurrentScene",break;
+		case 1://"SetPreviewScene",break;
+		case 2://"TransitionToProgram",break;
+		case 3://"SetCurrentTransition",break;
+		case 4://"SetSourceVisibility",break;
+		case 5://"ToggleSourceVisibility",break;
+		case 6://"ToggleMute",break;
+		case 7://"SetMute",break;
+		case 8://"StartStopStreaming",break;
+		case 9://"StartStreaming",break;
+		case 10://"StopStreaming",break;
+		case 11://"StartStopRecording",break;
+		case 12://"StartRecording",break;
+		case 13://"StopRecording",break;
+		case 14://"StartStopReplayBuffer",break;
+		case 15://"StartReplayBuffer",break;
+		case 16://"StopReplayBuffer",break;
+		case 17://"SaveReplayBuffer",break;
+		case 18://"PauseRecording",break;
+		case 19://"ResumeRecording",break;
+		case 20://"SetTransitionDuration",break;
+		case 21://"SetCurrentProfile",break;
+		case 22://"SetCurrentSceneCollection",break;
+		case 23://"ResetSceneItem",break;
+		case 24://"SetTextGDIPlusText",break;
+		case 25://"SetBrowserSourceURL",break;
+		case 26://"ReloadBrowserSource",break;
+		case 27://"TakeSourceScreenshot",break;
+		case 28://"EnableSourceFilter",break;
+		case 29://"DisableSourceFilter",break;
+		case 30://"ToggleSourceFilter" break;
+	],
+	"fader": [
+		"SetVolume",
+		"SetSyncOffset",
+		"SetSourcePosition",
+		"SetSourceRotation",
+		"SetSourceScale",
+		"SetTransitionDuration",
+		"SetGainFilter"
+	]
+}
+*/

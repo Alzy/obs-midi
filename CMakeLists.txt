@@ -61,7 +61,8 @@ set(CMAKE_AUTOUIC ON)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
+find_package(PythonLibs REQUIRED)
+include_directories(${PYTHON_INCLUDE_DIRS})
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
 
 include_directories(
@@ -92,6 +93,7 @@ add_library(obs-midi MODULE
 
 target_link_libraries(obs-midi
         ${obs-midi_DEPS}
+	${PYTHON_LIBRARIES}
         obs-frontend-api
         Qt5::Core
         Qt5::Widgets

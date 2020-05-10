@@ -30,10 +30,13 @@ public:
 	void MakeTypeCombo(int row);
 	void MakeTypeCombo(int row, int existing);
 	void MakeFaderActionsCombo(int row);
-	void MakeFaderActionsCombo(int row, int existing=0);
+	void MakeFaderActionsCombo(int row, int existing);
 
 	void MakeButtonActionsCombo(int row);
-	void MakeButtonActionsCombo(int row, int existing=0);
+	void MakeButtonActionsCombo(int row, int existing);
+	void AddRow(std::string mtype, int channel);
+	void AddRow(std::string mtype, int channel, int input_type,
+		    bool bidirectional, int action);
 
 
 private Q_SLOTS:

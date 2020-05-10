@@ -29,6 +29,10 @@ SettingsMidiMap::SettingsMidiMap(QWidget *parent)
 
 	ui->setupUi(this);
 	SettingsMidiMap::MakeTypeCombo(0);
+	SettingsMidiMap::AddRow("control_change", 1);
+	SettingsMidiMap::AddRow("control_change", 2);
+	SettingsMidiMap::AddRow("control_change", 3);
+	
 }
 
 
@@ -124,4 +128,60 @@ void SettingsMidiMap::MakeButtonActionsCombo(int row, int existing) {
 	}
 	ui->tbl_midimap->setItem(row, 4, new QTableWidgetItem);
 	ui->tbl_midimap->setCellWidget(row, 4, combo);
+}
+void SettingsMidiMap::AddRow(std::string mtype, int channel) {
+	//default Addrow
+	int startrow = ui->tbl_midimap->rowCount();
+	ui->tbl_midimap->insertRow(startrow);
+	ui->tbl_midimap->setItem(startrow, 0, new QTableWidgetItem);
+	ui->tbl_midimap->setItem(startrow, 1, new QTableWidgetItem);
+	ui->tbl_midimap->setCurrentCell(startrow, 1);
+	QTableWidgetItem *x = ui->tbl_midimap->currentItem();
+	
+	x = new QTableWidgetItem(QString::fromStdString(mtype));
+	ui->tbl_midimap->setCurrentCell(startrow, 2);
+	QTableWidgetItem *y = ui->tbl_midimap->currentItem();
+	y = new QTableWidgetItem(QString::number(channel));
+	
+	
+	
+	ui->tbl_midimap->setItem(startrow, 2, new QTableWidgetItem);
+	ui->tbl_midimap->setItem(startrow, 3, new QTableWidgetItem);
+
+	SettingsMidiMap::MakeTypeCombo(startrow, 1);
+	ui->tbl_midimap->setItem(startrow, 4, new QTableWidgetItem);
+	SettingsMidiMap::MakeFaderActionsCombo(startrow, 0);
+	ui->tbl_midimap->setItem(startrow, 5, new QTableWidgetItem);
+	ui->tbl_midimap->setItem(startrow, 6, new QTableWidgetItem);
+	ui->tbl_midimap->setItem(startrow, 7, new QTableWidgetItem);
+
+
+}
+
+
+void SettingsMidiMap::AddRow(std::string mtype, int channel, int input_type, bool bidirectional,
+	    int action)
+{
+	//addrow for use from saves
+	int startrow = ui->tbl_midimap->rowCount() ;
+	ui->tbl_midimap->insertRow(startrow);
+	ui->tbl_midimap->setItem(startrow, 0, new QTableWidgetItem);
+	ui->tbl_midimap->setItem(startrow, 1, new QTableWidgetItem);
+	ui->tbl_midimap->setCurrentCell(startrow, 0);
+	QTableWidgetItem *x = ui->tbl_midimap->currentItem();
+
+	x = new QTableWidgetItem(mtype.c_str());
+	ui->tbl_midimap->setCurrentCell(startrow, 1);
+	QTableWidgetItem *y = ui->tbl_midimap->currentItem();
+	y = new QTableWidgetItem(QString::number(channel));
+
+	ui->tbl_midimap->setItem(startrow, 2, new QTableWidgetItem);
+	ui->tbl_midimap->setItem(startrow, 3, new QTableWidgetItem);
+
+	SettingsMidiMap::MakeTypeCombo(startrow, 1);
+	ui->tbl_midimap->setItem(startrow, 4, new QTableWidgetItem);
+	SettingsMidiMap::MakeFaderActionsCombo(startrow, 0);
+	ui->tbl_midimap->setItem(startrow, 5, new QTableWidgetItem);
+	ui->tbl_midimap->setItem(startrow, 6, new QTableWidgetItem);
+	ui->tbl_midimap->setItem(startrow, 7, new QTableWidgetItem);
 }

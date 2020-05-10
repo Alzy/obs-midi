@@ -85,7 +85,7 @@ namespace Utils {
 	bool ReplayBufferEnabled();
 	void StartReplayBuffer();
 	bool IsRPHotkeySet();
-
+	float mapper(float x);
 	const char* GetFilenameFormatting();
 	bool SetFilenameFormatting(const char* filenameFormatting);
 

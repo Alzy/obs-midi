@@ -34,10 +34,7 @@ OBS_MODULE_USE_DEFAULT_LOCALE("obs-midi", "en-US")
 
 ConfigPtr _config;
 
-float mapper (float x, float in_min=0, float in_max=127, float out_min=0, float out_max=1)
-{
-	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-}
+
 
 
 
@@ -51,12 +48,12 @@ float mapper (float x, float in_min=0, float in_max=127, float out_min=0, float 
 	int y = (int)message->at(2);
 
 		sd->pushDebugMidiMessage(std::to_string(deltatime), byte1,
-				 x, mapper(y));
+				 x, Utils::mapper(y));
 	if  (x == 1) {
-		MidiAgent::SetVolume("Mic/Aux", mapper(y) );
+		MidiAgent::SetVolume("Mic/Aux", Utils::mapper(y) );
 	}
 	if (x == 2) {
-		MidiAgent::SetVolume("Desktop Audio", mapper(y));
+		MidiAgent::SetVolume("Desktop Audio", Utils::mapper(y));
 	}
 }
 

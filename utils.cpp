@@ -34,7 +34,15 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 Q_DECLARE_METATYPE(OBSScene);
 
+float Utils::mapper(float x)
 
+{
+	float in_min = 0;
+	float in_max = 127;
+	float out_min = 0;
+	float out_max = 1;
+	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
 
 std::string Utils::getMidiMessageType(int in)
 {

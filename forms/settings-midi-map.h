@@ -16,7 +16,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #pragma once
 
 #include <QtWidgets/QDialog>
-
+#include <qcombobox.h>
 #include "ui_settings-midi-map.h"
 
 class SettingsMidiMap : public QDialog
@@ -27,6 +27,14 @@ public:
 	explicit SettingsMidiMap(QWidget *parent = 0);
 	~SettingsMidiMap();
 	void ToggleShowHide();
+	void MakeTypeCombo(int row);
+	void MakeTypeCombo(int row, int existing);
+	void MakeFaderActionsCombo(int row);
+	void MakeFaderActionsCombo(int row, int existing);
+
+	void MakeButtonActionsCombo(int row);
+	void MakeButtonActionsCombo(int row, int existing);
+
 
 private Q_SLOTS:
 	void FormAccepted();

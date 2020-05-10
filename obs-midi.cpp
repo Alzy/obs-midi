@@ -15,6 +15,7 @@
 #include "config.h"
 #include "utils.h"
 #include "midi-agent.h"
+
 using namespace std;
 
 void ___source_dummy_addref(obs_source_t *) {}
@@ -38,7 +39,7 @@ ConfigPtr _config;
 
 
 
-	void midiin_callback(double deltatime, std::vector<unsigned char> *message, void *userData)
+void midiin_callback(double deltatime, std::vector<unsigned char> *message, void *userData)
 {
 	unsigned int nBytes = message->size();
 	SettingsDialog *sd = static_cast<SettingsDialog *> (userData);
@@ -47,14 +48,8 @@ ConfigPtr _config;
 	int x = (int)message->at(1);
 	int y = (int)message->at(2);
 
-		sd->pushDebugMidiMessage(std::to_string(deltatime), byte1,
+	sd->pushDebugMidiMessage(std::to_string(deltatime), byte1,
 				 x, Utils::mapper(y));
-	if  (x == 1) {
-		MidiAgent::SetVolume("Mic/Aux", Utils::mapper(y) );
-	}
-	if (x == 2) {
-		MidiAgent::SetVolume("Desktop Audio", Utils::mapper(y));
-	}
 }
 
 
@@ -63,27 +58,8 @@ bool obs_module_load(void)
 {
 	blog(LOG_INFO, "MIDI LOADED ");
 
-	RtMidiIn *midiin = 0;
-	// RtMidiIn constructor
-	try {
-		midiin = new RtMidiIn();
-	} catch (RtMidiError &error) {
-		// Handle the exception here
-		error.printMessage();
-	}
-
-	unsigned int nPorts = midiin->getPortCount();
-	std::vector<std::string> midiDevices;
-	blog(LOG_INFO, "Number of MIDI ports found: %d", nPorts);
-	for (unsigned int i = 0; i < nPorts; i++) {
-		try {
-			std::string portName = midiin->getPortName(i).c_str();
-			blog(LOG_INFO, "MIDI DEVICE FOUND: %s", portName.c_str());
-			midiDevices.push_back(portName);
-		} catch (RtMidiError &error) {
-			error.printMessage();
-		}
-	}
+	MidiAgent *midiA = new MidiAgent();
+	midiA->SetMidiDevice(0);
 
 	// UI SETUP
 	QMainWindow *mainWindow = (QMainWindow *)obs_frontend_get_main_window();
@@ -96,12 +72,11 @@ bool obs_module_load(void)
 		// to pass the pointer to this QAction belonging to the main window
 		settingsDialog->ToggleShowHide();
 	});
-	settingsDialog->SetAvailableDevices(midiDevices);
+	//settingsDialog->SetAvailableDevices(midiDevices);
 	
-	midiin->openPort(0);
-	midiin->setCallback(&midiin_callback, settingsDialog);
-	midiin->openPort(1);
-	midiin->setCallback(&midiin_callback, settingsDialog);
+	//midiin->openPort(0);
+	//midiin->setCallback(&midiin_callback, settingsDialog);
+
 	return true;
 }
 

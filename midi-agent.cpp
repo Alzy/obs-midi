@@ -17,23 +17,41 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #include <obs-frontend-api.h>
 #include <QtCore/QTime>
-#include "obs-midi.h"
 
 #include "utils.h"
 #include "midi-agent.h"
-
+#include "obs-midi.h"
 
 MidiAgent::MidiAgent()
 {
-	//
+	name = "Alfredo";
+	midiin = new RtMidiIn();
+	midiin->setCallback(&MidiAgent::HandleInput, this);
 }
 
 MidiAgent::~MidiAgent()
 {
-	//
+	UnsetMidiDevice();
 }
 
- void MidiAgent::SetVolume(QString source, float volume)
+void MidiAgent::SetMidiDevice(int port)
+{
+	midiin->openPort(port);
+}
+
+void MidiAgent::UnsetMidiDevice()
+{
+	midiin->closePort();
+}
+
+void MidiAgent::HandleInput(double deltatime,
+			    std::vector<unsigned char> *message, void *userData)
+{
+	MidiAgent* self = static_cast<MidiAgent *>(userData);
+	blog(LOG_INFO, "MIDI LOADED %s", self->name.c_str());
+}
+
+void MidiAgent::SetVolume(QString source, float volume)
 {
 	OBSSourceAutoRelease obsSource = obs_get_source_by_name(source.toUtf8());
 	if (!obsSource) {

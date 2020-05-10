@@ -21,9 +21,24 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <QtCore/QString>
 #include <QtCore/QSharedPointer>
 
+#include "RtMidi.h"
+
 class MidiAgent {
 	public:
 		MidiAgent();
 		~MidiAgent();
-		static void MidiAgent::SetVolume (QString source, float volume);
+
+		void SetMidiDevice(int port);
+		void UnsetMidiDevice();
+		static void HandleInput(double deltatime,
+				 std::vector<unsigned char> *message,
+				 void *userData);
+
+		void SetVolume(QString source, float volume);
+
+	private:
+		RtMidiIn *midiin;
+		int port;
+		std::string name;
+
 };

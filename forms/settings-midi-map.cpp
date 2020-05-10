@@ -26,7 +26,9 @@ SettingsMidiMap::SettingsMidiMap(QWidget *parent)
 	:
 	QDialog(parent, Qt::Dialog), ui(new Ui::SettingsMidiMap)
 {
+
 	ui->setupUi(this);
+	SettingsMidiMap::MakeTypeCombo(0);
 }
 
 
@@ -50,7 +52,7 @@ SettingsMidiMap::~SettingsMidiMap()
 	delete ui;
 }
 
-void SettingsMidiMap::MakeTypeCombo(int row, int existing=0) {
+void SettingsMidiMap::MakeTypeCombo(int row, int existing) {
 	QComboBox* combo = new QComboBox;
 	combo->insertItem(0,"button");
 	combo->insertItem(1,"fader");
@@ -60,7 +62,16 @@ void SettingsMidiMap::MakeTypeCombo(int row, int existing=0) {
 	ui->tbl_midimap->setItem(row, 2, new QTableWidgetItem);
 	ui->tbl_midimap->setCellWidget(row, 2, combo);
 }
-void SettingsMidiMap::MakeFaderActionsCombo(int row, int existing = 0) {
+void SettingsMidiMap::MakeTypeCombo(int row)
+{
+	QComboBox *combo = new QComboBox;
+	combo->insertItem(0, "button");
+	combo->insertItem(1, "fader");
+
+	ui->tbl_midimap->setItem(row, 2, new QTableWidgetItem);
+	ui->tbl_midimap->setCellWidget(row, 2, combo);
+}
+void SettingsMidiMap::MakeFaderActionsCombo(int row, int existing) {
 	QComboBox *combo = new QComboBox;
 	combo->insertItem(0, "SetVolume");
 	combo->insertItem(1, "SetSyncOffset");
@@ -75,7 +86,7 @@ void SettingsMidiMap::MakeFaderActionsCombo(int row, int existing = 0) {
 	ui->tbl_midimap->setItem(row, 4, new QTableWidgetItem);
 	ui->tbl_midimap->setCellWidget(row, 4, combo);
 }
-void SettingsMidiMap::MakeButtonActionsCombo(int row, int existing = 0) {
+void SettingsMidiMap::MakeButtonActionsCombo(int row, int existing) {
 	QComboBox *combo = new QComboBox;
 	combo->insertItem(0, "SetCurrentScene");
 	combo->insertItem(1, "SetPreviewScene");

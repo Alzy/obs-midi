@@ -30,10 +30,10 @@ public:
 	void MakeTypeCombo(int row);
 	void MakeTypeCombo(int row, int existing);
 	void MakeFaderActionsCombo(int row);
-	void MakeFaderActionsCombo(int row, int existing);
+	void MakeFaderActionsCombo(int row, int existing=0);
 
 	void MakeButtonActionsCombo(int row);
-	void MakeButtonActionsCombo(int row, int existing);
+	void MakeButtonActionsCombo(int row, int existing=0);
 
 
 private Q_SLOTS:

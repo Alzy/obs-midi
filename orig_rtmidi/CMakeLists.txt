@@ -235,13 +235,13 @@ set(RTMIDI_CMAKE_DESTINATION share/rtmidi)
 
 # Create CMake configuration export file.
 if(NEED_PTHREAD)
-  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/plugins/obs-midi/rtmidi/RtMidiConfig.cmake "find_package(Threads REQUIRED)\n")
+  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/RtMidiConfig.cmake "find_package(Threads REQUIRED)\n")
 endif()
 
-file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/plugins/obs-midi/rtmidi/RtMidiConfig.cmake "include(\${CMAKE_CURRENT_LIST_DIR}/RtMidiTargets.cmake)")
+file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/RtMidiConfig.cmake "include(\${CMAKE_CURRENT_LIST_DIR}/RtMidiTargets.cmake)")
 
 # Install CMake configuration export file.
-install(FILES ${CMAKE_BINARY_DIR}/plugins/obs-midi/rtmidi/RtMidiConfig.cmake
+install(FILES ${CMAKE_BINARY_DIR}/RtMidiConfig.cmake
         DESTINATION ${RTMIDI_CMAKE_DESTINATION})
 
 # Export library target (build-tree).
@@ -256,10 +256,11 @@ install(EXPORT RtMidiTargets
 # Configure uninstall target.
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/RtMidiConfigUninstall.cmake.in"
-    "${CMAKE_BINARY_DIR}/plugins/obs-midi/rtmidi/RtMidiConfigUninstall.cmake" @ONLY)
+    "${CMAKE_BINARY_DIR}/RtMidiConfigUninstall.cmake" @ONLY)
 
 # Create uninstall target.
-add_custom_target(${RTMIDI_TARGETNAME_UNINSTALL})
+add_custom_target(${RTMIDI_TARGETNAME_UNINSTALL}
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/RtMidiConfigUninstall.cmake)
 
 install(
     FILES ${CMAKE_CURRENT_BINARY_DIR}/rtmidi.pc

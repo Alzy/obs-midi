@@ -6,7 +6,7 @@ if (WIN32)
 elseif(APPLE)
     add_definitions(-D__MACOSX_CORE__)
 elseif(UNIX)
-    add_definitions(-D__LINUX_ALSA__)
+    add_definitions(-D__LINUX_ALSA__ -fPIC)
 endif()
 
 set(RTMIDI_SOURCES

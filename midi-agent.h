@@ -51,7 +51,6 @@ class MidiAgent {
 		void RemoveMidiHook(string mType, MidiHook *hook);
 		void callCommand(int mtype, int commandint);
 
-		void SetVolume(QString source, float volume);
 
 	private:
 		RtMidiIn *midiin;

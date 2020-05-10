@@ -61,8 +61,7 @@ set(CMAKE_AUTOUIC ON)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-find_package(PythonLibs REQUIRED)
-include_directories(${PYTHON_INCLUDE_DIRS})
+
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
 
 include_directories(
@@ -75,6 +74,7 @@ set(obs-midi_SOURCES
         utils.cpp
 	config.cpp
 	midi-agent.cpp
+	obs-controller.cpp
         forms/settings-dialog.cpp
         forms/settings-midi-map.cpp
         obs-midi.cpp)
@@ -83,6 +83,7 @@ list(APPEND obs-midi_HEADERS
         utils.h
 	config.h
 	midi-agent.h
+	obs-controller.h
         forms/settings-dialog.h
         forms/settings-midi-map.h
         obs-midi.h)
@@ -93,7 +94,6 @@ add_library(obs-midi MODULE
 
 target_link_libraries(obs-midi
         ${obs-midi_DEPS}
-	${PYTHON_LIBRARIES}
         obs-frontend-api
         Qt5::Core
         Qt5::Widgets

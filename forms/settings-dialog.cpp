@@ -35,8 +35,10 @@ SettingsDialog::SettingsDialog(QWidget *parent, vector<MidiAgent *> activeMidiAg
 {
 	ui->setupUi(this);
 
-	connect(ui->btn_configure, &QPushButton::clicked, this,&SettingsDialog::on_btn_configure_clicked);
+	connect(ui->list_midi_dev, &QListWidget::itemSelectionChanged, this, &SettingsDialog::on_item_select);
 	connect(ui->check_enabled, &QCheckBox::stateChanged, this, &SettingsDialog::on_check_enabled_stateChanged);
+	connect(ui->btn_configure, &QPushButton::clicked, this,&SettingsDialog::on_btn_configure_clicked);
+
 	connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::FormAccepted);
 }
 
@@ -86,11 +88,19 @@ void SettingsDialog::on_btn_configure_clicked()
 	mDialog.exec();
 }
 
-int SettingsDialog::on_check_enabled_stateChanged(int state) {
-
-
-
+int SettingsDialog::on_check_enabled_stateChanged(int state)
+{
+	return state;
 }
+
+void SettingsDialog::on_item_select()
+{
+	QString current = this->ui->list_midi_dev->currentItem()->text();
+	blog(LOG_INFO, "item clicked: %s", current.toLocal8Bit());
+	ui->check_enabled->setChecked(true);
+}
+
+
 void SettingsDialog::FormAccepted()
 {
 	return;

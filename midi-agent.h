@@ -38,6 +38,7 @@ class MidiAgent {
 	private:
 		RtMidiIn *midiin;
 		int port;
+		std::string name;
 
 
 };

@@ -24,8 +24,9 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 MidiAgent::MidiAgent()
 {
+	name = "Alfredo";
 	midiin = new RtMidiIn();
-	midiin->setCallback(&MidiAgent::HandleInput);
+	midiin->setCallback(&MidiAgent::HandleInput, this);
 }
 
 MidiAgent::~MidiAgent()
@@ -46,7 +47,8 @@ void MidiAgent::UnsetMidiDevice()
 void MidiAgent::HandleInput(double deltatime,
 			    std::vector<unsigned char> *message, void *userData)
 {
-	blog(LOG_INFO, "MIDI LOADED ");
+	MidiAgent* self = static_cast<MidiAgent *>(userData);
+	blog(LOG_INFO, "MIDI LOADED %s", self->name.c_str());
 }
 
 void MidiAgent::SetVolume(QString source, float volume)

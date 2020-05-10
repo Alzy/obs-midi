@@ -84,7 +84,7 @@ void SettingsDialog::on_btn_configure_clicked()
 	blog(LOG_INFO, "Configure button clicked");
 	
 	SettingsMidiMap mDialog;
-	mDialog.setModal(true);
+	//mDialog.setModal(true);
 	mDialog.exec();
 }
 
@@ -99,7 +99,16 @@ void SettingsDialog::on_item_select()
 	QString current = this->ui->list_midi_dev->currentItem()->text();
 	blog(LOG_INFO, "item clicked: %s", current.toLocal8Bit().data());
 	pushDebugMidiMessage("item clicked",current.toLocal8Bit().data(), 0, 0);
-	ui->check_enabled->setChecked(true);
+
+	// Pull info on if device is enabled, if so set true if not set false
+	ui->check_enabled->setChecked(false);
+
+	//If enabled, allow for configuration, if not disable it.
+	if (ui->check_enabled->checkState()) {
+		ui->btn_configure->setEnabled(true);
+	} else {
+		ui->btn_configure->setEnabled(false);
+	}
 }
 
 

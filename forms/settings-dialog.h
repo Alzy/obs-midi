@@ -34,6 +34,7 @@ public:
 	void SetAvailableDevices(std::vector<std::string> &midiDevices);
         void pushDebugMidiMessage(std::string time, std::string message, int control, int value);
 	void on_btn_configure_clicked();
+	int on_check_enabled_stateChanged(int state);
 
 private Q_SLOTS:
 	void FormAccepted();

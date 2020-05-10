@@ -36,7 +36,7 @@ SettingsDialog::SettingsDialog(QWidget *parent, vector<MidiAgent *> activeMidiAg
 	ui->setupUi(this);
 
 	connect(ui->btn_configure, &QPushButton::clicked, this,&SettingsDialog::on_btn_configure_clicked);
-
+	connect(ui->check_enabled, &QCheckBox::stateChanged, this, &SettingsDialog::on_check_enabled_stateChanged);
 	connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::FormAccepted);
 }
 
@@ -86,8 +86,13 @@ void SettingsDialog::on_btn_configure_clicked()
 	mDialog.exec();
 }
 
+int SettingsDialog::on_check_enabled_stateChanged(int state) {
 
-void SettingsDialog::FormAccepted() {
+
+
+}
+void SettingsDialog::FormAccepted()
+{
 	return;
 }
 

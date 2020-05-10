@@ -24,7 +24,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #include "settings-dialog.h"
 #include "settings-midi-map.h"
-#include <QtWidgets\qdialogbuttonbox.h>
+#include <qdialogbuttonbox.h>
 
 #define CHANGE_ME "changeme"
 

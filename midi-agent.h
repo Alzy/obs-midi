@@ -20,8 +20,21 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <obs-frontend-api.h>
 #include <QtCore/QString>
 #include <QtCore/QSharedPointer>
+#include <vector>
 
 #include "RtMidi.h"
+
+using namespace std;
+
+class MidiHook {
+public:
+	int index;
+	string command;
+	string param;
+
+	MidiHook(int i, string c, string p) : index(i), command(c), param(p) {}
+};
+
 
 class MidiAgent {
 	public:
@@ -31,14 +44,21 @@ class MidiAgent {
 		void SetMidiDevice(int port);
 		void UnsetMidiDevice();
 		static void HandleInput(double deltatime,
-				 std::vector<unsigned char> *message,
+				 vector<unsigned char> *message,
 				 void *userData);
+		void TriggerInputCommand(MidiHook *hook);
+		void AddMidiHook(string mType, MidiHook *hook);
+		void RemoveMidiHook(string mType, MidiHook *hook);
 
 		void SetVolume(QString source, float volume);
 
 	private:
 		RtMidiIn *midiin;
+		string name;
 		int port;
-		std::string name;
+		vector<MidiHook*> noteOnHooks;
+		vector<MidiHook*> noteOffHooks;
+		vector<MidiHook*> ccHooks;
 
+		vector<MidiHook *> &GetMidiHooksByType(string mType);
 };

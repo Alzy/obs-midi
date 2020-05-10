@@ -51,7 +51,6 @@ void MidiAgent::HandleInput(double deltatime,
 			    std::vector<unsigned char> *message, void *userData)
 {
 	MidiAgent *self = static_cast<MidiAgent *>(userData);
-	blog(LOG_INFO, "MIDI LOADED %s", self->name.c_str());
 
 	string mType = Utils::getMidiMessageType(message->at(0));
 	int mIndex = message->at(1);
@@ -61,14 +60,14 @@ void MidiAgent::HandleInput(double deltatime,
 	// check if hook exists for this note or cc index and launch it
 	for (unsigned i = 0; i < hooks->size(); i++) {
 		if (hooks->at(i)->index == mIndex) {
-			self->TriggerInputCommand(hooks->at(i));
+			self->TriggerInputCommand(hooks->at(i), (int)message->at(2));
 		}
 	}
 }
 
-void MidiAgent::TriggerInputCommand(MidiHook* hook)
+void MidiAgent::TriggerInputCommand(MidiHook* hook, int midiVal)
 {
-	blog(LOG_INFO, "Triggered: %d %s %s", hook->index, hook->command.c_str(),
+	blog(LOG_INFO, "Triggered: %d [%d] %s %s", hook->index, midiVal, hook->command.c_str(),
 	     hook->param.c_str());
 }
 

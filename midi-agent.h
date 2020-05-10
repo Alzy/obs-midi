@@ -46,7 +46,7 @@ class MidiAgent {
 		static void HandleInput(double deltatime,
 				 vector<unsigned char> *message,
 				 void *userData);
-		void TriggerInputCommand(MidiHook *hook);
+		void TriggerInputCommand(MidiHook *hook, int midiVal);
 		void AddMidiHook(string mType, MidiHook *hook);
 		void RemoveMidiHook(string mType, MidiHook *hook);
 

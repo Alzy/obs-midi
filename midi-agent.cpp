@@ -108,12 +108,18 @@ vector<MidiHook *>& MidiAgent::GetMidiHooksByType(string mType)
 	}
 }
 
+
+
+
+
+//The Following Functions are the meat and potatoes of actually executing midi functions.... these maps allow us to effectively exexute commands by using their string equivelents.
+// The Overloads handle the various paramaters we need to pass into obs
+
 void MidiAgent::executor(MidiHook *hook, std::string name, int midiVal)
 {
 	std::map < std::string,	std::function < void(std::string name, int value)>> funcMap = {
-		{"SetVolume", [](std::string audio,int  y) { float x = (float) y; OBSController::SetVolume(QString::fromStdString(audio), Utils::mapper(x)); }},
-		
-		{"sub", [](std::string x, int y) {  }}};
+		// as you can see here you can call more than one function per line if need be. may be useful if we need to get by name or id, or for data type conversion
+		{"SetVolume", [](std::string audio,int  y) { float x = (float) y; OBSController::SetVolume(QString::fromStdString(audio), Utils::mapper(x)); }}};
 	funcMap[hook->command](hook->param, midiVal);
 
 
@@ -148,14 +154,16 @@ void MidiAgent::executor(MidiHook *hook){
 		{"ResumeRecording", []() { OBSController::ResumeRecording(); }}};
 	funcMap[hook->command]();
 	}
-
+//probably the best one to look at to see how it all works
 void MidiAgent::executor(MidiHook *hook, std::string name){
+	//remaps things
 	std::map<std::string, std::function<void(std::string name)>> funcMap = {
 		{"SetCurrentScene", [](std::string sceneName) {  OBSController::SetCurrentScene(sceneName.c_str()); }},
 		{"SetPreviewScene", [](std::string sceneName) { OBSController::SetPreviewScene(sceneName.c_str()); }},
 		{"TransitionToProgram", [](std::string sceneName) { OBSController::TransitionToProgram(sceneName); }},
 		{"SetCurrentTransition", [](std::string transition) {  OBSController::SetCurrentTransition(QString::fromStdString(transition)); }},
 		{"SetCurrentSceneCollection", [](std::string SCName) { OBSController::SetCurrentSceneCollection(QString::fromStdString(SCName)); }}};
+	//pulls command from the hook, as well as paramaters and passes them into the above map, The map calls the function, wit the passed paramaters. 
 	funcMap[hook->command](name);
 	}
 /*

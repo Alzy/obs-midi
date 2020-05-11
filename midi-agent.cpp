@@ -125,8 +125,3 @@ vector<MidiHook *>& MidiAgent::GetMidiHooksByType(string mType)
 		throw "GetMidiHooksByType FAILED. INVALID MIDI HOOK TYPE";
 	}
 }
-
-
-
-
-

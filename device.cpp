@@ -93,11 +93,19 @@ void Device::Save(t_device device)
 	
 	config_t *obsDevice = GetConfigStore();
 
-	config_set_bool(obsDevice, device.SECTION_NAME, PARAM_ENABLED,
-			device.Enabled);
-	config_set_string(obsDevice, device.SECTION_NAME, PARAM_NAME,
-			  device.NAME.c_str());
-
+	config_set_bool(obsDevice, device.SECTION_NAME, PARAM_ENABLED, device.Enabled);
+	config_set_string(obsDevice, device.SECTION_NAME, PARAM_NAME, device.NAME.c_str());
+	for (int i = 0; i < device.total_rows; i++) {
+		//load Each Row
+		config_set_string(obsDevice, device.rows[i].ROW_NAME(device.SECTION_NAME), "MessageType", device.rows[i].MessageType.c_str());
+		config_set_int   (obsDevice, device.rows[i].ROW_NAME(device.SECTION_NAME), "Channel",device.rows[i].channel  );
+		config_set_int   (obsDevice, device.rows[i].ROW_NAME(device.SECTION_NAME), "InputType", device.rows[i].InputType );
+		config_set_bool  (obsDevice, device.rows[i].ROW_NAME(device.SECTION_NAME), "Bidirectional", device.rows[i].bidirectional );
+		config_set_int   (obsDevice, device.rows[i].ROW_NAME(device.SECTION_NAME), "Action", device.rows[i].Action   );
+		config_set_int   (obsDevice, device.rows[i].ROW_NAME(device.SECTION_NAME), "Option1",device.rows[i].option1);
+		config_set_int   (obsDevice, device.rows[i].ROW_NAME(device.SECTION_NAME), "Option2",device.rows[i].option2);
+		config_set_int   (obsDevice, device.rows[i].ROW_NAME(device.SECTION_NAME), "Option3", device.rows[i].option3);
+	}
 	config_save(obsDevice);
 }
 
@@ -106,12 +114,9 @@ void Device::SetDefaults(t_device device)
 	// OBS Device defaults
 	config_t *obsDevice = GetConfigStore();
 	if (obsDevice) {
-		config_set_default_bool(obsDevice, device.SECTION_NAME,
-					PARAM_ENABLED, device.Enabled);
-		config_set_default_string(obsDevice, device.SECTION_NAME,
-					  PARAM_NAME, device.NAME.c_str());
+		config_set_default_bool(obsDevice, device.SECTION_NAME,	PARAM_ENABLED, device.Enabled);
+		config_set_default_string(obsDevice, device.SECTION_NAME, PARAM_NAME, device.NAME.c_str());
 	}
-	
 }
 
 config_t *Device::GetConfigStore()

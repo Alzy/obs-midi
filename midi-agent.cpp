@@ -73,12 +73,10 @@ void MidiAgent::HandleInput(double deltatime,
 
 void MidiAgent::TriggerInputCommand(MidiHook* hook, int midiVal)
 {
-	std::map<std::string, std::function<void(std::string name, int value)>> funcMap = {
-		{"SetVolume", [](std::string audio,int  y) { float x = (float) y; OBSController::SetVolume(QString::fromStdString(audio), Utils::mapper(x)); }},
-		{"sub", [](std::string x, int y) {  }}};
+
 	blog(LOG_INFO, "Triggered: %d [%d] %s %s", hook->index, midiVal, hook->command.c_str(),
 	     hook->param.c_str());
-	funcMap[hook->command](hook->param,  midiVal);
+	MidiAgent::executor(hook, hook->command, midiVal);
 
 }
 
@@ -108,4 +106,22 @@ vector<MidiHook *>& MidiAgent::GetMidiHooksByType(string mType)
 	} else {
 		throw "GetMidiHooksByType FAILED. INVALID MIDI HOOK TYPE";
 	}
+}
+
+void MidiAgent::executor(MidiHook *hook, std::string name, int midiVal)
+{
+	std::map < std::string,	std::function < void(std::string name, int value)>> funcMap = {
+		{"SetVolume", [](std::string audio,int  y) { float x = (float) y; OBSController::SetVolume(QString::fromStdString(audio), Utils::mapper(x)); }},
+		{"sub", [](std::string x, int y) {  }}};
+	funcMap[hook->command](hook->param, midiVal);
+
+
+}
+
+void MidiAgent::executor(MidiHook *hook, std::string name, float midiVal)
+{
+	std::map < std::string,	std::function < void(std::string name, float y)>> funcMap = {
+		{"SetVolume", [](std::string audio,float  y) {  OBSController::SetVolume(QString::fromStdString(audio), Utils::mapper(y)); }},
+		{"sub", [](std::string x, int y) {  }}};
+	funcMap[hook->command](hook->param,  midiVal);
 }

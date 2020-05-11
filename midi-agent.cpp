@@ -29,29 +29,72 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 using namespace std;
 
+///////////////////////
+/* MIDI HOOK ROUTES */
+//////////////////////
 map<string, function<void(MidiHook* hook, int midiVal)>> funcMap = {
-	{"SetVolume", [](MidiHook* hook, int midiVal) {  OBSController::SetVolume(QString::fromStdString(hook->param), Utils::mapper(midiVal)); }},
+	// BUTTON ACTIONS
+	{"SetCurrentScene", [](MidiHook* hook, int midiVal) { OBSController::SetCurrentScene(hook->param.c_str()); }},
+	{"SetPreviewScene", [](MidiHook* hook, int midiVal) { OBSController::SetPreviewScene(hook->param.c_str()); }},
+	{"SetCurrentSceneCollection", [](MidiHook* hook, int midiVal) { OBSController::SetCurrentSceneCollection(QString::fromStdString(hook->param)); }},
+	//{"ResetSceneItem", [](MidiHook* hook, int midiVal) { OBSController::ResetSceneItem(const char* sceneName, const char* itemName); }},
+	{"TransitionToProgram", [](MidiHook* hook, int midiVal) { OBSController::TransitionToProgram(); }},
+	{"TransitionToProgram", [](MidiHook* hook, int midiVal) { OBSController::TransitionToProgram(hook->param); }},
+	//{"TransitionToProgram", [](MidiHook* hook, int midiVal) { OBSController::TransitionToProgram(QString transitionName, int transitionDuration = 300); }},
+	{"SetCurrentTransition", [](MidiHook* hook, int midiVal) { OBSController::SetCurrentTransition(QString::fromStdString(hook->param)); }},
+	//{"SetTransitionDuration", [](MidiHook* hook, int midiVal) { OBSController::SetTransitionDuration(int duration); }},
 
-	{"StartStopReplayBuffer", [](MidiHook* hook, int midiVal) {  OBSController::StartStopReplayBuffer(); }},
-	{"StartReplayBuffer", [](MidiHook* hook, int midiVal) { OBSController::StartReplayBuffer(); }},
-	{"StopReplayBuffer", [](MidiHook* hook, int midiVal) { OBSController::StopReplayBuffer(); }},
-	{"SaveReplayBuffer", [](MidiHook* hook, int midiVal) {  OBSController::SaveReplayBuffer(); }},
+	{"ToggleMute", [](MidiHook* hook, int midiVal) { OBSController::ToggleMute(QString::fromStdString(hook->param)); }},
+	//{"SetMute", [](MidiHook* hook, int midiVal) { OBSController::SetMute(QString sourceName, bool mute); }},
+
 	{"StartStopStreaming", [](MidiHook* hook, int midiVal) { OBSController::StartStopStreaming(); }},
-	{"StartStreaming"  , [](MidiHook* hook, int midiVal) {  OBSController::StartStreaming(); }},
+	{"StartStreaming", [](MidiHook* hook, int midiVal) { OBSController::StartStreaming(); }},
 	{"StopStreaming", [](MidiHook* hook, int midiVal) { OBSController::StopStreaming(); }},
+
 	{"StartStopRecording", [](MidiHook* hook, int midiVal) { OBSController::StartStopRecording(); }},
-	{"StartRecording", [](MidiHook* hook, int midiVal) { OBSController::StartRecording; }},
+	{"StartRecording", [](MidiHook* hook, int midiVal) { OBSController::StartRecording(); }},
 	{"StopRecording", [](MidiHook* hook, int midiVal) { OBSController::StopRecording(); }},
 	{"PauseRecording", [](MidiHook* hook, int midiVal) { OBSController::PauseRecording(); }},
-	{"ResumeRecording", [](MidiHook* hook, int midiVal) { OBSController::ResumeRecording(); }}
+	{"ResumeRecording", [](MidiHook* hook, int midiVal) { OBSController::ResumeRecording(); }},
+
+	{"StartStopReplayBuffer", [](MidiHook* hook, int midiVal) { OBSController::StartStopReplayBuffer(); }},
+	{"StartReplayBuffer", [](MidiHook* hook, int midiVal) { OBSController::StartReplayBuffer(); }},
+	{"StopReplayBuffer", [](MidiHook* hook, int midiVal) { OBSController::StopReplayBuffer(); }},
+	{"SaveReplayBuffer", [](MidiHook* hook, int midiVal) { OBSController::SaveReplayBuffer(); }},
+
+	{"SetCurrentProfile", [](MidiHook* hook, int midiVal) { OBSController::SetCurrentProfile(QString::fromStdString(hook->param)); }},
+	{"SetTextGDIPlusText", [](MidiHook* hook, int midiVal) { OBSController::SetTextGDIPlusText(); }},
+	{"SetBrowserSourceURL", [](MidiHook* hook, int midiVal) { OBSController::SetBrowserSourceURL(); }},
+	{"ReloadBrowserSource", [](MidiHook* hook, int midiVal) { OBSController::ReloadBrowserSource(); }},
+	{"TakeSourceScreenshot", [](MidiHook* hook, int midiVal) { OBSController::TakeSourceScreenshot(QString::fromStdString(hook->param)); }},
+	{"EnableSourceFilter", [](MidiHook* hook, int midiVal) { OBSController::EnableSourceFilter(); }},
+	{"DisableSourceFilter", [](MidiHook* hook, int midiVal) { OBSController::DisableSourceFilter(); }},
+	{"ToggleSourceFilter", [](MidiHook* hook, int midiVal) { OBSController::ToggleSourceFilter(); }},
+
+	// CC ACTIONS
+	{"SetVolume", [](MidiHook* hook, int midiVal) {  OBSController::SetVolume(QString::fromStdString(hook->param), Utils::mapper(midiVal)); }},
+	//{"SetSyncOffset", [](MidiHook* hook, int midiVal) { OBSController::SetSyncOffset(QString sourceName, int64_t sourceSyncOffset); }},
+	{"SetSourcePosition", [](MidiHook* hook, int midiVal) { OBSController::SetSourcePosition(); }},
+	{"SetSourceRotation", [](MidiHook* hook, int midiVal) { OBSController::SetSourceRotation(); }},
+	{"SetSourceScale", [](MidiHook* hook, int midiVal) { OBSController::SetSourceScale(); }},
+	{"SetGainFilter", [](MidiHook* hook, int midiVal) { OBSController::SetGainFilter(); }},
+	{"SetOpacity", [](MidiHook* hook, int midiVal) { OBSController::SetOpacity(); }},
+
 };
 
+
+
+
+////////////////
+// MIDI AGENT //
+////////////////
 MidiAgent::MidiAgent()
 {
 	name = "Alfredo";
 	midiin = new RtMidiIn();
 	midiin->setCallback(&MidiAgent::HandleInput, this);
 
+	// for testing..  remove me:
 	MidiHook *mh = new MidiHook(7, "SetVolume", "Desktop Audio");
 	AddMidiHook("control_change", mh);
 }

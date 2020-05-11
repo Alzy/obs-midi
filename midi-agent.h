@@ -60,5 +60,3 @@ class MidiAgent {
 
 		vector<MidiHook *> &GetMidiHooksByType(string mType);
 };
-
-

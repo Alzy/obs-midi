@@ -137,16 +137,24 @@ void MidiAgent::executor(MidiHook *hook, int y){
 void MidiAgent::executor(MidiHook *hook)
 {
 	std::map<std::string, std::function<void()>> funcMap = {
-		{"StartStopReplayBuffer", []() {  OBSController::StartStopReplayBuffer(); }},
-		{"StartReplayBuffer", []() { OBSController::StartReplayBuffer(); }},
-		{"StopReplayBuffer", []() { OBSController::StopReplayBuffer(); }},
-		{"SaveReplayBuffer", []() {  OBSController::SaveReplayBuffer(); }},
-		{"StartStopStreaming", []() { OBSController::StartStopStreaming(); }},
-		{"StartStreaming"  , []() {  OBSController::StartStreaming(); }},
+		{"StartStopReplayBuffer",
+		 []() { OBSController::StartStopReplayBuffer(); }},
+		{"StartReplayBuffer",
+		 []() { OBSController::StartReplayBuffer(); }},
+		{"StopReplayBuffer",
+		 []() { OBSController::StopReplayBuffer(); }},
+		{"SaveReplayBuffer",
+		 []() { OBSController::SaveReplayBuffer(); }},
+		{"StartStopStreaming",
+		 []() { OBSController::StartStopStreaming(); }},
+		{"StartStreaming", []() { OBSController::StartStreaming(); }},
 		{"StopStreaming", []() { OBSController::StopStreaming(); }},
-		{"StartStopRecording", []() { OBSController::StartStopRecording(); }},
+		{"StartStopRecording",
+		 []() { OBSController::StartStopRecording(); }},
 		{"StartRecording", []() { OBSController::StartRecording; }},
 		{"StopRecording", []() { OBSController::StopRecording(); }},
 		{"PauseRecording", []() { OBSController::PauseRecording(); }},
-		{"ResumeRecording", []() { OBSController::ResumeRecording(); }}};
+		{"ResumeRecording",
+		 []() { OBSController::ResumeRecording(); }}};
 	funcMap[hook->command]();
+}

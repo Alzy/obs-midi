@@ -58,12 +58,16 @@ bool obs_module_load(void)
 {
 	blog(LOG_INFO, "MIDI LOADED ");
 
+	vector<MidiAgent *> activeMidiAgents;
+
 	MidiAgent *midiA = new MidiAgent();
 	midiA->SetMidiDevice(0);
 
+	activeMidiAgents.push_back(midiA);
+
 	// UI SETUP
 	QMainWindow *mainWindow = (QMainWindow *)obs_frontend_get_main_window();
-	SettingsDialog *settingsDialog = new SettingsDialog(mainWindow);
+	SettingsDialog *settingsDialog = new SettingsDialog(mainWindow, activeMidiAgents);
 
 	const char* menuActionText = obs_module_text("OBSMIDI.Settings.DialogTitle");
 	QAction* menuAction = (QAction*)obs_frontend_add_tools_menu_qaction(menuActionText);
@@ -71,12 +75,20 @@ bool obs_module_load(void)
 		// The settings dialog belongs to the main window. Should be ok
 		// to pass the pointer to this QAction belonging to the main window
 		settingsDialog->ToggleShowHide();
-	});
-	//settingsDialog->SetAvailableDevices(midiDevices);
-	
-	//midiin->openPort(0);
-	//midiin->setCallback(&midiin_callback, settingsDialog);
+		if (settingsDialog->isVisible()) {
+			RtMidi *sdMidi = new RtMidiIn();
 
+			int nDevices = sdMidi->getPortCount();
+			if (nDevices == 0 ) { return; }
+
+			vector<string> devNames;
+			for (int i = 0; i < nDevices; i++) {
+				devNames.push_back(sdMidi->getPortName(i));
+			}
+			settingsDialog->SetAvailableDevices(devNames);
+		}
+	});
+	
 	return true;
 }
 

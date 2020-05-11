@@ -21,7 +21,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <iostream>
 #include <utility>
 #include "midi-agent.h"
-#include "device.hpp"
 
 #include "settings-dialog.h"
 #include "settings-midi-map.h"
@@ -32,10 +31,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #define CHANGE_ME "changeme"
 
-SettingsDialog::SettingsDialog(QWidget *parent, vector<MidiAgent *> activeMidiAgents)
-	:
-	QDialog(parent, Qt::Dialog),
-	ui(new Ui::SettingsDialog)
+SettingsDialog::SettingsDialog(QWidget *parent, vector<MidiAgent *> activeMidiAgents):QDialog(parent, Qt::Dialog),ui(new Ui::SettingsDialog)
 {
 	ui->setupUi(this);
 
@@ -67,8 +63,8 @@ void SettingsDialog::SetAvailableDevices(std::vector<std::string> &midiDevices)
 	for (int i = 0; i < midiDevices.size(); i++) {
 		this->ui->list_midi_dev->addItem(midiDevices.at(i).c_str());
 		std::string name = midiDevices.at(i);
-		Device x = Device(name); 
-		this->ui->check_enabled->setEnabled(x.getEnabled(name));
+		//Device x = Device(name); 
+		//this->ui->check_enabled->setEnabled(x.getEnabled(name));
 	}
 }
 void SettingsDialog::on_check_clicked(bool enabled) {
@@ -103,9 +99,10 @@ void SettingsDialog::on_btn_configure_clicked()
 	mDialog.exec();
 }
 
-int SettingsDialog::on_check_enabled_stateChanged(int state)
+int SettingsDialog::on_check_enabled_stateChanged(bool state)
 {
 	pushDebugMidiMessage("time", "Check State", state, 0);
+	ui->btn_configure->setEnabled(state);
 	return state;
 }
 

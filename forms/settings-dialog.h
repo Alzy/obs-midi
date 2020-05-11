@@ -35,7 +35,7 @@ public:
         void pushDebugMidiMessage(std::string time, std::string message, int control, int value);
 	void on_check_clicked(bool enabled);
 	void on_btn_configure_clicked();
-	int on_check_enabled_stateChanged(int state);
+	int on_check_enabled_stateChanged(bool state);
 	void on_item_select();
 
 private Q_SLOTS:

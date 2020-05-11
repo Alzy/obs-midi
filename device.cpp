@@ -34,7 +34,6 @@ std::string section = "MIDI-OBS-Device-";
 
 Device::Device(std::string name) 
 {
-	t_device dev = Load(name);
 	t_device *devices;
 
 	qsrand(QTime::currentTime().msec());

@@ -18,10 +18,14 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <obs-frontend-api.h>
 #include <QtCore/QTime>
 //#include <Python.h>
-
+#include <functional>
+#include <map>
+#include <string>
+#include <iostream>
 #include "utils.h"
 #include "midi-agent.h"
 #include "obs-midi.h"
+#include "obs-controller.h"	
 
 MidiAgent::MidiAgent()
 {
@@ -69,8 +73,12 @@ void MidiAgent::HandleInput(double deltatime,
 
 void MidiAgent::TriggerInputCommand(MidiHook* hook, int midiVal)
 {
+	std::map<std::string, std::function<void(std::string name, int value)>> funcMap = {
+		{"SetVolume", [](std::string audio,int  y) { float x = (float) y; OBSController::SetVolume(QString::fromStdString(audio), Utils::mapper(x)); }},
+		{"sub", [](std::string x, int y) {  }}};
 	blog(LOG_INFO, "Triggered: %d [%d] %s %s", hook->index, midiVal, hook->command.c_str(),
 	     hook->param.c_str());
+	funcMap[hook->command](hook->param,  midiVal);
 
 }
 

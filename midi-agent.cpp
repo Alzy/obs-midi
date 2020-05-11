@@ -124,9 +124,7 @@ void MidiAgent::executor(MidiHook *hook, std::string name, float midiVal)
 	std::map < std::string,	std::function < void(std::string name, float y)>> funcMap = {
 		{"SetVolume", [](std::string audio,float  y) {  OBSController::SetVolume(QString::fromStdString(audio), Utils::mapper(y)); }},
 		{"ToggleMute", [](std::string audio,float  y) {  OBSController::ToggleMute(QString::fromStdString(audio)); }},
-		{"TakeSourceScreenshot", [](std::string audio,float  y) {  OBSController::TakeSourceScreenshot(QString::fromStdString(audio)); }},
-
-		{"sub", [](std::string x, int y) {  }}};
+		{"TakeSourceScreenshot", [](std::string audio,float  y) {  OBSController::TakeSourceScreenshot(QString::fromStdString(audio)); }}};
 	funcMap[hook->command](hook->param,  midiVal);
 }
 void MidiAgent::executor(MidiHook *hook, int y){
@@ -134,8 +132,7 @@ void MidiAgent::executor(MidiHook *hook, int y){
 	{"SetTransitionDuration", [](int y) {  OBSController::SetTransitionDuration(y); }}};
 	funcMap[hook->command](y);
 }
-void MidiAgent::executor(MidiHook *hook)
-{
+void MidiAgent::executor(MidiHook *hook){
 	std::map<std::string, std::function<void()>> funcMap = {
 		{"StartStopReplayBuffer", []() {  OBSController::StartStopReplayBuffer(); }},
 		{"StartReplayBuffer", []() { OBSController::StartReplayBuffer(); }},
@@ -151,3 +148,28 @@ void MidiAgent::executor(MidiHook *hook)
 		{"ResumeRecording", []() { OBSController::ResumeRecording(); }}};
 	funcMap[hook->command]();
 	}
+/*
+TODO: Add the following maps
+
+		"SetCurrentScene":           [1,  'scene-name'                      ],	
+                "SetPreviewScene":           [1,  'scene-name'                      ],
+                "TransitionToProgram":       [1,  'scene-name'                      ],
+                "SetCurrentTransition":      [1,  'transition'                      ],
+                "SetCurrentProfile":         [1,  'profile'                         ],
+                "SetCurrentSceneCollection": [1,  'sc-name'                         ],
+                "ResetSceneItem":            [1,  'item'                            ],
+                "SetMute":                   [2,  'source', 'bool'                  ],
+                "SetSyncOffset":             [2,  'source', 'offset'                ],
+                "ReloadBrowserSource":       [2,  'source', 'url'                   ],
+                "EnableSourceFilter":        [2,  'source', 'filter'                ],
+                "DisableSourceFilter":       [2,  'source', 'filter'                ],
+                "SetTextGDIPlusText":        [2,  'source', 'text'                  ],
+                "SetBrowserSourceURL":       [2,  'source', 'url'                   ],
+                "SetSourceVisibility":       [2,  'item',   'bool'                  ],
+                "ToggleSourceVisibility":    [2,  'item',   'bool'                  ],
+                "SetSourceScale":            [3,  'source', 'item',     'scale'     ],
+                "SetSourcePosition":         [3,  'source', 'item',     'position'  ],
+                "SetSourceRotation":         [3,  'source', 'item',     'rotation'  ],
+                "SetGainFilter":             [3,  'source', 'filter',   'db'        ],
+                "ToggleSourceFilter":        [3,  'source', 'filter',   'bool'      ]
+*/

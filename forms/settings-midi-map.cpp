@@ -16,12 +16,14 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <obs-frontend-api.h>
 
 #include "settings-midi-map.h"
+
 #include <qdialogbuttonbox.h>
 #include <QDialog>
 #include <qcombobox.h>
 #include <qlabel.h>
 #include <qcheckbox.h>
 #include <QMessageBox>
+
 #define CHANGE_ME "changeme"
 
 SettingsMidiMap::SettingsMidiMap(QWidget *parent)

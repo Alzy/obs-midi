@@ -7,6 +7,7 @@ if (WIN32)
 elseif(APPLE)
     add_definitions(-D__MACOSX_CORE__)
 elseif(UNIX)
+
     find_package(ALSA)
     if (NOT ALSA_FOUND)
       message(FATAL_ERROR "ALSA API requested but no ALSA dev libraries found")
@@ -18,7 +19,9 @@ elseif(UNIX)
     list(APPEND API_LIST "alsa")
     add_definitions(-fPIC)
 
+
 endif()
+
 
 set(RTMIDI_SOURCES
         RtMidi.cpp

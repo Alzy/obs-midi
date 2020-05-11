@@ -32,11 +32,15 @@ std::string section = "MIDI-OBS-Device-";
 
 #define QT_TO_UTF8(str) str.toUtf8().constData()
 
-Device::Device() 
+Device::Device(std::string name) 
 {
+	t_device dev = Load(name);
+	t_device *devices;
+
 	qsrand(QTime::currentTime().msec());
 	//obs_frontend_add_event_callback(OnFrontendEvent, this);
 }
+
 typedef struct t_row {
 	int id;
 	std::string MessageType;
@@ -59,17 +63,22 @@ typedef struct Device::t_device {
 	bool Enabled;
 	int total_rows;
 	const char *SECTION_NAME = section.append(NAME).c_str();
-	
-
 	t_row * rows;
-};
+}t_device;
 Device::~Device()
 {
+	
 	//obs_frontend_remove_event_callback(OnFrontendEvent, this);
 }
-
-void Device::Load(t_device device)
+bool Device::getEnabled(std::string name)
 {
+	t_device x= Load(name);
+	return x.Enabled;
+}
+
+t_device Device::Load(std::string name)
+{
+	t_device device;
 	config_t *obsDevice = GetConfigStore();
 	device.Enabled = config_get_bool(obsDevice, device.SECTION_NAME, PARAM_ENABLED);
 	device.NAME = config_get_string(obsDevice, device.SECTION_NAME, PARAM_NAME);
@@ -84,6 +93,7 @@ void Device::Load(t_device device)
 		device.rows[i].option2       = config_get_int   (obsDevice, device.rows[i].ROW_NAME(device.SECTION_NAME), "Option2");
 		device.rows[i].option3       = config_get_int   (obsDevice, device.rows[i].ROW_NAME(device.SECTION_NAME), "Option3");
 	}
+	return device;
 }
 
 void Device::Save(t_device device)

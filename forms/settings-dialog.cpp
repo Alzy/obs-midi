@@ -21,10 +21,12 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <iostream>
 #include <utility>
 #include "midi-agent.h"
+#include "device.hpp"
 
 #include "settings-dialog.h"
 #include "settings-midi-map.h"
-#include <QtWidgets/qdialogbuttonbox.h>
+#include <qdialogbuttonbox.h>
+#include <qcheckbox.h>
 
 #define CHANGE_ME "changeme"
 
@@ -34,7 +36,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) :
 {
 	ui->setupUi(this);
 	connect(ui->btn_configure, &QPushButton::clicked, this,&SettingsDialog::on_btn_configure_clicked);
-
+	connect(ui->check_enabled, &QCheckBox::toggled, this, &SettingsDialog::on_check_clicked);
 	connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::FormAccepted);
 }
 
@@ -58,7 +60,18 @@ void SettingsDialog::SetAvailableDevices(std::vector<std::string> &midiDevices)
 
 	for (int i = 0; i < midiDevices.size(); i++) {
 		this->ui->list_midi_dev->addItem(midiDevices.at(i).c_str());
+		std::string name = midiDevices.at(i);
+		Device x = Device(name); 
+		this->ui->check_enabled->setEnabled(x.getEnabled(name));
 	}
+}
+void SettingsDialog::on_check_clicked(bool enabled) {
+	if (enabled) {
+		pushDebugMidiMessage("time", "check", 0, 0);
+	} else {
+		pushDebugMidiMessage("time", "check", 1, 0);
+	}
+	
 }
 
 

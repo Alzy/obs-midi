@@ -25,10 +25,12 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 class Device {
 public:
-	Device();
+	Device(std::string name);
 	~Device();
 	struct t_device;
-	void Load(t_device device);
+
+	t_device Load(std::string name);
+	bool getEnabled(std::string name);
 	void Save(t_device device);
 	void SetDefaults(t_device device);
 	void addFullRow(t_device device, std::string message, int channel);

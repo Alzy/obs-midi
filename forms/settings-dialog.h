@@ -15,10 +15,12 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #pragma once
 
+#include <vector>
 #include <QtWidgets/QDialog>
 #include "settings-midi-map.h"
 #include "ui_settings-dialog.h"
 #include "ui_settings-midi-map.h"
+#include "midi-agent.h"
 
 
 class SettingsDialog : public QDialog
@@ -26,13 +28,15 @@ class SettingsDialog : public QDialog
 	Q_OBJECT
 
 public:
-	explicit SettingsDialog(QWidget* parent = 0);
+	SettingsDialog(QWidget* parent, std::vector<MidiAgent *> activeMidiAgents);
 	~SettingsDialog();
 	void ToggleShowHide();
 	void SetAvailableDevices(std::vector<std::string> &midiDevices);
         void pushDebugMidiMessage(std::string time, std::string message, int control, int value);
 	void on_check_clicked(bool enabled);
 	void on_btn_configure_clicked();
+	int on_check_enabled_stateChanged(int state);
+	void on_item_select();
 
 private Q_SLOTS:
 	void FormAccepted();

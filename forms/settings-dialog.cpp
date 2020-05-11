@@ -25,16 +25,22 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #include "settings-dialog.h"
 #include "settings-midi-map.h"
+
 #include <qdialogbuttonbox.h>
 #include <qcheckbox.h>
 
+
 #define CHANGE_ME "changeme"
 
-SettingsDialog::SettingsDialog(QWidget* parent) :
+SettingsDialog::SettingsDialog(QWidget *parent, vector<MidiAgent *> activeMidiAgents)
+	:
 	QDialog(parent, Qt::Dialog),
 	ui(new Ui::SettingsDialog)
 {
 	ui->setupUi(this);
+
+	connect(ui->list_midi_dev, &QListWidget::itemSelectionChanged, this, &SettingsDialog::on_item_select);
+	connect(ui->check_enabled, &QCheckBox::stateChanged, this, &SettingsDialog::on_check_enabled_stateChanged);
 	connect(ui->btn_configure, &QPushButton::clicked, this,&SettingsDialog::on_btn_configure_clicked);
 	connect(ui->check_enabled, &QCheckBox::toggled, this, &SettingsDialog::on_check_clicked);
 	connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::FormAccepted);
@@ -79,10 +85,10 @@ void SettingsDialog::pushDebugMidiMessage(std::string time, std::string message,
 {
 	int rowCount = this->ui->tbl_debug->rowCount();
 	this->ui->tbl_debug->insertRow(rowCount);
-	this->ui->tbl_debug->setItem(rowCount - 1, 0, new QTableWidgetItem (tr(time.c_str())));
-	this->ui->tbl_debug->setItem(rowCount - 1, 1, new QTableWidgetItem(tr(message.c_str())));
-	this->ui->tbl_debug->setItem(rowCount - 1, 2, new QTableWidgetItem(tr(std::to_string(control).c_str())));
-	this->ui->tbl_debug->setItem(rowCount - 1, 3, new QTableWidgetItem(tr(std::to_string(value).c_str())));
+	this->ui->tbl_debug->setItem(rowCount , 0, new QTableWidgetItem (tr(time.c_str())));
+	this->ui->tbl_debug->setItem(rowCount , 1, new QTableWidgetItem(tr(message.c_str())));
+	this->ui->tbl_debug->setItem(rowCount , 2, new QTableWidgetItem(tr(std::to_string(control).c_str())));
+	this->ui->tbl_debug->setItem(rowCount , 3, new QTableWidgetItem(tr(std::to_string(value).c_str())));
 }
 
 
@@ -93,12 +99,36 @@ void SettingsDialog::on_btn_configure_clicked()
 	blog(LOG_INFO, "Configure button clicked");
 	
 	SettingsMidiMap mDialog;
-	mDialog.setModal(true);
+	//mDialog.setModal(true);
 	mDialog.exec();
 }
 
+int SettingsDialog::on_check_enabled_stateChanged(int state)
+{
+	pushDebugMidiMessage("time", "Check State", state, 0);
+	return state;
+}
 
-void SettingsDialog::FormAccepted() {
+void SettingsDialog::on_item_select()
+{
+	QString current = this->ui->list_midi_dev->currentItem()->text();
+	blog(LOG_INFO, "item clicked: %s", current.toLocal8Bit().data());
+	pushDebugMidiMessage("item clicked",current.toLocal8Bit().data(), 0, 0);
+
+	// Pull info on if device is enabled, if so set true if not set false
+	ui->check_enabled->setChecked(false);
+
+	//If enabled, allow for configuration, if not disable it.
+	if (ui->check_enabled->checkState()) {
+		ui->btn_configure->setEnabled(true);
+	} else {
+		ui->btn_configure->setEnabled(false);
+	}
+}
+
+
+void SettingsDialog::FormAccepted()
+{
 	return;
 }
 

@@ -62,7 +62,7 @@ namespace OBSController
 	void SetTextGDIPlusText();
 	void SetBrowserSourceURL();
 	void ReloadBrowserSource();
-	void TakeSourceScreenshot();
+	void TakeSourceScreenshot(QString source);
 	void EnableSourceFilter();
 	void DisableSourceFilter();
 	void ToggleSourceFilter();

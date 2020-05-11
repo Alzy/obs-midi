@@ -112,6 +112,7 @@ void MidiAgent::executor(MidiHook *hook, std::string name, int midiVal)
 {
 	std::map < std::string,	std::function < void(std::string name, int value)>> funcMap = {
 		{"SetVolume", [](std::string audio,int  y) { float x = (float) y; OBSController::SetVolume(QString::fromStdString(audio), Utils::mapper(x)); }},
+		
 		{"sub", [](std::string x, int y) {  }}};
 	funcMap[hook->command](hook->param, midiVal);
 
@@ -122,6 +123,30 @@ void MidiAgent::executor(MidiHook *hook, std::string name, float midiVal)
 {
 	std::map < std::string,	std::function < void(std::string name, float y)>> funcMap = {
 		{"SetVolume", [](std::string audio,float  y) {  OBSController::SetVolume(QString::fromStdString(audio), Utils::mapper(y)); }},
+		{"ToggleMute", [](std::string audio,float  y) {  OBSController::ToggleMute(QString::fromStdString(audio)); }},
+		{"TakeSourceScreenshot", [](std::string audio,float  y) {  OBSController::TakeSourceScreenshot(QString::fromStdString(audio)); }},
+
 		{"sub", [](std::string x, int y) {  }}};
 	funcMap[hook->command](hook->param,  midiVal);
 }
+void MidiAgent::executor(MidiHook *hook, int y){
+	std::map < std::string,	std::function < void(int y)>> funcMap = {
+	{"SetTransitionDuration", [](int y) {  OBSController::SetTransitionDuration(y); }}};
+	funcMap[hook->command](y);
+}
+void MidiAgent::executor(MidiHook *hook)
+{
+	std::map<std::string, std::function<void()>> funcMap = {
+		{"StartStopReplayBuffer", []() {  OBSController::StartStopReplayBuffer(); }},
+		{"StartReplayBuffer", []() { OBSController::StartReplayBuffer(); }},
+		{"StopReplayBuffer", []() { OBSController::StopReplayBuffer(); }},
+		{"SaveReplayBuffer", []() {  OBSController::SaveReplayBuffer(); }},
+		{"StartStopStreaming", []() { OBSController::StartStopStreaming(); }},
+		{"StartStreaming"  , []() {  OBSController::StartStreaming(); }},
+		{"StopStreaming", []() { OBSController::StopStreaming(); }},
+		{"StartStopRecording", []() { OBSController::StartStopRecording(); }},
+		{"StartRecording", []() { OBSController::StartRecording; }},
+		{"StopRecording", []() { OBSController::StopRecording(); }},
+		{"PauseRecording", []() { OBSController::PauseRecording(); }},
+		{"ResumeRecording", []() { OBSController::ResumeRecording(); }}};
+	funcMap[hook->command]();

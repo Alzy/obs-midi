@@ -337,7 +337,7 @@ void OBSController::SetBrowserSourceURL() {}
 
 void OBSController::ReloadBrowserSource() {}
 
-void OBSController::TakeSourceScreenshot() {}
+void OBSController::TakeSourceScreenshot(QString source) {}
 
 void OBSController::EnableSourceFilter() {}
 

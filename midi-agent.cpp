@@ -25,7 +25,26 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "utils.h"
 #include "midi-agent.h"
 #include "obs-midi.h"
-#include "obs-controller.h"	
+#include "obs-controller.h"
+
+using namespace std;
+
+map<string, function<void(MidiHook* hook, int midiVal)>> funcMap = {
+	{"SetVolume", [](MidiHook* hook, int midiVal) {  OBSController::SetVolume(QString::fromStdString(hook->param), Utils::mapper(midiVal)); }},
+
+	{"StartStopReplayBuffer", [](MidiHook* hook, int midiVal) {  OBSController::StartStopReplayBuffer(); }},
+	{"StartReplayBuffer", [](MidiHook* hook, int midiVal) { OBSController::StartReplayBuffer(); }},
+	{"StopReplayBuffer", [](MidiHook* hook, int midiVal) { OBSController::StopReplayBuffer(); }},
+	{"SaveReplayBuffer", [](MidiHook* hook, int midiVal) {  OBSController::SaveReplayBuffer(); }},
+	{"StartStopStreaming", [](MidiHook* hook, int midiVal) { OBSController::StartStopStreaming(); }},
+	{"StartStreaming"  , [](MidiHook* hook, int midiVal) {  OBSController::StartStreaming(); }},
+	{"StopStreaming", [](MidiHook* hook, int midiVal) { OBSController::StopStreaming(); }},
+	{"StartStopRecording", [](MidiHook* hook, int midiVal) { OBSController::StartStopRecording(); }},
+	{"StartRecording", [](MidiHook* hook, int midiVal) { OBSController::StartRecording; }},
+	{"StopRecording", [](MidiHook* hook, int midiVal) { OBSController::StopRecording(); }},
+	{"PauseRecording", [](MidiHook* hook, int midiVal) { OBSController::PauseRecording(); }},
+	{"ResumeRecording", [](MidiHook* hook, int midiVal) { OBSController::ResumeRecording(); }}
+};
 
 MidiAgent::MidiAgent()
 {
@@ -33,7 +52,7 @@ MidiAgent::MidiAgent()
 	midiin = new RtMidiIn();
 	midiin->setCallback(&MidiAgent::HandleInput, this);
 
-	MidiHook *mh = new MidiHook(1, "SetVolume", "Desktop Audio");
+	MidiHook *mh = new MidiHook(7, "SetVolume", "Desktop Audio");
 	AddMidiHook("control_change", mh);
 }
 
@@ -76,8 +95,7 @@ void MidiAgent::TriggerInputCommand(MidiHook* hook, int midiVal)
 
 	blog(LOG_INFO, "Triggered: %d [%d] %s %s", hook->index, midiVal, hook->command.c_str(),
 	     hook->param.c_str());
-	MidiAgent::executor(hook, hook->command, midiVal);
-
+	funcMap[hook->command](hook, midiVal);
 }
 
 
@@ -112,83 +130,3 @@ vector<MidiHook *>& MidiAgent::GetMidiHooksByType(string mType)
 
 
 
-//The Following Functions are the meat and potatoes of actually executing midi functions.... these maps allow us to effectively exexute commands by using their string equivelents.
-// The Overloads handle the various paramaters we need to pass into obs
-
-void MidiAgent::executor(MidiHook *hook, std::string name, int midiVal)
-{
-	std::map < std::string,	std::function < void(std::string name, int value)>> funcMap = {
-		// as you can see here you can call more than one function per line if need be. may be useful if we need to get by name or id, or for data type conversion
-		{"SetVolume", [](std::string audio,int  y) { float x = (float) y; OBSController::SetVolume(QString::fromStdString(audio), Utils::mapper(x)); }}};
-	funcMap[hook->command](hook->param, midiVal);
-
-
-}
-
-void MidiAgent::executor(MidiHook *hook, std::string name, float midiVal)
-{
-	std::map < std::string,	std::function < void(std::string name, float y)>> funcMap = {
-		{"SetVolume", [](std::string audio,float  y) {  OBSController::SetVolume(QString::fromStdString(audio), Utils::mapper(y)); }},
-		{"ToggleMute", [](std::string audio,float  y) {  OBSController::ToggleMute(QString::fromStdString(audio)); }},
-		{"TakeSourceScreenshot", [](std::string audio,float  y) {  OBSController::TakeSourceScreenshot(QString::fromStdString(audio)); }}};
-	funcMap[hook->command](hook->param,  midiVal);
-}
-void MidiAgent::executor(MidiHook *hook, int y){
-	std::map < std::string,	std::function < void(int y)>> funcMap = {
-	{"SetTransitionDuration", [](int y) {  OBSController::SetTransitionDuration(y); }}};
-	funcMap[hook->command](y);
-}
-void MidiAgent::executor(MidiHook *hook){
-	std::map<std::string, std::function<void()>> funcMap = {
-		{"StartStopReplayBuffer", []() {  OBSController::StartStopReplayBuffer(); }},
-		{"StartReplayBuffer", []() { OBSController::StartReplayBuffer(); }},
-		{"StopReplayBuffer", []() { OBSController::StopReplayBuffer(); }},
-		{"SaveReplayBuffer", []() {  OBSController::SaveReplayBuffer(); }},
-		{"StartStopStreaming", []() { OBSController::StartStopStreaming(); }},
-		{"StartStreaming"  , []() {  OBSController::StartStreaming(); }},
-		{"StopStreaming", []() { OBSController::StopStreaming(); }},
-		{"StartStopRecording", []() { OBSController::StartStopRecording(); }},
-		{"StartRecording", []() { OBSController::StartRecording; }},
-		{"StopRecording", []() { OBSController::StopRecording(); }},
-		{"PauseRecording", []() { OBSController::PauseRecording(); }},
-		{"ResumeRecording", []() { OBSController::ResumeRecording(); }}};
-	funcMap[hook->command]();
-	}
-//probably the best one to look at to see how it all works
-void MidiAgent::executor(MidiHook *hook, std::string name){
-	//remaps things
-	std::map<std::string, std::function<void(std::string name)>> funcMap = {
-		{"SetCurrentScene", [](std::string sceneName) {  OBSController::SetCurrentScene(sceneName.c_str()); }},
-		{"SetPreviewScene", [](std::string sceneName) { OBSController::SetPreviewScene(sceneName.c_str()); }},
-		{"TransitionToProgram", [](std::string sceneName) { OBSController::TransitionToProgram(sceneName); }},
-		{"SetCurrentTransition", [](std::string transition) {  OBSController::SetCurrentTransition(QString::fromStdString(transition)); }},
-		{"SetCurrentSceneCollection", [](std::string SCName) { OBSController::SetCurrentSceneCollection(QString::fromStdString(SCName)); }}};
-	//pulls command from the hook, as well as paramaters and passes them into the above map, The map calls the function, wit the passed paramaters. 
-	funcMap[hook->command](name);
-	}
-/*
-TODO: Add the following maps
-
-
-		{"ResetSceneItem", [](std::string sceneName,std::string item) { OBSController::ResetSceneItem(sceneName.c_str(), item.c_str()); }}};
-
-                "ResetSceneItem":            [1,  'item'                            ],
-
-
-                "SetMute":                   [2,  'source', 'bool'                  ],
-                "SetSyncOffset":             [2,  'source', 'offset'                ],
-                "ReloadBrowserSource":       [2,  'source', 'url'                   ],
-                "EnableSourceFilter":        [2,  'source', 'filter'                ],
-                "DisableSourceFilter":       [2,  'source', 'filter'                ],
-                "SetTextGDIPlusText":        [2,  'source', 'text'                  ],
-                "SetBrowserSourceURL":       [2,  'source', 'url'                   ],
-                "SetSourceVisibility":       [2,  'item',   'bool'                  ],
-                "ToggleSourceVisibility":    [2,  'item',   'bool'                  ],
-
-
-                "SetSourceScale":            [3,  'source', 'item',     'scale'     ],
-                "SetSourcePosition":         [3,  'source', 'item',     'position'  ],
-                "SetSourceRotation":         [3,  'source', 'item',     'rotation'  ],
-                "SetGainFilter":             [3,  'source', 'filter',   'db'        ],
-                "ToggleSourceFilter":        [3,  'source', 'filter',   'bool'      ]
-*/

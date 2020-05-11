@@ -34,7 +34,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 Q_DECLARE_METATYPE(OBSScene);
 
-float Utils::mapper(float x)
+float Utils::mapper(int x)
 
 {
 	float in_min = 0;

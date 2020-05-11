@@ -79,14 +79,14 @@ void OBSController::SetCurrentSceneCollection(MidiHook *hook)
 */
 void OBSController::ResetSceneItem(MidiHook *hook)
 {
-	QString sceneName = hook->param1.c_str();
-	OBSScene scene = Utils::GetSceneFromNameOrCurrent(sceneName);
+	std::string sceneName = hook->param1;
+	OBSScene scene = Utils::GetSceneFromNameOrCurrent(QString::fromStdString(sceneName));
 	if (!scene) {
 		throw("requested scene doesn't exist");
 	}
 
 	obs_data_t *params = obs_data_create();
-	obs_data_set_string(params, "scene-name", sceneName.toStdString().c_str());
+	obs_data_set_string(params, "scene-name", sceneName.c_str());
 	OBSDataItemAutoRelease itemField = obs_data_item_byname(params, "item");
 
 	OBSSceneItemAutoRelease sceneItem = Utils::GetSceneItemFromRequestField(scene, itemField);

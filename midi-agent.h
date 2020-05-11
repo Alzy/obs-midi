@@ -30,9 +30,12 @@ class MidiHook {
 public:
 	int index;
 	string command;
-	string param;
+	string param1;
+	string param2;
+	string param3;
+	string value;
 
-	MidiHook(int i, string c, string p) : index(i), command(c), param(p) {}
+	MidiHook(int i, string c, string p="", string p2="", string p3="") : index(i), command(c), param1(p),param2(p2),param3(p3) {}
 };
 
 
@@ -49,11 +52,8 @@ class MidiAgent {
 		void TriggerInputCommand(MidiHook *hook, int midiVal);
 		void AddMidiHook(string mType, MidiHook *hook);
 		void RemoveMidiHook(string mType, MidiHook *hook);
-		void executor(MidiHook *hook, std::string source, float midiVal);
-		void executor(MidiHook *hook, std::string name, int midiVal);
-		void executor(MidiHook *hook, std::string name);
+	
 		void executor(MidiHook *hook);
-		void executor(MidiHook *hook, int y);
 
 	private:
 		RtMidiIn *midiin;

@@ -27,21 +27,21 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 namespace OBSController
 {
 	// BUTTON ACTIONS
-	void SetCurrentScene(const char *sceneName);
-	void SetPreviewScene(const char *sceneName);
-	void SetCurrentSceneCollection(QString sceneCollection);
-	void ResetSceneItem(const char *sceneName, const char *itemName);
-	void TransitionToProgram();
-	void TransitionToProgram(std::string name);
-	void TransitionToProgram(QString transitionName, int transitionDuration = 300);
-	void SetCurrentTransition(QString name);
-	void SetTransitionDuration(int duration); // can also be used with cc
+	void SetCurrentScene(MidiHook* hook);
+	void SetPreviewScene(MidiHook* hook);
+	void SetCurrentSceneCollection(MidiHook* hook);
+	void ResetSceneItem(MidiHook *hook);
+	void TriggerTransition();
+	
+	void TransitionToProgram(MidiHook *hook);
+	void SetCurrentTransition(MidiHook *hook);
+	void SetTransitionDuration(MidiHook *hook); // can also be used with cc
 
-	void SetSourceVisibility(); // doesn't exist??
-	void ToggleSourceVisibility(); //doesn't exist?
+	void SetSourceVisibility(MidiHook *hook); // doesn't exist??
+	void ToggleSourceVisibility(MidiHook *hook); //doesn't exist?
 
-	void ToggleMute(QString sourceName);
-	void SetMute(QString sourceName, bool mute);
+	void ToggleMute(MidiHook *hook);
+	void SetMute(MidiHook *hook);
 
 	void StartStopStreaming();
 	void StartStreaming();
@@ -58,21 +58,21 @@ namespace OBSController
 	void StopReplayBuffer();
 	void SaveReplayBuffer();
 
-	void SetCurrentProfile(QString profileName);
-	void SetTextGDIPlusText();
-	void SetBrowserSourceURL();
-	void ReloadBrowserSource();
-	void TakeSourceScreenshot(QString source);
-	void EnableSourceFilter();
-	void DisableSourceFilter();
-	void ToggleSourceFilter();
+	void SetCurrentProfile(MidiHook *hook);
+	void SetTextGDIPlusText(MidiHook *hook);
+	void SetBrowserSourceURL(MidiHook *hook);
+	void ReloadBrowserSource(MidiHook *hook);
+	void TakeSourceScreenshot(MidiHook *hook);
+	void EnableSourceFilter(MidiHook *hook);
+	void DisableSourceFilter(MidiHook *hook);
+	void ToggleSourceFilter(MidiHook *hook);
 
 	// CC ACTIONS
-	void SetVolume(QString source, float volume);
-	void SetSyncOffset(QString sourceName, int64_t sourceSyncOffset);
-	void SetSourcePosition();
-	void SetSourceRotation();
-	void SetSourceScale();
-	void SetGainFilter();
-	void SetOpacity();
-};
+	void SetVolume(MidiHook *hook);
+	void SetSyncOffset(MidiHook *hook);
+	void SetSourcePosition(MidiHook *hook);
+	void SetSourceRotation(MidiHook *hook);
+	void SetSourceScale(MidiHook *hook);
+	void SetGainFilter(MidiHook *hook);
+	void SetOpacity(MidiHook *hook);
+	};

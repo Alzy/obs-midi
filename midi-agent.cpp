@@ -75,8 +75,9 @@ void MidiAgent::TriggerInputCommand(MidiHook* hook, int midiVal)
 {
 
 	blog(LOG_INFO, "Triggered: %d [%d] %s %s", hook->index, midiVal, hook->command.c_str(),
-	     hook->param.c_str());
-	MidiAgent::executor(hook, hook->command, midiVal);
+	     hook->param1.c_str());
+	hook->value = std::to_string(midiVal);
+	MidiAgent::executor(hook);
 
 }
 
@@ -115,59 +116,40 @@ vector<MidiHook *>& MidiAgent::GetMidiHooksByType(string mType)
 //The Following Functions are the meat and potatoes of actually executing midi functions.... these maps allow us to effectively exexute commands by using their string equivelents.
 // The Overloads handle the various paramaters we need to pass into obs
 
-void MidiAgent::executor(MidiHook *hook, std::string name, int midiVal)
-{
-	std::map < std::string,	std::function < void(std::string name, int value)>> funcMap = {
-		// as you can see here you can call more than one function per line if need be. may be useful if we need to get by name or id, or for data type conversion
-		{"SetVolume", [](std::string audio,int  y) { float x = (float) y; OBSController::SetVolume(QString::fromStdString(audio), Utils::mapper(x)); }}};
-	funcMap[hook->command](hook->param, midiVal);
 
-
-}
-
-void MidiAgent::executor(MidiHook *hook, std::string name, float midiVal)
-{
-	std::map < std::string,	std::function < void(std::string name, float y)>> funcMap = {
-		{"SetVolume", [](std::string audio,float  y) {  OBSController::SetVolume(QString::fromStdString(audio), Utils::mapper(y)); }},
-		{"ToggleMute", [](std::string audio,float  y) {  OBSController::ToggleMute(QString::fromStdString(audio)); }},
-		{"TakeSourceScreenshot", [](std::string audio,float  y) {  OBSController::TakeSourceScreenshot(QString::fromStdString(audio)); }}};
-	funcMap[hook->command](hook->param,  midiVal);
-}
-void MidiAgent::executor(MidiHook *hook, int y){
-	std::map < std::string,	std::function < void(int y)>> funcMap = {
-	{"SetTransitionDuration", [](int y) {  OBSController::SetTransitionDuration(y); }}};
-	funcMap[hook->command](y);
-}
 void MidiAgent::executor(MidiHook *hook){
-	std::map<std::string, std::function<void()>> funcMap = {
-		{"StartStopReplayBuffer", []() {  OBSController::StartStopReplayBuffer(); }},
-		{"StartReplayBuffer", []() { OBSController::StartReplayBuffer(); }},
-		{"StopReplayBuffer", []() { OBSController::StopReplayBuffer(); }},
-		{"SaveReplayBuffer", []() {  OBSController::SaveReplayBuffer(); }},
-		{"StartStopStreaming", []() { OBSController::StartStopStreaming(); }},
-		{"StartStreaming"  , []() {  OBSController::StartStreaming(); }},
-		{"StopStreaming", []() { OBSController::StopStreaming(); }},
-		{"StartStopRecording", []() { OBSController::StartStopRecording(); }},
-		{"StartRecording", []() { OBSController::StartRecording; }},
-		{"StopRecording", []() { OBSController::StopRecording(); }},
-		{"PauseRecording", []() { OBSController::PauseRecording(); }},
-		{"ResumeRecording", []() { OBSController::ResumeRecording(); }}};
-	funcMap[hook->command]();
+	std::map<std::string, std::function<void(MidiHook* hook)>> funcMap = {
+		
+		//dont require hook passing
+		{"StartStopReplayBuffer", [](MidiHook *hook) {  OBSController::StartStopReplayBuffer(); }},
+		{"StartReplayBuffer", [](MidiHook *hook) { OBSController::StartReplayBuffer(); }},
+		{"StartReplayBuffer", [](MidiHook *hook) { OBSController::StartReplayBuffer(); }},
+		{"StopReplayBuffer", [](MidiHook *hook) { OBSController::StopReplayBuffer(); }},
+		{"SaveReplayBuffer", [](MidiHook *hook) {  OBSController::SaveReplayBuffer(); }},
+		{"StartStopStreaming", [](MidiHook *hook) { OBSController::StartStopStreaming(); }},
+		{"StartStreaming"  , [](MidiHook *hook) {  OBSController::StartStreaming(); }},
+		{"StopStreaming", [](MidiHook *hook) { OBSController::StopStreaming(); }},
+		{"StartStopRecording", [](MidiHook *hook) { OBSController::StartStopRecording(); }},
+		{"StartRecording", [](MidiHook *hook) { OBSController::StartRecording; }},
+		{"StopRecording", [](MidiHook *hook) { OBSController::StopRecording(); }},
+		{"PauseRecording", [](MidiHook *hook) { OBSController::PauseRecording(); }},
+		{"ResumeRecording", [](MidiHook *hook) { OBSController::ResumeRecording(); }},
+		{"TriggerTransition", [](MidiHook *hook) { OBSController::TriggerTransition(); }},
+		//require hook passing
+		{"TransitionToProgram", [](MidiHook *hook) { OBSController::TransitionToProgram(hook); }},
+		{"SetVolume", [](MidiHook *hook) {  OBSController::SetVolume(hook); }},
+		{"ToggleMute", [](MidiHook *hook) {  OBSController::ToggleMute(hook); }},
+		{"TakeSourceScreenshot", [](MidiHook *hook) {  OBSController::TakeSourceScreenshot(hook); }},
+		{"SetTransitionDuration", [](MidiHook *hook) {  OBSController::SetTransitionDuration(hook); }},
+		{"SetCurrentScene", [](MidiHook *hook) {  OBSController::SetCurrentScene(hook); }},
+		{"SetPreviewScene", [](MidiHook *hook) { OBSController::SetPreviewScene(hook); }},
+		{"SetCurrentTransition", [](MidiHook *hook) {  OBSController::SetCurrentTransition(hook); }},
+		{"SetCurrentSceneCollection", [](MidiHook *hook) { OBSController::SetCurrentSceneCollection(hook); }}};
+	funcMap[hook->command](hook);
 	}
 //probably the best one to look at to see how it all works
-void MidiAgent::executor(MidiHook *hook, std::string name){
-	//remaps things
-	std::map<std::string, std::function<void(std::string name)>> funcMap = {
-		{"SetCurrentScene", [](std::string sceneName) {  OBSController::SetCurrentScene(sceneName.c_str()); }},
-		{"SetPreviewScene", [](std::string sceneName) { OBSController::SetPreviewScene(sceneName.c_str()); }},
-		{"TransitionToProgram", [](std::string sceneName) { OBSController::TransitionToProgram(sceneName); }},
-		{"SetCurrentTransition", [](std::string transition) {  OBSController::SetCurrentTransition(QString::fromStdString(transition)); }},
-		{"SetCurrentSceneCollection", [](std::string SCName) { OBSController::SetCurrentSceneCollection(QString::fromStdString(SCName)); }}};
-	//pulls command from the hook, as well as paramaters and passes them into the above map, The map calls the function, wit the passed paramaters. 
-	funcMap[hook->command](name);
-	}
-/*
-TODO: Add the following maps
+	/*
+	TODO: Add the following maps
 
 
 		{"ResetSceneItem", [](std::string sceneName,std::string item) { OBSController::ResetSceneItem(sceneName.c_str(), item.c_str()); }}};

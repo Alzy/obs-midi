@@ -77,7 +77,8 @@ set(obs-midi_SOURCES
 	obs-controller.cpp
         forms/settings-dialog.cpp
         forms/settings-midi-map.cpp
-        obs-midi.cpp)
+        obs-midi.cpp
+	device.cpp)
 
 list(APPEND obs-midi_HEADERS
         utils.h
@@ -86,7 +87,8 @@ list(APPEND obs-midi_HEADERS
 	obs-controller.h
         forms/settings-dialog.h
         forms/settings-midi-map.h
-        obs-midi.h)
+        obs-midi.h
+	device.hpp)
 
 add_library(obs-midi MODULE
         ${obs-midi_SOURCES}

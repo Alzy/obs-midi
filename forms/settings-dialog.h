@@ -33,6 +33,7 @@ public:
 	void ToggleShowHide();
 	void SetAvailableDevices(std::vector<std::string> &midiDevices);
         void pushDebugMidiMessage(std::string time, std::string message, int control, int value);
+	void on_check_clicked(bool enabled);
 	void on_btn_configure_clicked();
 	int on_check_enabled_stateChanged(int state);
 	void on_item_select();

@@ -108,6 +108,36 @@ void Device::Save(t_device device)
 	}
 	config_save(obsDevice);
 }
+void Device::addFullRow(t_device device, std::string message, int channel) {}
+void Device::addDefaultRow(t_device device, std::string message, int channel)
+{
+	t_row row = device.rows[device.total_rows+1];
+	row.MessageType = message;
+	row.channel = channel;
+	if (message == "control_change") {
+		row.InputType=1;
+	} else if (message == "note_on" || message == "note_off") {
+		row.InputType =0;
+	}
+	row.bidirectional = false;
+	row.Action=0;
+	row.option1=1; //first value
+	row.option2=0; //disabled value
+	row.option3=0; //disabled Value
+	device.total_rows += 1;
+	//add table row to struct
+	Save(device);
+}
+void Device::editRow(t_device device, std::string Mtype, int channel) {
+	//based on Message type and channel number, find and edit save info
+}
+void Device::delRow(t_device device, std::string Mtype, int channel) {
+	//based on Message type and channel number, find and delete save info
+
+	device.total_rows -= 1;
+	Save(device);
+}
+
 
 void Device::SetDefaults(t_device device)
 {

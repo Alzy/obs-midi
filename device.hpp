@@ -31,6 +31,10 @@ public:
 	void Load(t_device device);
 	void Save(t_device device);
 	void SetDefaults(t_device device);
+	void addFullRow(t_device device, std::string message, int channel);
+	void addDefaultRow(t_device device, std::string message, int channel);
+	void editRow(t_device device, std::string Mtype, int channel);
+	void delRow(t_device device, std::string Mtype, int channel);
 	config_t *GetConfigStore();
 
 	void MigrateFromGlobalSettings(t_device device);

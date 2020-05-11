@@ -17,11 +17,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 */
 
 #include <obs-frontend-api.h>
-
+#include "forms/settings-dialog.h"
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QTime>
 #include <QtWidgets/QSystemTrayIcon>
-
+#include "forms/settings-dialog.h"
 #define PARAM_ENABLED "device.Enabled"
 #define PARAM_NAME "DeviceName"
 std::string section = "MIDI-OBS-Device-";
@@ -32,38 +32,33 @@ std::string section = "MIDI-OBS-Device-";
 
 #define QT_TO_UTF8(str) str.toUtf8().constData()
 
-Device::Device(std::string name) 
+Device::Device(std::string name)
 {
-	t_device *devices;
+	SettingsDialog *set;
 
-	qsrand(QTime::currentTime().msec());
-	//obs_frontend_add_event_callback(OnFrontendEvent, this);
+	
+
+	config_t *obsDevice = GetConfigStore();
+
+	//if device exists, ignore.
+	//if device doesnt exist set defaults
+	if (!getDeviceByName(name)) {
+		t_device x;
+		x.NAME = name;
+			
+		x.Enabled = true;
+		Device::SetDefaults(x);
+		
+		config_save(obsDevice);
+		Device::Load(name);
+		
+	}
+	//obs_frontend_remove_event_callback(OnFrontendEvent, this);
+}
+bool Device::getDeviceByName(std::string name) {
+	return false;
 }
 
-typedef struct t_row {
-	int id;
-	std::string MessageType;
-	int channel;
-	int InputType;
-	bool bidirectional;
-	int Action;
-	int option1;
-	int option2;
-	int option3;
-	const char *ROW_NAME(std::string NAME)
-	{
-		std::string x = section.append(NAME);
-		std::string y = x+"-row-" + std::to_string(channel)+"-MessageType-"+MessageType;
-		return y.c_str();
-	}
-}t_row;
-typedef struct Device::t_device {
-	std::string NAME;
-	bool Enabled;
-	int total_rows;
-	const char *SECTION_NAME = section.append(NAME).c_str();
-	t_row * rows;
-}t_device;
 Device::~Device()
 {
 	
@@ -156,6 +151,7 @@ void Device::SetDefaults(t_device device)
 		config_set_default_bool(obsDevice, device.SECTION_NAME,	PARAM_ENABLED, device.Enabled);
 		config_set_default_string(obsDevice, device.SECTION_NAME, PARAM_NAME, device.NAME.c_str());
 	}
+	config_save(obsDevice);
 }
 
 config_t *Device::GetConfigStore()

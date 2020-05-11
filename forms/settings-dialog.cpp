@@ -27,7 +27,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #include <qdialogbuttonbox.h>
 #include <qcheckbox.h>
-
+#include <device.hpp>
 
 #define CHANGE_ME "changeme"
 
@@ -40,6 +40,7 @@ SettingsDialog::SettingsDialog(QWidget *parent, vector<MidiAgent *> activeMidiAg
 	connect(ui->btn_configure, &QPushButton::clicked, this,&SettingsDialog::on_btn_configure_clicked);
 	connect(ui->check_enabled, &QCheckBox::toggled, this, &SettingsDialog::on_check_clicked);
 	connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::FormAccepted);
+	
 }
 
 
@@ -50,6 +51,10 @@ void SettingsDialog::ToggleShowHide() {
 		setVisible(false);
 }
 
+void SettingsDialog::setCheck(bool x)
+{
+	this->ui->check_enabled->setChecked(x);
+}
 
 void SettingsDialog::SetAvailableDevices(std::vector<std::string> &midiDevices)
 {
@@ -63,8 +68,8 @@ void SettingsDialog::SetAvailableDevices(std::vector<std::string> &midiDevices)
 	for (int i = 0; i < midiDevices.size(); i++) {
 		this->ui->list_midi_dev->addItem(midiDevices.at(i).c_str());
 		std::string name = midiDevices.at(i);
-		//Device x = Device(name); 
-		//this->ui->check_enabled->setEnabled(x.getEnabled(name));
+		Device x = Device(name); 
+		this->ui->check_enabled->setEnabled(x.getEnabled(name));
 	}
 }
 void SettingsDialog::on_check_clicked(bool enabled) {

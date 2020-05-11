@@ -23,14 +23,44 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <QtCore/QString>
 #include <QtCore/QSharedPointer>
 
+typedef struct t_row {
+	int id;
+	std::string MessageType;
+	int channel;
+	int InputType;
+	bool bidirectional;
+	int Action;
+	int option1;
+	int option2;
+	int option3;
+	std::string section = "MIDI-OBS-Device-";
+	const char *ROW_NAME(std::string NAME)
+	{
+		std::string x = section.append(NAME);
+		std::string y = x + "-row-" + std::to_string(channel) +
+				"-MessageType-" + MessageType;
+		return y.c_str();
+	}
+} t_row;
+typedef struct t_device {
+	std::string NAME;
+	bool Enabled;
+	int total_rows;
+	std::string section = "MIDI-OBS-Device-";
+	const char *SECTION_NAME = section.append(NAME).c_str();
+	t_row *rows;
+} t_device;
+
+
 class Device {
 public:
-	Device(std::string name);
+	Device(std::string x);
 	~Device();
-	struct t_device;
+	std::string section = "MIDI-OBS-Device-";
 
 	t_device Load(std::string name);
 	bool getEnabled(std::string name);
+	bool getDeviceByName(std::string name);
 	void Save(t_device device);
 	void SetDefaults(t_device device);
 	void addFullRow(t_device device, std::string message, int channel);
@@ -41,8 +71,7 @@ public:
 
 	void MigrateFromGlobalSettings(t_device device);
 
-
-
+	
 private:
 };
 #pragma once

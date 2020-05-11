@@ -15,6 +15,7 @@
 #include "config.h"
 #include "utils.h"
 #include "midi-agent.h"
+#include "device.hpp"
 
 using namespace std;
 
@@ -83,7 +84,11 @@ bool obs_module_load(void)
 
 			vector<string> devNames;
 			for (int i = 0; i < nDevices; i++) {
-				devNames.push_back(sdMidi->getPortName(i));
+				std::string portn = sdMidi->getPortName(i);
+				devNames.push_back(portn);
+				Device::Device(portn);
+
+				
 			}
 			settingsDialog->SetAvailableDevices(devNames);
 		}

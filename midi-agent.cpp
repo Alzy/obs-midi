@@ -148,16 +148,25 @@ void MidiAgent::executor(MidiHook *hook){
 		{"ResumeRecording", []() { OBSController::ResumeRecording(); }}};
 	funcMap[hook->command]();
 	}
+
+void MidiAgent::executor(MidiHook *hook, std::string name){
+	std::map<std::string, std::function<void(std::string name)>> funcMap = {
+		{"SetCurrentScene", [](std::string sceneName) {  OBSController::SetCurrentScene(sceneName.c_str()); }},
+		{"SetPreviewScene", [](std::string sceneName) { OBSController::SetPreviewScene(sceneName.c_str()); }},
+		{"TransitionToProgram", [](std::string sceneName) { OBSController::TransitionToProgram(sceneName); }},
+		{"SetCurrentTransition", [](std::string transition) {  OBSController::SetCurrentTransition(QString::fromStdString(transition)); }},
+		{"SetCurrentSceneCollection", [](std::string SCName) { OBSController::SetCurrentSceneCollection(QString::fromStdString(SCName)); }}};
+	funcMap[hook->command](name);
+	}
 /*
 TODO: Add the following maps
 
-		"SetCurrentScene":           [1,  'scene-name'                      ],	
-                "SetPreviewScene":           [1,  'scene-name'                      ],
-                "TransitionToProgram":       [1,  'scene-name'                      ],
-                "SetCurrentTransition":      [1,  'transition'                      ],
-                "SetCurrentProfile":         [1,  'profile'                         ],
-                "SetCurrentSceneCollection": [1,  'sc-name'                         ],
+
+		{"ResetSceneItem", [](std::string sceneName,std::string item) { OBSController::ResetSceneItem(sceneName.c_str(), item.c_str()); }}};
+
                 "ResetSceneItem":            [1,  'item'                            ],
+
+
                 "SetMute":                   [2,  'source', 'bool'                  ],
                 "SetSyncOffset":             [2,  'source', 'offset'                ],
                 "ReloadBrowserSource":       [2,  'source', 'url'                   ],
@@ -167,6 +176,8 @@ TODO: Add the following maps
                 "SetBrowserSourceURL":       [2,  'source', 'url'                   ],
                 "SetSourceVisibility":       [2,  'item',   'bool'                  ],
                 "ToggleSourceVisibility":    [2,  'item',   'bool'                  ],
+
+
                 "SetSourceScale":            [3,  'source', 'item',     'scale'     ],
                 "SetSourcePosition":         [3,  'source', 'item',     'position'  ],
                 "SetSourceRotation":         [3,  'source', 'item',     'rotation'  ],

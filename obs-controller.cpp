@@ -104,6 +104,14 @@ void OBSController::TransitionToProgram()
 {
 	obs_frontend_preview_program_trigger_transition();
 }
+/**
+ * Transitions the currently previewed scene to the main output.
+ */
+void OBSController::TransitionToProgram(std::string scene)
+{
+	obs_frontend_preview_program_trigger_transition();
+	
+}
 
 /**
  * Transitions the currently previewed scene to the main output using specified transition.

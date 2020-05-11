@@ -51,6 +51,7 @@ class MidiAgent {
 		void RemoveMidiHook(string mType, MidiHook *hook);
 		void executor(MidiHook *hook, std::string source, float midiVal);
 		void executor(MidiHook *hook, std::string name, int midiVal);
+		void executor(MidiHook *hook, std::string name);
 		void executor(MidiHook *hook);
 		void executor(MidiHook *hook, int y);
 

@@ -63,7 +63,7 @@ void Config::Save()
 
 	config_set_bool(obsConfig, SECTION_NAME, PARAM_DEBUG, DebugEnabled);
 	config_set_bool(obsConfig, SECTION_NAME, PARAM_ALERT, AlertsEnabled);
-
+	
 	config_save(obsConfig);
 }
 

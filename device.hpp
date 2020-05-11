@@ -27,17 +27,15 @@ class Device {
 public:
 	Device();
 	~Device();
-	void Load(std::string NAME);
-	void Save(std::string NAME);
-	void SetDefaults(std::string NAME);
+	struct t_device;
+	void Load(t_device device);
+	void Save(t_device device);
+	void SetDefaults(t_device device);
 	config_t *GetConfigStore();
 
-	void MigrateFromGlobalSettings(std::string NAME);
+	void MigrateFromGlobalSettings(t_device device);
 
-	bool DeviceEnabled;
-	std::string DeviceName;
 
-	bool SettingsLoaded;
 
 private:
 };

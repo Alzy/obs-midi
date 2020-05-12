@@ -32,9 +32,9 @@ using namespace std;
 /**
  * Sets the currently active scene
  */
-void OBSController::SetCurrentScene(MidiHook *hook)
+void OBSController::SetCurrentScene(const char *sceneName)
 {
-	OBSSourceAutoRelease source = obs_get_source_by_name(hook->param1.c_str());
+	OBSSourceAutoRelease source = obs_get_source_by_name(sceneName);
 
 	if (source) {
 		obs_frontend_set_current_scene(source);
@@ -46,9 +46,8 @@ void OBSController::SetCurrentScene(MidiHook *hook)
 /**
  * Sets the scene in preview. Must be in Studio mode or will throw error
  */
-void OBSController::SetPreviewScene(MidiHook *hook)
+void OBSController::SetPreviewScene(const char *sceneName)
 {
-	QString sceneName = hook->param1.c_str();
 	if (!obs_frontend_preview_program_mode_active()) {
 		throw("studio mode not enabled");
 	}
@@ -63,30 +62,28 @@ void OBSController::SetPreviewScene(MidiHook *hook)
 /**
  * Change the active scene collection.
  */
-void OBSController::SetCurrentSceneCollection(MidiHook *hook)
+void OBSController::SetCurrentSceneCollection(QString sceneCollection)
 {
-	QString SCName = hook->param1.c_str();
-	if (SCName.isEmpty()) {
+	if (sceneCollection.isEmpty()) {
 		throw("Scene Collection name is empty");
 	}
 
 	// TODO : Check if specified profile exists and if changing is allowed
-	obs_frontend_set_current_scene_collection(SCName.toUtf8());
+	obs_frontend_set_current_scene_collection(sceneCollection.toUtf8());
 }
 
 /**
 * Reset a scene item.
 */
-void OBSController::ResetSceneItem(MidiHook *hook)
+void OBSController::ResetSceneItem(const char * sceneName, const char * itemName)
 {
-	std::string sceneName = hook->param1;
-	OBSScene scene = Utils::GetSceneFromNameOrCurrent(QString::fromStdString(sceneName));
+	OBSScene scene = Utils::GetSceneFromNameOrCurrent(sceneName);
 	if (!scene) {
 		throw("requested scene doesn't exist");
 	}
 
 	obs_data_t *params = obs_data_create();
-	obs_data_set_string(params, "scene-name", sceneName.c_str());
+	obs_data_set_string(params, "scene-name", sceneName);
 	OBSDataItemAutoRelease itemField = obs_data_item_byname(params, "item");
 
 	OBSSceneItemAutoRelease sceneItem = Utils::GetSceneItemFromRequestField(scene, itemField);
@@ -103,28 +100,18 @@ void OBSController::ResetSceneItem(MidiHook *hook)
 /**
  * Transitions the currently previewed scene to the main output.
  */
-void OBSController::TriggerTransition()
+void OBSController::TransitionToProgram()
 {
 	obs_frontend_preview_program_trigger_transition();
 }
-
-
-
-
-
-
-
-
 
 
 /**
  * Transitions the currently previewed scene to the main output using specified transition.
  * transitionDuration is optional. (milliseconds)
  */
-void OBSController::TransitionToProgram(MidiHook *hook)
+void OBSController::TransitionToProgram(QString transitionName, int transitionDuration)
 {
-	QString transitionName = hook->param1.c_str();
-	int transitionDuration = std::stoi(hook->value);
 	if (!obs_frontend_preview_program_mode_active()) {
 		throw("studio mode not enabled");
 	}
@@ -144,10 +131,8 @@ void OBSController::TransitionToProgram(MidiHook *hook)
 /**
  * Set the active transition.
  */
-void OBSController::SetCurrentTransition(MidiHook *hook)
+void OBSController::SetCurrentTransition(QString name)
 {
-	QString name = hook->param1.c_str();
-
 	bool success = Utils::SetTransitionByName(name);
 	if (!success) {
 		throw("requested transition does not exist");
@@ -157,24 +142,20 @@ void OBSController::SetCurrentTransition(MidiHook *hook)
 /**
  * Set the duration of the currently active transition
  */
-void OBSController::SetTransitionDuration(MidiHook *hook)
+void OBSController::SetTransitionDuration(int duration)
 {
-	int duration = std::stoi(hook->value);
-
 	obs_frontend_set_transition_duration(duration);
 }
 
-void OBSController::SetSourceVisibility(MidiHook *hook) {} //DOESNT EXIST
+void OBSController::SetSourceVisibility() {} //DOESNT EXIST
 
-void OBSController::ToggleSourceVisibility(MidiHook *hook) {} //DOESNT EXIST
+void OBSController::ToggleSourceVisibility() {} //DOESNT EXIST
 
 /**
 * Inverts the mute status of a specified source.
 */
-void OBSController::ToggleMute(MidiHook *hook)
+void OBSController::ToggleMute(QString sourceName)
 {
-	QString sourceName = hook->param1.c_str();
-
 	if (sourceName.isEmpty()) {
 		throw("sourceName is empty");
 	}
@@ -190,11 +171,8 @@ void OBSController::ToggleMute(MidiHook *hook)
 /**
  * Sets the mute status of a specified source.
  */
-void OBSController::SetMute(MidiHook *hook)
+void OBSController::SetMute(QString sourceName, bool mute)
 {
-	QString sourceName = hook->param1.c_str();
-	bool mute = std::stoi(hook->param2);
-
 	if (sourceName.isEmpty()) {
 		throw("sourceName is empty");
 	}
@@ -344,10 +322,8 @@ void OBSController::SaveReplayBuffer()
 	calldata_free(&cd);
 }
 
-void OBSController::SetCurrentProfile(MidiHook *hook)
+void OBSController::SetCurrentProfile(QString profileName)
 {
-	QString profileName = hook->param1.c_str();
-
 	if (profileName.isEmpty()) {
 		throw("profile name is empty");
 	}
@@ -356,19 +332,19 @@ void OBSController::SetCurrentProfile(MidiHook *hook)
 	obs_frontend_set_current_profile(profileName.toUtf8());
 }
 
-void OBSController::SetTextGDIPlusText(MidiHook *hook) {}
+void OBSController::SetTextGDIPlusText() {}
 
-void OBSController::SetBrowserSourceURL(MidiHook *hook) {}
+void OBSController::SetBrowserSourceURL() {}
 
-void OBSController::ReloadBrowserSource(MidiHook *hook) {}
+void OBSController::ReloadBrowserSource() {}
 
-void OBSController::TakeSourceScreenshot(MidiHook *hook) {}
+void OBSController::TakeSourceScreenshot(QString source) {}
 
-void OBSController::EnableSourceFilter(MidiHook *hook) {}
+void OBSController::EnableSourceFilter() {}
 
-void OBSController::DisableSourceFilter(MidiHook *hook) {}
+void OBSController::DisableSourceFilter() {}
 
-void OBSController::ToggleSourceFilter(MidiHook *hook) {}
+void OBSController::ToggleSourceFilter() {}
 
 
 
@@ -376,29 +352,22 @@ void OBSController::ToggleSourceFilter(MidiHook *hook) {}
 // CC ACTIONS //
 ////////////////
 
-void OBSController::SetVolume(MidiHook *hook)
+void OBSController::SetVolume(QString source, float volume)
 {
-	QString source = hook->param1.c_str();
-	
-	float volume = std::stoi(hook->value);
-	float mvol = Utils::mapper(volume);
 	OBSSourceAutoRelease obsSource =
 		obs_get_source_by_name(source.toUtf8());
 	if (!obsSource) {
 		return; // source does not exist
 	}
 
-	obs_source_set_volume(obsSource, mvol);
+	obs_source_set_volume(obsSource, volume);
 }
 
 /**
  * Set the audio sync offset of a specified source.
  */
-void OBSController::SetSyncOffset(MidiHook *hook)
+void OBSController::SetSyncOffset(QString sourceName, int64_t sourceSyncOffset)
 {
-	QString sourceName = hook->param1.c_str();
-	int sourceSyncOffset = std::stoi(hook->value);
-
 	if (sourceName.isEmpty()) {
 		throw("source name is empty");
 	}
@@ -411,12 +380,12 @@ void OBSController::SetSyncOffset(MidiHook *hook)
 	obs_source_set_sync_offset(source, sourceSyncOffset);
 }
 
-void OBSController::SetSourcePosition(MidiHook *hook) {}
+void OBSController::SetSourcePosition() {}
 
-void OBSController::SetSourceRotation(MidiHook *hook) {}
+void OBSController::SetSourceRotation() {}
 
-void OBSController::SetSourceScale(MidiHook *hook) {}
+void OBSController::SetSourceScale() {}
 
-void OBSController::SetGainFilter(MidiHook *hook) {}
+void OBSController::SetGainFilter() {}
 
-void OBSController::SetOpacity(MidiHook *hook) {}
+void OBSController::SetOpacity() {}

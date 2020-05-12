@@ -31,7 +31,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #define CHANGE_ME "changeme"
 
-SettingsDialog::SettingsDialog(QWidget *parent, vector<MidiAgent *> activeMidiAgents):QDialog(parent, Qt::Dialog),ui(new Ui::SettingsDialog)
+SettingsDialog::SettingsDialog(QWidget *parent, vector<MidiAgent *> &activeMidiAgents):QDialog(parent, Qt::Dialog),ui(new Ui::SettingsDialog)
 {
 	ui->setupUi(this);
 
@@ -41,7 +41,9 @@ SettingsDialog::SettingsDialog(QWidget *parent, vector<MidiAgent *> activeMidiAg
 	connect(ui->check_enabled, &QCheckBox::toggled, this, &SettingsDialog::on_check_clicked);
 	connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::FormAccepted);
 
-	
+	//MidiHook* mh = new MidiHook(8, "SetVolume", "Desktop Audio");
+	//activeMidiAgents.at(0)->AddMidiHook("control_change", mh);
+	blog(LOG_INFO, "Active Midi Agents: %d", activeMidiAgents.size());
 }
 
 

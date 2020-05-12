@@ -34,7 +34,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 Q_DECLARE_METATYPE(OBSScene);
 
-float Utils::mapper(float x)
+float Utils::mapper(int x)
 
 {
 	float in_min = 0;
@@ -44,15 +44,28 @@ float Utils::mapper(float x)
 	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
+bool Utils::is_number(const std::string& s)
+{
+	std::string::const_iterator it = s.begin();
+	while (it != s.end() && std::isdigit(*it)) ++it;
+	return !s.empty() && it == s.end();
+}
+
 std::string Utils::getMidiMessageType(int in)
 {
-	std::map<int, std::string> MsgType;
-	MsgType.insert(std::pair<int, std::string>(176, "control_change"));
-	MsgType.insert(std::pair<int, std::string>(128, "note_off"));
-	MsgType.insert(std::pair<int, std::string>(144, "note_on"));
-	MsgType.insert(std::pair<int, std::string>(192, "program_change"));
-	std::string a = MsgType[in];
-	return a;
+	switch (in)
+	{
+	case 176:
+		return "control_change";
+	case 128:
+		return "note_off";
+	case 144:
+		return "note_on";
+	case 192:
+		"program_change";
+	default:
+		return "";
+	}
 }
 
 

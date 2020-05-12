@@ -33,9 +33,8 @@ public:
 	string param1;
 	string param2;
 	string param3;
-	string value;
 
-	MidiHook(int i, string c, string p="", string p2="", string p3="") : index(i), command(c), param1(p),param2(p2),param3(p3) {}
+	MidiHook(int i, string c, string p1 = "", string p2 = "", string p3 = "") : index(i), command(c), param1(p1), param2(p2), param3(p3) {}
 };
 
 
@@ -52,8 +51,6 @@ class MidiAgent {
 		void TriggerInputCommand(MidiHook *hook, int midiVal);
 		void AddMidiHook(string mType, MidiHook *hook);
 		void RemoveMidiHook(string mType, MidiHook *hook);
-	
-		void executor(MidiHook *hook);
 
 	private:
 		RtMidiIn *midiin;

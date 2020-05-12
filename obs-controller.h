@@ -32,7 +32,6 @@ namespace OBSController
 	void SetCurrentSceneCollection(QString sceneCollection);
 	void ResetSceneItem(const char *sceneName, const char *itemName);
 	void TransitionToProgram();
-	void TransitionToProgram(std::string name);
 	void TransitionToProgram(QString transitionName, int transitionDuration = 300);
 	void SetCurrentTransition(QString name);
 	void SetTransitionDuration(int duration); // can also be used with cc

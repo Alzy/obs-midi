@@ -30,9 +30,11 @@ class MidiHook {
 public:
 	int index;
 	string command;
-	string param;
+	string param1;
+	string param2;
+	string param3;
 
-	MidiHook(int i, string c, string p) : index(i), command(c), param(p) {}
+	MidiHook(int i, string c, string p1 = "", string p2 = "", string p3 = "") : index(i), command(c), param1(p1), param2(p2), param3(p3) {}
 };
 
 

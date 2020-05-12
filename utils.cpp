@@ -44,6 +44,13 @@ float Utils::mapper(int x)
 	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
+bool Utils::is_number(const std::string& s)
+{
+	std::string::const_iterator it = s.begin();
+	while (it != s.end() && std::isdigit(*it)) ++it;
+	return !s.empty() && it == s.end();
+}
+
 std::string Utils::getMidiMessageType(int in)
 {
 	std::map<int, std::string> MsgType;

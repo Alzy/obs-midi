@@ -39,7 +39,7 @@ Device::Device(std::string name)
 	
 
 	config_t *obsDevice = GetConfigStore();
-
+	t_device x;
 	//if device exists, ignore.
 	//if device doesnt exist set defaults
 	if (!getDeviceByName(name)) {
@@ -52,7 +52,10 @@ Device::Device(std::string name)
 		config_save(obsDevice);
 		Device::Load(name);
 		
+	} else {
+		x = Device::Load(name);
 	}
+	//set->setCheck(x.Enabled); errors out due to window not being created yet?
 	//obs_frontend_remove_event_callback(OnFrontendEvent, this);
 }
 bool Device::getDeviceByName(std::string name) {
@@ -76,6 +79,16 @@ t_device Device::Load(std::string name)
 	config_t *obsDevice = GetConfigStore();
 	device.Enabled = config_get_bool(obsDevice, device.SECTION_NAME, PARAM_ENABLED);
 	device.NAME = config_get_string(obsDevice, device.SECTION_NAME, PARAM_NAME);
+	std::string en;
+	if (device.Enabled)
+	{
+		en = "enabled";
+	} else {
+		en = "disabled";
+	};
+	blog(LOG_INFO, "EnableCheck- ");
+	blog(LOG_INFO, en.c_str());
+	
 	for (int i = 0; i < device.total_rows; i++) {
 		//load Each Row
 		device.rows[i].MessageType   = config_get_string(obsDevice, device.rows[i].ROW_NAME(device.SECTION_NAME), "MessageType");
@@ -87,6 +100,7 @@ t_device Device::Load(std::string name)
 		device.rows[i].option2       = config_get_int   (obsDevice, device.rows[i].ROW_NAME(device.SECTION_NAME), "Option2");
 		device.rows[i].option3       = config_get_int   (obsDevice, device.rows[i].ROW_NAME(device.SECTION_NAME), "Option3");
 	}
+	
 	return device;
 }
 

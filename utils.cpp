@@ -53,13 +53,19 @@ bool Utils::is_number(const std::string& s)
 
 std::string Utils::getMidiMessageType(int in)
 {
-	std::map<int, std::string> MsgType;
-	MsgType.insert(std::pair<int, std::string>(176, "control_change"));
-	MsgType.insert(std::pair<int, std::string>(128, "note_off"));
-	MsgType.insert(std::pair<int, std::string>(144, "note_on"));
-	MsgType.insert(std::pair<int, std::string>(192, "program_change"));
-	std::string a = MsgType[in];
-	return a;
+	switch (in)
+	{
+	case 176:
+		return "control_change";
+	case 128:
+		return "note_off";
+	case 144:
+		return "note_on";
+	case 192:
+		"program_change";
+	default:
+		return "";
+	}
 }
 
 

@@ -138,16 +138,20 @@ void MidiAgent::HandleInput(double deltatime,
 	MidiAgent *self = static_cast<MidiAgent *>(userData);
 
 	string mType = Utils::getMidiMessageType(message->at(0));
+	if (mType.empty()) { return; } // unknown message type. return.
 	int mIndex = message->at(1);
 
-	vector<MidiHook *> *hooks = &self->GetMidiHooksByType(mType);
+	try
+	{
+		vector<MidiHook *> *hooks = &self->GetMidiHooksByType(mType);
 
-	// check if hook exists for this note or cc index and launch it
-	for (unsigned i = 0; i < hooks->size(); i++) {
-		if (hooks->at(i)->index == mIndex) {
-			self->TriggerInputCommand(hooks->at(i), (int)message->at(2));
+		// check if hook exists for this note or cc index and launch it
+		for (unsigned i = 0; i < hooks->size(); i++) {
+			if (hooks->at(i)->index == mIndex) {
+				self->TriggerInputCommand(hooks->at(i), (int)message->at(2));
+			}
 		}
-	}
+	} catch (const std::exception&) { return; }
 }
 
 void MidiAgent::TriggerInputCommand(MidiHook* hook, int midiVal)

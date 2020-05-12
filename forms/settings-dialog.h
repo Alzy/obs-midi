@@ -28,7 +28,7 @@ class SettingsDialog : public QDialog
 	Q_OBJECT
 
 public:
-	SettingsDialog(QWidget* parent, std::vector<MidiAgent *> activeMidiAgents);
+	SettingsDialog(QWidget* parent, std::vector<MidiAgent *> &activeMidiAgents);
 	~SettingsDialog();
 	void ToggleShowHide();
 	void SetAvailableDevices(std::vector<std::string> &midiDevices);

@@ -42,6 +42,7 @@ public:
 	void AddRow(std::string mtype, int channel);
 	void AddRow(std::string mtype, int channel, int input_type,
 		    bool bidirectional, int action);
+	void MakeScenes(int row, int col);
 
 
 private Q_SLOTS:

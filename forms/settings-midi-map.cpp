@@ -14,9 +14,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 */
 
 #include <obs-frontend-api.h>
-
+#include <iostream>
+#include <string>
 #include "settings-midi-map.h"
-
+#include "utils.h"
 #include <qdialogbuttonbox.h>
 #include <QDialog>
 #include <qcombobox.h>
@@ -156,9 +157,8 @@ void SettingsMidiMap::MakeButtonActionsCombo(int row, int existing)
 	ui->tbl_midimap->setCellWidget(row, 4, combo);
 }
 void SettingsMidiMap::MakeOption1(int row) {
-	QComboBox *combo = new QComboBox;
-	ui->tbl_midimap->setItem(row, 5, new QTableWidgetItem);
-	ui->tbl_midimap->setCellWidget(row, 5, combo);
+	MakeScenes(row, 5);
+
 }
 void SettingsMidiMap::MakeOption2(int row) {
 	QComboBox *combo = new QComboBox;
@@ -214,4 +214,17 @@ void SettingsMidiMap::AddRow(std::string mtype, int channel, int input_type, boo
 	SettingsMidiMap::MakeOption1(startrow);
 	SettingsMidiMap::MakeOption2(startrow);
 	SettingsMidiMap::MakeOption3(startrow);
+}
+void SettingsMidiMap::MakeScenes(int row, int col) {
+	QComboBox *combo = new QComboBox;
+	obs_data_array_t *scenes = Utils::GetScenes();
+	//scene count
+	size_t x = obs_data_array_count(scenes);
+	for (size_t i = 0; i < x; i++) {
+		obs_data_t *scene = obs_data_array_item(scenes, i);
+		//obs_data_get_json(scene);
+		combo->addItem(obs_data_get_string(scene, "name"));
+	}
+	ui->tbl_midimap->setItem(row, 5, new QTableWidgetItem);
+	ui->tbl_midimap->setCellWidget(row, 5, combo);
 }

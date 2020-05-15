@@ -30,5 +30,8 @@ using OBSDataItemAutoRelease =
 
 
 class Config;
+class DeviceManager;
 typedef std::shared_ptr<Config> ConfigPtr;
+typedef std::shared_ptr<DeviceManager> DeviceManagerPtr;
 ConfigPtr GetConfig();
+DeviceManagerPtr GetDeviceManager();

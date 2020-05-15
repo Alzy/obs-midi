@@ -29,7 +29,7 @@ class SettingsDialog : public QDialog
 	Q_OBJECT
 
 public:
-	SettingsDialog(QWidget* parent, std::vector<MidiAgent *> &activeMidiAgents);
+	SettingsDialog(QWidget* parent);
 	~SettingsDialog();
 	void ToggleShowHide();
 	void setCheck(bool check);

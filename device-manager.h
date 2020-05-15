@@ -23,23 +23,28 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <QtCore/QString>
 #include <QtCore/QSharedPointer>
 #include <vector>
+#include "midi-agent.h"
 
 using namespace std;
 
-class Config {
+class DeviceManager {
 	public:
-		Config();
-		~Config();
-		void Load();
-		void Save();
-		void SetDefaults();
-		config_t* GetConfigStore();
+		DeviceManager();
+		~DeviceManager();
+		void Load(obs_data_t* data);
 
-		bool DebugEnabled;
-		bool AlertsEnabled;
+		vector <string> GetPortsList();
+		int GetPortNumberByDeviceName(const char* deviceName);
 
-		bool SettingsLoaded;
+		vector<MidiAgent*> GetActiveMidiDevices();
+		MidiAgent* GetMidiDeviceByName(const char* deviceName);
+		vector <MidiHook *> GetMidiHooksByDeviceName(const char* deviceName);
+
+		void RegisterMidiDevice(int port);
+
+		obs_data_t* GetData();
 
 	private:
-		static void OnFrontendEvent(enum obs_frontend_event event, void* param);
+		RtMidiIn* rtMidi;
+		vector<MidiAgent*> midiAgents;
 };

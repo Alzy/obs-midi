@@ -22,16 +22,18 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <utility>
 #include "midi-agent.h"
 
+#include "obs-midi.h"
+#include "device-manager.h"
+#include "config.h"
 #include "settings-dialog.h"
 #include "settings-midi-map.h"
 
 #include <qdialogbuttonbox.h>
 #include <qcheckbox.h>
-#include <device.hpp>
 
 #define CHANGE_ME "changeme"
 
-SettingsDialog::SettingsDialog(QWidget *parent, vector<MidiAgent *> &activeMidiAgents):QDialog(parent, Qt::Dialog),ui(new Ui::SettingsDialog)
+SettingsDialog::SettingsDialog(QWidget *parent):QDialog(parent, Qt::Dialog),ui(new Ui::SettingsDialog)
 {
 	ui->setupUi(this);
 
@@ -40,10 +42,6 @@ SettingsDialog::SettingsDialog(QWidget *parent, vector<MidiAgent *> &activeMidiA
 	connect(ui->btn_configure, &QPushButton::clicked, this,&SettingsDialog::on_btn_configure_clicked);
 	connect(ui->check_enabled, &QCheckBox::toggled, this, &SettingsDialog::on_check_clicked);
 	connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::FormAccepted);
-
-	//MidiHook* mh = new MidiHook(8, "SetVolume", "Desktop Audio");
-	//activeMidiAgents.at(0)->AddMidiHook("control_change", mh);
-	blog(LOG_INFO, "Active Midi Agents: %d", activeMidiAgents.size());
 }
 
 
@@ -71,8 +69,6 @@ void SettingsDialog::SetAvailableDevices(std::vector<std::string> &midiDevices)
 	for (int i = 0; i < midiDevices.size(); i++) {
 		this->ui->list_midi_dev->addItem(midiDevices.at(i).c_str());
 		std::string name = midiDevices.at(i);
-		Device x = Device(name); 
-		this->ui->check_enabled->setEnabled(x.getEnabled(name));
 	}
 }
 void SettingsDialog::on_check_clicked(bool enabled) {
@@ -109,8 +105,36 @@ void SettingsDialog::on_btn_configure_clicked()
 
 int SettingsDialog::on_check_enabled_stateChanged(bool state)
 {
+	auto deviceManager = GetDeviceManager();
+	string selectedDeviceName = ui->list_midi_dev->currentItem()->text().toStdString();
+
+	auto device = deviceManager->GetMidiDeviceByName(selectedDeviceName.c_str());
+	if (state == true) {
+		blog(LOG_INFO, "Item enabled: %s", selectedDeviceName.c_str());
+		int devicePort = deviceManager->GetPortNumberByDeviceName(selectedDeviceName.c_str());
+		if (device == NULL)
+		{
+			deviceManager->RegisterMidiDevice(devicePort);
+		}
+		else
+		{
+			device->OpenPort(devicePort);
+		}
+	}
+	else {
+		if (device != NULL)
+		{
+			device->ClosePort();
+		}
+		blog(LOG_INFO, "Item disabled: %s", selectedDeviceName.c_str());
+	}
+
 	pushDebugMidiMessage("time", "Check State", state, 0);
 	ui->btn_configure->setEnabled(state);
+
+	auto config = GetConfig();
+	config->Save();
+
 	return state;
 }
 
@@ -121,9 +145,19 @@ void SettingsDialog::on_item_select()
 	pushDebugMidiMessage("item clicked",current.toLocal8Bit().data(), 0, 0);
 
 	// Pull info on if device is enabled, if so set true if not set false
-	ui->check_enabled->setChecked(false);
+	auto deviceManager = GetDeviceManager();
+	string selectedDeviceName = current.toStdString();
+	auto device = deviceManager->GetMidiDeviceByName(selectedDeviceName.c_str());
+	if (device != NULL && device->isEnabled())
+	{
+		ui->check_enabled->setChecked(true);
+	}
+	else {
+		ui->check_enabled->setChecked(false);
 
-	//If enabled, allow for configuration, if not disable it.
+	}
+
+	//If enabled, enable configuration button, if not disable it.
 	if (ui->check_enabled->checkState()) {
 		ui->btn_configure->setEnabled(true);
 	} else {

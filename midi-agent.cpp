@@ -29,6 +29,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 using namespace std;
 
+
 ///////////////////////
 /* MIDI HOOK ROUTES */
 //////////////////////
@@ -110,50 +111,94 @@ MidiAgent::MidiAgent()
 	midiin->setCallback(&MidiAgent::HandleInput, this);
 
 	// for testing..  remove me:
-	MidiHook *mh = new MidiHook(7, "SetVolume", "Desktop Audio");
-	AddMidiHook("control_change", mh);
+	//MidiHook *mh = new MidiHook("control_change", 7, "SetVolume", "Desktop Audio", "" ,  "", "fader");
+	MidiHook *mh = new MidiHook("control_change", 7, "SetVolume", "Desktop Audio");
+	AddMidiHook(mh);
 }
 
 MidiAgent::~MidiAgent()
 {
-	UnsetMidiDevice();
+	ClosePort();
 	delete midiin;
 }
 
-void MidiAgent::SetMidiDevice(int port)
+/* Loads information from OBS data. (recalled from Config)
+ * This will not enable the MidiAgent or open the port. (and shouldn't)
+ */
+void MidiAgent::Load(obs_data_t * data)
+{
+	name = obs_data_get_string(data, "name");
+	enabled = obs_data_get_bool(data, "enabled");
+	obs_data_array_t* hooksData = obs_data_get_array(data, "hooks");
+	size_t hooksCount = obs_data_array_count(hooksData);
+	for (size_t i = 0; i < hooksCount; i++)
+	{
+		obs_data_t* hookData = obs_data_array_item(hooksData, i);
+		MidiHook* mh = new MidiHook(
+			obs_data_get_string(hookData, "type"),
+			obs_data_get_int(hookData, "index"),
+			obs_data_get_string(hookData, "command"),
+			obs_data_get_string(hookData, "param1"),
+			obs_data_get_string(hookData, "param2"),
+			obs_data_get_string(hookData, "param3"),
+			obs_data_get_string(hookData, "action")
+		);
+		AddMidiHook(mh);
+	}
+
+}
+
+/* Will open the port and enable this MidiAgent
+*/
+void MidiAgent::OpenPort(int port)
 {
 	midiin->openPort(port);
 	name = midiin->getPortName(port);
+	enabled = true;
+	connected = true;
 	blog(LOG_INFO, "MIDI device connected: [%d] %s", port, name.c_str());
 }
 
-void MidiAgent::UnsetMidiDevice()
+/* Will close the port and disable this MidiAgent
+*/
+void MidiAgent::ClosePort()
 {
 	midiin->closePort();
+	enabled = false;
+	connected = false;
 }
 
+
+string MidiAgent::GetName() { return name; }
+int MidiAgent::GetPort() { return port; }
+bool MidiAgent::isEnabled() { return enabled; }
+bool MidiAgent::isConnected() { return connected; }
+
+
+/* Midi input callback.
+ * Extend input handling functionality here.
+ * For OBS command triggers, edit the funcMap instead.
+ */
 void MidiAgent::HandleInput(double deltatime,
 			    std::vector<unsigned char> *message, void *userData)
 {
 	MidiAgent *self = static_cast<MidiAgent *>(userData);
+	if (self->enabled == false || self->connected == false){ return; }
 
 	string mType = Utils::getMidiMessageType(message->at(0));
 	if (mType.empty()) { return; } // unknown message type. return.
 	int mIndex = message->at(1);
 
-	try
-	{
-		vector<MidiHook *> *hooks = &self->GetMidiHooksByType(mType);
-
-		// check if hook exists for this note or cc index and launch it
-		for (unsigned i = 0; i < hooks->size(); i++) {
-			if (hooks->at(i)->index == mIndex) {
-				self->TriggerInputCommand(hooks->at(i), (int)message->at(2));
-			}
+	// check if hook exists for this note or cc index and launch it
+	for (unsigned i = 0; i < self->midiHooks.size(); i++) {
+		if (self->midiHooks.at(i)->type == mType && self->midiHooks.at(i)->index == mIndex) {
+			self->TriggerInputCommand(self->midiHooks.at(i), (int)message->at(2));
 		}
-	} catch (const std::exception&) { return; }
+	}
 }
 
+/* Triggers funcMap function. Called from HandleInput callback
+*/
 void MidiAgent::TriggerInputCommand(MidiHook* hook, int midiVal)
 {
 
@@ -162,30 +207,52 @@ void MidiAgent::TriggerInputCommand(MidiHook* hook, int midiVal)
 	funcMap[hook->command](hook, midiVal);
 }
 
-
-void MidiAgent::AddMidiHook(string mType, MidiHook* hook)
+/* Get the midi hooks for this device
+*/
+vector<MidiHook*> MidiAgent::GetMidiHooks()
 {
-	GetMidiHooksByType(mType).push_back(hook);
+	return midiHooks;
 }
 
-void MidiAgent::RemoveMidiHook(string mType, MidiHook* hook) {
-	vector<MidiHook*> *hooks = &GetMidiHooksByType(mType);
-	auto it = std::find(hooks->begin(), hooks->end(), hook);
-	if (it != hooks->end()) {
-		hooks->erase(it);
+/* Add a new MidiHook
+*/
+void MidiAgent::AddMidiHook(MidiHook* hook)
+{
+	midiHooks.push_back(hook);
+}
+
+/* Remove a MidiHook
+*/
+void MidiAgent::RemoveMidiHook(MidiHook* hook)
+{
+	auto it = std::find(midiHooks.begin(), midiHooks.end(), hook);
+	if (it != midiHooks.end()) {
+		midiHooks.erase(it);
 	}
 }
 
-
-vector<MidiHook *>& MidiAgent::GetMidiHooksByType(string mType) 
+/* Clears all the MidiHooks for this device.
+*/
+void MidiAgent::ClearMidiHooks()
 {
-	if (mType == "note_on") {
-		return noteOnHooks;
-	} else if (mType == "note_off") {
-		return noteOffHooks;
-	} else if (mType == "control_change") {
-		return ccHooks;
-	} else {
-		throw "GetMidiHooksByType FAILED. INVALID MIDI HOOK TYPE";
+	midiHooks.clear();
+}
+
+/* Get this MidiAgent state as OBS Data. (includes midi hooks)
+* This is needed to Serialize the state in the config.
+* https://obsproject.com/docs/reference-settings.html
+*/
+obs_data_t* MidiAgent::GetData() {
+	obs_data_t* data = obs_data_create();
+	obs_data_set_string(data, "name", name.c_str());
+	obs_data_set_bool(data, "enabled", enabled);
+
+	obs_data_array_t* arrayData = obs_data_array_create();
+	for (int i = 0; i < midiHooks.size(); i++)
+	{
+		obs_data_t* hookData = midiHooks.at(i)->GetData();
+		obs_data_array_push_back(arrayData, hookData);
 	}
+	obs_data_set_array(data, "hooks", arrayData);
+	return data;
 }

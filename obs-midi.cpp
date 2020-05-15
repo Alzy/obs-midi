@@ -13,9 +13,9 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMainWindow>
 #include "config.h"
+#include "device-manager.h"
 #include "utils.h"
 #include "midi-agent.h"
-#include "device.hpp"
 
 using namespace std;
 
@@ -35,23 +35,7 @@ OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE("obs-midi", "en-US")
 
 ConfigPtr _config;
-
-
-
-
-
-void midiin_callback(double deltatime, std::vector<unsigned char> *message, void *userData)
-{
-	unsigned int nBytes = message->size();
-	SettingsDialog *sd = static_cast<SettingsDialog *> (userData);
-	std::string byte1 = Utils::getMidiMessageType((int)message->at(0));
-
-	int x = (int)message->at(1);
-	int y = (int)message->at(2);
-
-	sd->pushDebugMidiMessage(std::to_string(deltatime), byte1,
-				 x, Utils::mapper(y));
-}
+DeviceManagerPtr _deviceManager;
 
 
 
@@ -59,16 +43,18 @@ bool obs_module_load(void)
 {
 	blog(LOG_INFO, "MIDI LOADED ");
 
-	vector<MidiAgent *> activeMidiAgents;
+	// Device Manager Setup
+	_deviceManager = DeviceManagerPtr(new DeviceManager());
 
-	MidiAgent *midiA = new MidiAgent();
-	midiA->SetMidiDevice(0);
 
-	activeMidiAgents.push_back(midiA);
+	// Config Setup
+	_config = ConfigPtr(new Config());
+	_config->Load();
+
 
 	// UI SETUP
 	QMainWindow *mainWindow = (QMainWindow *)obs_frontend_get_main_window();
-	SettingsDialog *settingsDialog = new SettingsDialog(mainWindow, activeMidiAgents);
+	SettingsDialog *settingsDialog = new SettingsDialog(mainWindow);
 
 	const char* menuActionText = obs_module_text("OBSMIDI.Settings.DialogTitle");
 	QAction* menuAction = (QAction*)obs_frontend_add_tools_menu_qaction(menuActionText);
@@ -77,19 +63,7 @@ bool obs_module_load(void)
 		// to pass the pointer to this QAction belonging to the main window
 		settingsDialog->ToggleShowHide();
 		if (settingsDialog->isVisible()) {
-			RtMidi *sdMidi = new RtMidiIn();
-
-			int nDevices = sdMidi->getPortCount();
-			if (nDevices == 0 ) { return; }
-
-			vector<string> devNames;
-			for (int i = 0; i < nDevices; i++) {
-				std::string portn = sdMidi->getPortName(i);
-				devNames.push_back(portn);
-				Device::Device(portn);
-
-				
-			}
+			auto devNames = _deviceManager->GetPortsList();
 			settingsDialog->SetAvailableDevices(devNames);
 		}
 	});
@@ -98,7 +72,21 @@ bool obs_module_load(void)
 }
 
 
+void obs_module_unload()
+{
+	_config.reset();
+
+	blog(LOG_INFO, "goodbye!");
+}
+
+
+
 ConfigPtr GetConfig()
 {
 	return _config;
+}
+
+DeviceManagerPtr GetDeviceManager()
+{
+	return _deviceManager;
 }

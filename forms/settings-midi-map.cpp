@@ -23,14 +23,12 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <qlabel.h>
 #include <qcheckbox.h>
 #include <QMessageBox>
-#include <device.hpp>
 #define CHANGE_ME "changeme"
 
 SettingsMidiMap::SettingsMidiMap(QWidget *parent)
 	:
 	QDialog(parent, Qt::Dialog), ui(new Ui::SettingsMidiMap)
 {
-	t_device device;
 
 	ui->setupUi(this);
 	

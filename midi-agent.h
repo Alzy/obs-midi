@@ -28,13 +28,49 @@ using namespace std;
 
 class MidiHook {
 public:
+	string type;
 	int index;
+	string action;
 	string command;
 	string param1;
 	string param2;
 	string param3;
 
-	MidiHook(int i, string c, string p1 = "", string p2 = "", string p3 = "") : index(i), command(c), param1(p1), param2(p2), param3(p3) {}
+	MidiHook(string midiMessageType, int midiChannelIndex, string OBSCommand, string p1 = "", string p2 = "", string p3 = "", string actionType = "") :
+		type(midiMessageType), index(midiChannelIndex), command(OBSCommand), param1(p1), param2(p2), param3(p3), action(actionType)
+	{
+		// if action not provided, default to button or fader depending on command
+		if (actionType.empty()) {
+			action = (command == "note_on" ? "button" : "fader");
+		}
+	}
+
+	MidiHook(const char * jsonString) {
+		obs_data_t* data = obs_data_create_from_json(jsonString);
+		type = obs_data_get_string(data, "type");
+		index = obs_data_get_int(data, "index");
+		action = obs_data_get_string(data, "action");
+		command = obs_data_get_string(data, "command");
+		param1 = obs_data_get_string(data, "param1");
+		param2 = obs_data_get_string(data, "param2");
+		param3 = obs_data_get_string(data, "param3");
+	}
+
+	obs_data_t* GetData() {
+		obs_data_t* data = obs_data_create();
+		obs_data_set_string(data, "type", type.c_str());
+		obs_data_set_int(data, "index", index);
+		obs_data_set_string(data, "action", action.c_str());
+		obs_data_set_string(data, "command", command.c_str());
+		obs_data_set_string(data, "param1", param1.c_str());
+		obs_data_set_string(data, "param2", param2.c_str());
+		obs_data_set_string(data, "param3", param3.c_str());
+		return data;
+	}
+
+	const char* ToJSON() {
+		return obs_data_get_json(GetData());
+	}
 };
 
 
@@ -42,23 +78,32 @@ class MidiAgent {
 	public:
 		MidiAgent();
 		~MidiAgent();
+		void Load(obs_data_t* data);
 
-		void SetMidiDevice(int port);
-		void UnsetMidiDevice();
+		void OpenPort(int port);
+		void ClosePort();
+
+		string GetName();
+		int GetPort();
+		bool isEnabled();
+		bool isConnected();
+
 		static void HandleInput(double deltatime,
 				 vector<unsigned char> *message,
 				 void *userData);
 		void TriggerInputCommand(MidiHook *hook, int midiVal);
-		void AddMidiHook(string mType, MidiHook *hook);
-		void RemoveMidiHook(string mType, MidiHook *hook);
+
+		vector<MidiHook*> GetMidiHooks();
+		void AddMidiHook(MidiHook *hook);
+		void RemoveMidiHook(MidiHook *hook);
+		void ClearMidiHooks();
+		obs_data_t* GetData();
 
 	private:
 		RtMidiIn *midiin;
 		string name;
 		int port;
-		vector<MidiHook*> noteOnHooks;
-		vector<MidiHook*> noteOffHooks;
-		vector<MidiHook*> ccHooks;
-
-		vector<MidiHook *> &GetMidiHooksByType(string mType);
+		bool enabled;
+		bool connected;
+		vector<MidiHook*> midiHooks;
 };

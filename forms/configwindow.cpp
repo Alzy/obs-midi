@@ -8,12 +8,13 @@ ConfigWindow::ConfigWindow(QWidget *parent)
 	//Setup the UI
 	ui.setupUi(this);
 	//Connect back button functionality
-	connect(ui.btnBack, &QPushButton::clicked, this,
-		&ConfigWindow::on_btn_back_clicked);
+	connect(ui.btnBack, &QPushButton::clicked, this,&ConfigWindow::on_btn_back_clicked);
 	ui.tableView->setSelectionMode(QAbstractItemView::SingleSelection);
-	//QItemSelectionModel *x = ui.tableView->selectionModel();
-	//x->connect(SLOT(this, ConfigWindow::TselChanged));
 	
+	//hide override and bidirectional elements
+	ui.checkBox->setVisible(false);
+	ui.label_8->setVisible(false);
+	ui.slider_override->setVisible(false);
 	//create lists
 	QList<QString> messagetype;
 	QList<int> messagenumber;
@@ -40,11 +41,11 @@ ConfigWindow::ConfigWindow(QWidget *parent)
 	option2.append("");
 	option3.append("");
 
-	
+	ConfigWindow::SetupModel();
 	//create model
 	//TestModel configTableModel;
 	TestModel *configTableModel = new TestModel(this);
-	ConfigWindow::SetupModel();
+	
 
 	//Wrap Data into Model
 
@@ -61,11 +62,11 @@ ConfigWindow::ConfigWindow(QWidget *parent)
 	mapper->addMapping(ui.lin_mtype, 0);
 	mapper->addMapping(ui.num_mchan, 1, "value");
 	mapper->addMapping(ui.checkBox, 2, "enabled");
-	mapper->addMapping(ui.cb_atype, 3, "currentIndex");
-	mapper->addMapping(ui.cb_action, 4, "currentIndex");
-	mapper->addMapping(ui.cb_param1, 5, "currentIndex");
-	mapper->addMapping(ui.cb_param2, 6, "currentIndex");
-	mapper->addMapping(ui.cb_param3, 7, "currentIndex");
+	mapper->addMapping(ui.cb_atype, 3, "currentText");
+	mapper->addMapping(ui.cb_action, 4, "currentText");
+	mapper->addMapping(ui.cb_param1, 5, "currentText");
+	mapper->addMapping(ui.cb_param2, 6, "currentText");
+	mapper->addMapping(ui.cb_param3, 7, "currentText");
 	configTableModel->populateData(messagetype, messagenumber,
 				       bidirectional, actiontype, action,
 				       option1, option2, option3);
@@ -88,7 +89,9 @@ ConfigWindow::ConfigWindow(QWidget *parent)
 	// TODO:: Add Data to Table here
 	
 }
-void ConfigWindow::SetupModel() {
+void ConfigWindow::rebuildModel() {}
+void ConfigWindow::SetupModel()
+{
 	//Make models for combo box and add to combobox
 	QStringList items;
 	items << tr("Button") << tr("Fader") ;

@@ -26,7 +26,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "device-manager.h"
 #include "config.h"
 #include "settings-dialog.h"
-#include "settings-midi-map.h"
 #include "ui_configwindow.h"
 #include "configwindow.h"
 #include <qdialogbuttonbox.h>

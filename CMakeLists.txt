@@ -77,7 +77,6 @@ set(obs-midi_SOURCES
 	device-manager.cpp
 	obs-controller.cpp
         forms/settings-dialog.cpp
-        forms/settings-midi-map.cpp
 	forms/configwindow.cpp
         obs-midi.cpp
 )
@@ -89,7 +88,6 @@ list(APPEND obs-midi_HEADERS
 	device-manager.h
 	obs-controller.h
         forms/settings-dialog.h
-        forms/settings-midi-map.h
 	forms/configwindow.h
         obs-midi.h
 )

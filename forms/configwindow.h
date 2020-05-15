@@ -39,7 +39,7 @@ public:
 		Q_DECL_OVERRIDE;
 
 	QVariant data(const QModelIndex &index,
-		      int role) const Q_DECL_OVERRIDE;
+		      int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
 	QVariant headerData(int section, Qt::Orientation orientation,
 			    int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
 
@@ -69,7 +69,7 @@ class ConfigWindow : public QDialog{
     ~ConfigWindow();
     void SetupModel();
     void on_btn_back_clicked();
-    
+    void rebuildModel();
     void ToggleShowHide();
     void TselChanged(QModelIndex i);
     //variables

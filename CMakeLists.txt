@@ -68,7 +68,7 @@ include_directories(
         SYSTEM
 	${Qt5Core_INCLUDES}
 	${Qt5Widgets_INCLUDES}
-        "${CMAKE_SOURCE_DIR}/UI/obs-frontend-api")
+        "${CMAKE_SOURCE_DIR}/UI")
 
 set(obs-midi_SOURCES
         utils.cpp
@@ -78,6 +78,7 @@ set(obs-midi_SOURCES
 	obs-controller.cpp
         forms/settings-dialog.cpp
         forms/settings-midi-map.cpp
+	forms/configwindow.cpp
         obs-midi.cpp
 )
 
@@ -89,6 +90,7 @@ list(APPEND obs-midi_HEADERS
 	obs-controller.h
         forms/settings-dialog.h
         forms/settings-midi-map.h
+	forms/configwindow.h
         obs-midi.h
 )
 

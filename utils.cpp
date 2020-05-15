@@ -23,7 +23,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <QtCore/QDir>
 #include <QtCore/QUrl>
 
-#include <obs-frontend-api.h>
+#include <obs-frontend-api/obs-frontend-api.h>
 #include <obs.hpp>
 #include <util/platform.h>
 

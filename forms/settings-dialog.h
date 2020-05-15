@@ -20,8 +20,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "settings-midi-map.h"
 #include "ui_settings-dialog.h"
 #include "ui_settings-midi-map.h"
+#include "ui_configwindow.h"
+#include "configwindow.h"
 #include "midi-agent.h"
 
+class ConfigWindow;
 
 
 class SettingsDialog : public QDialog
@@ -46,4 +49,5 @@ private Q_SLOTS:
 private:
 	Ui::SettingsDialog* ui;
 	SettingsMidiMap *mDialog;
+	ConfigWindow *cwin;
 };

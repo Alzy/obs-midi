@@ -13,7 +13,7 @@ You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>
 */
 
-#include <obs-frontend-api.h>
+#include <obs-frontend-api/obs-frontend-api.h>
 #include <obs-module.h>
 #include <obs-data.h>
 #include <string>
@@ -27,7 +27,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "config.h"
 #include "settings-dialog.h"
 #include "settings-midi-map.h"
-
+#include "ui_configwindow.h"
+#include "configwindow.h"
 #include <qdialogbuttonbox.h>
 #include <qcheckbox.h>
 
@@ -36,7 +37,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 SettingsDialog::SettingsDialog(QWidget *parent):QDialog(parent, Qt::Dialog),ui(new Ui::SettingsDialog)
 {
 	ui->setupUi(this);
-
 	connect(ui->list_midi_dev, &QListWidget::itemSelectionChanged, this, &SettingsDialog::on_item_select);
 	connect(ui->check_enabled, &QCheckBox::stateChanged, this, &SettingsDialog::on_check_enabled_stateChanged);
 	connect(ui->btn_configure, &QPushButton::clicked, this,&SettingsDialog::on_btn_configure_clicked);
@@ -97,10 +97,15 @@ void SettingsDialog::on_btn_configure_clicked()
 	
 	pushDebugMidiMessage("time", "button clicked", 0, 0);
 	blog(LOG_INFO, "Configure button clicked");
+	ConfigWindow *cwin = new ConfigWindow;
+
+
+	cwin->devicename =ui->list_midi_dev->currentItem()->text().toStdString();
+
+	//setVisible(false);
+	//hide();
+	cwin->exec();
 	
-	SettingsMidiMap mDialog;
-	//mDialog.setModal(true);
-	mDialog.exec();
 }
 
 int SettingsDialog::on_check_enabled_stateChanged(bool state)

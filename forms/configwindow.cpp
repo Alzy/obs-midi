@@ -1,7 +1,16 @@
 #include "configwindow.h"
+#include "config.h"
 #include "ui_configwindow.h"
 #include <QtWidgets>
 #include <QAbstractItemView>
+#include <obs-frontend-api/obs-frontend-api.h>
+#include <obs-module.h>
+#include <obs-data.h>
+#include <string>
+#include <map>
+#include <iostream>
+#include <utility>
+#include <device-manager.h>
 ConfigWindow::ConfigWindow(QWidget *parent)
 	
 {
@@ -12,9 +21,9 @@ ConfigWindow::ConfigWindow(QWidget *parent)
 	ui.tableView->setSelectionMode(QAbstractItemView::SingleSelection);
 	
 	//hide override and bidirectional elements
-	ui.checkBox->setVisible(false);
-	ui.label_8->setVisible(false);
-	ui.slider_override->setVisible(false);
+	//ui.checkBox->setVisible(false);
+	//ui.label_8->setVisible(false);
+	//ui.slider_override->setVisible(false);
 	//create lists
 	QList<QString> messagetype;
 	QList<int> messagenumber;
@@ -34,14 +43,18 @@ ConfigWindow::ConfigWindow(QWidget *parent)
 	option3.append("");
 	messagetype.append("ass");
 	messagenumber.append(1);
-	bidirectional.append(false);
+	bidirectional.append(true);
 	actiontype.append("Button");
 	action.append("Set Mute");
 	option1.append("Mic/ Aux");
 	option2.append("");
 	option3.append("");
 
+
+	//setup model
 	ConfigWindow::SetupModel();
+	//create default actions
+	ConfigWindow::chooseAtype(1);
 	//create model
 	//TestModel configTableModel;
 	TestModel *configTableModel = new TestModel(this);
@@ -61,7 +74,7 @@ ConfigWindow::ConfigWindow(QWidget *parent)
 	mapper->setSubmitPolicy(QDataWidgetMapper::AutoSubmit);
 	mapper->addMapping(ui.lin_mtype, 0);
 	mapper->addMapping(ui.num_mchan, 1, "value");
-	mapper->addMapping(ui.checkBox, 2, "enabled");
+	mapper->addMapping(ui.checkBox, 2, "checked");
 	mapper->addMapping(ui.cb_atype, 3, "currentText");
 	mapper->addMapping(ui.cb_action, 4, "currentText");
 	mapper->addMapping(ui.cb_param1, 5, "currentText");
@@ -71,7 +84,14 @@ ConfigWindow::ConfigWindow(QWidget *parent)
 				       bidirectional, actiontype, action,
 				       option1, option2, option3);
 	//connect(ui.tableView, &QTableView::clicked, this,		&ConfigWindow::TselChanged);
+	connect(ui.tableView,
+		SIGNAL(activated), ui.tableView,
+		SLOT(repaint));
+	
 	connect(ui.tableView->selectionModel(),&QItemSelectionModel::currentRowChanged, mapper,&QDataWidgetMapper::setCurrentModelIndex);
+	connect(ui.cb_atype, SIGNAL(currentIndexChanged(int)), this, SLOT(chooseAtype(int)));
+	//mapper->AutoSubmit = true;
+	connect(ui.cb_action, SIGNAL(currentIndexChanged(int)), this, SLOT(mapper->submit()));
 	//connect(ui.tableView, &QTableView::clicked, mapper, &QDataWidgetMapper::setCurrentModelIndex);
 
 	ui.tableView->setCurrentIndex(configTableModel->index(0, 0));
@@ -90,7 +110,55 @@ ConfigWindow::ConfigWindow(QWidget *parent)
 	
 }
 void ConfigWindow::rebuildModel() {}
-void ConfigWindow::SetupModel()
+// Choose Action Type Handler
+void ConfigWindow::chooseAtype(int index) {
+	//actiontypemodel = new QStringListModel(items, this);
+	QStringList items;
+	switch (index) {
+	case 0:
+		//Button
+		
+		items << tr("SetCurrentScene") << tr("SetPreviewScene")
+		       << tr("TransitionToProgram")
+		       << tr("SetCurrentTransition")
+		       << tr("SetSourceVisibility")
+		       << tr("ToggleSourceVisibility") << tr("ToggleMute")
+		       << tr("SetMute") << tr("StartStopStreaming")
+		       << tr("StartStreaming") << tr("StopStreaming")
+		       << tr("StartStopRecording") << tr("StartRecording")
+		       << tr("StopRecording") << tr("StartStopReplayBuffer")
+		       << tr("StartReplayBuffer") << tr("StopReplayBuffer")
+		       << tr("SaveReplayBuffer") << tr("PauseRecording")
+		       << tr("ResumeRecording") << tr("SetTransitionDuration")
+		       << tr("SetCurrentProfile")
+		       << tr("SetCurrentSceneCollection")
+		       << tr("ResetSceneItem") << tr("SetTextGDIPlusText")
+		       << tr("SetBrowserSourceURL") << tr("ReloadBrowserSource")
+		       << tr("TakeSourceScreenshot") << tr("EnableSourceFilter")
+		       << tr("DisableSourceFilter") << tr("ToggleSourceFilter");
+		break;
+	case 1:
+		//Fader
+		
+
+		items << tr("SetVolume") << tr("SetSyncOffset")
+		       << tr("SetSourcePosition") << tr("SetSourceRotation")
+		       << tr("SetSourceScale") << tr("SetTransitionDuration")
+		       << tr("SetGainFilter");
+		break;
+	case 2:
+		//OSC
+		break;
+	case 4:
+		//Soundboard
+		break;
+	}
+	buttonactionsmodel = new QStringListModel(items, this);
+	ui.cb_action->setModel(buttonactionsmodel);
+	//QDataWidgetMapper *mapper = new QDataWidgetMapper(this);
+	//mapper->addMapping(ui.cb_action, 4, "currentText");
+}
+	void ConfigWindow::SetupModel()
 {
 	//Make models for combo box and add to combobox
 	QStringList items;
@@ -99,36 +167,8 @@ void ConfigWindow::SetupModel()
 	actiontypemodel->setProperty("role",2);
 	ui.cb_atype->setModel(actiontypemodel);
 
-	QStringList items2;
-	items2 << tr("SetCurrentScene") << tr("SetPreviewScene")
-	       << tr("TransitionToProgram") << tr("SetCurrentTransition")
-	       << tr("SetSourceVisibility") << tr("ToggleSourceVisibility")
-	       << tr("ToggleMute") << tr("SetMute") << tr("StartStopStreaming")
-	       << tr("StartStreaming") << tr("StopStreaming")
-	       << tr("StartStopRecording") << tr("StartRecording")
-	       << tr("StopRecording") << tr("StartStopReplayBuffer")
-	       << tr("StartReplayBuffer") << tr("StopReplayBuffer")
-	       << tr("SaveReplayBuffer") << tr("PauseRecording")
-	       << tr("ResumeRecording") << tr("SetTransitionDuration")
-	       << tr("SetCurrentProfile") << tr("SetCurrentSceneCollection")
-	       << tr("ResetSceneItem") << tr("SetTextGDIPlusText")
-	       << tr("SetBrowserSourceURL") << tr("ReloadBrowserSource")
-	       << tr("TakeSourceScreenshot") << tr("EnableSourceFilter")
-	       << tr("DisableSourceFilter") << tr("ToggleSourceFilter");
-	buttonactionsmodel = new QStringListModel(items2, this);
-	ui.cb_action->setModel(buttonactionsmodel);
-	/*
-	// This will be dynamically chosen based on cb_atype
-	// For use when we have if statement made
 
-	QStringList items3;
 	
-	items3 << tr("SetVolume") << tr("SetSyncOffset") << tr("SetSourcePosition")
-	<< tr("SetSourceRotation") << tr("SetSourceScale")
-	<< tr("SetTransitionDuration") << tr("SetGainFilter"); 
-	faderactionsmodel = new QStringListModel(items3, this);
-	ui.cb_action->setModel(faderactionsmodel);
-	*/
 	
 	//We need to Dynamically Generate These ones based on value of cb_action and data pulled from OBS
 	QStringList items4;
@@ -152,14 +192,24 @@ void ConfigWindow::SetupModel()
 	
 }
 
-void ConfigWindow::TselChanged(QModelIndex i)
-{
-	//mapper->toFirst();
-}
 
 TestModel::TestModel(QObject *parent) : QAbstractTableModel(parent) {}
+void GetConfigAndDoThing() {
+	DeviceManager *dm = new DeviceManager();
 
-// Create a method to populate the model with data:
+	vector<MidiHook> hooks = dm->GetMidiHooksByDeviceName("name");
+	for (int i = 0; i <= hooks->length(); i++) {
+		hooks[i]->na string type;
+		int index;
+		string action;
+		string command;
+		string param1;
+		string param2;
+		string param3;
+	}
+	
+}
+	// Create a method to populate the model with data:
 void TestModel::populateData(
 	const QList<QString> &messagetype, const QList<int> &messagenumber,
 	const QList<bool> &bidirectional, const QList<QString> &actiontype,

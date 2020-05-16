@@ -76,7 +76,10 @@ class ConfigWindow : public QDialog{
     std::string devicename;
     QTableView tableEntity;
 
-private:
+private slots:
+    void chooseAtype(int index);
+
+    private:
 	QDataWidgetMapper *mapper;
 	QStringListModel *actiontypemodel;
 	QStringListModel *buttonactionsmodel;
@@ -85,6 +88,7 @@ private:
 	QStringListModel *options2model;
 	QStringListModel *options3model;
 	Ui::ConfigWindow ui;
+
 };
 
 #endif // CONFIGWINDOW_H

@@ -1,3 +1,4 @@
+#pragma once
 #ifndef CONFIGWINDOW_H
 #define CONFIGWINDOW_H
 
@@ -7,7 +8,7 @@
 #include <QAbstractTableModel>
 #include <QWidget>
 #include "ui_configwindow.h"
-
+//#include "midi-agent.h"
 class QComboBox;
 class QDataWidgetMapper;
 class QLabel;
@@ -18,9 +19,7 @@ class QStringListModel;
 class QTextEdit;
 class QAbstractItemView;
 
-namespace Ui {
-class ConfigWindow;
-}
+
 class TestModel : public QAbstractTableModel {
 	Q_OBJECT
 
@@ -33,7 +32,19 @@ public:
 			  const QList<QString> &tm_actiontype,
 			  const QList<QString> &tm_action, const QList<QString> &tm_option1,
 			  const QList<QString> &tm_option2, const QList<QString> &tm_option3);
-
+	//Insert Default Row
+	bool insertRow(int row, QString mtype,
+			int mindex,
+			const QModelIndex &parent = QModelIndex());
+	//Insert MH Row
+	bool insertRow(int row, std::string mtype, int mindex,
+		       std::string actiontype, std::string action,
+		       std::string option1, std::string option2,
+		       std::string option3,
+		       const QModelIndex &parent = QModelIndex());
+	
+	//bool insertRows(int row, int rows,const QModelIndex &parent = QModelIndex());
+	//bool removeRows(int row, int mindex,const QModelIndex &parent = QModelIndex());)
 	int rowCount(const QModelIndex &parent = QModelIndex()) const
 		Q_DECL_OVERRIDE;
 	int columnCount(const QModelIndex &parent = QModelIndex()) const
@@ -43,7 +54,7 @@ public:
 		      int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
 	QVariant headerData(int section, Qt::Orientation orientation,
 			    int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
-
+	void save(QString devname);
 private:
 	QList<QString> tm_messagetype;
 	QList<int> tm_messagenumber;
@@ -76,8 +87,17 @@ class ConfigWindow : public QDialog{
     //variables
     std::string devicename;
     QTableView tableEntity;
+    void loadFromHooks();
+    private slots:
 
-private slots:
+	void load();
+	void save();
+	void addrow();
+	void deleterow();
+	void setDirty() { setWindowModified(true); }
+	void updateUi();
+	void selectionChanged();
+
     void chooseAtype(int index);
 	void domessage(QString mtype, int mchan);
 
@@ -89,7 +109,9 @@ private slots:
 	QStringListModel *options1model;
 	QStringListModel *options2model;
 	QStringListModel *options3model;
+	TestModel *configTableModel;
 	Ui::ConfigWindow ui;
+	//std::vector<MidiHook *> hooks;
 
 };
 

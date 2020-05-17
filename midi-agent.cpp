@@ -202,6 +202,8 @@ void MidiAgent::HandleInput(double deltatime,
 	if (mType.empty()) { return; } // unknown message type. return.
 	int mIndex = message->at(1);
 
+	//send message when received
+	
 	// check if hook exists for this note or cc index and launch it
 	for (unsigned i = 0; i < self->midiHooks.size(); i++) {
 		if (self->midiHooks.at(i)->type == mType && self->midiHooks.at(i)->index == mIndex) {
@@ -211,6 +213,7 @@ void MidiAgent::HandleInput(double deltatime,
 			self->SendMessage(mType, mIndex);
 		}
 	}
+	
 }
 
 /* Triggers funcMap function. Called from HandleInput callback

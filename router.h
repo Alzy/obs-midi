@@ -1,3 +1,5 @@
+#pragma once
+
 #include <QObject>
 using namespace std;
 class Router : public QObject {
@@ -11,4 +13,3 @@ public slots:
 signals:
 	void UnknownMessage(QString mtype, int messageindex);
 };
-#pragma once

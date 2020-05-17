@@ -6,7 +6,7 @@
 #include "obs-midi.h"
 #include "config.h"
 #include "device-manager.h"
-#include "midi-agent.h"
+//#include "midi-agent.h"
 
 ConfigWindow::ConfigWindow( std::string devicename)
 	
@@ -15,9 +15,13 @@ ConfigWindow::ConfigWindow( std::string devicename)
 	//auto rob = static_cast<RouterPtr>(GetRouter());
 	auto devicemanager = GetDeviceManager();
 	auto config = GetConfig();
+	//config->Load();
 	Router *rt = midiobsrouter;	
 	//connect(this, SIGNAL(&SendNewUnknownMessage), this	SIGNAL(rt.UnknownMessage));
 	auto device = devicemanager->GetMidiDeviceByName(devicename.c_str());
+
+	std::vector<MidiHook *> hooks =	devicemanager->GetMidiHooksByDeviceName(devicename.c_str());
+		
 	connect( rt, SIGNAL(UnknownMessage(QString, int)), this,SLOT(domessage(QString, int)));
 	//Setup the UI
 	ui.setupUi(this);
@@ -26,6 +30,9 @@ ConfigWindow::ConfigWindow( std::string devicename)
 //connect
 	//Connect back button functionality
 	connect(ui.btnBack, &QPushButton::clicked, this,&ConfigWindow::on_btn_back_clicked);
+	connect(ui.btnSave, &QPushButton::clicked, this,
+		&ConfigWindow::save);
+
 	ui.tableView->setSelectionMode(QAbstractItemView::SingleSelection);
 	
 	//hide override and bidirectional elements
@@ -33,6 +40,7 @@ ConfigWindow::ConfigWindow( std::string devicename)
 	//ui.label_8->setVisible(false);
 	//ui.slider_override->setVisible(false);
 	//create lists
+	
 	QList<QString> messagetype;
 	QList<int> messagenumber;
 	QList<bool> bidirectional;
@@ -41,23 +49,7 @@ ConfigWindow::ConfigWindow( std::string devicename)
 	QList<QString> option1;
 	QList<QString> option2;
 	QList<QString> option3;
-	messagetype.append("control_change");
-	messagenumber.append(101);
-	bidirectional.append(false);
-	actiontype.append("Fader");
-	action.append("Set Volume");
-	option1.append("Mic/ Aux");
-	option2.append("");
-	option3.append("");
-	messagetype.append("ass");
-	messagenumber.append(1);
-	bidirectional.append(true);
-	actiontype.append("Button");
-	action.append("Set Mute");
-	option1.append("Mic/ Aux");
-	option2.append("");
-	option3.append("");
-
+	
 
 	//setup model
 	ConfigWindow::SetupModel();
@@ -65,11 +57,19 @@ ConfigWindow::ConfigWindow( std::string devicename)
 	ConfigWindow::chooseAtype(1);
 	//create model
 	//TestModel configTableModel;
-	TestModel *configTableModel = new TestModel(this);
-	
+	configTableModel = new TestModel(this);
 
 	//Wrap Data into Model
+		configTableModel->populateData(messagetype, messagenumber, bidirectional, actiontype, action,option1, option2, option3);
+		for (int i = 0; i < hooks.size(); i++) {
 
+			configTableModel->insertRow(
+				i, hooks.at(i)->type, hooks.at(i)->index,
+				hooks.at(i)->action, hooks.at(i)->command,
+				hooks.at(i)->param1, hooks.at(i)->param2,
+				hooks.at(i)->param3);
+		}
+	
 	//set model to TableView
 	ui.tableView->setModel(configTableModel);
 	ui.tableView->horizontalHeader()->setVisible(true);
@@ -88,9 +88,7 @@ ConfigWindow::ConfigWindow( std::string devicename)
 	mapper->addMapping(ui.cb_param1, 5, "currentText");
 	mapper->addMapping(ui.cb_param2, 6, "currentText");
 	mapper->addMapping(ui.cb_param3, 7, "currentText");
-	configTableModel->populateData(messagetype, messagenumber,
-				       bidirectional, actiontype, action,
-				       option1, option2, option3);
+	
 	//connect(ui.tableView, &QTableView::clicked, this,		&ConfigWindow::TselChanged);
 	connect(ui.tableView,
 		SIGNAL(activated), ui.tableView,
@@ -117,9 +115,107 @@ ConfigWindow::ConfigWindow( std::string devicename)
 	// TODO:: Add Data to Table here
 	
 }
-void ConfigWindow::domessage(QString mtype, int mchan)
+bool TestModel::insertRow(int row, std::string  mtype, int mindex, std::string actiontype,
+		std::string action, std::string option1, std::string option2,
+		std::string option3, const QModelIndex &parent)
 {
+
+	
+		beginInsertRows(parent, row, row);
+		tm_messagetype.append(QString::fromStdString(mtype));
+		tm_messagenumber.append(mindex);
+		tm_bidirectional.append(true);
+		tm_actiontype.append(QString::fromStdString(actiontype));
+		tm_action.append(QString::fromStdString(action));
+		tm_option1.append(QString::fromStdString(option1));
+		tm_option2.append(QString::fromStdString(option2));
+		tm_option3.append(QString::fromStdString(option3));
+		endInsertRows();
+		return true;
+}
+
+bool TestModel::insertRow(int row, QString mtype,
+			   int mindex, const QModelIndex &parent)
+{
+		if (!tm_messagenumber.contains(mindex)) {
+		beginInsertRows(parent, row, row);
+		tm_messagetype.append(mtype);
+		tm_messagenumber.append(mindex);
+		tm_bidirectional.append(true);
+		if (mtype == "control_change") {
+			tm_actiontype.append("Fader");
+			tm_action.append("Set Volume");
+		} else {
+			tm_actiontype.append("Button");
+			tm_action.append("Set Mute");
+		}
+
+		tm_option1.append("Mic/ Aux");
+		tm_option2.append("");
+		tm_option3.append("");
+		endInsertRows();
+		return true;
+		} else {
+			return false;
+		}
+	
+	//configTableModel->populateData(messagetype, messagenumber, bidirectional, actiontype, action, option1, option2, option3);
+}
+void TestModel::save(QString devicename) {
+	//Get Device Manager
+	auto dm = GetDeviceManager();
+	auto save = GetConfig();
+	//to get device
+	auto dev = dm->GetMidiDeviceByName(devicename.toStdString().c_str());
+	dev->ClearMidiHooks();
+	//get row count
+	int rc = tm_messagenumber.length();
+	//loop through rows
+	for (int i=0; i < rc; i++)
+	{
+	//make default midihook
+		/*/
+		MidiHook *mh = new MidiHook;
+		//map values
+		mh->type = tm_messagetype.at(i).toStdString();
+		mh->index = tm_messagenumber.at(i);
+		//mh->bidirectional = tm_bidirectional.at(i);
+		mh->action = tm_actiontype.at(i).toStdString();
+		mh->command = tm_action.at(i).toStdString();
+		mh->param1 = tm_option1.at(i).toStdString();
+		mh->param1 = tm_option2.at(i).toStdString();
+		mh->param1 = tm_option3.at(i).toStdString();
+		*/
+		//uglyway//
+	//MidiHook(string midiMessageType, int midiChannelIndex,string OBSCommand, string p1 = "", string p2 = "",string p3 = "", string actionType = "")
+		MidiHook *mh = new MidiHook(
+		tm_messagetype.at(i).toStdString(), tm_messagenumber.at(i),
+		tm_action.at(i).toStdString(), tm_option1.at(i).toStdString(),
+		tm_option2.at(i).toStdString(), tm_option3.at(i).toStdString(),
+		tm_actiontype.at(i).toStdString());
+		
+		//add midihook
+		dev->AddMidiHook(mh);
+		
+	};
+	save->Save();
+}
+	void ConfigWindow::domessage(QString mtype, int mchan)
+{
+	
 	blog(1, "domessage");
+	int x = configTableModel->rowCount();
+	if (configTableModel->insertRow(x - 1, mtype, mchan)) {
+		ui.tableView->update();	
+	}
+	
+//
+	//make default row
+	
+		
+	//insert default row//
+
+	//updateview
 }
 void ConfigWindow::rebuildModel() {}
 // Choose Action Type Handler
@@ -233,6 +329,12 @@ void TestModel::populateData(
 
 	return;
 }
+void ConfigWindow::save() {
+	//do TestModel->save();
+
+	configTableModel->save(QString::fromStdString(this->devicename));
+	
+}
 
 int TestModel::rowCount(const QModelIndex &parent) const
 {
@@ -319,3 +421,17 @@ void ConfigWindow::ToggleShowHide()
 	else
 		setVisible(false);
 }
+void ConfigWindow::load(){};
+void ConfigWindow::addrow(){};
+void ConfigWindow::deleterow(){};
+void ConfigWindow::updateUi(){};
+void ConfigWindow::selectionChanged(){};
+void ConfigWindow::loadFromHooks()
+{
+	
+
+
+}
+/*bool TestModel::insertRow(int row, std::string  mtype, int mindex, std::string actiontype,
+		std::string action, std::string option1, std::string option2,
+		std::string option3, const QModelIndex &parent)*/

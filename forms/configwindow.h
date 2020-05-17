@@ -17,6 +17,7 @@ class QStandardItemModel;
 class QStringListModel;
 class QTextEdit;
 class QAbstractItemView;
+
 namespace Ui {
 class ConfigWindow;
 }
@@ -78,7 +79,7 @@ class ConfigWindow : public QDialog{
 
 private slots:
     void chooseAtype(int index);
-	void domessage(std::string mtype, int mchan);
+	void domessage(QString mtype, int mchan);
 
     private:
 	QDataWidgetMapper *mapper;

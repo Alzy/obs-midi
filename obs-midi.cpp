@@ -35,7 +35,6 @@ OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE("obs-midi", "en-US")
 ConfigPtr _config;
 DeviceManagerPtr _deviceManager;
-RouterPtr _router;
 
 
 
@@ -55,8 +54,7 @@ bool obs_module_load(void)
 	_config->Load();
 
 	// Signal Router Setup
-	_router = RouterPtr(new Router());
-
+	
 
 	// UI SETUP
 	QMainWindow *mainWindow = (QMainWindow *)obs_frontend_get_main_window();
@@ -96,10 +94,7 @@ ConfigPtr GetConfig()
 {
 	return _config;
 }
-RouterPtr GetRouter()
-{
-	return _router;
-}
+
 
 DeviceManagerPtr GetDeviceManager()
 {

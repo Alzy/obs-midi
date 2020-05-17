@@ -1,4 +1,5 @@
 #include <QObject>
+using namespace std;
 class Router : public QObject {
 	Q_OBJECT
 
@@ -8,6 +9,6 @@ public:
 public slots:
 	void gotmessage(std::string mtype, int mc);
 signals:
-	void UnknownMessage(std::string mtype, int messageindex);
+	void UnknownMessage(QString mtype, int messageindex);
 };
 #pragma once

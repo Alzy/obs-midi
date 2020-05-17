@@ -26,7 +26,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "midi-agent.h"
 #include "obs-midi.h"
 #include "obs-controller.h"
-#include "router.h"
 using namespace std;
 
 
@@ -111,7 +110,7 @@ MidiAgent::MidiAgent()
 	midiin->setCallback(&MidiAgent::HandleInput, this);
 
 	//Get Router Pointer and connect signals
-	auto rt = GetRouter();
+
 	
 	connect(this, SIGNAL(&SendNewUnknownMessage), this, SIGNAL(rt.UnknownMessage));
 	connect(this, SIGNAL(&SendNewUnknownMessage), this, SLOT(Router::gotmessage));
@@ -158,8 +157,8 @@ void MidiAgent::Load(obs_data_t * data)
 }
 void MidiAgent::SendMessage(std::string mType, int mIndex) {
 	emit this->SendNewUnknownMessage(mType, mIndex);
-	auto router = GetRouter();
-	router->gotmessage(mType, mIndex);
+	
+	midiobsrouter->gotmessage(mType, mIndex);
 }
 
 	/* Will open the port and enable this MidiAgent
@@ -207,6 +206,8 @@ void MidiAgent::HandleInput(double deltatime,
 	for (unsigned i = 0; i < self->midiHooks.size(); i++) {
 		if (self->midiHooks.at(i)->type == mType && self->midiHooks.at(i)->index == mIndex) {
 			self->TriggerInputCommand(self->midiHooks.at(i), (int)message->at(2));
+			
+		} else {
 			self->SendMessage(mType, mIndex);
 		}
 	}

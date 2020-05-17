@@ -5,7 +5,6 @@
 #include <obs-frontend-api/obs-frontend-api.h>
 #include "obs-midi.h"
 #include "config.h"
-#include "router.h"
 #include "device-manager.h"
 #include "midi-agent.h"
 
@@ -16,10 +15,10 @@ ConfigWindow::ConfigWindow( std::string devicename)
 	//auto rob = static_cast<RouterPtr>(GetRouter());
 	auto devicemanager = GetDeviceManager();
 	auto config = GetConfig();
-	auto rt = GetRouter();	
+	Router *rt = midiobsrouter;	
 	//connect(this, SIGNAL(&SendNewUnknownMessage), this	SIGNAL(rt.UnknownMessage));
 	auto device = devicemanager->GetMidiDeviceByName(devicename.c_str());
-	connect(rt, SIGNAL(&Router::UnknownMessage), this,SLOT(domessage));
+	connect( rt, SIGNAL(UnknownMessage(QString, int)), this,SLOT(domessage(QString, int)));
 	//Setup the UI
 	ui.setupUi(this);
 
@@ -100,7 +99,7 @@ ConfigWindow::ConfigWindow( std::string devicename)
 	connect(ui.tableView->selectionModel(),&QItemSelectionModel::currentRowChanged, mapper,&QDataWidgetMapper::setCurrentModelIndex);
 	connect(ui.cb_atype, SIGNAL(currentIndexChanged(int)), this, SLOT(chooseAtype(int)));
 	//mapper->AutoSubmit = true;
-	connect(ui.cb_action, SIGNAL(currentIndexChanged(int)), this, SLOT(mapper->submit()));
+	connect(ui.cb_action, SIGNAL(currentIndexChanged(int)), mapper, SLOT(mapper->submit()));
 	//connect(ui.tableView, &QTableView::clicked, mapper, &QDataWidgetMapper::setCurrentModelIndex);
 
 	ui.tableView->setCurrentIndex(configTableModel->index(0, 0));
@@ -118,7 +117,7 @@ ConfigWindow::ConfigWindow( std::string devicename)
 	// TODO:: Add Data to Table here
 	
 }
-void ConfigWindow::domessage(std::string mtype, int mchan)
+void ConfigWindow::domessage(QString mtype, int mchan)
 {
 	blog(1, "domessage");
 }

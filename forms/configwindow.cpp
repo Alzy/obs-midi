@@ -7,12 +7,12 @@
 #include "configwindow.h"
 #include "ui_configwindow.h"
 #include <QtWidgets>
-#include <QAbstractItemView>
+#include <QTableWidget>
 #include <obs-frontend-api/obs-frontend-api.h>
 #include "obs-midi.h"
 #include "config.h"
 #include "device-manager.h"
-//#include "midi-agent.h"
+#include "midi-agent.h"
 
 ConfigWindow::ConfigWindow( std::string devicename)
 	
@@ -37,145 +37,130 @@ ConfigWindow::ConfigWindow( std::string devicename)
 //connect
 	//Connect back button functionality
 	connect(ui.btnBack, &QPushButton::clicked, this,&ConfigWindow::on_btn_back_clicked);
-	connect(ui.btnSave, &QPushButton::clicked, this,
-		&ConfigWindow::save);
+	//connect(ui.btnSave, &QPushButton::clicked, this, &ConfigWindow::save);
 
-	ui.tableView->setSelectionMode(QAbstractItemView::SingleSelection);
 	
-	//hide override and bidirectional elements
-	//ui.checkBox->setVisible(false);
-	//ui.label_8->setVisible(false);
-	//ui.slider_override->setVisible(false);
-	//create lists
-	
-	QList<QString> messagetype;
-	QList<int> messagenumber;
-	QList<bool> bidirectional;
-	QList<QString> actiontype;
-	QList<QString> action;
-	QList<QString> option1;
-	QList<QString> option2;
-	QList<QString> option3;
-	
-	for (int i = 0; i < hooks.size(); i++) {
-
-		messagetype.append(QString::fromStdString(hooks.at(i)->type));
-		messagenumber.append(hooks.at(i)->index);
-		bidirectional.append(false);
-		actiontype.append(QString::fromStdString(hooks.at(i)->action));
-		action.append(QString::fromStdString(hooks.at(i)->command));
-		option1.append(QString::fromStdString(hooks.at(i)->param1));
-		option2.append(QString::fromStdString(hooks.at(i)->param2));
-		option3.append(QString::fromStdString(hooks.at(i)->param3));
+		for (int i = 0; i < hooks.size(); i++) {
+		int rc = ui.tableWidget->rowCount();
+		AddRowFromHooks(rc,hooks.at(i)->type, hooks.at(i)->index, false,
+				hooks.at(i)->action, hooks.at(i)->command,
+				hooks.at(i)->param1, hooks.at(i)->param2,
+				hooks.at(i)->param3);
 	}
+	
+	
+	
 	//setup model
 	ConfigWindow::SetupModel();
 	//create default actions
 	ConfigWindow::chooseAtype(1);
 	//create model
-	//TestModel configTableModel;
-	configTableModel = new TestModel(this);
+	//ConfigWindow configTableModel;
 
 	//Wrap Data into Model
-		configTableModel->populateData(messagetype, messagenumber, bidirectional, actiontype, action,option1, option2, option3);
+		
 	
 	
-	//set model to TableView
-	ui.tableView->setModel(configTableModel);
-	ui.tableView->horizontalHeader()->setVisible(true);
-	ui.tableView->show();
-	//create Data Mapper
-	//QDataWidgetMapper mapper =  QDataWidgetMapper(this);
-	QDataWidgetMapper *mapper = new QDataWidgetMapper(this);
-	mapper->setSubmitPolicy(QDataWidgetMapper::AutoSubmit);
+	
 
-	mapper->setModel(configTableModel);
-	mapper->addMapping(ui.lin_mtype, 0);
-	mapper->addMapping(ui.num_mchan, 1, "value");
-	mapper->addMapping(ui.checkBox, 2, "checked");
-	mapper->addMapping(ui.cb_atype, 3, "currentText");
-	mapper->addMapping(ui.cb_action, 4, "currentText");
-	mapper->addMapping(ui.cb_param1, 5, "currentText");
-	mapper->addMapping(ui.cb_param2, 6, "currentText");
-	mapper->addMapping(ui.cb_param3, 7, "currentText");
 	
-	//connect(ui.tableView, &QTableView::clicked, this,		&ConfigWindow::TselChanged);
-	
-	//connect UI elements
-	connect(ui.tableView->selectionModel(),&QItemSelectionModel::currentRowChanged, mapper,&QDataWidgetMapper::setCurrentModelIndex);
+
 	connect(ui.cb_atype, SIGNAL(currentIndexChanged(int)), this, SLOT(chooseAtype(int)));
-	connect(ui.cb_action, SIGNAL(currentTextChanged(QString)), configTableModel, SLOT(chooseOptions1(QString)));
-	//connect(ui.cb_param1, SIGNAL(currentTextChanged(QString)), this, SLOT(chooseOptions2(QString)));
-	//connect(ui.cb_param2, SIGNAL(currentTextChanged(QString)), this, SLOT(chooseOptions3(QString)));
-	connect(ui.cb_param1, SIGNAL(currentIndexChanged(int)), ui.tableView,
-		SLOT(update()));
-	
-	
-	//mapper->AutoSubmit = true;
-	//connect(ui.tableView, &QTableView::clicked, mapper, &QDataWidgetMapper::setCurrentModelIndex);
+	//connect(ui.cb_action, SIGNAL(currentTextChanged(QString)), configTableModel, SLOT(chooseOptions1(QString)));
 
-	ui.tableView->setCurrentIndex(configTableModel->index(0, 0));
-	mapper->toFirst();
 	
-
-	/*
-    QStringListModel *actiontypemodel;
-    QStringListModel *buttonactionsmodel;
-    QStringListModel *faderactionsmodel;
-    QStringListModel *options1model;
-    QStringListModel *options2model;
-    QStringListModel *options3model;
-    */
-	// TODO:: Add Data to Table here
 	
 }
-bool TestModel::insertRow(int row, std::string  mtype, int mindex, std::string actiontype,
-		std::string action, std::string option1, std::string option2,
-		std::string option3, const QModelIndex &parent)
+
+void ConfigWindow::AddRowFromHooks(int rc, std::string type, int index, bool bid,
+			     std::string action, std::string command,
+			     std::string param1, std::string param2,
+			     std::string param3)
 {
 
-	
-		beginInsertRows(parent, row, row);
-		tm_messagetype.append(QString::fromStdString(mtype));
-		tm_messagenumber.append(mindex);
-		tm_bidirectional.append(true);
-		tm_actiontype.append(QString::fromStdString(actiontype));
-		tm_action.append(QString::fromStdString(action));
-		tm_option1.append(QString::fromStdString(option1));
-		tm_option2.append(QString::fromStdString(option2));
-		tm_option3.append(QString::fromStdString(option3));
-		endInsertRows();
-		return true;
-}
+		ui.tableWidget->insertRow(rc);
+		QTableWidgetItem *newItem = new QTableWidgetItem();
+		QTableWidgetItem *newItem2 = new QTableWidgetItem();
+		QTableWidgetItem *newItem3 = new QTableWidgetItem();
+		QTableWidgetItem *newItem4 = new QTableWidgetItem();
+		QTableWidgetItem *newItem5 = new QTableWidgetItem();
+		QTableWidgetItem *newItem6 = new QTableWidgetItem();
+		QTableWidgetItem *newItem7 = new QTableWidgetItem();
+		QTableWidgetItem *newItem8 = new QTableWidgetItem();
 
-bool TestModel::insertRow(int row, QString mtype,
-			   int mindex, const QModelIndex &parent)
+		
+		//load rows from hooks
+		//bidirectional.append(false);
+
+		
+		newItem->setText(QString::fromStdString(type)); //Message Type
+		newItem2->setText(QString::number(index)); //message channel
+		//newItem3->setCheckState(false); //Bidirectional
+		newItem4->setText(QString::fromStdString(action)); //Action Type
+		newItem5->setText(QString::fromStdString(command)); //Action
+		newItem6->setText(QString::fromStdString(param1)); //Option 1
+		newItem7->setText(QString::fromStdString(param2)); //Option 2
+		newItem8->setText(QString::fromStdString(param3));        //Option 3
+
+		//if (!tm_messagenumber.contains(mindex)) {
+
+		ui.tableWidget->setItem(rc, 0, newItem);
+		ui.tableWidget->setItem(rc, 1, newItem2);
+		ui.tableWidget->setItem(rc, 2, newItem3);
+		ui.tableWidget->setItem(rc, 3, newItem4);
+		ui.tableWidget->setItem(rc, 4, newItem5);
+		ui.tableWidget->setItem(rc, 5, newItem6);
+		ui.tableWidget->setItem(rc, 6, newItem7);
+		ui.tableWidget->setItem(rc, 7, newItem8);	
+}
+void  ConfigWindow::insertRow(QString mtype,int mindex)
 {
-		if (!tm_messagenumber.contains(mindex)) {
-		beginInsertRows(parent, row, row);
-		tm_messagetype.append(mtype);
-		tm_messagenumber.append(mindex);
-		tm_bidirectional.append(true);
-		if (mtype == "control_change") {
-			tm_actiontype.append("Fader");
-			tm_action.append("Set Volume");
-		} else {
-			tm_actiontype.append("Button");
-			tm_action.append("Set Mute");
-		}
 
-		tm_option1.append("Mic/Aux");
-		tm_option2.append("");
-		tm_option3.append("");
-		endInsertRows();
-		return true;
-		} else {
-			return false;
-		}
+	int rc = ui.tableWidget->rowCount();
+	ui.tableWidget->insertRow(rc );
+	QTableWidgetItem *newItem = new QTableWidgetItem();
+	QTableWidgetItem *newItem2 = new QTableWidgetItem();
+	QTableWidgetItem *newItem3 = new QTableWidgetItem();
+	QTableWidgetItem *newItem4 = new QTableWidgetItem();
+	QTableWidgetItem *newItem5 = new QTableWidgetItem();
+	QTableWidgetItem *newItem6 = new QTableWidgetItem();
+	QTableWidgetItem *newItem7 = new QTableWidgetItem();
+	QTableWidgetItem *newItem8 = new QTableWidgetItem();
 	
-	//configTableModel->populateData(messagetype, messagenumber, bidirectional, actiontype, action, option1, option2, option3);
+	newItem->setText(mtype); //Message Type
+	newItem2->setText(QString::number(mindex));   //message channel
+	//newItem3->setCheckState(false); //Bidirectional
+	
+	if (mtype == "control_change") {
+		newItem4->setText("Fader"); //Action Type
+		newItem5->setText("Set Volume"); //Action	tm_actiontype.append("Fader");
+		
+	} else {
+		newItem4->setText("Button");  //Action Type
+		newItem5->setText("Set Mute"); //Action
+		
+	}
+	newItem6->setText("Mic/Aux");   //Option 1
+	newItem7->setText("");   //Option 2
+	newItem8->setText("");   //Option 3
+
+	
+	
+	//if (!tm_messagenumber.contains(mindex)) {
+	
+	
+	ui.tableWidget->setItem(rc , 0, newItem);
+	ui.tableWidget->setItem(rc, 1, newItem2);
+	ui.tableWidget->setItem(rc, 2, newItem3);
+	ui.tableWidget->setItem(rc, 3, newItem4);
+	ui.tableWidget->setItem(rc, 4, newItem5);
+	ui.tableWidget->setItem(rc, 5, newItem6);
+	ui.tableWidget->setItem(rc, 6, newItem7);
+	ui.tableWidget->setItem(rc, 7, newItem8);
+
+	
 }
-void TestModel::save(QString devicename) {
+void ConfigWindow::save(QString devicename) {
 	//Get Device Manager
 	auto dm = GetDeviceManager();
 	auto save = GetConfig();
@@ -183,32 +168,24 @@ void TestModel::save(QString devicename) {
 	auto dev = dm->GetMidiDeviceByName(devicename.toStdString().c_str());
 	dev->ClearMidiHooks();
 	//get row count
-	int rc = tm_messagenumber.length();
+	int rc =ui.tableWidget->rowCount();
 	//loop through rows
 	for (int i=0; i < rc; i++)
 	{
 	//make default midihook
 		
 		MidiHook *mh = new MidiHook;
-		//map values
-		mh->type = tm_messagetype.at(i).toStdString();
-		mh->index = tm_messagenumber.at(i);
-		//mh->bidirectional = tm_bidirectional.at(i);
-		mh->action = tm_actiontype.at(i).toStdString();
-		mh->command = tm_action.at(i).toStdString();
-		mh->param1 = tm_option1.at(i).toStdString();
-		mh->param2 = tm_option2.at(i).toStdString();
-		mh->param3 = tm_option3.at(i).toStdString();
 		
-		//uglyway//
-	//MidiHook(string midiMessageType, int midiChannelIndex,string OBSCommand, string p1 = "", string p2 = "",string p3 = "", string actionType = "")
-		/*MidiHook *mh = new MidiHook(
-		tm_messagetype.at(i).toStdString(), tm_messagenumber.at(i),
-		tm_action.at(i).toStdString(), tm_option1.at(i).toStdString(),
-		tm_option2.at(i).toStdString(), tm_option3.at(i).toStdString(),
-		tm_actiontype.at(i).toStdString());
-		*/
-		//add midihook
+		//map values
+		mh->type = ui.tableWidget->item(i, 0)->text().toStdString();
+		mh->index =ui.tableWidget->item(i, 1)->text().toInt();
+		//mh->bidirectional = ui.tableWidget->item(i, 2)->text;
+		mh->action = ui.tableWidget->item(i, 3)->text().toStdString();
+		mh->command = ui.tableWidget->item(i, 4)->text().toStdString();
+		mh->param1 = ui.tableWidget->item(i, 5)->text().toStdString();
+		mh->param2 = ui.tableWidget->item(i, 6)->text().toStdString();
+		mh->param3 = ui.tableWidget->item(i, 7)->text().toStdString();
+		
 		dev->AddMidiHook(mh);
 		
 	};
@@ -218,83 +195,44 @@ void TestModel::save(QString devicename) {
 {
 	
 	blog(1, "domessage");
-	int x = configTableModel->rowCount();
-	switch (x) {
-	case 0:
-		x = 0;
-		break;
-	default:
-		x = x - 1;
-		break;
-	}
-
-
-	if (configTableModel->insertRow(x, mtype, mchan)) {
-		ui.tableView->update();	
-	}
-	
-//
-	//make default row
-	
+	if (!inrow(mchan)) {
+		if (!inrow(mtype)) {
+			insertRow(mtype, mchan);
+		}
 		
-	//insert default row//
+	}
+}
+bool ConfigWindow::inrow(int x) {
 
-	//updateview
+int rows = ui.tableWidget->rowCount();
+	bool found = false;
+	for (int i = 0; i < rows; ++i) {
+		if (ui.tableWidget->item(i, 1)->text() ==
+		    QString::number(x)) {
+			return true;
+		}
+	}
+	return false;
+}
+bool ConfigWindow::inrow(QString mtype)
+{
+
+	int rows = ui.tableWidget->rowCount();
+	bool found = false;
+	for (int i = 0; i < rows; ++i) {
+		if (ui.tableWidget->item(i, 1)->text() == mtype) {
+			return true;
+		}
+	}
+	return false;
 }
 void ConfigWindow::rebuildModel() {}
-// Choose Action Type Handler
-void ConfigWindow::chooseAtype(int index) {
-	//actiontypemodel = new QStringListModel(items, this);
-	QStringList items;
-	switch (index) {
-	case 0:
-		//Button
-		
-		items << tr("SetCurrentScene") << tr("SetPreviewScene")
-		       << tr("TransitionToProgram")
-		       << tr("SetCurrentTransition")
-		       << tr("SetSourceVisibility")
-		       << tr("ToggleSourceVisibility") << tr("ToggleMute")
-		       << tr("SetMute") << tr("StartStopStreaming")
-		       << tr("StartStreaming") << tr("StopStreaming")
-		       << tr("StartStopRecording") << tr("StartRecording")
-		       << tr("StopRecording") << tr("StartStopReplayBuffer")
-		       << tr("StartReplayBuffer") << tr("StopReplayBuffer")
-		       << tr("SaveReplayBuffer") << tr("PauseRecording")
-		       << tr("ResumeRecording") << tr("SetTransitionDuration")
-		       << tr("SetCurrentProfile")
-		       << tr("SetCurrentSceneCollection")
-		       << tr("ResetSceneItem") << tr("SetTextGDIPlusText")
-		       << tr("SetBrowserSourceURL") << tr("ReloadBrowserSource")
-		       << tr("TakeSourceScreenshot") << tr("EnableSourceFilter")
-		       << tr("DisableSourceFilter") << tr("ToggleSourceFilter");
-		break;
-	case 1:
-		//Fader
-		
-
-		items << tr("SetVolume") << tr("SetSyncOffset")
-		       << tr("SetSourcePosition") << tr("SetSourceRotation")
-		       << tr("SetSourceScale") << tr("SetTransitionDuration")
-		       << tr("SetGainFilter");
-		break;
-	case 2:
-		//OSC
-		break;
-	case 4:
-		//Soundboard
-		break;
-	}
-	buttonactionsmodel = new QStringListModel(items, this);
-	ui.cb_action->setModel(buttonactionsmodel);
-	//QDataWidgetMapper *mapper = new QDataWidgetMapper(this);
-	//mapper->addMapping(ui.cb_action, 4, "currentText");
-}
 
 
 
 
-	void ConfigWindow::SetupModel()
+
+void ConfigWindow::SetupModel()
 {
 	//Make models for combo box and add to combobox
 	QStringList items;
@@ -305,121 +243,10 @@ void ConfigWindow::chooseAtype(int index) {
 }
 
 
-TestModel::TestModel(QObject *parent) : QAbstractTableModel(parent) {
-	MakeSceneCombo();
-	MakeVolumeCombo();
-}
+
 
 	// Create a method to populate the model with data:
-void TestModel::populateData(
-	const QList<QString> &messagetype, const QList<int> &messagenumber,
-	const QList<bool> &bidirectional, const QList<QString> &actiontype,
-	const QList<QString> &action, const QList<QString> &option1,
-	const QList<QString> &option2, const QList<QString> &option3)
-{
-	tm_messagetype.clear();
-	tm_messagetype = messagetype;
-	tm_messagenumber.clear();
-	tm_messagenumber = messagenumber;
-	tm_bidirectional.clear();
-	tm_bidirectional = bidirectional;
-	tm_actiontype.clear();
-	tm_actiontype = actiontype;
-	tm_action.clear();
-	tm_action = action;
-	tm_option1.clear();
-	tm_option1 = option2;
-	tm_option2.clear();
-	tm_option2 = option2;
-	tm_option3.clear();
-	tm_option3 = option3;
 
-	return;
-}
-void TestModel::PopulateOptions(const QList<QString> &option1,
-				const QList<QString> &option2,
-				const QList<QString> &option3)
-{
-	tm_option1.clear();
-	tm_option1 = option2;
-	tm_option2.clear();
-	tm_option2 = option2;
-	tm_option3.clear();
-	tm_option3 = option3;
-}
-
-	void ConfigWindow::save()
-{
-	//do TestModel->save();
-
-	configTableModel->save(QString::fromStdString(this->devicename));
-	
-}
-
-int TestModel::rowCount(const QModelIndex &parent) const
-{
-	Q_UNUSED(parent);
-	return tm_messagetype.length();
-}
-
-int TestModel::columnCount(const QModelIndex & /*parent*/) const
-{
-	return 8;
-}
-QVariant TestModel::data(const QModelIndex &index, int role) const
-{
-	if (!index.isValid()){
-		return QVariant();
-	    }
-	if (role == Qt::EditRole || role == Qt::DisplayRole) {
-		switch (index.column()) {
-		case 0:
-			return tm_messagetype[index.row()];
-		case 1:
-			return tm_messagenumber[index.row()];
-		case 2:
-			return tm_bidirectional[index.row()];
-		case 3:
-			return tm_actiontype[index.row()];
-		case 4:
-			return tm_action[index.row()];
-		case 5:
-			return tm_option1[index.row()];
-		case 6:
-			return tm_option2[index.row()];
-		case 7:
-			return tm_option3[index.row()];
-		}
-	}
-		return QVariant();
-	
-	}
-QVariant TestModel::headerData(int section, Qt::Orientation orientation,  int role) const
-{
-	if (role == Qt::DisplayRole && orientation == Qt::Horizontal) {
-		switch (section) {
-		case 0:
-			return QString("Message Type");
-		case 1:
-			return QString("Message Number");
-		case 2:
-			return QString("Bidirectional");
-		case 3:
-			return QString("ActionType");
-		case 4:
-			return QString("Action");
-		case 5:
-			return QString("Option 1");
-		case 6:
-			return QString("Option 2");
-		case 7:
-			return QString("Option 3");
-		}
-	}
-	return QVariant();
-}
-
-void TestModel::MakeMapper() {}
 
 void ConfigWindow::on_btn_back_clicked()
 {
@@ -451,7 +278,7 @@ void ConfigWindow::loadFromHooks()
 
 
 }
-/*bool TestModel::insertRow(int row, std::string  mtype, int mindex, std::string actiontype,
+/*bool ConfigWindow::insertRow(int row, std::string  mtype, int mindex, std::string actiontype,
 		std::string action, std::string option1, std::string option2,
 		std::string option3, const QModelIndex &parent)*/
 
@@ -459,7 +286,7 @@ void ConfigWindow::loadFromHooks()
 
 /*                Make Combo list models
 */
-void TestModel::chooseOptions1(QString Action) {
+void ConfigWindow::chooseOptions1(QString Action) {
 	QList<QString> option1;
 	QList<QString> option2;
 	QList<QString> volume;
@@ -479,7 +306,7 @@ tm_option2 = option2;
 tm_option3.clear();
 tm_option3 = option3;
 */
-void TestModel::MakeSceneCombo()
+QStringList ConfigWindow::MakeSceneCombo()
 {
 	QStringList opitems;
 	auto scenes = Utils::GetScenes();
@@ -489,13 +316,13 @@ void TestModel::MakeSceneCombo()
 		auto name = obs_data_get_string(d, "name");
 		opitems << tr(name);
 	}
-	scenesModel= new QStringListModel(opitems, this);
-	scenesModel->setProperty("role", 2);
+	return opitems;
 	//ui.cb_param1->setModel(options1model);
 }
 
 
-void TestModel::MakeVolumeCombo() {
+QStringList ConfigWindow::MakeVolumeCombo()
+{
 	QStringList opitems;
 	QMap<const char *, int> sources;
 	sources["desktop-1"] = 1;
@@ -514,7 +341,50 @@ void TestModel::MakeVolumeCombo() {
 			opitems << obs_source_get_name(source);
 		}
 	}
-	volumeModel = new QStringListModel(opitems, this);
-	volumeModel->setProperty("role", 2);
-	//ui.cb_param1->setModel(volumeModel);
+	return opitems;
+	
+}
+// Choose Action Type Handler
+QStringList ConfigWindow::chooseAtype(int index)
+{
+	//actiontypemodel = new QStringListModel(items, this);
+	QStringList items;
+	switch (index) {
+	case 0:
+		//Button
+
+		items << tr("SetCurrentScene") << tr("SetPreviewScene")
+		      << tr("TransitionToProgram") << tr("SetCurrentTransition")
+		      << tr("SetSourceVisibility")
+		      << tr("ToggleSourceVisibility") << tr("ToggleMute")
+		      << tr("SetMute") << tr("StartStopStreaming")
+		      << tr("StartStreaming") << tr("StopStreaming")
+		      << tr("StartStopRecording") << tr("StartRecording")
+		      << tr("StopRecording") << tr("StartStopReplayBuffer")
+		      << tr("StartReplayBuffer") << tr("StopReplayBuffer")
+		      << tr("SaveReplayBuffer") << tr("PauseRecording")
+		      << tr("ResumeRecording") << tr("SetTransitionDuration")
+		      << tr("SetCurrentProfile")
+		      << tr("SetCurrentSceneCollection") << tr("ResetSceneItem")
+		      << tr("SetTextGDIPlusText") << tr("SetBrowserSourceURL")
+		      << tr("ReloadBrowserSource") << tr("TakeSourceScreenshot")
+		      << tr("EnableSourceFilter") << tr("DisableSourceFilter")
+		      << tr("ToggleSourceFilter");
+		break;
+	case 1:
+		//Fader
+
+		items << tr("SetVolume") << tr("SetSyncOffset")
+		      << tr("SetSourcePosition") << tr("SetSourceRotation")
+		      << tr("SetSourceScale") << tr("SetTransitionDuration")
+		      << tr("SetGainFilter");
+		break;
+	case 2:
+		//OSC
+		break;
+	case 4:
+		//Soundboard
+		break;
+	}
+	return items;
 }

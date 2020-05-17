@@ -50,7 +50,17 @@ ConfigWindow::ConfigWindow( std::string devicename)
 	QList<QString> option2;
 	QList<QString> option3;
 	
+	for (int i = 0; i < hooks.size(); i++) {
 
+		messagetype.append(QString::fromStdString(hooks.at(i)->type));
+		messagenumber.append(hooks.at(i)->index);
+		bidirectional.append(false);
+		actiontype.append(QString::fromStdString(hooks.at(i)->action));
+		action.append(QString::fromStdString(hooks.at(i)->command));
+		option1.append(QString::fromStdString(hooks.at(i)->param1));
+		option2.append(QString::fromStdString(hooks.at(i)->param2));
+		option3.append(QString::fromStdString(hooks.at(i)->param3));
+	}
 	//setup model
 	ConfigWindow::SetupModel();
 	//create default actions
@@ -61,14 +71,7 @@ ConfigWindow::ConfigWindow( std::string devicename)
 
 	//Wrap Data into Model
 		configTableModel->populateData(messagetype, messagenumber, bidirectional, actiontype, action,option1, option2, option3);
-		for (int i = 0; i < hooks.size(); i++) {
-
-			configTableModel->insertRow(
-				i, hooks.at(i)->type, hooks.at(i)->index,
-				hooks.at(i)->action, hooks.at(i)->command,
-				hooks.at(i)->param1, hooks.at(i)->param2,
-				hooks.at(i)->param3);
-		}
+	
 	
 	//set model to TableView
 	ui.tableView->setModel(configTableModel);

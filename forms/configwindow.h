@@ -71,7 +71,7 @@ private slots:
 	QStringList MakeSceneCombo();
 	QStringList MakeVolumeCombo();
 	//Combobox Actions
-	QStringList chooseAtype(int index);
+	QStringList chooseAtype(QString index);
 
     private:
 	QDataWidgetMapper *mapper;

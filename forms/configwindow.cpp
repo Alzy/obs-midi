@@ -33,6 +33,7 @@ ConfigWindow::ConfigWindow(std::string devn)
 	//Setup the UI
 	ui.setupUi(this);
 
+	void SetupModel();
 	ui.tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	
 	
@@ -47,9 +48,9 @@ ConfigWindow::ConfigWindow(std::string devn)
 	
 	
 	//setup model
-	ConfigWindow::SetupModel();
+	//ConfigWindow::SetupModel();
 	//create default actions
-	ConfigWindow::chooseAtype(1);
+	//ConfigWindow::chooseAtype(1);
 	//create model
 	//ConfigWindow configTableModel;
 
@@ -77,6 +78,9 @@ ConfigWindow::ConfigWindow(std::string devn)
 
 	connect(ui.cb_action, SIGNAL(currentTextChanged(QString)), this, SLOT(chooseOptions1(QString)));
 
+	connect(ui.btnDel, SIGNAL(clicked()), this, SLOT(deleterow()));
+	connect(ui.btnClear, SIGNAL(clicked()), ui.tableWidget,
+		SLOT(clearContents()));
 
 	
 	
@@ -86,6 +90,7 @@ void ConfigWindow::select(int row, int col) {
 	ui.num_mchan->display(ui.tableWidget->item(row, 1)->text().toInt());
 	ui.checkBox->setChecked(QVariant(ui.tableWidget->item(row, 2)->text()).toBool());
 	ui.cb_atype->setCurrentText(ui.tableWidget->item(row, 3)->text());
+	chooseAtype(ui.tableWidget->item(row, 3)->text());
 	ui.cb_action->setCurrentText(ui.tableWidget->item(row, 4)->text());
 	ui.cb_param3->setCurrentText(ui.tableWidget->item(row, 5)->text());
 	ui.cb_param3->setCurrentText(ui.tableWidget->item(row, 6)->text());
@@ -183,7 +188,7 @@ void  ConfigWindow::insertRow(QString mtype,int mindex)
 void ConfigWindow::save() {
 	//Get Device Manager
 	auto dm = GetDeviceManager();
-	auto save = GetConfig();
+	auto conf = GetConfig();
 	//to get device
 	auto dev = dm->GetMidiDeviceByName(devicename.c_str());
 	dev->ClearMidiHooks();
@@ -209,7 +214,7 @@ void ConfigWindow::save() {
 		dev->AddMidiHook(mh);
 		
 	};
-	save->Save();
+	conf->Save();
 }
 	void ConfigWindow::domessage(QString mtype, int mchan)
 {
@@ -246,8 +251,6 @@ bool ConfigWindow::inrow(QString mtype)
 	}
 	return false;
 }
-void ConfigWindow::rebuildModel() {}
-
 
 
 void ConfigWindow::sendToTable() {
@@ -267,9 +270,8 @@ void ConfigWindow::SetupModel()
 	//Make models for combo box and add to combobox
 	QStringList items;
 	items << tr("Button") << tr("Fader") ;
-	actiontypemodel = new QStringListModel(items, this);
-	actiontypemodel->setProperty("role",2);
-	ui.cb_atype->setModel(actiontypemodel);
+	
+	ui.cb_atype->addItems(items);
 }
 
 
@@ -297,11 +299,7 @@ void ConfigWindow::ToggleShowHide()
 	else
 		setVisible(false);
 }
-void ConfigWindow::load(){};
-void ConfigWindow::addrow(){};
-void ConfigWindow::deleterow(){};
-void ConfigWindow::updateUi(){};
-void ConfigWindow::selectionChanged(){};
+
 void ConfigWindow::loadFromHooks()
 {
 	
@@ -382,13 +380,12 @@ QStringList ConfigWindow::MakeVolumeCombo()
 	
 }
 // Choose Action Type Handler
-QStringList ConfigWindow::chooseAtype(int index)
+QStringList ConfigWindow::chooseAtype(QString text)
 {
 	
 	//actiontypemodel = new QStringListModel(items, this);
 	QStringList items;
-	switch (index) {
-	case 0:
+	if (text == "button") {
 		//Button
 
 		items << tr("SetCurrentScene") << tr("SetPreviewScene")
@@ -408,24 +405,37 @@ QStringList ConfigWindow::chooseAtype(int index)
 		      << tr("ReloadBrowserSource") << tr("TakeSourceScreenshot")
 		      << tr("EnableSourceFilter") << tr("DisableSourceFilter")
 		      << tr("ToggleSourceFilter");
-		break;
-	case 1:
+	} else if (text == "Fader ") {
+
 		//Fader
 
 		items << tr("SetVolume") << tr("SetSyncOffset")
 		      << tr("SetSourcePosition") << tr("SetSourceRotation")
 		      << tr("SetSourceScale") << tr("SetTransitionDuration")
 		      << tr("SetGainFilter");
-		break;
-	case 2:
-		//OSC
-		break;
-	case 4:
-		//Soundboard
-		break;
 	}
 	ui.cb_action->clear();
 	ui.cb_action->addItems(items);
 
 	return items;
 }
+
+void ConfigWindow::load(){};
+void ConfigWindow::addrow(){};
+void ConfigWindow::deleterow(){
+	
+	
+	try {
+		auto items = ui.tableWidget->selectedItems();
+		if (!items.isEmpty()) {
+			int rc = items[0]->row();
+			ui.tableWidget->removeRow(rc);
+		}
+		
+	} catch (const std::exception &e) {
+		//blog(1, e.what().c_str);
+		return;
+	}
+};
+void ConfigWindow::updateUi(){};
+void ConfigWindow::selectionChanged(){};

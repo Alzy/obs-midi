@@ -49,9 +49,9 @@ class ConfigWindow : public QDialog{
 			 std::string atype, std::string action,
 			 std::string option1, std::string option2,
 			 std::string option3);
-    void save();
     bool inrow(int x);
     bool inrow(QString mtype);
+    
 
 private slots:
 
@@ -64,8 +64,9 @@ private slots:
 	void selectionChanged();
 	void domessage(QString mtype, int mchan);
 	void insertRow(QString mtype, int mindex);
-	
-	void save(QString devicename);
+	void select(int row, int col);
+	void sendToTable();
+	void save();
 	void chooseOptions1(QString Action);
 	QStringList MakeSceneCombo();
 	QStringList MakeVolumeCombo();

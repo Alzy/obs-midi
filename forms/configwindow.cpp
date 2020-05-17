@@ -14,11 +14,11 @@
 #include "device-manager.h"
 #include "midi-agent.h"
 
-ConfigWindow::ConfigWindow( std::string devicename)
-	
+ConfigWindow::ConfigWindow(std::string devn) 
 {
 	//MakeSceneCombo();
-	
+
+	devicename = devn;
 	//auto rob = static_cast<RouterPtr>(GetRouter());
 	auto devicemanager = GetDeviceManager();
 	auto config = GetConfig();
@@ -33,12 +33,8 @@ ConfigWindow::ConfigWindow( std::string devicename)
 	//Setup the UI
 	ui.setupUi(this);
 
-
-//connect
-	//Connect back button functionality
-	connect(ui.btnBack, &QPushButton::clicked, this,&ConfigWindow::on_btn_back_clicked);
-	//connect(ui.btnSave, &QPushButton::clicked, this, &ConfigWindow::save);
-
+	ui.tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	
 	
 		for (int i = 0; i < hooks.size(); i++) {
 		int rc = ui.tableWidget->rowCount();
@@ -64,14 +60,38 @@ ConfigWindow::ConfigWindow( std::string devicename)
 	
 
 	
-
+	//connect
+	//Connect back button functionality
+	connect(ui.btnBack, &QPushButton::clicked, this,
+		&ConfigWindow::on_btn_back_clicked);
+	connect(ui.btnSave, SIGNAL(clicked()), this, SLOT(save()));
+	connect(ui.tableWidget, SIGNAL(cellClicked(int, int)), this, SLOT(select(int,int)));
 	connect(ui.cb_atype, SIGNAL(currentIndexChanged(int)), this, SLOT(chooseAtype(int)));
-	//connect(ui.cb_action, SIGNAL(currentTextChanged(QString)), configTableModel, SLOT(chooseOptions1(QString)));
+	connect(ui.cb_atype, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
+	connect(ui.cb_action, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
+	connect(ui.cb_param1, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
+	connect(ui.cb_param2, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
+	connect(ui.cb_param3, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
+	connect(ui.checkBox, SIGNAL(stateChanged(int)), this,SLOT(sendToTable()));
+	//connect(ui.cb_atype, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
+
+	connect(ui.cb_action, SIGNAL(currentTextChanged(QString)), this, SLOT(chooseOptions1(QString)));
+
 
 	
 	
 }
+void ConfigWindow::select(int row, int col) {
+	ui.lin_mtype->setText(ui.tableWidget->item(row, 0)->text());
+	ui.num_mchan->display(ui.tableWidget->item(row, 1)->text().toInt());
+	ui.checkBox->setChecked(QVariant(ui.tableWidget->item(row, 2)->text()).toBool());
+	ui.cb_atype->setCurrentText(ui.tableWidget->item(row, 3)->text());
+	ui.cb_action->setCurrentText(ui.tableWidget->item(row, 4)->text());
+	ui.cb_param3->setCurrentText(ui.tableWidget->item(row, 5)->text());
+	ui.cb_param3->setCurrentText(ui.tableWidget->item(row, 6)->text());
+	ui.cb_param3->setCurrentText(ui.tableWidget->item(row, 7)->text());
 
+}
 void ConfigWindow::AddRowFromHooks(int rc, std::string type, int index, bool bid,
 			     std::string action, std::string command,
 			     std::string param1, std::string param2,
@@ -95,7 +115,7 @@ void ConfigWindow::AddRowFromHooks(int rc, std::string type, int index, bool bid
 		
 		newItem->setText(QString::fromStdString(type)); //Message Type
 		newItem2->setText(QString::number(index)); //message channel
-		//newItem3->setCheckState(false); //Bidirectional
+		newItem3->setText(QVariant(false).toString()); //Bidirectional
 		newItem4->setText(QString::fromStdString(action)); //Action Type
 		newItem5->setText(QString::fromStdString(command)); //Action
 		newItem6->setText(QString::fromStdString(param1)); //Option 1
@@ -160,12 +180,12 @@ void  ConfigWindow::insertRow(QString mtype,int mindex)
 
 	
 }
-void ConfigWindow::save(QString devicename) {
+void ConfigWindow::save() {
 	//Get Device Manager
 	auto dm = GetDeviceManager();
 	auto save = GetConfig();
 	//to get device
-	auto dev = dm->GetMidiDeviceByName(devicename.toStdString().c_str());
+	auto dev = dm->GetMidiDeviceByName(devicename.c_str());
 	dev->ClearMidiHooks();
 	//get row count
 	int rc =ui.tableWidget->rowCount();
@@ -230,7 +250,17 @@ void ConfigWindow::rebuildModel() {}
 
 
 
-
+void ConfigWindow::sendToTable() {
+	int rc =ui.tableWidget->selectedItems()[0]->row();
+	ui.tableWidget->item(rc, 0)->setText( ui.lin_mtype->text());//mtype
+	ui.tableWidget->item(rc, 1)->setText( QString::number(ui.num_mchan->intValue()));               //mindex
+	ui.tableWidget->item(rc, 2)->setText(QVariant(ui.checkBox->isChecked()).toString()); //bool
+	ui.tableWidget->item(rc, 3)->setText(ui.cb_atype->currentText());//atype
+	ui.tableWidget->item(rc, 4)->setText(ui.cb_action->currentText());   //action
+	ui.tableWidget->item(rc, 5)->setText(ui.cb_param1->currentText());
+	ui.tableWidget->item(rc, 6)->setText(ui.cb_param2->currentText());
+	ui.tableWidget->item(rc, 7)->setText(ui.cb_param3->currentText());
+}
 
 void ConfigWindow::SetupModel()
 {
@@ -287,17 +317,24 @@ void ConfigWindow::loadFromHooks()
 /*                Make Combo list models
 */
 void ConfigWindow::chooseOptions1(QString Action) {
+	ui.tableWidget->item(ui.tableWidget->selectedItems()[0]->row(), 4)
+		->setText(Action);
 	QList<QString> option1;
 	QList<QString> option2;
 	QList<QString> volume;
 	QStringList nada;
+	ui.cb_param1->clear();
+	ui.cb_param2->clear();
+	ui.cb_param3->clear();
 	if (Action == "SetVolume") {
-		
+
+		ui.cb_param1->addItems(MakeVolumeCombo());
 		//configTableModel->PopulateOptions(volumeModel, nada, nada);
 		//configTableModel->options1model->
 		
 	} else if (Action == "SetCurrentScene") {
-		
+		ui.cb_param1->addItems(MakeSceneCombo());
+
 	}
 }
 /*
@@ -347,6 +384,7 @@ QStringList ConfigWindow::MakeVolumeCombo()
 // Choose Action Type Handler
 QStringList ConfigWindow::chooseAtype(int index)
 {
+	
 	//actiontypemodel = new QStringListModel(items, this);
 	QStringList items;
 	switch (index) {
@@ -386,5 +424,8 @@ QStringList ConfigWindow::chooseAtype(int index)
 		//Soundboard
 		break;
 	}
+	ui.cb_action->clear();
+	ui.cb_action->addItems(items);
+
 	return items;
 }

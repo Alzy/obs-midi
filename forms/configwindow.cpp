@@ -1,3 +1,9 @@
+#include <inttypes.h>
+
+
+#include <obs.hpp>
+#include <util/platform.h>
+
 #include "configwindow.h"
 #include "ui_configwindow.h"
 #include <QtWidgets>
@@ -11,6 +17,7 @@
 ConfigWindow::ConfigWindow( std::string devicename)
 	
 {
+	MakeSceneCombo();
 	
 	//auto rob = static_cast<RouterPtr>(GetRouter());
 	auto devicemanager = GetDeviceManager();
@@ -80,9 +87,9 @@ ConfigWindow::ConfigWindow( std::string devicename)
 	//create Data Mapper
 	//QDataWidgetMapper mapper =  QDataWidgetMapper(this);
 	QDataWidgetMapper *mapper = new QDataWidgetMapper(this);
+	mapper->setSubmitPolicy(QDataWidgetMapper::AutoSubmit);
 
 	mapper->setModel(configTableModel);
-	mapper->setSubmitPolicy(QDataWidgetMapper::AutoSubmit);
 	mapper->addMapping(ui.lin_mtype, 0);
 	mapper->addMapping(ui.num_mchan, 1, "value");
 	mapper->addMapping(ui.checkBox, 2, "checked");
@@ -97,6 +104,10 @@ ConfigWindow::ConfigWindow( std::string devicename)
 	
 	connect(ui.tableView->selectionModel(),&QItemSelectionModel::currentRowChanged, mapper,&QDataWidgetMapper::setCurrentModelIndex);
 	connect(ui.cb_atype, SIGNAL(currentIndexChanged(int)), this, SLOT(chooseAtype(int)));
+	connect(ui.cb_param1, SIGNAL(currentIndexChanged(int)), ui.tableView,
+		SLOT(update()));
+	
+	
 	//mapper->AutoSubmit = true;
 	//connect(ui.tableView, &QTableView::clicked, mapper, &QDataWidgetMapper::setCurrentModelIndex);
 
@@ -174,7 +185,7 @@ void TestModel::save(QString devicename) {
 	for (int i=0; i < rc; i++)
 	{
 	//make default midihook
-		/*/
+		
 		MidiHook *mh = new MidiHook;
 		//map values
 		mh->type = tm_messagetype.at(i).toStdString();
@@ -183,17 +194,17 @@ void TestModel::save(QString devicename) {
 		mh->action = tm_actiontype.at(i).toStdString();
 		mh->command = tm_action.at(i).toStdString();
 		mh->param1 = tm_option1.at(i).toStdString();
-		mh->param1 = tm_option2.at(i).toStdString();
-		mh->param1 = tm_option3.at(i).toStdString();
-		*/
+		mh->param2 = tm_option2.at(i).toStdString();
+		mh->param3 = tm_option3.at(i).toStdString();
+		
 		//uglyway//
 	//MidiHook(string midiMessageType, int midiChannelIndex,string OBSCommand, string p1 = "", string p2 = "",string p3 = "", string actionType = "")
-		MidiHook *mh = new MidiHook(
+		/*MidiHook *mh = new MidiHook(
 		tm_messagetype.at(i).toStdString(), tm_messagenumber.at(i),
 		tm_action.at(i).toStdString(), tm_option1.at(i).toStdString(),
 		tm_option2.at(i).toStdString(), tm_option3.at(i).toStdString(),
 		tm_actiontype.at(i).toStdString());
-		
+		*/
 		//add midihook
 		dev->AddMidiHook(mh);
 		
@@ -290,29 +301,58 @@ void ConfigWindow::chooseAtype(int index) {
 	
 	//We need to Dynamically Generate These ones based on value of cb_action and data pulled from OBS
 	QStringList items4;
-	items4 << tr("Button") << tr("Fader");
+	items4 << tr("Mix/Aux") << tr("Desktop Audio");
 	options1model = new QStringListModel(items4, this);
 	ui.cb_param1->setModel(options1model);
+	
 
 	QStringList items5;
-	items5 << tr("Button") << tr("Fader");
+	
 	options2model = new QStringListModel(items5, this);
 	ui.cb_param2->setModel(options2model);
-
+	/*/
 	QStringList items6;
-	items6 << tr("Button") << tr("Fader");
+	
 	options3model = new QStringListModel(items6, this);
 	ui.cb_param3->setModel(options3model);
 	//link combobox info
-	
-	
+	*/
+	QStringList opitems;
+	auto scenes = Utils::GetScenes();
+	auto length = obs_data_array_count(scenes);
+	for (size_t i = 0; i < length; i++) {
+		auto d = obs_data_array_item(scenes, i);
+
+		auto name = obs_data_get_string(d, "name");
+		opitems << tr(name);
+	}
+
+	options3model = new QStringListModel(opitems, this);
+	options3model->setProperty("role", 2);
+	ui.cb_param3->setModel(options3model);
 
 	
 }
 
 
 TestModel::TestModel(QObject *parent) : QAbstractTableModel(parent) {}
+void ConfigWindow::MakeSceneCombo() {
+		
+	
+	
+	//auto name = obs_frontend_get_scene_names();
+	//auto name2 = obs_frontend_get_scene_names();
+	//struct obs_frontend_source_list scenes;
+	
 
+	//obs_frontend_get_scenes(&scenes);
+
+
+	//obs_frontend_source_list_free(&scenes);
+	//bfree(name);
+	//blog(1, name);
+
+}
 	// Create a method to populate the model with data:
 void TestModel::populateData(
 	const QList<QString> &messagetype, const QList<int> &messagenumber,

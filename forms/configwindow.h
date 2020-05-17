@@ -2,6 +2,12 @@
 #ifndef CONFIGWINDOW_H
 #define CONFIGWINDOW_H
 
+
+//include obs stuff
+#include <obs.hpp>
+#include <obs-module.h>
+
+//qt stuff
 #include <QDialog>
 #include <QTableView>
 //#include <QMainWindow>
@@ -84,6 +90,7 @@ class ConfigWindow : public QDialog{
     void rebuildModel();
     void ToggleShowHide();
     void TselChanged(QModelIndex i);
+    void MakeSceneCombo();
     //variables
     std::string devicename;
     QTableView tableEntity;

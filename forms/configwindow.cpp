@@ -1,21 +1,30 @@
 #include "configwindow.h"
-#include "config.h"
 #include "ui_configwindow.h"
 #include <QtWidgets>
 #include <QAbstractItemView>
 #include <obs-frontend-api/obs-frontend-api.h>
-#include <obs-module.h>
-#include <obs-data.h>
-#include <string>
-#include <map>
-#include <iostream>
-#include <utility>
-#include <device-manager.h>
-ConfigWindow::ConfigWindow(QWidget *parent)
+#include "obs-midi.h"
+#include "config.h"
+#include "router.h"
+#include "device-manager.h"
+#include "midi-agent.h"
+
+ConfigWindow::ConfigWindow( std::string devicename)
 	
 {
+	
+	//auto rob = static_cast<RouterPtr>(GetRouter());
+	auto devicemanager = GetDeviceManager();
+	auto config = GetConfig();
+	auto rt = GetRouter();	
+	//connect(this, SIGNAL(&SendNewUnknownMessage), this	SIGNAL(rt.UnknownMessage));
+	auto device = devicemanager->GetMidiDeviceByName(devicename.c_str());
+	connect(rt, SIGNAL(&Router::UnknownMessage), this,SLOT(domessage));
 	//Setup the UI
 	ui.setupUi(this);
+
+
+//connect
 	//Connect back button functionality
 	connect(ui.btnBack, &QPushButton::clicked, this,&ConfigWindow::on_btn_back_clicked);
 	ui.tableView->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -109,6 +118,10 @@ ConfigWindow::ConfigWindow(QWidget *parent)
 	// TODO:: Add Data to Table here
 	
 }
+void ConfigWindow::domessage(std::string mtype, int mchan)
+{
+	blog(1, "domessage");
+}
 void ConfigWindow::rebuildModel() {}
 // Choose Action Type Handler
 void ConfigWindow::chooseAtype(int index) {
@@ -194,21 +207,7 @@ void ConfigWindow::chooseAtype(int index) {
 
 
 TestModel::TestModel(QObject *parent) : QAbstractTableModel(parent) {}
-void GetConfigAndDoThing() {
-	DeviceManager *dm = new DeviceManager();
 
-	vector<MidiHook> hooks = dm->GetMidiHooksByDeviceName("name");
-	for (int i = 0; i <= hooks->length(); i++) {
-		hooks[i]->na string type;
-		int index;
-		string action;
-		string command;
-		string param1;
-		string param2;
-		string param3;
-	}
-	
-}
 	// Create a method to populate the model with data:
 void TestModel::populateData(
 	const QList<QString> &messagetype, const QList<int> &messagenumber,

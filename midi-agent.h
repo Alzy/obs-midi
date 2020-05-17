@@ -21,7 +21,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <QtCore/QString>
 #include <QtCore/QSharedPointer>
 #include <vector>
-
+#include <QObject>
 #include "RtMidi.h"
 
 using namespace std;
@@ -74,7 +74,9 @@ public:
 };
 
 
-class MidiAgent {
+class MidiAgent: public QObject {
+	Q_OBJECT
+
 	public:
 		MidiAgent();
 		~MidiAgent();
@@ -82,6 +84,8 @@ class MidiAgent {
 
 		void OpenPort(int port);
 		void ClosePort();
+
+		 void SendMessage(std::string mType, int mIndex);
 
 		string GetName();
 		int GetPort();
@@ -98,7 +102,8 @@ class MidiAgent {
 		void RemoveMidiHook(MidiHook *hook);
 		void ClearMidiHooks();
 		obs_data_t* GetData();
-
+	signals:
+		void SendNewUnknownMessage(std::string mtype, int msgindex);
 	private:
 		RtMidiIn *midiin;
 		string name;
@@ -106,4 +111,5 @@ class MidiAgent {
 		bool enabled;
 		bool connected;
 		vector<MidiHook*> midiHooks;
+
 };

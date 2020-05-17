@@ -65,7 +65,7 @@ private:
 class ConfigWindow : public QDialog{
 		Q_OBJECT
 	 public:
-    explicit ConfigWindow(QWidget *parent = 0);
+    explicit ConfigWindow(std::string devicename);
     ~ConfigWindow();
     void SetupModel();
     void on_btn_back_clicked();
@@ -78,6 +78,7 @@ class ConfigWindow : public QDialog{
 
 private slots:
     void chooseAtype(int index);
+	void domessage(std::string mtype, int mchan);
 
     private:
 	QDataWidgetMapper *mapper;

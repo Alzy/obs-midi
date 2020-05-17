@@ -16,7 +16,7 @@
 #include "device-manager.h"
 #include "utils.h"
 #include "midi-agent.h"
-
+#include "router.h"
 using namespace std;
 
 void ___source_dummy_addref(obs_source_t *) {}
@@ -33,9 +33,12 @@ void ___data_item_release(obs_data_item_t *dataItem)
 
 OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE("obs-midi", "en-US")
-
 ConfigPtr _config;
 DeviceManagerPtr _deviceManager;
+RouterPtr _router;
+
+
+
 
 
 
@@ -50,6 +53,9 @@ bool obs_module_load(void)
 	// Config Setup
 	_config = ConfigPtr(new Config());
 	_config->Load();
+
+	// Signal Router Setup
+	_router = RouterPtr(new Router());
 
 
 	// UI SETUP
@@ -90,8 +96,14 @@ ConfigPtr GetConfig()
 {
 	return _config;
 }
+RouterPtr GetRouter()
+{
+	return _router;
+}
 
 DeviceManagerPtr GetDeviceManager()
 {
 	return _deviceManager;
 }
+
+

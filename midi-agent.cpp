@@ -26,7 +26,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "midi-agent.h"
 #include "obs-midi.h"
 #include "obs-controller.h"
-
+#include "router.h"
 using namespace std;
 
 
@@ -110,10 +110,19 @@ MidiAgent::MidiAgent()
 	midiin = new RtMidiIn();
 	midiin->setCallback(&MidiAgent::HandleInput, this);
 
+	//Get Router Pointer and connect signals
+	auto rt = GetRouter();
+	
+	connect(this, SIGNAL(&SendNewUnknownMessage), this, SIGNAL(rt.UnknownMessage));
+	connect(this, SIGNAL(&SendNewUnknownMessage), this, SLOT(Router::gotmessage));
+	//connect(this, SIGNAL(&SendNewUnknownMessage), router, SLOT(gotmessage));
 	// for testing..  remove me:
 	//MidiHook *mh = new MidiHook("control_change", 7, "SetVolume", "Desktop Audio", "" ,  "", "fader");
-	MidiHook *mh = new MidiHook("control_change", 7, "SetVolume", "Desktop Audio");
-	AddMidiHook(mh);
+	//MidiHook *mh = new MidiHook("control_change", 1, "SetVolume", "Desktop Audio");
+	//AddMidiHook(mh);
+	//MidiHook *mh2 =
+		//new MidiHook("control_change", 2, "SetVolume", "Mic / Aux");
+	//AddMidiHook(mh2);
 }
 
 MidiAgent::~MidiAgent()
@@ -147,8 +156,13 @@ void MidiAgent::Load(obs_data_t * data)
 	}
 
 }
+void MidiAgent::SendMessage(std::string mType, int mIndex) {
+	emit this->SendNewUnknownMessage(mType, mIndex);
+	auto router = GetRouter();
+	router->gotmessage(mType, mIndex);
+}
 
-/* Will open the port and enable this MidiAgent
+	/* Will open the port and enable this MidiAgent
 */
 void MidiAgent::OpenPort(int port)
 {
@@ -193,6 +207,7 @@ void MidiAgent::HandleInput(double deltatime,
 	for (unsigned i = 0; i < self->midiHooks.size(); i++) {
 		if (self->midiHooks.at(i)->type == mType && self->midiHooks.at(i)->index == mIndex) {
 			self->TriggerInputCommand(self->midiHooks.at(i), (int)message->at(2));
+			self->SendMessage(mType, mIndex);
 		}
 	}
 }

@@ -54,6 +54,7 @@ void SettingsDialog::ToggleShowHide() {
 void SettingsDialog::setCheck(bool x)
 {
 	this->ui->check_enabled->setChecked(x);
+	ui->btn_configure->setEnabled(x);
 }
 
 void SettingsDialog::SetAvailableDevices(std::vector<std::string> &midiDevices)
@@ -69,6 +70,7 @@ void SettingsDialog::SetAvailableDevices(std::vector<std::string> &midiDevices)
 		this->ui->list_midi_dev->addItem(midiDevices.at(i).c_str());
 		std::string name = midiDevices.at(i);
 	}
+	this->ui->list_midi_dev->setCurrentRow(0);
 }
 void SettingsDialog::on_check_clicked(bool enabled) {
 	if (enabled) {
@@ -96,10 +98,12 @@ void SettingsDialog::on_btn_configure_clicked()
 	
 	pushDebugMidiMessage("time", "button clicked", 0, 0);
 	blog(LOG_INFO, "Configure button clicked");
-	ConfigWindow *cwin = new ConfigWindow;
+	string devicename =
+		ui->list_midi_dev->currentItem()->text().toStdString();
 
+	ConfigWindow *cwin = new ConfigWindow(devicename);
+	cwin->devicename = devicename;
 
-	cwin->devicename =ui->list_midi_dev->currentItem()->text().toStdString();
 
 	//setVisible(false);
 	//hide();
@@ -155,18 +159,19 @@ void SettingsDialog::on_item_select()
 	if (device != NULL && device->isEnabled())
 	{
 		ui->check_enabled->setChecked(true);
+		ui->btn_configure->setEnabled(true);
+
 	}
 	else {
 		ui->check_enabled->setChecked(false);
+		ui->btn_configure->setEnabled(false);
+
 
 	}
 
 	//If enabled, enable configuration button, if not disable it.
-	if (ui->check_enabled->checkState()) {
-		ui->btn_configure->setEnabled(true);
-	} else {
-		ui->btn_configure->setEnabled(false);
-	}
+ui->btn_configure->setEnabled(ui->check_enabled->isChecked());
+	
 }
 
 

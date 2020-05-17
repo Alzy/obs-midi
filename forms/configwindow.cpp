@@ -17,7 +17,9 @@
 ConfigWindow::ConfigWindow(std::string devn) 
 {
 	//MakeSceneCombo();
-
+	
+	MakeVolumeCombo();
+	MakeSceneCombo();
 	devicename = devn;
 	//auto rob = static_cast<RouterPtr>(GetRouter());
 	auto devicemanager = GetDeviceManager();
@@ -25,15 +27,15 @@ ConfigWindow::ConfigWindow(std::string devn)
 	//config->Load();
 	Router *rt = midiobsrouter;	
 	//connect(this, SIGNAL(&SendNewUnknownMessage), this	SIGNAL(rt.UnknownMessage));
-	auto device = devicemanager->GetMidiDeviceByName(devicename.c_str());
+	//auto device = devicemanager->GetMidiDeviceByName(devicename.c_str());
 
 	std::vector<MidiHook *> hooks =	devicemanager->GetMidiHooksByDeviceName(devicename.c_str());
-		
+	///HOOK up the Message Handler
 	connect( rt, SIGNAL(UnknownMessage(QString, int)), this,SLOT(domessage(QString, int)));
 	//Setup the UI
 	ui.setupUi(this);
-
-	void SetupModel();
+	//void SetupModel();
+	//ConfigWindow::chooseAtype("Button");
 	ui.tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	
 	
@@ -47,27 +49,13 @@ ConfigWindow::ConfigWindow(std::string devn)
 	
 	
 	
-	//setup model
-	//ConfigWindow::SetupModel();
-	//create default actions
-	//ConfigWindow::chooseAtype(1);
-	//create model
-	//ConfigWindow configTableModel;
 
-	//Wrap Data into Model
-		
-	
-	
-	
-
-	
-	//connect
 	//Connect back button functionality
 	connect(ui.btnBack, &QPushButton::clicked, this,
 		&ConfigWindow::on_btn_back_clicked);
 	connect(ui.btnSave, SIGNAL(clicked()), this, SLOT(save()));
 	connect(ui.tableWidget, SIGNAL(cellClicked(int, int)), this, SLOT(select(int,int)));
-	connect(ui.cb_atype, SIGNAL(currentIndexChanged(int)), this, SLOT(chooseAtype(int)));
+	connect(ui.cb_atype, SIGNAL(currenTextChanged(QString)), this, SLOT(chooseAtype(QString)));
 	connect(ui.cb_atype, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
 	connect(ui.cb_action, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
 	connect(ui.cb_param1, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
@@ -158,11 +146,11 @@ void  ConfigWindow::insertRow(QString mtype,int mindex)
 	
 	if (mtype == "control_change") {
 		newItem4->setText("Fader"); //Action Type
-		newItem5->setText("Set Volume"); //Action	tm_actiontype.append("Fader");
+		newItem5->setText("SetVolume"); //Action	tm_actiontype.append("Fader");
 		
 	} else {
 		newItem4->setText("Button");  //Action Type
-		newItem5->setText("Set Mute"); //Action
+		newItem5->setText("SetMute"); //Action
 		
 	}
 	newItem6->setText("Mic/Aux");   //Option 1
@@ -230,7 +218,7 @@ void ConfigWindow::save() {
 bool ConfigWindow::inrow(int x) {
 
 int rows = ui.tableWidget->rowCount();
-	bool found = false;
+
 	for (int i = 0; i < rows; ++i) {
 		if (ui.tableWidget->item(i, 1)->text() ==
 		    QString::number(x)) {
@@ -243,7 +231,7 @@ bool ConfigWindow::inrow(QString mtype)
 {
 
 	int rows = ui.tableWidget->rowCount();
-	bool found = false;
+	
 	for (int i = 0; i < rows; ++i) {
 		if (ui.tableWidget->item(i, 1)->text() == mtype) {
 			return true;
@@ -265,14 +253,7 @@ void ConfigWindow::sendToTable() {
 	ui.tableWidget->item(rc, 7)->setText(ui.cb_param3->currentText());
 }
 
-void ConfigWindow::SetupModel()
-{
-	//Make models for combo box and add to combobox
-	QStringList items;
-	items << tr("Button") << tr("Fader") ;
-	
-	ui.cb_atype->addItems(items);
-}
+
 
 
 
@@ -326,12 +307,12 @@ void ConfigWindow::chooseOptions1(QString Action) {
 	ui.cb_param3->clear();
 	if (Action == "SetVolume") {
 
-		ui.cb_param1->addItems(MakeVolumeCombo());
+		ui.cb_param1->addItems(VolumeList);
 		//configTableModel->PopulateOptions(volumeModel, nada, nada);
 		//configTableModel->options1model->
 		
 	} else if (Action == "SetCurrentScene") {
-		ui.cb_param1->addItems(MakeSceneCombo());
+		ui.cb_param1->addItems(ScenesList);
 
 	}
 }
@@ -341,24 +322,24 @@ tm_option2 = option2;
 tm_option3.clear();
 tm_option3 = option3;
 */
-QStringList ConfigWindow::MakeSceneCombo()
+void ConfigWindow::MakeSceneCombo()
 {
-	QStringList opitems;
 	auto scenes = Utils::GetScenes();
 	auto length = obs_data_array_count(scenes);
 	for (size_t i = 0; i < length; i++) {
 		auto d = obs_data_array_item(scenes, i);
 		auto name = obs_data_get_string(d, "name");
-		opitems << tr(name);
+		VolumeList<< tr(name);
 	}
-	return opitems;
+	
 	//ui.cb_param1->setModel(options1model);
 }
 
 
-QStringList ConfigWindow::MakeVolumeCombo()
+void ConfigWindow::MakeVolumeCombo()
 {
-	QStringList opitems;
+
+	
 	QMap<const char *, int> sources;
 	sources["desktop-1"] = 1;
 	sources["desktop-2"] = 2;
@@ -370,54 +351,26 @@ QStringList ConfigWindow::MakeVolumeCombo()
 	while (i.hasNext()) {
 		i.next();
 
-		const char *id = i.key();
 		OBSSourceAutoRelease source = obs_get_output_source(i.value());
 		if (source) {
-			opitems << obs_source_get_name(source);
+			VolumeList.append(obs_source_get_name(source));
 		}
 	}
-	return opitems;
+	
 	
 }
 // Choose Action Type Handler
-QStringList ConfigWindow::chooseAtype(QString text)
+void ConfigWindow::chooseAtype(QString text)
 {
-	
-	//actiontypemodel = new QStringListModel(items, this);
 	QStringList items;
-	if (text == "button") {
-		//Button
-
-		items << tr("SetCurrentScene") << tr("SetPreviewScene")
-		      << tr("TransitionToProgram") << tr("SetCurrentTransition")
-		      << tr("SetSourceVisibility")
-		      << tr("ToggleSourceVisibility") << tr("ToggleMute")
-		      << tr("SetMute") << tr("StartStopStreaming")
-		      << tr("StartStreaming") << tr("StopStreaming")
-		      << tr("StartStopRecording") << tr("StartRecording")
-		      << tr("StopRecording") << tr("StartStopReplayBuffer")
-		      << tr("StartReplayBuffer") << tr("StopReplayBuffer")
-		      << tr("SaveReplayBuffer") << tr("PauseRecording")
-		      << tr("ResumeRecording") << tr("SetTransitionDuration")
-		      << tr("SetCurrentProfile")
-		      << tr("SetCurrentSceneCollection") << tr("ResetSceneItem")
-		      << tr("SetTextGDIPlusText") << tr("SetBrowserSourceURL")
-		      << tr("ReloadBrowserSource") << tr("TakeSourceScreenshot")
-		      << tr("EnableSourceFilter") << tr("DisableSourceFilter")
-		      << tr("ToggleSourceFilter");
+	if (text == "Button") {
+		items = ButtonAList;
 	} else if (text == "Fader ") {
-
-		//Fader
-
-		items << tr("SetVolume") << tr("SetSyncOffset")
-		      << tr("SetSourcePosition") << tr("SetSourceRotation")
-		      << tr("SetSourceScale") << tr("SetTransitionDuration")
-		      << tr("SetGainFilter");
+		items = FaderAList;
 	}
 	ui.cb_action->clear();
 	ui.cb_action->addItems(items);
-
-	return items;
+	
 }
 
 void ConfigWindow::load(){};

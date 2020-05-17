@@ -68,16 +68,54 @@ private slots:
 	void sendToTable();
 	void save();
 	void chooseOptions1(QString Action);
-	QStringList MakeSceneCombo();
-	QStringList MakeVolumeCombo();
+	void MakeSceneCombo();
+	void MakeVolumeCombo();
 	//Combobox Actions
-	QStringList chooseAtype(QString index);
+	void chooseAtype(QString index);
 
     private:
-	QDataWidgetMapper *mapper;
-	QStringListModel *actiontypemodel;
-	QStringListModel *buttonactionsmodel;
-	QStringListModel *faderactionsmodel;
+	QStringList ScenesList ;
+	    QStringList VolumeList;
+
+	
+	QStringList ButtonAList = {"SetCurrentScene",
+				    "SetPreviewScene",
+				    "TransitionToProgram",
+				    "SetCurrentTransition",
+				    "SetSourceVisibility",
+				    "ToggleSourceVisibility",
+				    "ToggleMute",
+				    "SetMute",
+				    "StartStopStreaming",
+				    "StartStreaming",
+				    "StopStreaming",
+				    "StartStopRecording",
+				    "StartRecording",
+				    "StopRecording",
+				    "StartStopReplayBuffer",
+				    "StartReplayBuffer",
+				    "StopReplayBuffer",
+				    "SaveReplayBuffer",
+				    "PauseRecording",
+				    "ResumeRecording",
+				    "SetTransitionDuration",
+				    "SetCurrentProfile",
+				    "SetCurrentSceneCollection",
+				    "ResetSceneItem",
+				    "SetTextGDIPlusText",
+				    "SetBrowserSourceURL",
+				    "ReloadBrowserSource",
+				    "TakeSourceScreenshot",
+				    "EnableSourceFilter",
+				    "DisableSourceFilter",
+				    "ToggleSourceFilter"};
+	QStringList FaderAList = {"SetVolume",         "SetSyncOffset",
+				  "SetSourcePosition", "SetSourceRotation",
+				  "SetSourceScale",    "SetTransitionDuration",
+				  "SetGainFilter"};
+	
+
+
 	QStringListModel *options1model;
 	QStringListModel *options2model;
 	QStringListModel *options3model;

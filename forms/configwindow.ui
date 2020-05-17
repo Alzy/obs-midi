@@ -107,6 +107,16 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <item>
+       <property name="text">
+        <string>Button</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Fader</string>
+       </property>
+      </item>
      </widget>
      <widget class="QLabel" name="label_5">
       <property name="sizePolicy">

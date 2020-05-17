@@ -93,14 +93,11 @@ ConfigWindow::ConfigWindow( std::string devicename)
 	mapper->addMapping(ui.cb_param3, 7, "currentText");
 	
 	//connect(ui.tableView, &QTableView::clicked, this,		&ConfigWindow::TselChanged);
-	connect(ui.tableView,
-		SIGNAL(activated), ui.tableView,
-		SLOT(repaint));
+	
 	
 	connect(ui.tableView->selectionModel(),&QItemSelectionModel::currentRowChanged, mapper,&QDataWidgetMapper::setCurrentModelIndex);
 	connect(ui.cb_atype, SIGNAL(currentIndexChanged(int)), this, SLOT(chooseAtype(int)));
 	//mapper->AutoSubmit = true;
-	connect(ui.cb_action, SIGNAL(currentIndexChanged(int)), mapper, SLOT(mapper->submit()));
 	//connect(ui.tableView, &QTableView::clicked, mapper, &QDataWidgetMapper::setCurrentModelIndex);
 
 	ui.tableView->setCurrentIndex(configTableModel->index(0, 0));
@@ -153,7 +150,7 @@ bool TestModel::insertRow(int row, QString mtype,
 			tm_action.append("Set Mute");
 		}
 
-		tm_option1.append("Mic/ Aux");
+		tm_option1.append("Mic/Aux");
 		tm_option2.append("");
 		tm_option3.append("");
 		endInsertRows();
@@ -208,7 +205,17 @@ void TestModel::save(QString devicename) {
 	
 	blog(1, "domessage");
 	int x = configTableModel->rowCount();
-	if (configTableModel->insertRow(x - 1, mtype, mchan)) {
+	switch (x) {
+	case 0:
+		x = 0;
+		break;
+	default:
+		x = x - 1;
+		break;
+	}
+
+
+	if (configTableModel->insertRow(x, mtype, mchan)) {
 		ui.tableView->update();	
 	}
 	

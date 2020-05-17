@@ -23,6 +23,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <vector>
 #include <QObject>
 #include "RtMidi.h"
+#include <functional>
+#include <map>
+#include <string>
+#include <iostream>
+#include "obs-controller.h"
 
 using namespace std;
 
@@ -111,5 +116,6 @@ class MidiAgent: public QObject {
 		bool enabled;
 		bool connected;
 		vector<MidiHook*> midiHooks;
+		
 
 };

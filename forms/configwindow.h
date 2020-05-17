@@ -26,6 +26,8 @@ class QTextEdit;
 class QAbstractItemView;
 
 
+
+
 class TestModel : public QAbstractTableModel {
 	Q_OBJECT
 
@@ -38,6 +40,10 @@ public:
 			  const QList<QString> &tm_actiontype,
 			  const QList<QString> &tm_action, const QList<QString> &tm_option1,
 			  const QList<QString> &tm_option2, const QList<QString> &tm_option3);
+
+	void PopulateOptions(const QList<QString> &option1,
+					const QList<QString> &option2,
+					const QList<QString> &option3);
 	//Insert Default Row
 	bool insertRow(int row, QString mtype,
 			int mindex,
@@ -48,7 +54,9 @@ public:
 		       std::string option1, std::string option2,
 		       std::string option3,
 		       const QModelIndex &parent = QModelIndex());
-	
+	void MakeVolumeCombo();
+	void MakeSceneCombo();
+	void chooseOptions1(QString Action);
 	//bool insertRows(int row, int rows,const QModelIndex &parent = QModelIndex());
 	//bool removeRows(int row, int mindex,const QModelIndex &parent = QModelIndex());)
 	int rowCount(const QModelIndex &parent = QModelIndex()) const
@@ -61,6 +69,8 @@ public:
 	QVariant headerData(int section, Qt::Orientation orientation,
 			    int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
 	void save(QString devname);
+
+
 private:
 	QList<QString> tm_messagetype;
 	QList<int> tm_messagenumber;
@@ -70,12 +80,27 @@ private:
 	QList<QString> tm_option1;
 	QList<QString> tm_option2;
 	QList<QString> tm_option3;
+
+	QList<QString> tm_scenes;
+	QList<QString> tm_sources;
+	QList<QString> tm_items;
+	QList<QString> tm_volume;
+
+	QStringList *scenes;
+	QStringList *sources;
+	QStringList *items;
+	QStringList *volume;
+
 	QStringListModel *actiontypemodel;
 	QStringListModel *buttonactionsmodel;
 	QStringListModel *faderactionsmodel;
 	QStringListModel *options1model;
 	QStringListModel *options2model;
 	QStringListModel *options3model;
+	QStringListModel *scenesModel;
+	QStringListModel *sourcesModel;
+	QStringListModel *itemsModel;
+	QStringListModel *volumeModel;
 	TestModel *configTableModel;
 
 
@@ -90,12 +115,16 @@ class ConfigWindow : public QDialog{
     void rebuildModel();
     void ToggleShowHide();
     void TselChanged(QModelIndex i);
-    void MakeSceneCombo();
+    
     //variables
     std::string devicename;
     QTableView tableEntity;
     void loadFromHooks();
-    private slots:
+	//MakeCombos
+
+
+
+private slots:
 
 	void load();
 	void save();
@@ -104,9 +133,10 @@ class ConfigWindow : public QDialog{
 	void setDirty() { setWindowModified(true); }
 	void updateUi();
 	void selectionChanged();
-
-    void chooseAtype(int index);
 	void domessage(QString mtype, int mchan);
+
+	//Combobox Actions
+	void chooseAtype(int index);
 
     private:
 	QDataWidgetMapper *mapper;
@@ -116,6 +146,10 @@ class ConfigWindow : public QDialog{
 	QStringListModel *options1model;
 	QStringListModel *options2model;
 	QStringListModel *options3model;
+
+	
+
+
 	TestModel *configTableModel;
 	Ui::ConfigWindow ui;
 	//std::vector<MidiHook *> hooks;

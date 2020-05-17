@@ -17,7 +17,7 @@
 ConfigWindow::ConfigWindow( std::string devicename)
 	
 {
-	MakeSceneCombo();
+	//MakeSceneCombo();
 	
 	//auto rob = static_cast<RouterPtr>(GetRouter());
 	auto devicemanager = GetDeviceManager();
@@ -101,9 +101,12 @@ ConfigWindow::ConfigWindow( std::string devicename)
 	
 	//connect(ui.tableView, &QTableView::clicked, this,		&ConfigWindow::TselChanged);
 	
-	
+	//connect UI elements
 	connect(ui.tableView->selectionModel(),&QItemSelectionModel::currentRowChanged, mapper,&QDataWidgetMapper::setCurrentModelIndex);
 	connect(ui.cb_atype, SIGNAL(currentIndexChanged(int)), this, SLOT(chooseAtype(int)));
+	connect(ui.cb_action, SIGNAL(currentTextChanged(QString)), configTableModel, SLOT(chooseOptions1(QString)));
+	//connect(ui.cb_param1, SIGNAL(currentTextChanged(QString)), this, SLOT(chooseOptions2(QString)));
+	//connect(ui.cb_param2, SIGNAL(currentTextChanged(QString)), this, SLOT(chooseOptions3(QString)));
 	connect(ui.cb_param1, SIGNAL(currentIndexChanged(int)), ui.tableView,
 		SLOT(update()));
 	
@@ -287,6 +290,10 @@ void ConfigWindow::chooseAtype(int index) {
 	//QDataWidgetMapper *mapper = new QDataWidgetMapper(this);
 	//mapper->addMapping(ui.cb_action, 4, "currentText");
 }
+
+
+
+
 	void ConfigWindow::SetupModel()
 {
 	//Make models for combo box and add to combobox
@@ -295,64 +302,14 @@ void ConfigWindow::chooseAtype(int index) {
 	actiontypemodel = new QStringListModel(items, this);
 	actiontypemodel->setProperty("role",2);
 	ui.cb_atype->setModel(actiontypemodel);
-
-
-	
-	
-	//We need to Dynamically Generate These ones based on value of cb_action and data pulled from OBS
-	QStringList items4;
-	items4 << tr("Mix/Aux") << tr("Desktop Audio");
-	options1model = new QStringListModel(items4, this);
-	ui.cb_param1->setModel(options1model);
-	
-
-	QStringList items5;
-	
-	options2model = new QStringListModel(items5, this);
-	ui.cb_param2->setModel(options2model);
-	/*/
-	QStringList items6;
-	
-	options3model = new QStringListModel(items6, this);
-	ui.cb_param3->setModel(options3model);
-	//link combobox info
-	*/
-	QStringList opitems;
-	auto scenes = Utils::GetScenes();
-	auto length = obs_data_array_count(scenes);
-	for (size_t i = 0; i < length; i++) {
-		auto d = obs_data_array_item(scenes, i);
-
-		auto name = obs_data_get_string(d, "name");
-		opitems << tr(name);
-	}
-
-	options3model = new QStringListModel(opitems, this);
-	options3model->setProperty("role", 2);
-	ui.cb_param3->setModel(options3model);
-
-	
 }
 
 
-TestModel::TestModel(QObject *parent) : QAbstractTableModel(parent) {}
-void ConfigWindow::MakeSceneCombo() {
-		
-	
-	
-	//auto name = obs_frontend_get_scene_names();
-	//auto name2 = obs_frontend_get_scene_names();
-	//struct obs_frontend_source_list scenes;
-	
-
-	//obs_frontend_get_scenes(&scenes);
-
-
-	//obs_frontend_source_list_free(&scenes);
-	//bfree(name);
-	//blog(1, name);
-
+TestModel::TestModel(QObject *parent) : QAbstractTableModel(parent) {
+	MakeSceneCombo();
+	MakeVolumeCombo();
 }
+
 	// Create a method to populate the model with data:
 void TestModel::populateData(
 	const QList<QString> &messagetype, const QList<int> &messagenumber,
@@ -370,16 +327,24 @@ void TestModel::populateData(
 	tm_actiontype = actiontype;
 	tm_action.clear();
 	tm_action = action;
+	
+
+	return;
+}
+void TestModel::PopulateOptions(const QList<QString> &option1,
+				const QList<QString> &option2,
+				const QList<QString> &option3)
+{
 	tm_option1.clear();
-	tm_option1 = option1;
+	tm_option1 = option2;
 	tm_option2.clear();
 	tm_option2 = option2;
 	tm_option3.clear();
 	tm_option3 = option3;
-
-	return;
 }
-void ConfigWindow::save() {
+
+	void ConfigWindow::save()
+{
 	//do TestModel->save();
 
 	configTableModel->save(QString::fromStdString(this->devicename));
@@ -424,8 +389,7 @@ QVariant TestModel::data(const QModelIndex &index, int role) const
 		return QVariant();
 	
 	}
-QVariant TestModel::headerData(int section, Qt::Orientation orientation,
-			       int role) const
+QVariant TestModel::headerData(int section, Qt::Orientation orientation,  int role) const
 {
 	if (role == Qt::DisplayRole && orientation == Qt::Horizontal) {
 		switch (section) {
@@ -485,3 +449,67 @@ void ConfigWindow::loadFromHooks()
 /*bool TestModel::insertRow(int row, std::string  mtype, int mindex, std::string actiontype,
 		std::string action, std::string option1, std::string option2,
 		std::string option3, const QModelIndex &parent)*/
+
+
+
+/*                Make Combo list models
+*/
+void TestModel::chooseOptions1(QString Action) {
+	QList<QString> option1;
+	QList<QString> option2;
+	QList<QString> volume;
+	QStringList nada;
+	if (Action == "SetVolume") {
+		
+		//configTableModel->PopulateOptions(volumeModel, nada, nada);
+		//configTableModel->options1model->
+		
+	} else if (Action == "SetCurrentScene") {
+		
+	}
+}
+/*
+tm_option2.clear();
+tm_option2 = option2;
+tm_option3.clear();
+tm_option3 = option3;
+*/
+void TestModel::MakeSceneCombo()
+{
+	QStringList opitems;
+	auto scenes = Utils::GetScenes();
+	auto length = obs_data_array_count(scenes);
+	for (size_t i = 0; i < length; i++) {
+		auto d = obs_data_array_item(scenes, i);
+		auto name = obs_data_get_string(d, "name");
+		opitems << tr(name);
+	}
+	scenesModel= new QStringListModel(opitems, this);
+	scenesModel->setProperty("role", 2);
+	//ui.cb_param1->setModel(options1model);
+}
+
+
+void TestModel::MakeVolumeCombo() {
+	QStringList opitems;
+	QMap<const char *, int> sources;
+	sources["desktop-1"] = 1;
+	sources["desktop-2"] = 2;
+	sources["mic-1"] = 3;
+	sources["mic-2"] = 4;
+	sources["mic-3"] = 5;
+
+	QMapIterator<const char *, int> i(sources);
+	while (i.hasNext()) {
+		i.next();
+
+		const char *id = i.key();
+		OBSSourceAutoRelease source = obs_get_output_source(i.value());
+		if (source) {
+			opitems << obs_source_get_name(source);
+		}
+	}
+	volumeModel = new QStringListModel(opitems, this);
+	volumeModel->setProperty("role", 2);
+	//ui.cb_param1->setModel(volumeModel);
+}

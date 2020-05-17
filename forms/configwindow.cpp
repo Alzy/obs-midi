@@ -327,7 +327,12 @@ void TestModel::populateData(
 	tm_actiontype = actiontype;
 	tm_action.clear();
 	tm_action = action;
-	
+	tm_option1.clear();
+	tm_option1 = option2;
+	tm_option2.clear();
+	tm_option2 = option2;
+	tm_option3.clear();
+	tm_option3 = option3;
 
 	return;
 }

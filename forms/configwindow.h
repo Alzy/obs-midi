@@ -72,7 +72,7 @@ private slots:
 	void MakeVolumeCombo();
 	//Combobox Actions
 	void chooseAtype(QString index);
-
+	void clearTable();
     private:
 	QStringList ScenesList ;
 	QStringList VolumeList;

@@ -68,13 +68,31 @@ ConfigWindow::ConfigWindow(std::string devn)
 	connect(ui.cb_action, SIGNAL(currentTextChanged(QString)), this, SLOT(chooseOptions1(QString)));
 
 	connect(ui.btnDel, SIGNAL(clicked()), this, SLOT(deleterow()));
-	connect(ui.btnClear, SIGNAL(clicked()), ui.tableWidget,
-		SLOT(clearContents()));
+	connect(ui.btnClear, SIGNAL(clicked()), this,
+		SLOT(clearTable()));
 
 	
 	
 }
-void ConfigWindow::select(int row, int col) {
+void ConfigWindow::clearTable() {
+	QMessageBox msgBox;
+	msgBox.setText("Are You Sure ??");
+	msgBox.setInformativeText("This will Clear all table Entries");
+	msgBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
+	msgBox.setDefaultButton(QMessageBox::Cancel);
+	int ret = msgBox.exec();
+	switch (ret) {
+	case QMessageBox::Ok:
+		ui.tableWidget->setRowCount(0);
+		break;
+	case QMessageBox::Cancel:
+		return;
+	}
+	
+}
+
+void ConfigWindow::select(int row, int col)
+{
 	ui.lin_mtype->setText(ui.tableWidget->item(row, 0)->text());
 	ui.num_mchan->display(ui.tableWidget->item(row, 1)->text().toInt());
 	ui.checkBox->setChecked(QVariant(ui.tableWidget->item(row, 2)->text()).toBool());
@@ -82,8 +100,8 @@ void ConfigWindow::select(int row, int col) {
 	//chooseAtype(ui.cb_atype->currentText());
 	ui.cb_action->setCurrentText(ui.tableWidget->item(row, 4)->text());
 	//chooseOptions1(ui.cb_action->currentText());
-	ui.cb_param3->setCurrentText(ui.tableWidget->item(row, 5)->text());
-	ui.cb_param3->setCurrentText(ui.tableWidget->item(row, 6)->text());
+	ui.cb_param1->setCurrentText(ui.tableWidget->item(row, 5)->text());
+	ui.cb_param2->setCurrentText(ui.tableWidget->item(row, 6)->text());
 	ui.cb_param3->setCurrentText(ui.tableWidget->item(row, 7)->text());
 
 }

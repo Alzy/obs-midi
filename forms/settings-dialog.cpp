@@ -44,6 +44,7 @@ SettingsDialog::SettingsDialog(QWidget *parent):QDialog(parent, Qt::Dialog),ui(n
 	//hide debug items 
 	ui->lbl_debug->setHidden(hidedebugitems);
 	ui->tbl_debug->setHidden(hidedebugitems);
+	this->ui->list_midi_dev->setCurrentRow(0);
 }
 
 

@@ -115,8 +115,8 @@ MidiAgent::MidiAgent()
 	//Get Router Pointer and connect signals
 
 	
-	connect(this, SIGNAL(&SendNewUnknownMessage), this, SIGNAL(rt.UnknownMessage));
-	connect(this, SIGNAL(&SendNewUnknownMessage), this, SLOT(Router::gotmessage));
+	//connect(this, SIGNAL(&SendNewUnknownMessage(std::string, int)), this, SIGNAL(rt.UnknownMessage(std::string, int)));
+	//connect(this, SIGNAL(&SendNewUnknownMessage(std::string, int)), this, SLOT(Router::gotmessage(std::string, int)));
 	//connect(this, SIGNAL(&SendNewUnknownMessage), router, SLOT(gotmessage));
 	// for testing..  remove me:
 	//MidiHook *mh = new MidiHook("control_change", 7, "SetVolume", "Desktop Audio", "" ,  "", "fader");
@@ -158,10 +158,10 @@ void MidiAgent::Load(obs_data_t * data)
 	}
 
 }
-void MidiAgent::SendMessage(std::string mType, int mIndex) {
+void MidiAgent::SendMessage(std::string name, std::string mType, int mIndex) {
 	emit this->SendNewUnknownMessage(mType, mIndex);
 	
-	midiobsrouter->gotmessage(mType, mIndex);
+	midiobsrouter->gotmessage(name, mType, mIndex);
 }
 
 	/* Will open the port and enable this MidiAgent
@@ -206,7 +206,8 @@ void MidiAgent::HandleInput(double deltatime,
 	int mIndex = message->at(1);
 
 	//send message when received
-	self->SendMessage(mType, mIndex);
+	
+	self->SendMessage(self->name, mType, mIndex);
 	// check if hook exists for this note or cc index and launch it
 	for (unsigned i = 0; i < self->midiHooks.size(); i++) {
 		if (self->midiHooks.at(i)->type == mType && self->midiHooks.at(i)->index == mIndex) {

@@ -15,8 +15,10 @@ Router::~Router()
 	//this is the router
 }
 
-void Router::gotmessage(std::string mtype, int mc)
+void Router::gotmessage(std::string name, std::string mtype, int mc)
 {
 	QString mtype2 = QString::fromStdString(mtype);
-	emit UnknownMessage(mtype2, mc);
+	QString name2 = QString::fromStdString(name);
+	
+	emit UnknownMessage(name2, mtype2, mc);
 }

@@ -90,7 +90,7 @@ class MidiAgent: public QObject {
 		void OpenPort(int port);
 		void ClosePort();
 
-		 void SendMessage(std::string mType, int mIndex);
+		 void SendMessage(std::string name, std::string mType, int mIndex);
 
 		string GetName();
 		int GetPort();

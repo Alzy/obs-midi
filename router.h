@@ -9,7 +9,7 @@ public:
 	Router();
 	~Router();
 public slots:
-	void gotmessage(std::string mtype, int mc);
+	void gotmessage(std::string name, std::string mtype, int mc);
 signals:
-	void UnknownMessage(QString mtype, int messageindex);
+	void UnknownMessage(QString name, QString mtype, int messageindex);
 };

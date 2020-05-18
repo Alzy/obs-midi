@@ -62,7 +62,7 @@ private slots:
 	void setDirty() { setWindowModified(true); }
 	void updateUi();
 	void selectionChanged();
-	void domessage(QString mtype, int mchan);
+	void domessage(QString name, QString mtype, int mchan);
 	void insertRow(QString mtype, int mindex);
 	void select(int row, int col);
 	void sendToTable();

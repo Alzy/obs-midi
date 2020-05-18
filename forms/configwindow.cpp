@@ -31,7 +31,7 @@ ConfigWindow::ConfigWindow(std::string devn)
 
 	std::vector<MidiHook *> hooks =	devicemanager->GetMidiHooksByDeviceName(devicename.c_str());
 	///HOOK up the Message Handler
-	connect( rt, SIGNAL(UnknownMessage(QString, int)), this,SLOT(domessage(QString, int)));
+	connect( rt, SIGNAL(UnknownMessage(QString, QString, int)), this,SLOT(domessage(QString, QString, int)));
 	//Setup the UI
 	ui.setupUi(this);
 	//void SetupModel();
@@ -233,16 +233,16 @@ void ConfigWindow::save() {
 	conf->Save();
 	on_btn_back_clicked();
 }
-	void ConfigWindow::domessage(QString mtype, int mchan)
+	void ConfigWindow::domessage(QString namein, QString mtype, int mchan)
 {
-	
-	blog(1, "domessage");
-	if (inrow(mchan, mtype)) {
-		
+		if (namein == QString::fromStdString(devicename)) {
+		if (inrow(mchan, mtype)) {
+			blog(1, "domessage");
 			insertRow(mtype, mchan);
-		
-		
-	}
+		}
+		}
+	
+	
 }
 bool ConfigWindow::inrow(int x) {
 

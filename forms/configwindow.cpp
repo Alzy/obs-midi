@@ -93,6 +93,7 @@ void ConfigWindow::clearTable() {
 
 void ConfigWindow::select(int row, int col)
 {
+	dirty = true;
 	ui.lin_mtype->setText(ui.tableWidget->item(row, 0)->text());
 	ui.num_mchan->display(ui.tableWidget->item(row, 1)->text().toInt());
 	ui.checkBox->setChecked(QVariant(ui.tableWidget->item(row, 2)->text()).toBool());
@@ -103,7 +104,7 @@ void ConfigWindow::select(int row, int col)
 	ui.cb_param1->setCurrentText(ui.tableWidget->item(row, 5)->text());
 	ui.cb_param2->setCurrentText(ui.tableWidget->item(row, 6)->text());
 	ui.cb_param3->setCurrentText(ui.tableWidget->item(row, 7)->text());
-
+	dirty = false;
 }
 void ConfigWindow::AddRowFromHooks(int rc, std::string type, int index, bool bid,
 			     std::string action, std::string command,
@@ -270,6 +271,8 @@ bool ConfigWindow::inrow(int x, QString mtype)
 
 
 void ConfigWindow::sendToTable() {
+	if (!dirty) {
+	
 	if (ui.tableWidget->rowCount() > 0) {
 	
 	int rc =ui.tableWidget->selectedItems()[0]->row();
@@ -281,6 +284,7 @@ void ConfigWindow::sendToTable() {
 	ui.tableWidget->item(rc, 5)->setText(ui.cb_param1->currentText());
 	ui.tableWidget->item(rc, 6)->setText(ui.cb_param2->currentText());
 	ui.tableWidget->item(rc, 7)->setText(ui.cb_param3->currentText());
+	}
 	}
 }
 

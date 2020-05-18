@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 project(rtmidi)
+option(PROJECT_VERSION 0.1)
 
 
 if (WIN32)

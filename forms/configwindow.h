@@ -51,7 +51,7 @@ class ConfigWindow : public QDialog{
 			 std::string option3);
     bool inrow(int x);
     bool inrow(int x, QString mtype);
-    
+    bool dirty;
 
 private slots:
 

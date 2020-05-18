@@ -47,4 +47,5 @@ private Q_SLOTS:
 private:
 	Ui::SettingsDialog* ui;
 	ConfigWindow *cwin;
+	bool hidedebugitems = true;
 };

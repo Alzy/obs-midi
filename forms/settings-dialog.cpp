@@ -41,6 +41,9 @@ SettingsDialog::SettingsDialog(QWidget *parent):QDialog(parent, Qt::Dialog),ui(n
 	connect(ui->btn_configure, &QPushButton::clicked, this,&SettingsDialog::on_btn_configure_clicked);
 	connect(ui->check_enabled, &QCheckBox::toggled, this, &SettingsDialog::on_check_clicked);
 	connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::FormAccepted);
+	//hide debug items 
+	ui->lbl_debug->setHidden(hidedebugitems);
+	ui->tbl_debug->setHidden(hidedebugitems);
 }
 
 

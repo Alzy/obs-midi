@@ -19,6 +19,8 @@ ConfigWindow::ConfigWindow(std::string devn)
 	//MakeSceneCombo();
 	
 	devicename = devn;
+	
+	
 	//auto rob = static_cast<RouterPtr>(GetRouter());
 	auto devicemanager = GetDeviceManager();
 	auto config = GetConfig();
@@ -33,7 +35,7 @@ ConfigWindow::ConfigWindow(std::string devn)
 	//Setup the UI
 	ui.setupUi(this);
 	//void SetupModel();
-	
+	this->setWindowTitle(this->windowTitle() +"  "+QString::fromStdString(devn));
 	ui.tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	
 	
@@ -70,7 +72,7 @@ ConfigWindow::ConfigWindow(std::string devn)
 	connect(ui.btnDel, SIGNAL(clicked()), this, SLOT(deleterow()));
 	connect(ui.btnClear, SIGNAL(clicked()), this,
 		SLOT(clearTable()));
-
+	ui.tableWidget->selectRow(0);
 	
 	
 }
@@ -145,7 +147,12 @@ void ConfigWindow::AddRowFromHooks(int rc, std::string type, int index, bool bid
 		ui.tableWidget->setItem(rc, 4, newItem5);
 		ui.tableWidget->setItem(rc, 5, newItem6);
 		ui.tableWidget->setItem(rc, 6, newItem7);
-		ui.tableWidget->setItem(rc, 7, newItem8);	
+		ui.tableWidget->setItem(rc, 7, newItem8);
+
+		//Set Default sidebar
+		if (rc == 1) {
+			select(0, 1);
+		}
 }
 void  ConfigWindow::insertRow(QString mtype,int mindex)
 {

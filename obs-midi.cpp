@@ -60,7 +60,7 @@ bool obs_module_load(void)
 	QMainWindow *mainWindow = (QMainWindow *)obs_frontend_get_main_window();
 	SettingsDialog *settingsDialog = new SettingsDialog(mainWindow);
 
-	const char* menuActionText = obs_module_text("OBSMIDI.Settings.DialogTitle");
+	const char* menuActionText = obs_module_text("OBS MIDI Settings");
 
 	QAction* menuAction = (QAction*)obs_frontend_add_tools_menu_qaction(menuActionText);
 

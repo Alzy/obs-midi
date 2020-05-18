@@ -20,6 +20,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #include <stdio.h>
 #include <iostream>
+#include <vector>
 
 #include <QtCore/QString>
 #include <QtWidgets/QSpinBox>
@@ -40,7 +41,8 @@ namespace Utils {
 	float mapper(int x);
 	bool is_number(const std::string& s);
 	std::string getMidiMessageType(int in);
-
+	std::vector <const char*> GetVideoSourceNames();
+	std::vector <const char*> GetAudioSourceNames();
 
 	obs_data_array_t* StringListToArray(char** strings, const char* key);
 	obs_data_array_t* GetSceneItems(obs_source_t* source);

@@ -50,7 +50,7 @@ class ConfigWindow : public QDialog{
 			 std::string option1, std::string option2,
 			 std::string option3);
     bool inrow(int x);
-    bool inrow(QString mtype);
+    bool inrow(int x, QString mtype);
     
 
 private slots:
@@ -75,44 +75,45 @@ private slots:
 
     private:
 	QStringList ScenesList ;
-	    QStringList VolumeList;
+	QStringList VolumeList;
 
 	
-	QStringList ButtonAList = {"SetCurrentScene",
-				    "SetPreviewScene",
-				    "TransitionToProgram",
-				    "SetCurrentTransition",
-				    "SetSourceVisibility",
-				    "ToggleSourceVisibility",
-				    "ToggleMute",
-				    "SetMute",
-				    "StartStopStreaming",
-				    "StartStreaming",
-				    "StopStreaming",
-				    "StartStopRecording",
-				    "StartRecording",
-				    "StopRecording",
-				    "StartStopReplayBuffer",
-				    "StartReplayBuffer",
-				    "StopReplayBuffer",
-				    "SaveReplayBuffer",
-				    "PauseRecording",
-				    "ResumeRecording",
-				    "SetTransitionDuration",
-				    "SetCurrentProfile",
-				    "SetCurrentSceneCollection",
-				    "ResetSceneItem",
-				    "SetTextGDIPlusText",
-				    "SetBrowserSourceURL",
-				    "ReloadBrowserSource",
-				    "TakeSourceScreenshot",
-				    "EnableSourceFilter",
-				    "DisableSourceFilter",
-				    "ToggleSourceFilter"};
-	QStringList FaderAList = {"SetVolume",         "SetSyncOffset",
-				  "SetSourcePosition", "SetSourceRotation",
-				  "SetSourceScale",    "SetTransitionDuration",
-				  "SetGainFilter"};
+	QStringList ButtonAList = {"Set Current Scene",
+				    "Set Preview Scene",
+				    "Transition To Program",
+				    "Set Current Transition",
+				    "Set Source Visibility",
+				    "Toggle Source Visibility",
+				    "Toggle Mute",
+				    "Set Mute",
+				    "Start Stop Streaming",
+				    "Start Streaming",
+				    "Stop Streaming",
+				    "Start Stop Recording",
+				    "Start Recording",
+				    "Stop Recording",
+				    "Start Stop Replay Buffer",
+				    "Start Replay Buffer",
+				    "Stop Replay Buffer",
+				    "Save Replay Buffer",
+				    "Pause Recording",
+				    "Resume Recording",
+				    "Set Transition Duration",
+				    "Set Current Profile",
+				    "Set Current Scene Collection",
+				    "Reset Scene Item",
+				    "Set Text GDIPlus Text",
+				    "Set Browser Source URL",
+				    "Reload Browser Source",
+				    "Take Source Screenshot",
+				    "Enable Source Filter",
+				    "Disable Source Filter",
+				    "Toggle Source Filter"};
+	QStringList FaderAList = {"Set Volume",
+		"Set Sync Offset",
+				  "Set Source Position", "Set Source Rotation",
+				  "Set Source Scale",    "Set Transition Duration",
+				  "Set Gain Filter"};
 	
 
 

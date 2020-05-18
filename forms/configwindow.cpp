@@ -18,8 +18,6 @@ ConfigWindow::ConfigWindow(std::string devn)
 {
 	//MakeSceneCombo();
 	
-	MakeVolumeCombo();
-	MakeSceneCombo();
 	devicename = devn;
 	//auto rob = static_cast<RouterPtr>(GetRouter());
 	auto devicemanager = GetDeviceManager();
@@ -35,7 +33,7 @@ ConfigWindow::ConfigWindow(std::string devn)
 	//Setup the UI
 	ui.setupUi(this);
 	//void SetupModel();
-	//ConfigWindow::chooseAtype("Button");
+	
 	ui.tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	
 	
@@ -50,18 +48,21 @@ ConfigWindow::ConfigWindow(std::string devn)
 	
 	
 
+	MakeVolumeCombo();
+	MakeSceneCombo();
+	chooseAtype("Button");
 	//Connect back button functionality
 	connect(ui.btnBack, &QPushButton::clicked, this,
 		&ConfigWindow::on_btn_back_clicked);
 	connect(ui.btnSave, SIGNAL(clicked()), this, SLOT(save()));
 	connect(ui.tableWidget, SIGNAL(cellClicked(int, int)), this, SLOT(select(int,int)));
-	connect(ui.cb_atype, SIGNAL(currenTextChanged(QString)), this, SLOT(chooseAtype(QString)));
+	connect(ui.cb_atype, SIGNAL(currentTextChanged(QString)), this, SLOT(chooseAtype(QString)));
 	connect(ui.cb_atype, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
 	connect(ui.cb_action, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
 	connect(ui.cb_param1, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
-	connect(ui.cb_param2, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
-	connect(ui.cb_param3, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
-	connect(ui.checkBox, SIGNAL(stateChanged(int)), this,SLOT(sendToTable()));
+	//connect(ui.cb_param2, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
+	//connect(ui.cb_param3, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
+	//connect(ui.checkBox, SIGNAL(stateChanged(int)), this,SLOT(sendToTable()));
 	//connect(ui.cb_atype, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
 
 	connect(ui.cb_action, SIGNAL(currentTextChanged(QString)), this, SLOT(chooseOptions1(QString)));
@@ -78,8 +79,9 @@ void ConfigWindow::select(int row, int col) {
 	ui.num_mchan->display(ui.tableWidget->item(row, 1)->text().toInt());
 	ui.checkBox->setChecked(QVariant(ui.tableWidget->item(row, 2)->text()).toBool());
 	ui.cb_atype->setCurrentText(ui.tableWidget->item(row, 3)->text());
-	chooseAtype(ui.tableWidget->item(row, 3)->text());
+	//chooseAtype(ui.cb_atype->currentText());
 	ui.cb_action->setCurrentText(ui.tableWidget->item(row, 4)->text());
+	//chooseOptions1(ui.cb_action->currentText());
 	ui.cb_param3->setCurrentText(ui.tableWidget->item(row, 5)->text());
 	ui.cb_param3->setCurrentText(ui.tableWidget->item(row, 6)->text());
 	ui.cb_param3->setCurrentText(ui.tableWidget->item(row, 7)->text());
@@ -146,11 +148,11 @@ void  ConfigWindow::insertRow(QString mtype,int mindex)
 	
 	if (mtype == "control_change") {
 		newItem4->setText("Fader"); //Action Type
-		newItem5->setText("SetVolume"); //Action	tm_actiontype.append("Fader");
+		newItem5->setText("Set Volume"); //Action	tm_actiontype.append("Fader");
 		
 	} else {
 		newItem4->setText("Button");  //Action Type
-		newItem5->setText("SetMute"); //Action
+		newItem5->setText("Set Mute"); //Action
 		
 	}
 	newItem6->setText("Mic/Aux");   //Option 1
@@ -208,10 +210,10 @@ void ConfigWindow::save() {
 {
 	
 	blog(1, "domessage");
-	if (!inrow(mchan)) {
-		if (!inrow(mtype)) {
+	if (inrow(mchan, mtype)) {
+		
 			insertRow(mtype, mchan);
-		}
+		
 		
 	}
 }
@@ -224,33 +226,43 @@ int rows = ui.tableWidget->rowCount();
 		    QString::number(x)) {
 			return true;
 		}
+
 	}
 	return false;
 }
-bool ConfigWindow::inrow(QString mtype)
+bool ConfigWindow::inrow(int x, QString mtype)
 {
-
+	auto fitems = ui.tableWidget->findItems(QString::number(x), 0);
 	int rows = ui.tableWidget->rowCount();
-	
-	for (int i = 0; i < rows; ++i) {
-		if (ui.tableWidget->item(i, 1)->text() == mtype) {
-			return true;
+	int itemcount = fitems.size();
+		for (int i = 0; i < itemcount; ++i) {
+		
+		if (ui.tableWidget->item(fitems.at(i)->row(), 0)
+				    ->text() == mtype) {
+				return false;
+			}
+			
 		}
-	}
-	return false;
+	
+	return true;
+	
+	
 }
 
 
 void ConfigWindow::sendToTable() {
+	if (ui.tableWidget->rowCount() > 0) {
+	
 	int rc =ui.tableWidget->selectedItems()[0]->row();
-	ui.tableWidget->item(rc, 0)->setText( ui.lin_mtype->text());//mtype
-	ui.tableWidget->item(rc, 1)->setText( QString::number(ui.num_mchan->intValue()));               //mindex
+	ui.tableWidget->item(rc, 0)->setText(ui.lin_mtype->text());//mtype
+	ui.tableWidget->item(rc, 1)->setText(QString::number(ui.num_mchan->intValue()));               //mindex
 	ui.tableWidget->item(rc, 2)->setText(QVariant(ui.checkBox->isChecked()).toString()); //bool
 	ui.tableWidget->item(rc, 3)->setText(ui.cb_atype->currentText());//atype
 	ui.tableWidget->item(rc, 4)->setText(ui.cb_action->currentText());   //action
 	ui.tableWidget->item(rc, 5)->setText(ui.cb_param1->currentText());
 	ui.tableWidget->item(rc, 6)->setText(ui.cb_param2->currentText());
 	ui.tableWidget->item(rc, 7)->setText(ui.cb_param3->currentText());
+	}
 }
 
 
@@ -296,24 +308,27 @@ void ConfigWindow::loadFromHooks()
 /*                Make Combo list models
 */
 void ConfigWindow::chooseOptions1(QString Action) {
-	ui.tableWidget->item(ui.tableWidget->selectedItems()[0]->row(), 4)
-		->setText(Action);
-	QList<QString> option1;
-	QList<QString> option2;
-	QList<QString> volume;
-	QStringList nada;
-	ui.cb_param1->clear();
-	ui.cb_param2->clear();
-	ui.cb_param3->clear();
-	if (Action == "SetVolume") {
+	if (ui.tableWidget->rowCount() > 0) {
 
-		ui.cb_param1->addItems(VolumeList);
-		//configTableModel->PopulateOptions(volumeModel, nada, nada);
-		//configTableModel->options1model->
+		//ui.tableWidget->item(ui.tableWidget->selectedItems()[0]->row(), 4)->setText(Action);
+		QList<QString> option1;
+		QList<QString> option2;
+		QList<QString> volume;
+		QList<QString> scenes;
 		
-	} else if (Action == "SetCurrentScene") {
-		ui.cb_param1->addItems(ScenesList);
-
+		QStringList nada;
+		ui.cb_param1->clear();
+		ui.cb_param2->clear();
+		ui.cb_param3->clear();
+		if (Action == "Set Volume") {
+			ui.cb_param1->addItems(VolumeList);
+		} else if (Action == "Set Current Scene") {
+			ui.cb_param1->addItems(ScenesList);
+		} else if (Action == "Set Preview Scene") {
+			ui.cb_param1->addItems(ScenesList);
+		} else if (Action == "Set Mute") {
+			ui.cb_param1->addItems(VolumeList);
+		}
 	}
 }
 /*
@@ -329,7 +344,7 @@ void ConfigWindow::MakeSceneCombo()
 	for (size_t i = 0; i < length; i++) {
 		auto d = obs_data_array_item(scenes, i);
 		auto name = obs_data_get_string(d, "name");
-		VolumeList<< tr(name);
+		ScenesList<< tr(name);
 	}
 	
 	//ui.cb_param1->setModel(options1model);
@@ -339,7 +354,7 @@ void ConfigWindow::MakeSceneCombo()
 void ConfigWindow::MakeVolumeCombo()
 {
 
-	
+	/*
 	QMap<const char *, int> sources;
 	sources["desktop-1"] = 1;
 	sources["desktop-2"] = 2;
@@ -356,6 +371,12 @@ void ConfigWindow::MakeVolumeCombo()
 			VolumeList.append(obs_source_get_name(source));
 		}
 	}
+	*/
+	//add Utils get volume sources
+	auto utilsources = Utils::GetAudioSourceNames();
+	for (int i = 0; i < utilsources.size(); i++) {
+		VolumeList.append(utilsources.at(i));
+	}
 	
 	
 }
@@ -365,13 +386,33 @@ void ConfigWindow::chooseAtype(QString text)
 	QStringList items;
 	if (text == "Button") {
 		items = ButtonAList;
-	} else if (text == "Fader ") {
+	} else if (text == "Fader") {
 		items = FaderAList;
 	}
 	ui.cb_action->clear();
 	ui.cb_action->addItems(items);
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void ConfigWindow::load(){};
 void ConfigWindow::addrow(){};
@@ -392,3 +433,4 @@ void ConfigWindow::deleterow(){
 };
 void ConfigWindow::updateUi(){};
 void ConfigWindow::selectionChanged(){};
+

@@ -63,7 +63,7 @@ map<string, function<void(MidiHook *hook, int midiVal)>> funcMap = {
 	}},
 
 	{"Toggle Mute", [](MidiHook* hook, int midiVal) { OBSController::ToggleMute(QString::fromStdString(hook->param1)); }},
-	{"Set Mute", [](MidiHook* hook, int midiVal) { OBSController::SetMute(QString::fromStdString(hook->param1), (bool) stoi(hook->param2)); }},
+	{"Set Mute", [](MidiHook* hook, int midiVal) { OBSController::SetMute(QString::fromStdString(hook->param1), midiVal); }},
 
 	{"Start Stop Streaming", [](MidiHook* hook, int midiVal) { OBSController::StartStopStreaming(); }},
 	{"Start Streaming", [](MidiHook* hook, int midiVal) { OBSController::StartStreaming(); }},

@@ -76,7 +76,8 @@ private slots:
     private:
 	QStringList ScenesList ;
 	QStringList VolumeList;
-
+	bool clearpressed;
+	
 	
 	QStringList ButtonAList = {"Set Current Scene",
 				    "Set Preview Scene",

@@ -85,7 +85,10 @@ void ConfigWindow::clearTable() {
 	int ret = msgBox.exec();
 	switch (ret) {
 	case QMessageBox::Ok:
+		clearpressed = true;
 		ui.tableWidget->setRowCount(0);
+		save();
+		clearpressed = false;
 		break;
 	case QMessageBox::Cancel:
 		return;
@@ -231,7 +234,10 @@ void ConfigWindow::save() {
 		
 	};
 	conf->Save();
-	on_btn_back_clicked();
+	if (!clearpressed) {
+		on_btn_back_clicked();
+	}
+	
 }
 	void ConfigWindow::domessage(QString namein, QString mtype, int mchan)
 {

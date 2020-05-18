@@ -223,6 +223,7 @@ void ConfigWindow::save() {
 		
 	};
 	conf->Save();
+	on_btn_back_clicked();
 }
 	void ConfigWindow::domessage(QString mtype, int mchan)
 {

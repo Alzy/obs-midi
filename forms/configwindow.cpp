@@ -328,6 +328,8 @@ void ConfigWindow::chooseOptions1(QString Action) {
 			ui.cb_param1->addItems(ScenesList);
 		} else if (Action == "Set Mute") {
 			ui.cb_param1->addItems(VolumeList);
+		} else if (Action == "Toggle Mute") {
+			ui.cb_param1->addItems(VolumeList);
 		}
 	}
 }

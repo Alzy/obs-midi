@@ -80,10 +80,6 @@ private slots:
 	
 	QStringList ButtonAList = {"Set Current Scene",
 				    "Set Preview Scene",
-				    "Transition To Program",
-				    "Set Current Transition",
-				    "Set Source Visibility",
-				    "Toggle Source Visibility",
 				    "Toggle Mute",
 				    "Set Mute",
 				    "Start Stop Streaming",
@@ -98,22 +94,25 @@ private slots:
 				    "Save Replay Buffer",
 				    "Pause Recording",
 				    "Resume Recording",
-				    "Set Transition Duration",
-				    "Set Current Profile",
-				    "Set Current Scene Collection",
-				    "Reset Scene Item",
-				    "Set Text GDIPlus Text",
-				    "Set Browser Source URL",
-				    "Reload Browser Source",
-				    "Take Source Screenshot",
-				    "Enable Source Filter",
-				    "Disable Source Filter",
-				    "Toggle Source Filter"};
+};
+	QStringList ButtonTodo = {
+		"Transition To Program",        "Set Current Transition",
+		"Set Source Visibility",        "Toggle Source Visibility",
+		"Set Transition Duration",      "Set Current Profile",
+		"Set Current Scene Collection", "Reset Scene Item",
+		"Set Text GDIPlus Text",        "Set Browser Source URL",
+		"Reload Browser Source",        "Take Source Screenshot",
+		"Enable Source Filter",         "Disable Source Filter",
+		"Toggle Source Filter"
+
+	};
+	QStringList FaderTodo = {
+		"Set Sync Offset",         "Set Source Position",
+		"Set Source Rotation",     "Set Source Scale",
+		"Set Transition Duration", "Set Gain Filter"};
 	QStringList FaderAList = {"Set Volume",
-		"Set Sync Offset",
-				  "Set Source Position", "Set Source Rotation",
-				  "Set Source Scale",    "Set Transition Duration",
-				  "Set Gain Filter"};
+		};
+
 	
 
 

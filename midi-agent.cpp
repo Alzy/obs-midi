@@ -90,7 +90,9 @@ map<string, function<void(MidiHook *hook, int midiVal)>> funcMap = {
 	{"Toggle Source Filter", [](MidiHook* hook, int midiVal) { OBSController::ToggleSourceFilter(); }},
 
 	// CC ACTIONS
-	{"Set Volume", [](MidiHook* hook, int midiVal) {  OBSController::SetVolume(QString::fromStdString(hook->param1), Utils::mapper(midiVal)); }},
+	{"Set Volume",
+	 [](MidiHook *hook, int midiVal) {  OBSController::SetVolume(QString::fromStdString(hook->param1), pow(Utils::mapper(midiVal), 3.0));
+	 }},
 	{"Set Sync Offset", [](MidiHook* hook, int midiVal) { OBSController::SetSyncOffset(QString::fromStdString(hook->param1), (int64_t) midiVal); }},
 	{"Set Source Position", [](MidiHook* hook, int midiVal) { OBSController::SetSourcePosition(); }},
 	{"Set Source Rotation", [](MidiHook* hook, int midiVal) { OBSController::SetSourceRotation(); }},

@@ -17,12 +17,17 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #pragma once
 
-#include <obs-frontend-api.h>
+#include <obs-frontend-api/obs-frontend-api.h>
 #include <QtCore/QString>
 #include <QtCore/QSharedPointer>
 #include <vector>
-
+#include <QObject>
 #include "RtMidi.h"
+#include <functional>
+#include <map>
+#include <string>
+#include <iostream>
+#include "obs-controller.h"
 
 using namespace std;
 
@@ -35,7 +40,7 @@ public:
 	string param1;
 	string param2;
 	string param3;
-
+	MidiHook(){};
 	MidiHook(string midiMessageType, int midiChannelIndex, string OBSCommand, string p1 = "", string p2 = "", string p3 = "", string actionType = "") :
 		type(midiMessageType), index(midiChannelIndex), command(OBSCommand), param1(p1), param2(p2), param3(p3), action(actionType)
 	{
@@ -74,7 +79,9 @@ public:
 };
 
 
-class MidiAgent {
+class MidiAgent: public QObject {
+	Q_OBJECT
+
 	public:
 		MidiAgent();
 		~MidiAgent();
@@ -82,6 +89,8 @@ class MidiAgent {
 
 		void OpenPort(int port);
 		void ClosePort();
+
+		 void SendMessage(std::string mType, int mIndex);
 
 		string GetName();
 		int GetPort();
@@ -98,7 +107,8 @@ class MidiAgent {
 		void RemoveMidiHook(MidiHook *hook);
 		void ClearMidiHooks();
 		obs_data_t* GetData();
-
+	signals:
+		void SendNewUnknownMessage(std::string mtype, int msgindex);
 	private:
 		RtMidiIn *midiin;
 		string name;
@@ -106,4 +116,6 @@ class MidiAgent {
 		bool enabled;
 		bool connected;
 		vector<MidiHook*> midiHooks;
+		
+
 };

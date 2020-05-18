@@ -13,7 +13,7 @@ You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>
 */
 
-#include <obs-frontend-api.h>
+#include <obs-frontend-api/obs-frontend-api.h>
 #include <obs-module.h>
 #include <obs-data.h>
 #include <string>
@@ -26,8 +26,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "device-manager.h"
 #include "config.h"
 #include "settings-dialog.h"
-#include "settings-midi-map.h"
-
+#include "ui_configwindow.h"
+#include "configwindow.h"
 #include <qdialogbuttonbox.h>
 #include <qcheckbox.h>
 
@@ -36,7 +36,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 SettingsDialog::SettingsDialog(QWidget *parent):QDialog(parent, Qt::Dialog),ui(new Ui::SettingsDialog)
 {
 	ui->setupUi(this);
-
 	connect(ui->list_midi_dev, &QListWidget::itemSelectionChanged, this, &SettingsDialog::on_item_select);
 	connect(ui->check_enabled, &QCheckBox::stateChanged, this, &SettingsDialog::on_check_enabled_stateChanged);
 	connect(ui->btn_configure, &QPushButton::clicked, this,&SettingsDialog::on_btn_configure_clicked);
@@ -55,6 +54,7 @@ void SettingsDialog::ToggleShowHide() {
 void SettingsDialog::setCheck(bool x)
 {
 	this->ui->check_enabled->setChecked(x);
+	ui->btn_configure->setEnabled(x);
 }
 
 void SettingsDialog::SetAvailableDevices(std::vector<std::string> &midiDevices)
@@ -70,6 +70,7 @@ void SettingsDialog::SetAvailableDevices(std::vector<std::string> &midiDevices)
 		this->ui->list_midi_dev->addItem(midiDevices.at(i).c_str());
 		std::string name = midiDevices.at(i);
 	}
+	this->ui->list_midi_dev->setCurrentRow(0);
 }
 void SettingsDialog::on_check_clicked(bool enabled) {
 	if (enabled) {
@@ -97,10 +98,17 @@ void SettingsDialog::on_btn_configure_clicked()
 	
 	pushDebugMidiMessage("time", "button clicked", 0, 0);
 	blog(LOG_INFO, "Configure button clicked");
+	string devicename =
+		ui->list_midi_dev->currentItem()->text().toStdString();
+
+	ConfigWindow *cwin = new ConfigWindow(devicename);
+	cwin->devicename = devicename;
+
+
+	//setVisible(false);
+	//hide();
+	cwin->exec();
 	
-	SettingsMidiMap mDialog;
-	//mDialog.setModal(true);
-	mDialog.exec();
 }
 
 int SettingsDialog::on_check_enabled_stateChanged(bool state)
@@ -151,18 +159,19 @@ void SettingsDialog::on_item_select()
 	if (device != NULL && device->isEnabled())
 	{
 		ui->check_enabled->setChecked(true);
+		ui->btn_configure->setEnabled(true);
+
 	}
 	else {
 		ui->check_enabled->setChecked(false);
+		ui->btn_configure->setEnabled(false);
+
 
 	}
 
 	//If enabled, enable configuration button, if not disable it.
-	if (ui->check_enabled->checkState()) {
-		ui->btn_configure->setEnabled(true);
-	} else {
-		ui->btn_configure->setEnabled(false);
-	}
+ui->btn_configure->setEnabled(ui->check_enabled->isChecked());
+	
 }
 
 

@@ -101,7 +101,7 @@ MidiAgent* DeviceManager::GetMidiDeviceByName(const char* deviceName)
 
 vector <MidiHook*> DeviceManager::GetMidiHooksByDeviceName(const char* deviceName)
 {
-	MidiAgent* device = GetMidiDeviceByName(deviceName);
+	auto device = GetMidiDeviceByName(deviceName);
 	if (device != NULL)
 	{
 		return device->GetMidiHooks();

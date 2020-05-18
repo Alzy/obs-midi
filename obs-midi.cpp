@@ -1,7 +1,7 @@
 
 #include <iostream>
 #include <obs-module.h>
-#include <obs-frontend-api.h>
+#include <obs-frontend-api/obs-frontend-api.h>
 #include <obs-data.h>
 #include <string>
 #include <map>
@@ -16,7 +16,7 @@
 #include "device-manager.h"
 #include "utils.h"
 #include "midi-agent.h"
-
+#include "router.h"
 using namespace std;
 
 void ___source_dummy_addref(obs_source_t *) {}
@@ -33,9 +33,11 @@ void ___data_item_release(obs_data_item_t *dataItem)
 
 OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE("obs-midi", "en-US")
-
 ConfigPtr _config;
 DeviceManagerPtr _deviceManager;
+
+
+
 
 
 
@@ -51,13 +53,18 @@ bool obs_module_load(void)
 	_config = ConfigPtr(new Config());
 	_config->Load();
 
+	// Signal Router Setup
+	
 
 	// UI SETUP
 	QMainWindow *mainWindow = (QMainWindow *)obs_frontend_get_main_window();
 	SettingsDialog *settingsDialog = new SettingsDialog(mainWindow);
 
 	const char* menuActionText = obs_module_text("OBSMIDI.Settings.DialogTitle");
+
 	QAction* menuAction = (QAction*)obs_frontend_add_tools_menu_qaction(menuActionText);
+
+			 
 	QObject::connect(menuAction, &QAction::triggered, [settingsDialog] {
 		// The settings dialog belongs to the main window. Should be ok
 		// to pass the pointer to this QAction belonging to the main window
@@ -65,6 +72,8 @@ bool obs_module_load(void)
 		if (settingsDialog->isVisible()) {
 			auto devNames = _deviceManager->GetPortsList();
 			settingsDialog->SetAvailableDevices(devNames);
+			
+
 		}
 	});
 	
@@ -86,7 +95,10 @@ ConfigPtr GetConfig()
 	return _config;
 }
 
+
 DeviceManagerPtr GetDeviceManager()
 {
 	return _deviceManager;
 }
+
+

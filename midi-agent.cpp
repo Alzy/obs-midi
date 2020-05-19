@@ -196,9 +196,9 @@ bool MidiAgent::isConnected() { return connected; }
  * Extend input handling functionality here.
  * For OBS command triggers, edit the funcMap instead.
  */
-void MidiAgent::HandleInput(const rtmidi::message)
+void MidiAgent::HandleInput(const rtmidi::message &message)
 {       //************** NEED TO FIX ****************// not sure how to get messages
-
+	auto mType = message.get_message_type();
 	
 	//**** THESE ARE TO STOP COMPILE ERRORS TILL WE REBUILD FUNCTION *****//
 	double deltatime;
@@ -209,7 +209,7 @@ void MidiAgent::HandleInput(const rtmidi::message)
 
 	if (self->enabled == false || self->connected == false){ return; }
 
-	string mType = Utils::getMidiMessageType(message->at(0));
+	
 	if (mType.empty()) { return; } // unknown message type. return.
 	int mIndex = message->at(1);
 

@@ -55,10 +55,49 @@ bool Utils::inrange(int low, int high, int x) {
 	
 	return ((x - low) <= (high - low));
 }
+std::string Utils::mtype_to_string(rtmidi::message_type mess) {
+	switch (mess){
+	case INVALID: return "INVALID"; 
+	 // Standard Message
+	case NOTE_OFF : return "NOTE_OFF"; 
+	case NOTE_ON : return "NOTE_ON"; 
+	case POLY_PRESSURE : return "POLY_PRESSURE";
+	case CONTROL_CHANGE : return "CONTROL_CHANGE";
+	case PROGRAM_CHANGE : return "PROGRAM_CHANGE"; 
+	case AFTERTOUCH : return "AFTERTOUCH"; 
+	case PITCH_BEND : return "PITCH_BEND"; 
+ 
+	// System Common Messages
+	case SYSTEM_EXCLUSIVE : return "SYSTEM_EXCLUSIVE"; 
+	case TIME_CODE : return "TIME_CODE"; 
+	case SONG_POS_POINTER : return "SONG_POS_POINTER";
+	case SONG_SELECT : return "SONG_SELECT";
+	case RESERVED1 : return "RESERVED1"; 
+	case RESERVED2 : return "RESERVED2"; 
+	case TUNE_REQUEST : return "TUNE_REQUEST"; 
+	case EOX : return "EOX"; 
+  
+	// System Realtime Messages
+	case TIME_CLOCK : return "TIME_CLOCK";
+	case RESERVED3 : return "RESERVED3"; 
+	case START : return "START";
+	case CONTINUE : return "CONTINUE"; 
+	case STOP : return "STOP"; 
+	case RESERVED4 : return "RESERVED4"; 
+	case ACTIVE_SENSING : return "ACTIVE_SENSING"; 
+	case SYSTEM_RESET: return "SYSTEM_RESET"; 
 
+		}
+
+}
 
 std::string Utils::getMidiMessageType(int in)
 {
+
+
+
+
+
 	//currently sets from a few  non breaking returns, will need to have message format structs to return here instead
 	if (inrange(128, 143, in)) {
 		return "note_off";

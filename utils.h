@@ -28,7 +28,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QSystemTrayIcon>
-
+#include "RtMidi17/rtmidi17.hpp"
 #include <obs.hpp>
 #include <obs-module.h>
 #include <util/config-file.h>
@@ -92,5 +92,6 @@ namespace Utils {
 	const char* GetFilenameFormatting();
 	bool SetFilenameFormatting(const char* filenameFormatting);
 	bool inrange(int low, int high, int x);
+	std::string mtype_to_string(rtmidi::message_type);
 	QString nsToTimestamp(uint64_t ns);
 };

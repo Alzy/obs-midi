@@ -198,23 +198,26 @@ bool MidiAgent::isConnected() { return connected; }
  */
 void MidiAgent::HandleInput(const rtmidi::message &message)
 {       //************** NEED TO FIX ****************// not sure how to get messages
-	auto mType = message.get_message_type();
+	//MidiAgent *self = static_cast<MidiAgent *>(userData);
+	//if (self->enabled == false || self->connected == false){ return; }
+
+	auto mType = Utils::mtype_to_string(message.get_message_type());
+	int mchannel = message.get_channel();
+
+	//int mIndex = message->at(1);
+	auto command = message.make_command(message.get_message_type(),
+					    message.get_channel());
+	auto byt = message.bytes;
+
+	auto norc = Utils::get_midi_note_or_control(message);
+	auto value = Utils::get_midi_value(message);
 	
-	//**** THESE ARE TO STOP COMPILE ERRORS TILL WE REBUILD FUNCTION *****//
-	double deltatime;
-	std::vector<unsigned char> *message;
-	void *userData;
-	MidiAgent *self = static_cast<MidiAgent *>(userData);
-	//**** MAKE SURE TO REMOVE  ****//
-
-	if (self->enabled == false || self->connected == false){ return; }
-
+	blog(LOG_INFO, "RECEIVED: channel: %d MType: %s {note or chan: %d, value: %d}", mchannel, mType.c_str(), norc, value);
 	
-	if (mType.empty()) { return; } // unknown message type. return.
-	int mIndex = message->at(1);
 
+
+	/************ REMOVE FOR NOW, UNTIL WE GET THE VALUES WE NEED 
 	//send message when received
-	
 	// check if hook exists for this note or cc index and launch it
 	for (unsigned i = 0; i < self->midiHooks.size(); i++) {
 		if (self->midiHooks.at(i)->type == mType && self->midiHooks.at(i)->index == mIndex) {
@@ -222,6 +225,7 @@ void MidiAgent::HandleInput(const rtmidi::message &message)
 			
 		}
 	}
+	***********************/
 	
 }
 

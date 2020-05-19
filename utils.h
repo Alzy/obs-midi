@@ -93,5 +93,8 @@ namespace Utils {
 	bool SetFilenameFormatting(const char* filenameFormatting);
 	bool inrange(int low, int high, int x);
 	std::string mtype_to_string(rtmidi::message_type);
+
+	int get_midi_note_or_control(rtmidi::message mess);
+	int get_midi_value(rtmidi::message mess);
 	QString nsToTimestamp(uint64_t ns);
 };

@@ -91,6 +91,6 @@ namespace Utils {
 	bool IsRPHotkeySet();
 	const char* GetFilenameFormatting();
 	bool SetFilenameFormatting(const char* filenameFormatting);
-
+	bool inrange(int low, int high, int x);
 	QString nsToTimestamp(uint64_t ns);
 };

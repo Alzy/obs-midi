@@ -26,11 +26,12 @@ endif()
 ##################
 
 # RTMIDI
-add_subdirectory(rtmidi)
+    add_subdirectory(rtmidi)
+    include_directories(rtmidi)
 
-set(obs-midi_DEPS rtmidi)
 
-include_directories(rtmidi)
+
+
 
 if(APPLE)
     find_library(COREMIDI CoreMIDI)
@@ -49,9 +50,12 @@ elseif(WIN32)
     set(obs-midi_DEPS
             ${obs-midi_DEPS}
             winmm.lib)
+
+elif(LINUX)
+    target_link_libraries(module -lrtmidi)
 endif()
 
-
+set(obs-midi_DEPS rtmidi)
 
 
 # OBS MIDI

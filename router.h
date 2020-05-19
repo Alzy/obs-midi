@@ -1,6 +1,11 @@
 #pragma once
+#include <stdio.h>
 
 #include <QObject>
+
+
+
+
 using namespace std;
 class Router : public QObject {
 	Q_OBJECT

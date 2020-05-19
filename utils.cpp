@@ -23,6 +23,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <QtCore/QDir>
 #include <QtCore/QUrl>
 
+
 #include <obs-frontend-api/obs-frontend-api.h>
 #include <obs.hpp>
 #include <util/platform.h>
@@ -50,22 +51,45 @@ bool Utils::is_number(const std::string& s)
 	while (it != s.end() && std::isdigit(*it)) ++it;
 	return !s.empty() && it == s.end();
 }
+bool Utils::inrange(int low, int high, int x) {
+	
+	return ((x - low) <= (high - low));
+}
+
 
 std::string Utils::getMidiMessageType(int in)
 {
-	switch (in)
-	{
-	case 176:
-		return "control_change";
-	case 128:
+	//currently sets from a few  non breaking returns, will need to have message format structs to return here instead
+	if (inrange(128, 143, in)) {
 		return "note_off";
-	case 144:
+	} else if (inrange(144, 159, in)) {
 		return "note_on";
-	case 192:
-		"program_change";
-	default:
+	}else if (inrange(176, 191, in)) {
+		return "control_change";
+	} else 	if (inrange(192, 207, in)) {
+		return "program_change";
+	}  else
 		return "";
-	}
+
+	/*	
+	if (inrange(128, 143, in)) {
+		return "note_off";
+	} else if (inrange(144, 159, in)) {
+		return "note_on";
+	} else if (inrange(160, 175, in)) {
+		return "poly_aftertouch";
+	} else if (inrange(176, 191, in)) {
+		return "control_change";
+	} else 	if (inrange(192, 207, in)) {
+		return "program_change";
+	} else 	if (inrange(208, 223, in)) {
+		return "chan_aftertouch";
+	} else 	if (inrange(224, 239, in)) {
+		return "pitch_bend";
+	} else if (inrange(240, 255, in)) {
+		return "system";
+	} else
+		return "";*/
 }
 
 

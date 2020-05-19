@@ -146,10 +146,10 @@ std::string Utils::mtype_to_string(rtmidi::message_type mess) {
 	switch (mess){
 	 case rtmidi::message_type:: INVALID : return "INVALID"; 
  // Standard Message
- case rtmidi::message_type:: NOTE_OFF : return "NOTE_OFF"; 
- case rtmidi::message_type:: NOTE_ON : return "NOTE_ON"; 
+ case rtmidi::message_type:: NOTE_OFF : return "note_off"; 
+ case rtmidi::message_type:: NOTE_ON : return "note_on"; 
  case rtmidi::message_type:: POLY_PRESSURE : return "POLY_PRESSURE";
- case rtmidi::message_type:: CONTROL_CHANGE : return "CONTROL_CHANGE";
+ case rtmidi::message_type:: CONTROL_CHANGE : return "control_change";
  case rtmidi::message_type:: PROGRAM_CHANGE : return "PROGRAM_CHANGE"; 
  case rtmidi::message_type:: AFTERTOUCH : return "AFTERTOUCH"; 
  case rtmidi::message_type:: PITCH_BEND : return "PITCH_BEND"; 

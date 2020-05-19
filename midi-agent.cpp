@@ -111,7 +111,8 @@ MidiAgent::MidiAgent()
 	name = "Midi Device (uninit)";
 	midiin = new rtmidi::midi_in();
 	
-	midiin->set_callback(&MidiAgent::HandleInput);
+	midiin->set_callback(
+		[this](const auto &message) { HandleInput(message, this); });
 
 	//Get Router Pointer and connect signals
 
@@ -196,10 +197,10 @@ bool MidiAgent::isConnected() { return connected; }
  * Extend input handling functionality here.
  * For OBS command triggers, edit the funcMap instead.
  */
-void MidiAgent::HandleInput(const rtmidi::message &message)
+void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 {       //************** NEED TO FIX ****************// not sure how to get messages
-	//MidiAgent *self = static_cast<MidiAgent *>(userData);
-	//if (self->enabled == false || self->connected == false){ return; }
+	MidiAgent *self = static_cast<MidiAgent *>(userData);
+	if (self->enabled == false || self->connected == false){ return; }
 
 	auto mType = Utils::mtype_to_string(message.get_message_type());
 	int mchannel = message.get_channel();
@@ -219,13 +220,14 @@ void MidiAgent::HandleInput(const rtmidi::message &message)
 	/************ REMOVE FOR NOW, UNTIL WE GET THE VALUES WE NEED 
 	//send message when received
 	// check if hook exists for this note or cc index and launch it
+	*/
 	for (unsigned i = 0; i < self->midiHooks.size(); i++) {
-		if (self->midiHooks.at(i)->type == mType && self->midiHooks.at(i)->index == mIndex) {
-			self->TriggerInputCommand(self->midiHooks.at(i), (int)message->at(2));
+		if (self->midiHooks.at(i)->type == mType && self->midiHooks.at(i)->index == norc) {
+			self->TriggerInputCommand(self->midiHooks.at(i), value);
 			
 		}
 	}
-	***********************/
+	/***********************/
 	
 }
 

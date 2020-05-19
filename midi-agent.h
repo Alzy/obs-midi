@@ -97,7 +97,7 @@ class MidiAgent: public QObject {
 		bool isEnabled();
 		bool isConnected();
 
-		static void HandleInput(const rtmidi::message &message);
+		static void HandleInput(const rtmidi::message &message, void *userData);
 		void TriggerInputCommand(MidiHook *hook, int midiVal);
 
 		vector<MidiHook*> GetMidiHooks();

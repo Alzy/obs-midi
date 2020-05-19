@@ -59,7 +59,19 @@ bool Utils::inrange(int low, int high, int x) {
 
 std::string Utils::getMidiMessageType(int in)
 {
-	
+	//currently sets from a few  non breaking returns, will need to have message format structs to return here instead
+	if (inrange(128, 143, in)) {
+		return "note_off";
+	} else if (inrange(144, 159, in)) {
+		return "note_on";
+	}else if (inrange(176, 191, in)) {
+		return "control_change";
+	} else 	if (inrange(192, 207, in)) {
+		return "program_change";
+	}  else
+		return "";
+
+	/*	
 	if (inrange(128, 143, in)) {
 		return "note_off";
 	} else if (inrange(144, 159, in)) {
@@ -76,7 +88,8 @@ std::string Utils::getMidiMessageType(int in)
 		return "pitch_bend";
 	} else if (inrange(240, 255, in)) {
 		return "system";
-	}
+	} else
+		return "";*/
 }
 
 

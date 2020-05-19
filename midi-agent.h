@@ -22,7 +22,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <QtCore/QSharedPointer>
 #include <vector>
 #include <QObject>
-#include "RtMidi.h"
+#include "RtMidi17/rtmidi17.hpp"
 #include <functional>
 #include <map>
 #include <string>
@@ -97,9 +97,7 @@ class MidiAgent: public QObject {
 		bool isEnabled();
 		bool isConnected();
 
-		static void HandleInput(double deltatime,
-				 vector<unsigned char> *message,
-				 void *userData);
+		static void HandleInput(const rtmidi::message);
 		void TriggerInputCommand(MidiHook *hook, int midiVal);
 
 		vector<MidiHook*> GetMidiHooks();
@@ -110,7 +108,9 @@ class MidiAgent: public QObject {
 	signals:
 		void SendNewUnknownMessage(std::string mtype, int msgindex);
 	private:
-		RtMidiIn *midiin;
+		
+		rtmidi::midi_in *midiin;
+		
 		string name;
 		int port;
 		bool enabled;

@@ -26,11 +26,11 @@ endif()
 ##################
 
 # RTMIDI
-add_subdirectory(rtmidi)
+add_subdirectory(RtMidi17)
 
-set(obs-midi_DEPS rtmidi)
+set(obs-midi_DEPS RtMidi17)
 
-include_directories(rtmidi)
+include_directories(RtMidi17)
 
 if(APPLE)
     find_library(COREMIDI CoreMIDI)

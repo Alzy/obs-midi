@@ -45,6 +45,6 @@ class DeviceManager {
 		obs_data_t* GetData();
 
 	private:
-		RtMidiIn* rtMidi;
+		rtmidi::midi_in *rtMidi;
 		vector<MidiAgent*> midiAgents;
 };

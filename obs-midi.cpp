@@ -8,7 +8,8 @@
 #include <iostream>
 #include <utility>
 #include "obs-midi.h"
-#include "RtMidi.h"
+
+#include "RtMidi17/rtmidi17.hpp"
 #include "forms/settings-dialog.h"
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMainWindow>

@@ -109,8 +109,9 @@ map<string, function<void(MidiHook *hook, int midiVal)>> funcMap = {
 MidiAgent::MidiAgent()
 {
 	name = "Midi Device (uninit)";
-	midiin = new RtMidiIn();
-	midiin->setCallback(&MidiAgent::HandleInput, this);
+	midiin = new rtmidi::midi_in();
+	
+	midiin->set_callback(&MidiAgent::HandleInput);
 
 	//Get Router Pointer and connect signals
 
@@ -168,8 +169,8 @@ void MidiAgent::SendMessage(std::string name, std::string mType, int mIndex) {
 */
 void MidiAgent::OpenPort(int port)
 {
-	midiin->openPort(port);
-	name = midiin->getPortName(port);
+	midiin->open_port(port);
+	name = midiin->get_port_name(port);
 	enabled = true;
 	connected = true;
 	blog(LOG_INFO, "MIDI device connected: [%d] %s", port, name.c_str());
@@ -179,7 +180,7 @@ void MidiAgent::OpenPort(int port)
 */
 void MidiAgent::ClosePort()
 {
-	midiin->closePort();
+	midiin->close_port();
 	enabled = false;
 	connected = false;
 }
@@ -195,10 +196,17 @@ bool MidiAgent::isConnected() { return connected; }
  * Extend input handling functionality here.
  * For OBS command triggers, edit the funcMap instead.
  */
-void MidiAgent::HandleInput(double deltatime,
-			    std::vector<unsigned char> *message, void *userData)
-{
+void MidiAgent::HandleInput(const rtmidi::message)
+{       //************** NEED TO FIX ****************// not sure how to get messages
+
+	
+	//**** THESE ARE TO STOP COMPILE ERRORS TILL WE REBUILD FUNCTION *****//
+	double deltatime;
+	std::vector<unsigned char> *message;
+	void *userData;
 	MidiAgent *self = static_cast<MidiAgent *>(userData);
+	//**** MAKE SURE TO REMOVE  ****//
+
 	if (self->enabled == false || self->connected == false){ return; }
 
 	string mType = Utils::getMidiMessageType(message->at(0));
@@ -207,7 +215,6 @@ void MidiAgent::HandleInput(double deltatime,
 
 	//send message when received
 	
-	self->SendMessage(self->name, mType, mIndex);
 	// check if hook exists for this note or cc index and launch it
 	for (unsigned i = 0; i < self->midiHooks.size(); i++) {
 		if (self->midiHooks.at(i)->type == mType && self->midiHooks.at(i)->index == mIndex) {

@@ -215,7 +215,7 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 	
 	blog(LOG_INFO, "RECEIVED: channel: %d MType: %s {note or chan: %d, value: %d}", mchannel, mType.c_str(), norc, value);
 	
-
+	self->SendMessage(self->name, mType, norc);
 
 	/************ REMOVE FOR NOW, UNTIL WE GET THE VALUES WE NEED 
 	//send message when received

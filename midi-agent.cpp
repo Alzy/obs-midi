@@ -161,9 +161,9 @@ void MidiAgent::Load(obs_data_t * data)
 
 }
 void MidiAgent::SendMessage(std::string name, std::string mType, int mIndex) {
-	emit this->SendNewUnknownMessage(mType, mIndex);
+
+	emit this->SendNewUnknownMessage(QString::fromStdString(name), QString::fromStdString(mType), mIndex);
 	
-	midiobsrouter->gotmessage(name, mType, mIndex);
 }
 
 	/* Will open the port and enable this MidiAgent

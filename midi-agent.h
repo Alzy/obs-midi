@@ -22,7 +22,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <QtCore/QSharedPointer>
 #include <vector>
 #include <QObject>
-#include "RtMidi17/rtmidi17.hpp"
+#include "rtmidi17/rtmidi17.hpp"
 #include <functional>
 #include <map>
 #include <string>
@@ -90,6 +90,7 @@ class MidiAgent: public QObject {
 		void OpenPort(int port);
 		void ClosePort();
 
+
 		 void SendMessage(std::string name, std::string mType, int mIndex);
 
 		string GetName();
@@ -106,7 +107,7 @@ class MidiAgent: public QObject {
 		void ClearMidiHooks();
 		obs_data_t* GetData();
 	signals:
-		void SendNewUnknownMessage(std::string mtype, int msgindex);
+		void SendNewUnknownMessage(QString name, QString mtype, int msgindex);
 	private:
 		
 		rtmidi::midi_in *midiin;

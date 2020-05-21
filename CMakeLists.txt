@@ -79,7 +79,7 @@ set(obs-midi_SOURCES
         forms/settings-dialog.cpp
 	forms/configwindow.cpp
         obs-midi.cpp
-	router.cpp
+	
 )
 
 list(APPEND obs-midi_HEADERS
@@ -91,7 +91,7 @@ list(APPEND obs-midi_HEADERS
         forms/settings-dialog.h
 	forms/configwindow.h
         obs-midi.h
-	router.h
+	
 	
 )
 

@@ -9,7 +9,7 @@
 #include <utility>
 #include "obs-midi.h"
 
-#include "RtMidi17/rtmidi17.hpp"
+#include "rtmidi17/rtmidi17.hpp"
 #include "forms/settings-dialog.h"
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMainWindow>
@@ -17,7 +17,6 @@
 #include "device-manager.h"
 #include "utils.h"
 #include "midi-agent.h"
-#include "router.h"
 using namespace std;
 
 void ___source_dummy_addref(obs_source_t *) {}

@@ -25,13 +25,13 @@ ConfigWindow::ConfigWindow(std::string devn)
 	auto devicemanager = GetDeviceManager();
 	auto config = GetConfig();
 	//config->Load();
-	Router *rt = midiobsrouter;	
+		
 	//connect(this, SIGNAL(&SendNewUnknownMessage), this	SIGNAL(rt.UnknownMessage));
-	//auto device = devicemanager->GetMidiDeviceByName(devicename.c_str());
+	auto device = devicemanager->GetMidiDeviceByName(devicename.c_str());
 
 	std::vector<MidiHook *> hooks =	devicemanager->GetMidiHooksByDeviceName(devicename.c_str());
 	///HOOK up the Message Handler
-	connect( rt, SIGNAL(UnknownMessage(QString, QString, int)), this,SLOT(domessage(QString, QString, int)));
+	connect( device, SIGNAL(SendNewUnknownMessage(QString, QString, int)), this,SLOT(domessage(QString, QString, int)));
 	//Setup the UI
 	ui.setupUi(this);
 	//void SetupModel();

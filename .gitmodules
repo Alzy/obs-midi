@@ -1,0 +1,3 @@
+[submodule "RtMidi17"]
+	path = RtMidi17
+	url = https://github.com/jcelerier/RtMidi17.git

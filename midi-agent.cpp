@@ -110,23 +110,7 @@ MidiAgent::MidiAgent()
 {
 	name = "Midi Device (uninit)";
 	midiin = new rtmidi::midi_in();
-	
-	midiin->set_callback(
-		[this](const auto &message) { HandleInput(message, this); });
-
-	//Get Router Pointer and connect signals
-
-	
-	//connect(this, SIGNAL(&SendNewUnknownMessage(std::string, int)), this, SIGNAL(rt.UnknownMessage(std::string, int)));
-	//connect(this, SIGNAL(&SendNewUnknownMessage(std::string, int)), this, SLOT(Router::gotmessage(std::string, int)));
-	//connect(this, SIGNAL(&SendNewUnknownMessage), router, SLOT(gotmessage));
-	// for testing..  remove me:
-	//MidiHook *mh = new MidiHook("control_change", 7, "SetVolume", "Desktop Audio", "" ,  "", "fader");
-	//MidiHook *mh = new MidiHook("control_change", 1, "SetVolume", "Desktop Audio");
-	//AddMidiHook(mh);
-	//MidiHook *mh2 =
-		//new MidiHook("control_change", 2, "SetVolume", "Mic / Aux");
-	//AddMidiHook(mh2);
+	midiin->set_callback([this](const auto &message) { HandleInput(message, this); });
 }
 
 MidiAgent::~MidiAgent()
@@ -198,36 +182,31 @@ bool MidiAgent::isConnected() { return connected; }
  * For OBS command triggers, edit the funcMap instead.
  */
 void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
-{       //************** NEED TO FIX ****************// not sure how to get messages
+{       
 	MidiAgent *self = static_cast<MidiAgent *>(userData);
 	if (self->enabled == false || self->connected == false){ return; }
 
+	/*************Get Message parts***********/
 	auto mType = Utils::mtype_to_string(message.get_message_type());
 	int mchannel = message.get_channel();
-
-	//int mIndex = message->at(1);
-	auto command = message.make_command(message.get_message_type(),
-					    message.get_channel());
 	auto byt = message.bytes;
-
 	auto norc = Utils::get_midi_note_or_control(message);
 	auto value = Utils::get_midi_value(message);
 	
-	blog(LOG_INFO, "RECEIVED: channel: %d MType: %s {note or chan: %d, value: %d}", mchannel, mType.c_str(), norc, value);
-	
+	/***** Send Messages to emit function *****/
 	self->SendMessage(self->name, mType, norc);
 
-	/************ REMOVE FOR NOW, UNTIL WE GET THE VALUES WE NEED 
-	//send message when received
-	// check if hook exists for this note or cc index and launch it
-	*/
+	
+	/** check if hook exists for this note or cc index and launch it **/
+	//Eventually add channel to this check.
+	
 	for (unsigned i = 0; i < self->midiHooks.size(); i++) {
 		if (self->midiHooks.at(i)->type == mType && self->midiHooks.at(i)->index == norc) {
 			self->TriggerInputCommand(self->midiHooks.at(i), value);
 			
 		}
 	}
-	/***********************/
+	
 	
 }
 
@@ -235,12 +214,7 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 */
 void MidiAgent::TriggerInputCommand(MidiHook* hook, int midiVal)
 {
-
-	blog(LOG_INFO, "Triggered: %d [%d] %s %s", hook->index, midiVal, hook->command.c_str(),
-	     hook->param1.c_str());
-	//auto x = funcMap.find(hook->command);
-	//x->second(hook, midiVal);
-	 //funcMap.at(hook->command)(hook, midiVal);
+	blog(LOG_INFO, "Triggered: %d [%d] %s %s", hook->index, midiVal, hook->command.c_str(), hook->param1.c_str());
 	 funcMap[hook->command](hook, midiVal);
 }		
 

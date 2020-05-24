@@ -46,7 +46,7 @@ class ConfigWindow : public QDialog{
 		
 
 	private slots:
-		void load();
+		
 		void deleterow();
 		void setDirty() { setWindowModified(true); }
 		void domessage(QString name, QString mtype, int mchan);

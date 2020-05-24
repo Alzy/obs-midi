@@ -1077,10 +1077,12 @@ vector <const char*> Utils::GetAudioSourceNames()
 		{
 			sn.push_back(
 				obs_source_get_name(source)
+				
 			);
+			
 		}
 		return true;
 	}, static_cast <void *> (&sourceNames));
-
+	
 	return sourceNames;
 }

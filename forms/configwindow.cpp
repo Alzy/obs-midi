@@ -17,9 +17,9 @@ ConfigWindow::ConfigWindow(std::string devn)
 	auto devicemanager = GetDeviceManager();
 	auto config = GetConfig();	
 	auto device = devicemanager->GetMidiDeviceByName(devicename.c_str());
-	std::vector<MidiHook *> hooks =	devicemanager->GetMidiHooksByDeviceName(devicename.c_str());
+	auto hooks  = devicemanager->GetMidiHooksByDeviceName(devicename.c_str());
 	///HOOK up the Message Handler
-	connect( device, SIGNAL(SendNewUnknownMessage(QString, QString, int)), this,SLOT(domessage(QString, QString, int)));
+	connect( device, SIGNAL(SendNewUnknownMessage(QString, QString, int)), this, SLOT(domessage(QString, QString, int)));
 	//Setup the UI
 	ui.setupUi(this);
 	this->setWindowTitle(this->windowTitle() +"  "+QString::fromStdString(devn));
@@ -40,8 +40,7 @@ ConfigWindow::ConfigWindow(std::string devn)
 	MakeSceneCombo();
 	chooseAtype("Button");
 	//Connect back button functionality
-	connect(ui.btnBack, &QPushButton::clicked, this,
-		&ConfigWindow::on_btn_back_clicked);
+	connect(ui.btnBack, SIGNAL(clicked), this,SLOT(on_btn_back_clicked));
 	connect(ui.btnSave, SIGNAL(clicked()), this, SLOT(save()));
 	connect(ui.tableWidget, SIGNAL(cellClicked(int, int)), this, SLOT(select(int,int)));
 	connect(ui.cb_atype, SIGNAL(currentTextChanged(QString)), this, SLOT(chooseAtype(QString)));
@@ -226,7 +225,6 @@ int rows = ui.tableWidget->rowCount();
 bool ConfigWindow::inrow(int x, QString mtype)
 {
 	auto fitems = ui.tableWidget->findItems(QString::number(x), 0);
-	int rows = ui.tableWidget->rowCount();
 	int itemcount = fitems.size();
 		for (int i = 0; i < itemcount; ++i) {
 		

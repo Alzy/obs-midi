@@ -33,10 +33,7 @@ class ConfigWindow : public QDialog{
 		~ConfigWindow();
 		void on_btn_back_clicked();
 		void ToggleShowHide();
-		//variables
-		std::string devicename;
-		QTableView tableEntity;
-		void loadFromHooks();
+		
 		//MakeCombos
 		void AddRowFromHooks(int row, std::string mtype, int mindex, bool bid,
 					std::string atype, std::string action,
@@ -44,15 +41,14 @@ class ConfigWindow : public QDialog{
 					std::string option3);
 		bool inrow(int x);
 		bool inrow(int x, QString mtype);
-		bool dirty;
+		//variables
+		std::string devicename;
+		
 
 	private slots:
 		void load();
-		void addrow();
 		void deleterow();
 		void setDirty() { setWindowModified(true); }
-		void updateUi();
-		void selectionChanged();
 		void domessage(QString name, QString mtype, int mchan);
 		void insertRow(QString mtype, int mindex);
 		void select(int row, int col);
@@ -65,6 +61,7 @@ class ConfigWindow : public QDialog{
 		void chooseAtype(QString index);
 		void clearTable();
 	private:
+		bool dirty;
 		QStringList ScenesList ;
 		QStringList VolumeList;
 		bool clearpressed;

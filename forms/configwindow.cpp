@@ -1,9 +1,6 @@
 #include <inttypes.h>
-
-
 #include <obs.hpp>
 #include <util/platform.h>
-
 #include "configwindow.h"
 #include "ui_configwindow.h"
 #include <QtWidgets>
@@ -16,29 +13,19 @@
 
 ConfigWindow::ConfigWindow(std::string devn) 
 {
-	//MakeSceneCombo();
-	
 	devicename = devn;
-	
-	
-	//auto rob = static_cast<RouterPtr>(GetRouter());
 	auto devicemanager = GetDeviceManager();
-	auto config = GetConfig();
-	//config->Load();
-		
-	//connect(this, SIGNAL(&SendNewUnknownMessage), this	SIGNAL(rt.UnknownMessage));
+	auto config = GetConfig();	
 	auto device = devicemanager->GetMidiDeviceByName(devicename.c_str());
-
 	std::vector<MidiHook *> hooks =	devicemanager->GetMidiHooksByDeviceName(devicename.c_str());
 	///HOOK up the Message Handler
 	connect( device, SIGNAL(SendNewUnknownMessage(QString, QString, int)), this,SLOT(domessage(QString, QString, int)));
 	//Setup the UI
 	ui.setupUi(this);
-	//void SetupModel();
 	this->setWindowTitle(this->windowTitle() +"  "+QString::fromStdString(devn));
 	ui.tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-	
-	
+
+	//Add Existing Hooks to table.
 		for (int i = 0; i < hooks.size(); i++) {
 		int rc = ui.tableWidget->rowCount();
 		AddRowFromHooks(rc,hooks.at(i)->type, hooks.at(i)->index, false,
@@ -48,8 +35,7 @@ ConfigWindow::ConfigWindow(std::string devn)
 	}
 	
 	
-	
-
+	//Pull Data From OBS
 	MakeVolumeCombo();
 	MakeSceneCombo();
 	chooseAtype("Button");
@@ -66,15 +52,10 @@ ConfigWindow::ConfigWindow(std::string devn)
 	//connect(ui.cb_param3, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
 	//connect(ui.checkBox, SIGNAL(stateChanged(int)), this,SLOT(sendToTable()));
 	//connect(ui.cb_atype, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
-
 	connect(ui.cb_action, SIGNAL(currentTextChanged(QString)), this, SLOT(chooseOptions1(QString)));
-
 	connect(ui.btnDel, SIGNAL(clicked()), this, SLOT(deleterow()));
-	connect(ui.btnClear, SIGNAL(clicked()), this,
-		SLOT(clearTable()));
+	connect(ui.btnClear, SIGNAL(clicked()), this, SLOT(clearTable()));
 	ui.tableWidget->selectRow(0);
-	
-	
 }
 void ConfigWindow::clearTable() {
 	QMessageBox msgBox;
@@ -93,7 +74,6 @@ void ConfigWindow::clearTable() {
 	case QMessageBox::Cancel:
 		return;
 	}
-	
 }
 
 void ConfigWindow::select(int row, int col)
@@ -103,9 +83,7 @@ void ConfigWindow::select(int row, int col)
 	ui.num_mchan->display(ui.tableWidget->item(row, 1)->text().toInt());
 	ui.checkBox->setChecked(QVariant(ui.tableWidget->item(row, 2)->text()).toBool());
 	ui.cb_atype->setCurrentText(ui.tableWidget->item(row, 3)->text());
-	//chooseAtype(ui.cb_atype->currentText());
 	ui.cb_action->setCurrentText(ui.tableWidget->item(row, 4)->text());
-	//chooseOptions1(ui.cb_action->currentText());
 	ui.cb_param1->setCurrentText(ui.tableWidget->item(row, 5)->text());
 	ui.cb_param2->setCurrentText(ui.tableWidget->item(row, 6)->text());
 	ui.cb_param3->setCurrentText(ui.tableWidget->item(row, 7)->text());
@@ -126,12 +104,7 @@ void ConfigWindow::AddRowFromHooks(int rc, std::string type, int index, bool bid
 		QTableWidgetItem *newItem6 = new QTableWidgetItem();
 		QTableWidgetItem *newItem7 = new QTableWidgetItem();
 		QTableWidgetItem *newItem8 = new QTableWidgetItem();
-
-		
-		//load rows from hooks
-		//bidirectional.append(false);
-
-		
+		//load rows from hooks		
 		newItem->setText(QString::fromStdString(type)); //Message Type
 		newItem2->setText(QString::number(index)); //message channel
 		newItem3->setText(QVariant(false).toString()); //Bidirectional
@@ -140,9 +113,7 @@ void ConfigWindow::AddRowFromHooks(int rc, std::string type, int index, bool bid
 		newItem6->setText(QString::fromStdString(param1)); //Option 1
 		newItem7->setText(QString::fromStdString(param2)); //Option 2
 		newItem8->setText(QString::fromStdString(param3));        //Option 3
-
-		//if (!tm_messagenumber.contains(mindex)) {
-
+		//Set items		
 		ui.tableWidget->setItem(rc, 0, newItem);
 		ui.tableWidget->setItem(rc, 1, newItem2);
 		ui.tableWidget->setItem(rc, 2, newItem3);
@@ -151,7 +122,6 @@ void ConfigWindow::AddRowFromHooks(int rc, std::string type, int index, bool bid
 		ui.tableWidget->setItem(rc, 5, newItem6);
 		ui.tableWidget->setItem(rc, 6, newItem7);
 		ui.tableWidget->setItem(rc, 7, newItem8);
-
 		//Set Default sidebar
 		if (rc == 1) {
 			select(0, 1);
@@ -159,7 +129,6 @@ void ConfigWindow::AddRowFromHooks(int rc, std::string type, int index, bool bid
 }
 void  ConfigWindow::insertRow(QString mtype,int mindex)
 {
-
 	int rc = ui.tableWidget->rowCount();
 	ui.tableWidget->insertRow(rc );
 	QTableWidgetItem *newItem = new QTableWidgetItem();
@@ -187,11 +156,6 @@ void  ConfigWindow::insertRow(QString mtype,int mindex)
 	newItem6->setText("Mic/Aux");   //Option 1
 	newItem7->setText("");   //Option 2
 	newItem8->setText("");   //Option 3
-
-	
-	
-	//if (!tm_messagenumber.contains(mindex)) {
-	
 	
 	ui.tableWidget->setItem(rc , 0, newItem);
 	ui.tableWidget->setItem(rc, 1, newItem2);
@@ -216,10 +180,8 @@ void ConfigWindow::save() {
 	//loop through rows
 	for (int i=0; i < rc; i++)
 	{
-	//make default midihook
-		
+		//make default midihook
 		MidiHook *mh = new MidiHook;
-		
 		//map values
 		mh->type = ui.tableWidget->item(i, 0)->text().toStdString();
 		mh->index =ui.tableWidget->item(i, 1)->text().toInt();
@@ -228,8 +190,7 @@ void ConfigWindow::save() {
 		mh->command = ui.tableWidget->item(i, 4)->text().toStdString();
 		mh->param1 = ui.tableWidget->item(i, 5)->text().toStdString();
 		mh->param2 = ui.tableWidget->item(i, 6)->text().toStdString();
-		mh->param3 = ui.tableWidget->item(i, 7)->text().toStdString();
-		
+		mh->param3 = ui.tableWidget->item(i, 7)->text().toStdString();		
 		dev->AddMidiHook(mh);
 		
 	};
@@ -239,6 +200,7 @@ void ConfigWindow::save() {
 	}
 	
 }
+/************************** Message Handler for UI ***************************************/
 	void ConfigWindow::domessage(QString namein, QString mtype, int mchan)
 {
 		if (namein == QString::fromStdString(devicename)) {
@@ -250,16 +212,14 @@ void ConfigWindow::save() {
 	
 	
 }
+/************Checks if item exists in tow*************/
 bool ConfigWindow::inrow(int x) {
-
 int rows = ui.tableWidget->rowCount();
-
 	for (int i = 0; i < rows; ++i) {
 		if (ui.tableWidget->item(i, 1)->text() ==
 		    QString::number(x)) {
 			return true;
 		}
-
 	}
 	return false;
 }
@@ -276,45 +236,30 @@ bool ConfigWindow::inrow(int x, QString mtype)
 			}
 			
 		}
-	
 	return true;
-	
-	
 }
-
 
 void ConfigWindow::sendToTable() {
-	if (!dirty) {
-	
-	if (ui.tableWidget->rowCount() > 0) {
-	
-	int rc =ui.tableWidget->selectedItems()[0]->row();
-	ui.tableWidget->item(rc, 0)->setText(ui.lin_mtype->text());//mtype
-	ui.tableWidget->item(rc, 1)->setText(QString::number(ui.num_mchan->intValue()));               //mindex
-	ui.tableWidget->item(rc, 2)->setText(QVariant(ui.checkBox->isChecked()).toString()); //bool
-	ui.tableWidget->item(rc, 3)->setText(ui.cb_atype->currentText());//atype
-	ui.tableWidget->item(rc, 4)->setText(ui.cb_action->currentText());   //action
-	ui.tableWidget->item(rc, 5)->setText(ui.cb_param1->currentText());
-	ui.tableWidget->item(rc, 6)->setText(ui.cb_param2->currentText());
-	ui.tableWidget->item(rc, 7)->setText(ui.cb_param3->currentText());
-	}
-	}
-}
+	if (!dirty) {	
+		if (ui.tableWidget->rowCount() > 0) {
+			int rc =ui.tableWidget->selectedItems()[0]->row();
+			ui.tableWidget->item(rc, 0)->setText(ui.lin_mtype->text());//mtype
+			ui.tableWidget->item(rc, 1)->setText(QString::number(ui.num_mchan->intValue()));               //mindex
+			ui.tableWidget->item(rc, 2)->setText(QVariant(ui.checkBox->isChecked()).toString()); //bool
+			ui.tableWidget->item(rc, 3)->setText(ui.cb_atype->currentText());//atype
+			ui.tableWidget->item(rc, 4)->setText(ui.cb_action->currentText());   //action
+			ui.tableWidget->item(rc, 5)->setText(ui.cb_param1->currentText());
+			ui.tableWidget->item(rc, 6)->setText(ui.cb_param2->currentText());
+			ui.tableWidget->item(rc, 7)->setText(ui.cb_param3->currentText());
+		} // If rowcount  > 0
+	}//Dirty
+}//Send to Table
 
-
-
-
-
-
-	// Create a method to populate the model with data:
-
-
+//Back Button handler
 void ConfigWindow::on_btn_back_clicked()
 {
-
+	this->close();
 	setVisible(false);
-	//&parentWidget->show()
-	//	parent::show();
 }
 
 ConfigWindow::~ConfigWindow()
@@ -329,30 +274,11 @@ void ConfigWindow::ToggleShowHide()
 		setVisible(false);
 }
 
-void ConfigWindow::loadFromHooks()
-{
-	
-
-
-}
-/*bool ConfigWindow::insertRow(int row, std::string  mtype, int mindex, std::string actiontype,
-		std::string action, std::string option1, std::string option2,
-		std::string option3, const QModelIndex &parent)*/
-
-
 
 /*                Make Combo list models
 */
 void ConfigWindow::chooseOptions1(QString Action) {
 	if (ui.tableWidget->rowCount() > 0) {
-
-		//ui.tableWidget->item(ui.tableWidget->selectedItems()[0]->row(), 4)->setText(Action);
-		QList<QString> option1;
-		QList<QString> option2;
-		QList<QString> volume;
-		QList<QString> scenes;
-		
-		QStringList nada;
 		ui.cb_param1->clear();
 		ui.cb_param2->clear();
 		ui.cb_param3->clear();
@@ -369,12 +295,7 @@ void ConfigWindow::chooseOptions1(QString Action) {
 		}
 	}
 }
-/*
-tm_option2.clear();
-tm_option2 = option2;
-tm_option3.clear();
-tm_option3 = option3;
-*/
+// Pulls Scenes from OBS, Makes Scenes list.
 void ConfigWindow::MakeSceneCombo()
 {
 	auto scenes = Utils::GetScenes();
@@ -384,39 +305,15 @@ void ConfigWindow::MakeSceneCombo()
 		auto name = obs_data_get_string(d, "name");
 		ScenesList<< tr(name);
 	}
-	
-	//ui.cb_param1->setModel(options1model);
 }
 
-
+// Pulls volume sources from OBS, Makes Volume sources list. 
 void ConfigWindow::MakeVolumeCombo()
 {
-
-	/*
-	QMap<const char *, int> sources;
-	sources["desktop-1"] = 1;
-	sources["desktop-2"] = 2;
-	sources["mic-1"] = 3;
-	sources["mic-2"] = 4;
-	sources["mic-3"] = 5;
-
-	QMapIterator<const char *, int> i(sources);
-	while (i.hasNext()) {
-		i.next();
-
-		OBSSourceAutoRelease source = obs_get_output_source(i.value());
-		if (source) {
-			VolumeList.append(obs_source_get_name(source));
-		}
-	}
-	*/
-	//add Utils get volume sources
 	auto utilsources = Utils::GetAudioSourceNames();
 	for (int i = 0; i < utilsources.size(); i++) {
 		VolumeList.append(utilsources.at(i));
 	}
-	
-	
 }
 // Choose Action Type Handler
 void ConfigWindow::chooseAtype(QString text)
@@ -429,34 +326,9 @@ void ConfigWindow::chooseAtype(QString text)
 	}
 	ui.cb_action->clear();
 	ui.cb_action->addItems(items);
-	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void ConfigWindow::load(){};
-void ConfigWindow::addrow(){};
+// Delete row in table. 
 void ConfigWindow::deleterow(){
-	
-	
 	try {
 		auto items = ui.tableWidget->selectedItems();
 		if (!items.isEmpty()) {
@@ -465,10 +337,7 @@ void ConfigWindow::deleterow(){
 		}
 		
 	} catch (const std::exception &e) {
-		//blog(1, e.what().c_str);
 		return;
 	}
 };
-void ConfigWindow::updateUi(){};
-void ConfigWindow::selectionChanged(){};
 

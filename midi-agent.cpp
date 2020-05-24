@@ -35,12 +35,10 @@ using namespace std;
 
 // BUTTON ACTIONS
 map<string, function<void(MidiHook *hook, int midiVal)>> funcMap = {
-	
 	{"Set Current Scene", [](MidiHook* hook, int midiVal) { OBSController::SetCurrentScene(hook->param1.c_str()); }},
 	{"Set Preview Scene", [](MidiHook* hook, int midiVal) { OBSController::SetPreviewScene(hook->param1.c_str()); }},
 	{"Set Current Scene Collection", [](MidiHook* hook, int midiVal) { OBSController::SetCurrentSceneCollection(QString::fromStdString(hook->param1)); }},
 	{"Reset Scene Item", [](MidiHook* hook, int midiVal) { OBSController::ResetSceneItem(hook->param1.c_str(), hook->param2.c_str()); }},
-
 	{"TransitionToProgram", [](MidiHook* hook, int midiVal) {
 		if (QString::fromStdString(hook->param1).isEmpty()){
 			OBSController::TransitionToProgram();
@@ -61,25 +59,20 @@ map<string, function<void(MidiHook *hook, int midiVal)>> funcMap = {
 			OBSController::SetTransitionDuration(midiVal);
 		}
 	}},
-
 	{"Toggle Mute", [](MidiHook* hook, int midiVal) { OBSController::ToggleMute(QString::fromStdString(hook->param1)); }},
 	{"Set Mute", [](MidiHook* hook, int midiVal) { OBSController::SetMute(QString::fromStdString(hook->param1), midiVal); }},
-
 	{"Start Stop Streaming", [](MidiHook* hook, int midiVal) { OBSController::StartStopStreaming(); }},
 	{"Start Streaming", [](MidiHook* hook, int midiVal) { OBSController::StartStreaming(); }},
 	{"Stop Streaming", [](MidiHook* hook, int midiVal) { OBSController::StopStreaming(); }},
-
 	{"Start Stop Recording", [](MidiHook* hook, int midiVal) { OBSController::StartStopRecording(); }},
 	{"Start Recording", [](MidiHook* hook, int midiVal) { OBSController::StartRecording(); }},
 	{"Stop Recording", [](MidiHook* hook, int midiVal) { OBSController::StopRecording(); }},
 	{"Pause Recording", [](MidiHook* hook, int midiVal) { OBSController::PauseRecording(); }},
 	{"Resume Recording", [](MidiHook* hook, int midiVal) { OBSController::ResumeRecording(); }},
-
 	{"Start Stop Replay Buffer", [](MidiHook* hook, int midiVal) { OBSController::StartStopReplayBuffer(); }},
 	{"Start Replay Buffer", [](MidiHook* hook, int midiVal) { OBSController::StartReplayBuffer(); }},
 	{"Stop Replay Buffer", [](MidiHook* hook, int midiVal) { OBSController::StopReplayBuffer(); }},
 	{"Save Replay Buffer", [](MidiHook* hook, int midiVal) { OBSController::SaveReplayBuffer(); }},
-
 	{"Set Current Profile", [](MidiHook* hook, int midiVal) { OBSController::SetCurrentProfile(QString::fromStdString(hook->param1)); }},
 	{"Set Text GDIPlus Text", [](MidiHook* hook, int midiVal) { OBSController::SetTextGDIPlusText(); }},
 	{"Set Browser Source URL", [](MidiHook* hook, int midiVal) { OBSController::SetBrowserSourceURL(); }},
@@ -88,11 +81,9 @@ map<string, function<void(MidiHook *hook, int midiVal)>> funcMap = {
 	{"Enable Source Filter", [](MidiHook* hook, int midiVal) { OBSController::EnableSourceFilter(); }},
 	{"Disable Source Filter", [](MidiHook* hook, int midiVal) { OBSController::DisableSourceFilter(); }},
 	{"Toggle Source Filter", [](MidiHook* hook, int midiVal) { OBSController::ToggleSourceFilter(); }},
-
 	// CC ACTIONS
 	{"Set Volume",
-	 [](MidiHook *hook, int midiVal) {  OBSController::SetVolume(QString::fromStdString(hook->param1), pow(Utils::mapper(midiVal), 3.0));
-	 }},
+	 [](MidiHook *hook, int midiVal) {  OBSController::SetVolume(QString::fromStdString(hook->param1), pow(Utils::mapper(midiVal), 3.0));}},
 	{"Set Sync Offset", [](MidiHook* hook, int midiVal) { OBSController::SetSyncOffset(QString::fromStdString(hook->param1), (int64_t) midiVal); }},
 	{"Set Source Position", [](MidiHook* hook, int midiVal) { OBSController::SetSourcePosition(); }},
 	{"Set Source Rotation", [](MidiHook* hook, int midiVal) { OBSController::SetSourceRotation(); }},
@@ -109,22 +100,8 @@ map<string, function<void(MidiHook *hook, int midiVal)>> funcMap = {
 MidiAgent::MidiAgent()
 {
 	name = "Midi Device (uninit)";
-	midiin = new RtMidiIn();
-	midiin->setCallback(&MidiAgent::HandleInput, this);
-
-	//Get Router Pointer and connect signals
-
-	
-	//connect(this, SIGNAL(&SendNewUnknownMessage(std::string, int)), this, SIGNAL(rt.UnknownMessage(std::string, int)));
-	//connect(this, SIGNAL(&SendNewUnknownMessage(std::string, int)), this, SLOT(Router::gotmessage(std::string, int)));
-	//connect(this, SIGNAL(&SendNewUnknownMessage), router, SLOT(gotmessage));
-	// for testing..  remove me:
-	//MidiHook *mh = new MidiHook("control_change", 7, "SetVolume", "Desktop Audio", "" ,  "", "fader");
-	//MidiHook *mh = new MidiHook("control_change", 1, "SetVolume", "Desktop Audio");
-	//AddMidiHook(mh);
-	//MidiHook *mh2 =
-		//new MidiHook("control_change", 2, "SetVolume", "Mic / Aux");
-	//AddMidiHook(mh2);
+	midiin = new rtmidi::midi_in();
+	midiin->set_callback([this](const auto &message) { HandleInput(message, this); });
 }
 
 MidiAgent::~MidiAgent()
@@ -159,17 +136,17 @@ void MidiAgent::Load(obs_data_t * data)
 
 }
 void MidiAgent::SendMessage(std::string name, std::string mType, int mIndex) {
-	emit this->SendNewUnknownMessage(mType, mIndex);
+
+	emit this->SendNewUnknownMessage(QString::fromStdString(name), QString::fromStdString(mType), mIndex);
 	
-	midiobsrouter->gotmessage(name, mType, mIndex);
 }
 
 	/* Will open the port and enable this MidiAgent
 */
 void MidiAgent::OpenPort(int port)
 {
-	midiin->openPort(port);
-	name = midiin->getPortName(port);
+	midiin->open_port(port);
+	name = midiin->get_port_name(port);
 	enabled = true;
 	connected = true;
 	blog(LOG_INFO, "MIDI device connected: [%d] %s", port, name.c_str());
@@ -179,7 +156,7 @@ void MidiAgent::OpenPort(int port)
 */
 void MidiAgent::ClosePort()
 {
-	midiin->closePort();
+	midiin->close_port();
 	enabled = false;
 	connected = false;
 }
@@ -195,26 +172,32 @@ bool MidiAgent::isConnected() { return connected; }
  * Extend input handling functionality here.
  * For OBS command triggers, edit the funcMap instead.
  */
-void MidiAgent::HandleInput(double deltatime,
-			    std::vector<unsigned char> *message, void *userData)
-{
+void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
+{       
 	MidiAgent *self = static_cast<MidiAgent *>(userData);
 	if (self->enabled == false || self->connected == false){ return; }
 
-	string mType = Utils::getMidiMessageType(message->at(0));
-	if (mType.empty()) { return; } // unknown message type. return.
-	int mIndex = message->at(1);
-
-	//send message when received
+	/*************Get Message parts***********/
+	auto mType = Utils::mtype_to_string(message.get_message_type());
+	int mchannel = message.get_channel();
+	auto byt = message.bytes;
+	auto norc = Utils::get_midi_note_or_control(message);
+	auto value = Utils::get_midi_value(message);
 	
-	self->SendMessage(self->name, mType, mIndex);
-	// check if hook exists for this note or cc index and launch it
+	/***** Send Messages to emit function *****/
+	self->SendMessage(self->name, mType, norc);
+
+	
+	/** check if hook exists for this note or cc index and launch it **/
+	//Eventually add channel to this check.
+	
 	for (unsigned i = 0; i < self->midiHooks.size(); i++) {
-		if (self->midiHooks.at(i)->type == mType && self->midiHooks.at(i)->index == mIndex) {
-			self->TriggerInputCommand(self->midiHooks.at(i), (int)message->at(2));
+		if (self->midiHooks.at(i)->type == mType && self->midiHooks.at(i)->index == norc) {
+			self->TriggerInputCommand(self->midiHooks.at(i), value);
 			
 		}
 	}
+	
 	
 }
 
@@ -222,12 +205,7 @@ void MidiAgent::HandleInput(double deltatime,
 */
 void MidiAgent::TriggerInputCommand(MidiHook* hook, int midiVal)
 {
-
-	blog(LOG_INFO, "Triggered: %d [%d] %s %s", hook->index, midiVal, hook->command.c_str(),
-	     hook->param1.c_str());
-	//auto x = funcMap.find(hook->command);
-	//x->second(hook, midiVal);
-	 //funcMap.at(hook->command)(hook, midiVal);
+	blog(LOG_INFO, "Triggered: %d [%d] %s %s", hook->index, midiVal, hook->command.c_str(), hook->param1.c_str());
 	 funcMap[hook->command](hook, midiVal);
 }		
 

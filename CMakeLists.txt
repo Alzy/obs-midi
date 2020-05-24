@@ -26,11 +26,11 @@ endif()
 ##################
 
 # RTMIDI
-add_subdirectory(rtmidi)
+add_subdirectory(RtMidi17)
 
-set(obs-midi_DEPS rtmidi)
+set(obs-midi_DEPS RtMidi17)
 
-include_directories(rtmidi)
+include_directories(RtMidi17)
 
 if(APPLE)
     find_library(COREMIDI CoreMIDI)
@@ -79,7 +79,7 @@ set(obs-midi_SOURCES
         forms/settings-dialog.cpp
 	forms/configwindow.cpp
         obs-midi.cpp
-	router.cpp
+	
 )
 
 list(APPEND obs-midi_HEADERS
@@ -91,7 +91,7 @@ list(APPEND obs-midi_HEADERS
         forms/settings-dialog.h
 	forms/configwindow.h
         obs-midi.h
-	router.h
+	
 	
 )
 

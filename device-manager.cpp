@@ -19,7 +19,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 DeviceManager::DeviceManager()
 {
-	rtMidi = new RtMidiIn();
+	rtMidi = new rtmidi::midi_in();
 }
 
 DeviceManager::~DeviceManager()
@@ -58,10 +58,10 @@ void DeviceManager::Load(obs_data_t* data)
 vector <string> DeviceManager::GetPortsList()
 {
 	vector <string> ports;
-	int portCount = rtMidi->getPortCount();
+	int portCount = rtMidi->get_port_count();
 	for (int i = 0; i < portCount; i++)
 	{
-		ports.push_back(rtMidi->getPortName(i));
+		ports.push_back(rtMidi->get_port_name(i));
 	}
 	return ports;
 }

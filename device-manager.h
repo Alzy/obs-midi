@@ -43,8 +43,8 @@ class DeviceManager {
 		void RegisterMidiDevice(int port);
 
 		obs_data_t* GetData();
-
+	
 	private:
-		RtMidiIn* rtMidi;
+		rtmidi::midi_in *rtMidi;
 		vector<MidiAgent*> midiAgents;
 };

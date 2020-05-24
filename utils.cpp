@@ -55,7 +55,126 @@ bool Utils::inrange(int low, int high, int x) {
 	
 	return ((x - low) <= (high - low));
 }
+int Utils::get_midi_note_or_control(rtmidi::message mess) {
+	int bytetopullfrom;
+	 switch (mess.get_message_type()){
+	case rtmidi::message_type::INVALID:break;
+	case rtmidi::message_type:: NOTE_OFF : bytetopullfrom = 1;break;
+	case rtmidi::message_type:: NOTE_ON : bytetopullfrom = 1;break;
+	case rtmidi::message_type:: PITCH_BEND : bytetopullfrom = 0;break;
 
+	case rtmidi::message_type:: CONTROL_CHANGE : bytetopullfrom = 1;break;
+	/*****************Messages to work on ***************
+	// Standard Message
+	case rtmidi::message_type:: POLY_PRESSURE : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: PROGRAM_CHANGE : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: AFTERTOUCH : bytetopullfrom = 0;break;
+
+	// System Common Messages
+	case rtmidi::message_type:: SYSTEM_EXCLUSIVE : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: TIME_CODE : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: SONG_POS_POINTER : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: SONG_SELECT : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: RESERVED1 : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: RESERVED2 : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: TUNE_REQUEST : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: EOX : bytetopullfrom = 0;break;
+
+	// System Realtime Messages
+	case rtmidi::message_type:: TIME_CLOCK : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: RESERVED3 : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: START : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: CONTINUE : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: STOP : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: RESERVED4 : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: ACTIVE_SENSING : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: SYSTEM_RESET : bytetopullfrom = 0;break;
+	****************************************************/
+
+	}
+	auto ret = mess.bytes.at(bytetopullfrom);
+		
+		return mess[bytetopullfrom];
+
+}
+int Utils::get_midi_value(rtmidi::message mess) {
+	int bytetopullfrom;
+	 switch (mess.get_message_type()){
+		 	case rtmidi::message_type::INVALID:break;
+
+		case rtmidi::message_type:: PITCH_BEND : bytetopullfrom = 1;break;
+  		case rtmidi::message_type:: CONTROL_CHANGE : bytetopullfrom = 2;break;
+		
+		case rtmidi::message_type:: NOTE_OFF : bytetopullfrom = 2;break;
+		case rtmidi::message_type:: NOTE_ON : bytetopullfrom = 2;break;
+	
+		/*****************Messages to work on ***************
+		// Standard Message
+		case rtmidi::message_type:: POLY_PRESSURE : bytetopullfrom = 0;break;
+	
+		case rtmidi::message_type:: PROGRAM_CHANGE : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: AFTERTOUCH : bytetopullfrom = 0;break;
+	
+		// System Common Messages
+		case rtmidi::message_type:: SYSTEM_EXCLUSIVE : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: TIME_CODE : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: SONG_POS_POINTER : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: SONG_SELECT : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: RESERVED1 : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: RESERVED2 : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: TUNE_REQUEST : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: EOX : bytetopullfrom = 0;break;
+
+		// System Realtime Messages
+		case rtmidi::message_type:: TIME_CLOCK : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: RESERVED3 : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: START : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: CONTINUE : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: STOP : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: RESERVED4 : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: ACTIVE_SENSING : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: SYSTEM_RESET : bytetopullfrom = 0;break;
+  			*/
+			}
+	auto ret = mess.bytes.at(bytetopullfrom);	
+	return mess[bytetopullfrom];
+
+}
+
+std::string Utils::mtype_to_string(rtmidi::message_type mess) {
+	switch (mess){
+	 case rtmidi::message_type:: INVALID : return "INVALID"; 
+	// Standard Message
+	case rtmidi::message_type:: NOTE_OFF : return "note_off"; 
+	case rtmidi::message_type:: NOTE_ON : return "note_on"; 
+	case rtmidi::message_type:: POLY_PRESSURE : return "POLY_PRESSURE";
+	case rtmidi::message_type:: CONTROL_CHANGE : return "control_change";
+	case rtmidi::message_type:: PROGRAM_CHANGE : return "PROGRAM_CHANGE"; 
+	case rtmidi::message_type:: AFTERTOUCH : return "AFTERTOUCH"; 
+	case rtmidi::message_type:: PITCH_BEND : return "PITCH_BEND"; 
+ 
+	// System Common Messages
+	case rtmidi::message_type:: SYSTEM_EXCLUSIVE : return "SYSTEM_EXCLUSIVE"; 
+	case rtmidi::message_type:: TIME_CODE : return "TIME_CODE"; 
+	case rtmidi::message_type:: SONG_POS_POINTER : return "SONG_POS_POINTER";
+	case rtmidi::message_type:: SONG_SELECT : return "SONG_SELECT";
+	case rtmidi::message_type:: RESERVED1 : return "RESERVED1"; 
+	case rtmidi::message_type:: RESERVED2 : return "RESERVED2"; 
+	case rtmidi::message_type:: TUNE_REQUEST : return "TUNE_REQUEST"; 
+	case rtmidi::message_type:: EOX : return "EOX"; 
+  
+	// System Realtime Messages
+	case rtmidi::message_type:: TIME_CLOCK : return "TIME_CLOCK";
+	case rtmidi::message_type:: RESERVED3 : return "RESERVED3"; 
+	case rtmidi::message_type:: START : return "START";
+	case rtmidi::message_type:: CONTINUE : return "CONTINUE"; 
+	case rtmidi::message_type:: STOP : return "STOP"; 
+	case rtmidi::message_type:: RESERVED4 : return "RESERVED4"; 
+	case rtmidi::message_type:: ACTIVE_SENSING : return "ACTIVE_SENSING"; 
+	case rtmidi::message_type:: SYSTEM_RESET : return "SYSTEM_RESET"; 
+  	}
+
+}
 
 std::string Utils::getMidiMessageType(int in)
 {
@@ -71,7 +190,7 @@ std::string Utils::getMidiMessageType(int in)
 	}  else
 		return "";
 
-	/*	
+	/* Future Message types to be worked on	
 	if (inrange(128, 143, in)) {
 		return "note_off";
 	} else if (inrange(144, 159, in)) {

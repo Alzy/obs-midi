@@ -2,7 +2,6 @@
 #include <obs.hpp>
 #include <memory>
 #include <QObject>
-#include "router.h"
 void ___source_dummy_addref(obs_source_t *);
 void ___sceneitem_dummy_addref(obs_sceneitem_t *);
 void ___data_dummy_addref(obs_data_t *);
@@ -32,7 +31,6 @@ using OBSDataItemAutoRelease =
 
 class Config;
 class DeviceManager;
-__declspec(selectany) Router *midiobsrouter = new Router;
 typedef std::shared_ptr<Config> ConfigPtr;
 typedef std::shared_ptr<DeviceManager> DeviceManagerPtr;
 

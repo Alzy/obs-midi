@@ -67,6 +67,7 @@ void SettingsDialog::SetAvailableDevices(std::vector<std::string> &midiDevices)
 
 	if (midiDevices.size() == 0){
 		this->ui->list_midi_dev->addItem("No Devices Available");
+		this->ui->check_enabled->setEnabled(false);
 		return;
 	}
 

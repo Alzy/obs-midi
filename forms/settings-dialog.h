@@ -22,7 +22,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "configwindow.h"
 #include "midi-agent.h"
 
-class ConfigWindow;
+
 
 
 class SettingsDialog : public QDialog
@@ -43,9 +43,11 @@ public:
 
 private Q_SLOTS:
 	void FormAccepted();
+	
 
 private:
 	Ui::SettingsDialog* ui;
-	ConfigWindow *cwin;
+	
+	Ui::ConfigWindow* cwin;
 	bool hidedebugitems = true;
 };

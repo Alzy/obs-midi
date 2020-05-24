@@ -1057,7 +1057,6 @@ vector <const char*> Utils::GetVideoSourceNames()
 			sn.push_back(
 				obs_source_get_name(source)
 			);
-			obs_source_release(source);
 		}
 
 		return true;
@@ -1081,7 +1080,7 @@ vector <const char*> Utils::GetAudioSourceNames()
 				obs_source_get_name(source)
 				
 			);
-			obs_source_release(source);
+			
 		}
 		return true;
 	}, static_cast <void *> (&sourceNames));

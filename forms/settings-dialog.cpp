@@ -67,6 +67,7 @@ void SettingsDialog::SetAvailableDevices(std::vector<std::string> &midiDevices)
 
 	if (midiDevices.size() == 0){
 		this->ui->list_midi_dev->addItem("No Devices Available");
+		this->ui->check_enabled->setEnabled(false);
 		return;
 	}
 
@@ -102,18 +103,20 @@ void SettingsDialog::on_btn_configure_clicked()
 	
 	pushDebugMidiMessage("time", "button clicked", 0, 0);
 	blog(LOG_INFO, "Configure button clicked");
-	string devicename =
-		ui->list_midi_dev->currentItem()->text().toStdString();
+	string devicename =ui->list_midi_dev->currentItem()->text().toStdString();
 
 	ConfigWindow *cwin = new ConfigWindow(devicename);
+	blog(LOG_INFO, "new config window created");
+
 	cwin->devicename = devicename;
+	blog(LOG_INFO, "Device Name set");
 
-
-	//setVisible(false);
-	//hide();
 	cwin->exec();
+	blog(LOG_INFO, "execute config window");
+
 	
 }
+
 
 int SettingsDialog::on_check_enabled_stateChanged(bool state)
 {

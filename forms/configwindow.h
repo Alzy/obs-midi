@@ -31,7 +31,7 @@ class ConfigWindow : public QDialog{
 	public:
 		explicit ConfigWindow(std::string devicename);
 		~ConfigWindow();
-		void on_btn_back_clicked();
+		
 		void ToggleShowHide();
 		
 		//MakeCombos
@@ -45,8 +45,9 @@ class ConfigWindow : public QDialog{
 		std::string devicename;
 		
 
-	private slots:
-		void load();
+
+	public slots:
+		void btn_back_clicked();
 		void deleterow();
 		void setDirty() { setWindowModified(true); }
 		void domessage(QString name, QString mtype, int mchan);
@@ -61,10 +62,11 @@ class ConfigWindow : public QDialog{
 		void chooseAtype(QString index);
 		void clearTable();
 	private:
+		Ui::ConfigWindow* ui;
 		bool dirty;
 		QStringList ScenesList ;
 		QStringList VolumeList;
-		bool clearpressed;
+		bool clearpressed=false;
 		QStringList ButtonAList = {"Set Current Scene",
 					    "Set Preview Scene",
 					    "Toggle Mute",
@@ -87,7 +89,6 @@ class ConfigWindow : public QDialog{
 		QStringListModel *options1model;
 		QStringListModel *options2model;
 		QStringListModel *options3model;
-		Ui::ConfigWindow ui;
 
 		/*******These are Actions that need to be built. Most involve adding new pull calls from OBS*****************/
 

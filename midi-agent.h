@@ -34,7 +34,7 @@ using namespace std;
 class MidiHook {
 public:
 	string type;
-	int index;
+	int index=0;
 	string action;
 	string command;
 	string param1;

@@ -194,7 +194,7 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 	//Eventually add channel to this check.
 	
 	for (unsigned i = 0; i < self->midiHooks.size(); i++) {
-		if (self->midiHooks.at(i)->type == mType && self->midiHooks.at(i)->index == norc && self->midiHooks.at(i)->channel == mchannel) {
+		if (self->midiHooks.at(i)->type == mType && self->midiHooks.at(i)->index == norc && self->midiHooks.at(i)->mchan == mchannel) {
 			self->TriggerInputCommand(self->midiHooks.at(i), value);
 			
 		}

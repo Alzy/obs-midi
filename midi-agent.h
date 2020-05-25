@@ -36,14 +36,14 @@ public:
 	string type;
 	int index;
 	bool bidirectional;
-	int channel;
+	int mchan; //midi channel
 	string action;
 	string command;
 	string param1;
 	string param2;
 	string param3;
 	MidiHook(){};
-	MidiHook(string midiMessageType, int midiChannelIndex, int channel, bool bidirectional, string OBSCommand, string p1 = "", string p2 = "", string p3 = "", string actionType = "") :
+	MidiHook(string midiMessageType, int midiChannelIndex, int mchan, bool bidirectional, string OBSCommand, string p1 = "", string p2 = "", string p3 = "", string actionType = "") :
 		type(midiMessageType), index(midiChannelIndex), command(OBSCommand), param1(p1), param2(p2), param3(p3), action(actionType)
 	{
 		// if action not provided, default to button or fader depending on command
@@ -56,7 +56,7 @@ public:
 		obs_data_t* data = obs_data_create_from_json(jsonString);
 		type = obs_data_get_string(data, "type");
 		index = obs_data_get_int(data, "index");
-		channel = obs_data_get_int(data, "channel");
+		mchan = obs_data_get_int(data, "mchan");
 		bidirectional = obs_data_get_bool(data, "bidirectional");
 		action = obs_data_get_string(data, "action");
 		command = obs_data_get_string(data, "command");
@@ -69,7 +69,7 @@ public:
 		obs_data_t* data = obs_data_create();
 		obs_data_set_string(data, "type", type.c_str());
 		obs_data_set_int(data, "index", index);
-		obs_data_set_int(data, "channel", channel);
+		obs_data_set_int(data, "mchan", mchan);
 		obs_data_set_bool(data, "bidirectional", bidirectional);
 		obs_data_set_string(data, "action", action.c_str());
 		obs_data_set_string(data, "command", command.c_str());

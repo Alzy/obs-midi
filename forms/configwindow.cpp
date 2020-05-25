@@ -36,7 +36,7 @@ ConfigWindow::ConfigWindow(std::string devn) : ui(new Ui::ConfigWindow)
 	
 		for (int i = 0; i < hooks.size(); i++) {
 			int rc = ui->tableWidget->rowCount();
-			AddRowFromHooks(rc, hooks.at(i)->type, hooks.at(i)->channel, hooks.at(i)->index, hooks.at(i)->bidirectional, hooks.at(i)->action, hooks.at(i)->command, hooks.at(i)->param1, hooks.at(i)->param2, hooks.at(i)->param3);
+			AddRowFromHooks(rc, hooks.at(i)->type, hooks.at(i)->mchan, hooks.at(i)->index, hooks.at(i)->bidirectional, hooks.at(i)->action, hooks.at(i)->command, hooks.at(i)->param1, hooks.at(i)->param2, hooks.at(i)->param3);
 		}
 	}
 	
@@ -195,7 +195,7 @@ void ConfigWindow::save() {
 		MidiHook *mh = new MidiHook;
 		//map values
 		mh->type = ui->tableWidget->item(i, 0)->text().toStdString();
-		mh->channel =ui->tableWidget->item(i, 1)->text().toInt();
+		mh->mchan =ui->tableWidget->item(i, 1)->text().toInt();
 		mh->index =ui->tableWidget->item(i, 2)->text().toInt();	
 		mh->bidirectional = QVariant(ui->tableWidget->item(i, 3)->text()).toBool();
 		mh->action = ui->tableWidget->item(i, 4)->text().toStdString();

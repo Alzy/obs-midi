@@ -29,7 +29,7 @@ class QAbstractItemView;
 class ConfigWindow : public QDialog{
 		Q_OBJECT
 	public:
-		explicit ConfigWindow(std::string devicename);
+		explicit ConfigWindow(QString devicename);
 		~ConfigWindow();
 		
 		void ToggleShowHide();

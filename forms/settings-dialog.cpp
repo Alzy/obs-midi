@@ -39,8 +39,7 @@ SettingsDialog::SettingsDialog(QWidget *parent):QDialog(parent, Qt::Dialog),ui(n
 	connect(ui->list_midi_dev, &QListWidget::itemSelectionChanged, this, &SettingsDialog::on_item_select);
 	connect(ui->check_enabled, &QCheckBox::stateChanged, this, &SettingsDialog::on_check_enabled_stateChanged);
 	connect(ui->btn_configure, &QPushButton::clicked, this,&SettingsDialog::on_btn_configure_clicked);
-	connect(ui->check_enabled, &QCheckBox::toggled, this, &SettingsDialog::on_check_clicked);
-	connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::FormAccepted);
+	
 	//hide debug items 
 	ui->lbl_debug->setHidden(hidedebugitems);
 	ui->tbl_debug->setHidden(hidedebugitems);
@@ -49,12 +48,11 @@ SettingsDialog::SettingsDialog(QWidget *parent):QDialog(parent, Qt::Dialog),ui(n
 
 
 void SettingsDialog::ToggleShowHide() {
-	auto dm = GetDeviceManager();
+	
 	if (!isVisible()) {
 
 		setVisible(true);
-		auto devNames = dm->GetPortsList();
-		SetAvailableDevices(devNames);
+		SetAvailableDevices();
 	}
 
 	else {
@@ -66,59 +64,38 @@ void SettingsDialog::ToggleShowHide() {
 void SettingsDialog::setCheck(bool x)
 {
 	this->ui->check_enabled->setChecked(x);
-	ui->btn_configure->setEnabled(x);
+	this->ui->btn_configure->setEnabled(x);
 }
 
-void SettingsDialog::SetAvailableDevices(std::vector<std::string> &midiDevices)
+void SettingsDialog::SetAvailableDevices()
 {
+	auto midiDevices = GetDeviceManager()->GetPortsList();
 	this->ui->list_midi_dev->clear();
 
 	if (midiDevices.size() == 0){
 		this->ui->list_midi_dev->addItem("No Devices Available");
 		this->ui->check_enabled->setEnabled(false);
+		this->ui->btn_configure->setEnabled(false);
 		return;
 	}
 
 	for (int i = 0; i < midiDevices.size(); i++) {
 		this->ui->list_midi_dev->addItem(midiDevices.at(i).c_str());
-		std::string name = midiDevices.at(i);
 	}
 	this->ui->list_midi_dev->setCurrentRow(0);
 }
-void SettingsDialog::on_check_clicked(bool enabled) {
-	if (enabled) {
-		pushDebugMidiMessage("time", "check", 0, 0);
-	} else {
-		pushDebugMidiMessage("time", "check", 1, 0);
-	}
-	
-}
 
 
-void SettingsDialog::pushDebugMidiMessage(std::string time, std::string message, int control, int value)
-{
-	int rowCount = this->ui->tbl_debug->rowCount();
-	this->ui->tbl_debug->insertRow(rowCount);
-	this->ui->tbl_debug->setItem(rowCount , 0, new QTableWidgetItem (tr(time.c_str())));
-	this->ui->tbl_debug->setItem(rowCount , 1, new QTableWidgetItem(tr(message.c_str())));
-	this->ui->tbl_debug->setItem(rowCount , 2, new QTableWidgetItem(tr(std::to_string(control).c_str())));
-	this->ui->tbl_debug->setItem(rowCount , 3, new QTableWidgetItem(tr(std::to_string(value).c_str())));
-}
+
+
 
 
 void SettingsDialog::on_btn_configure_clicked()
 {
-	
-	pushDebugMidiMessage("time", "button clicked", 0, 0);
+
 	blog(LOG_INFO, "Configure button clicked");
-	string devicename =ui->list_midi_dev->currentItem()->text().toStdString();
-
-	ConfigWindow *cwin = new ConfigWindow(devicename);
+	ConfigWindow *cwin = new ConfigWindow(ui->list_midi_dev->currentItem()->text());
 	blog(LOG_INFO, "new config window created");
-
-	cwin->devicename = devicename;
-	blog(LOG_INFO, "Device Name set");
-
 	cwin->exec();
 	blog(LOG_INFO, "execute config window");
 
@@ -128,16 +105,15 @@ void SettingsDialog::on_btn_configure_clicked()
 
 int SettingsDialog::on_check_enabled_stateChanged(bool state)
 {
-	auto deviceManager = GetDeviceManager();
-	string selectedDeviceName = ui->list_midi_dev->currentItem()->text().toStdString();
+	auto selectedDeviceName = ui->list_midi_dev->currentItem()->text().toStdString();
 
-	auto device = deviceManager->GetMidiDeviceByName(selectedDeviceName.c_str());
+	auto device = GetDeviceManager()->GetMidiDeviceByName(selectedDeviceName.c_str());
 	if (state == true) {
 		blog(LOG_INFO, "Item enabled: %s", selectedDeviceName.c_str());
-		int devicePort = deviceManager->GetPortNumberByDeviceName(selectedDeviceName.c_str());
+		int devicePort = GetDeviceManager()->GetPortNumberByDeviceName(selectedDeviceName.c_str());
 		if (device == NULL)
 		{
-			deviceManager->RegisterMidiDevice(devicePort);
+			GetDeviceManager()->RegisterMidiDevice(devicePort);
 		}
 		else
 		{
@@ -151,26 +127,15 @@ int SettingsDialog::on_check_enabled_stateChanged(bool state)
 		}
 		blog(LOG_INFO, "Item disabled: %s", selectedDeviceName.c_str());
 	}
-
-	pushDebugMidiMessage("time", "Check State", state, 0);
 	ui->btn_configure->setEnabled(state);
-
-	auto config = GetConfig();
-	config->Save();
-
+	GetConfig()->Save();
 	return state;
 }
 
 void SettingsDialog::on_item_select()
 {
-	QString current = this->ui->list_midi_dev->currentItem()->text();
-	blog(LOG_INFO, "item clicked: %s", current.toLocal8Bit().data());
-	pushDebugMidiMessage("item clicked",current.toLocal8Bit().data(), 0, 0);
-
 	// Pull info on if device is enabled, if so set true if not set false
-	auto deviceManager = GetDeviceManager();
-	string selectedDeviceName = current.toStdString();
-	auto device = deviceManager->GetMidiDeviceByName(selectedDeviceName.c_str());
+	auto device = GetDeviceManager()->GetMidiDeviceByName(this->ui->list_midi_dev->currentItem()->text().toStdString().c_str());
 	if (device != NULL && device->isEnabled())
 	{
 		ui->check_enabled->setChecked(true);
@@ -184,16 +149,11 @@ void SettingsDialog::on_item_select()
 
 	}
 
-	//If enabled, enable configuration button, if not disable it.
-ui->btn_configure->setEnabled(ui->check_enabled->isChecked());
+
 	
 }
 
 
-void SettingsDialog::FormAccepted()
-{
-	return;
-}
 
 
 SettingsDialog::~SettingsDialog() {

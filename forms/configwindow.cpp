@@ -11,9 +11,9 @@
 #include "device-manager.h"
 #include "midi-agent.h"
 
-ConfigWindow::ConfigWindow(std::string devn) : ui(new Ui::ConfigWindow)
+ConfigWindow::ConfigWindow(QString devn) : ui(new Ui::ConfigWindow)
 {
-	devicename = devn;
+	devicename = devn.toStdString();
 	//Setup the UI
 	ui->setupUi(this);
 	

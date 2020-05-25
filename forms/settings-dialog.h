@@ -33,15 +33,12 @@ public:
 	SettingsDialog(QWidget* parent);
 	~SettingsDialog();
 	void setCheck(bool check);
-	void SetAvailableDevices(std::vector<std::string> &midiDevices);
-        void pushDebugMidiMessage(std::string time, std::string message, int control, int value);
-	void on_check_clicked(bool enabled);
+	void SetAvailableDevices();
 	void on_btn_configure_clicked();
 	int on_check_enabled_stateChanged(bool state);
 	void on_item_select();
 
 private Q_SLOTS:
-	void FormAccepted();
 	void ToggleShowHide();
 
 

@@ -24,6 +24,7 @@ DeviceManager::DeviceManager()
 
 DeviceManager::~DeviceManager()
 {
+	rtMidi->~midi_in();
 }
 
 /* Load the Device Manager from saved Config Store data.

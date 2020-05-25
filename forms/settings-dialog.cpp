@@ -49,10 +49,18 @@ SettingsDialog::SettingsDialog(QWidget *parent):QDialog(parent, Qt::Dialog),ui(n
 
 
 void SettingsDialog::ToggleShowHide() {
-	if (!isVisible())
+	auto dm = GetDeviceManager();
+	if (!isVisible()) {
+
 		setVisible(true);
-	else
+		auto devNames = dm->GetPortsList();
+		SetAvailableDevices(devNames);
+	}
+
+	else {
 		setVisible(false);
+	}
+		
 }
 
 void SettingsDialog::setCheck(bool x)

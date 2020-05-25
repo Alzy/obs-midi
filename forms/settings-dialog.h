@@ -32,7 +32,6 @@ class SettingsDialog : public QDialog
 public:
 	SettingsDialog(QWidget* parent);
 	~SettingsDialog();
-	void ToggleShowHide();
 	void setCheck(bool check);
 	void SetAvailableDevices(std::vector<std::string> &midiDevices);
         void pushDebugMidiMessage(std::string time, std::string message, int control, int value);
@@ -43,7 +42,8 @@ public:
 
 private Q_SLOTS:
 	void FormAccepted();
-	
+	void ToggleShowHide();
+
 
 private:
 	Ui::SettingsDialog* ui;

@@ -35,12 +35,12 @@ class ConfigWindow : public QDialog{
 		void ToggleShowHide();
 		
 		//MakeCombos
-		void AddRowFromHooks(int row, std::string mtype, int mindex, bool bid,
+		void AddRowFromHooks(int row, std::string mtype, int channel, int mindex, bool bid,
 					std::string atype, std::string action,
 					std::string option1, std::string option2,
 					std::string option3);
 		bool inrow(int x);
-		bool inrow(int x, QString mtype);
+		bool inrow(int x, QString mtype, int channel);
 		//variables
 		std::string devicename;
 		
@@ -50,8 +50,8 @@ class ConfigWindow : public QDialog{
 		void btn_back_clicked();
 		void deleterow();
 		void setDirty() { setWindowModified(true); }
-		void domessage(QString name, QString mtype, int mchan);
-		void insertRow(QString mtype, int mindex);
+		void domessage(QString name, QString mtype, int mchan, int channel);
+		void insertRow(QString mtype, int mindex, int channel);
 		void select(int row, int col);
 		void sendToTable();
 		void save();

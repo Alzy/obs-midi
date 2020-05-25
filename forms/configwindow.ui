@@ -26,8 +26,66 @@
    <string>OBS MIDI Configuration - </string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QTableWidget" name="tableWidget">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+       <horstretch>3</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <column>
+      <property name="text">
+       <string>MessageType</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Channel</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Note or control</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Bidirectional</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Action Type</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Action</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Option 1</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Option 2</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Option 3</string>
+      </property>
+     </column>
+    </widget>
+   </item>
    <item row="0" column="1">
-    <widget class="QSplitter" name="splitter_3">
+    <widget class="QSplitter" name="splitter_2">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
@@ -53,6 +111,12 @@
        <bool>true</bool>
       </property>
      </widget>
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>Channel</string>
+      </property>
+     </widget>
+     <widget class="QLCDNumber" name="channel"/>
      <widget class="QLabel" name="label">
       <property name="sizePolicy">
        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
@@ -61,7 +125,7 @@
        </sizepolicy>
       </property>
       <property name="text">
-       <string>Message Channel</string>
+       <string>Note or Control</string>
       </property>
      </widget>
      <widget class="QLCDNumber" name="num_mchan">
@@ -277,59 +341,6 @@
        <string>Save</string>
       </property>
      </widget>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QTableWidget" name="tableWidget">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-       <horstretch>3</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
-     </property>
-     <column>
-      <property name="text">
-       <string>MessageType</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Message Channel</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Bidirectional</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Action Type</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Action</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Option 1</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Option 2</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Option 3</string>
-      </property>
-     </column>
     </widget>
    </item>
   </layout>

@@ -31,7 +31,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <qdialogbuttonbox.h>
 #include <qcheckbox.h>
 
-#define CHANGE_ME "changeme"
+
 
 SettingsDialog::SettingsDialog(QWidget *parent):QDialog(parent, Qt::Dialog),ui(new Ui::SettingsDialog)
 {

@@ -125,6 +125,8 @@ void MidiAgent::Load(obs_data_t * data)
 		MidiHook* mh = new MidiHook(
 			obs_data_get_string(hookData, "type"),
 			obs_data_get_int(hookData, "index"),
+			obs_data_get_int(hookData, "channel"),
+			obs_data_get_bool(hookData, "bidirectional"),
 			obs_data_get_string(hookData, "command"),
 			obs_data_get_string(hookData, "param1"),
 			obs_data_get_string(hookData, "param2"),
@@ -135,9 +137,9 @@ void MidiAgent::Load(obs_data_t * data)
 	}
 
 }
-void MidiAgent::SendMessage(std::string name, std::string mType, int mIndex) {
+void MidiAgent::SendMessage(std::string name, std::string mType, int mIndex, int channel) {
 
-	emit this->SendNewUnknownMessage(QString::fromStdString(name), QString::fromStdString(mType), mIndex);
+	emit this->SendNewUnknownMessage(QString::fromStdString(name), QString::fromStdString(mType), mIndex, channel);
 	
 }
 
@@ -185,14 +187,14 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 	auto value = Utils::get_midi_value(message);
 	
 	/***** Send Messages to emit function *****/
-	self->SendMessage(self->name, mType, norc);
+	self->SendMessage(self->name, mType, norc, mchannel);
 
 	
 	/** check if hook exists for this note or cc index and launch it **/
 	//Eventually add channel to this check.
 	
 	for (unsigned i = 0; i < self->midiHooks.size(); i++) {
-		if (self->midiHooks.at(i)->type == mType && self->midiHooks.at(i)->index == norc) {
+		if (self->midiHooks.at(i)->type == mType && self->midiHooks.at(i)->index == norc && self->midiHooks.at(i)->channel == mchannel) {
 			self->TriggerInputCommand(self->midiHooks.at(i), value);
 			
 		}

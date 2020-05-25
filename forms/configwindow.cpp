@@ -152,7 +152,7 @@ void  ConfigWindow::insertRow(QString mtype,int mindex, int channel)
 	newItem->setText(mtype); //Message Type
 	newItem1->setText(QString::number(channel)); //message channel
 	newItem2->setText(QString::number(mindex));   //message channel
-	newItem3->setText(false); //Bidirectional
+	newItem3->setText("false"); //Bidirectional
 	
 	if (mtype == "control_change") {
 		newItem4->setText("Fader"); //Action Type

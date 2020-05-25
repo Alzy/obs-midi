@@ -101,6 +101,7 @@ MidiAgent::MidiAgent()
 {
 	name = "Midi Device (uninit)";
 	midiin = new rtmidi::midi_in();
+	midiout = new rtmidi::midi_out();
 	midiin->set_callback([this](const auto &message) { HandleInput(message, this); });
 }
 
@@ -108,6 +109,7 @@ MidiAgent::~MidiAgent()
 {
 	ClosePort();
 	delete midiin;
+	delete midiout;
 }
 
 /* Loads information from OBS data. (recalled from Config)
@@ -143,11 +145,12 @@ void MidiAgent::SendMessage(std::string name, std::string mType, int mIndex, int
 	
 }
 
-	/* Will open the port and enable this MidiAgent
+/* Will open the port and enable this MidiAgent
 */
 void MidiAgent::OpenPort(int port)
 {
 	midiin->open_port(port);
+	midiout->open_port(port);
 	name = midiin->get_port_name(port);
 	enabled = true;
 	connected = true;
@@ -159,6 +162,7 @@ void MidiAgent::OpenPort(int port)
 void MidiAgent::ClosePort()
 {
 	midiin->close_port();
+	midiout->close_port();
 	enabled = false;
 	connected = false;
 }
@@ -199,8 +203,6 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 			
 		}
 	}
-	
-	
 }
 
 /* Triggers funcMap function. Called from HandleInput callback

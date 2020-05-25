@@ -39,10 +39,7 @@ SettingsDialog::SettingsDialog(QWidget *parent):QDialog(parent, Qt::Dialog),ui(n
 	connect(ui->list_midi_dev, &QListWidget::itemSelectionChanged, this, &SettingsDialog::on_item_select);
 	connect(ui->check_enabled, &QCheckBox::stateChanged, this, &SettingsDialog::on_check_enabled_stateChanged);
 	connect(ui->btn_configure, &QPushButton::clicked, this,&SettingsDialog::on_btn_configure_clicked);
-	
-	//hide debug items 
-	ui->lbl_debug->setHidden(hidedebugitems);
-	ui->tbl_debug->setHidden(hidedebugitems);
+
 	this->ui->list_midi_dev->setCurrentRow(0);
 }
 

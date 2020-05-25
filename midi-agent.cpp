@@ -125,7 +125,7 @@ void MidiAgent::Load(obs_data_t * data)
 		MidiHook* mh = new MidiHook(
 			obs_data_get_string(hookData, "type"),
 			obs_data_get_int(hookData, "index"),
-			obs_data_get_int(hookData, "channel"),
+			obs_data_get_int(hookData, "mchan"),
 			obs_data_get_bool(hookData, "bidirectional"),
 			obs_data_get_string(hookData, "command"),
 			obs_data_get_string(hookData, "param1"),

@@ -43,7 +43,7 @@ public:
 	string param2;
 	string param3;
 	MidiHook(){};
-	MidiHook(string midiMessageType, int midiChannelIndex, int midiChannel, bool bidirectional, string OBSCommand, string p1 = "", string p2 = "", string p3 = "", string actionType = "") :
+	MidiHook(string midiMessageType, int midiChannelIndex, int midiChannel, bool bidirectionals, string OBSCommand, string p1 = "", string p2 = "", string p3 = "", string actionType = "") :
 		type(midiMessageType), index(midiChannelIndex), mchan(midiChannel), command(OBSCommand), param1(p1), param2(p2), param3(p3), action(actionType)
 	{
 		// if action not provided, default to button or fader depending on command

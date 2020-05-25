@@ -20,11 +20,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 DeviceManager::DeviceManager()
 {
 	rtMidi = new rtmidi::midi_in();
+	MO = new rtmidi::midi_out();
 }
 
 DeviceManager::~DeviceManager()
 {
 	rtMidi->~midi_in();
+	MO->~midi_out();
 }
 
 /* Load the Device Manager from saved Config Store data.
@@ -140,3 +142,20 @@ obs_data_t* DeviceManager::GetData()
 	return data;
 }
 
+void DeviceManager::SendMidi(QString mtype, int channel, int norc, int value)
+
+{
+	rtmidi::message hello = new rtmidi::message();
+	if (mtype == "control_change"){
+		hello.control_change(channel, norc, value);
+	} else if (mtype == "note_on") {
+		hello.note_on(channel, norc, value);
+	} else if (mtype == "note_off") {
+		hello.note_off(channel, norc, value);
+	}
+	if (hello.size() != 0) {
+		MO->send_message(hello);
+	}
+	//***Need to add message Deletion here***//
+
+}

@@ -47,7 +47,6 @@ namespace Utils {
 	obs_data_array_t* StringListToArray(char** strings, const char* key);
 	obs_data_array_t* GetSceneItems(obs_source_t* source);
 	obs_data_t* GetSceneItemData(obs_sceneitem_t* item);
-
 	// These functions support nested lookup into groups
 	obs_sceneitem_t* GetSceneItemFromName(obs_scene_t* scene, QString name);
 	obs_sceneitem_t* GetSceneItemFromId(obs_scene_t* scene, int64_t id);

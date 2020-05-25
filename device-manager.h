@@ -41,10 +41,13 @@ class DeviceManager {
 		vector <MidiHook *> GetMidiHooksByDeviceName(const char* deviceName);
 
 		void RegisterMidiDevice(int port);
-
+		void SendMidi(QString mtype, int channel, int norc,
+			      int value);
 		obs_data_t* GetData();
 	
 	private:
 		rtmidi::midi_in *rtMidi;
+		rtmidi::midi_out *MO;
+
 		vector<MidiAgent*> midiAgents;
 };

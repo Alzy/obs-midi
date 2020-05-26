@@ -292,7 +292,7 @@ void MidiAgent::NewObsEvent(QString eventType, QString eventData) {
 	if (eventType == QString("SourceVolumeChanged")) {
 		double vol = obs_data_get_double(data, "volume");
 
-		int newvol = Utils::mapper2(cbrt(vol));
+		uint8_t newvol = Utils::mapper2(cbrt(vol));
 		std::string source = obs_data_get_string(data, "sourceName");
 		blog(1, "OBS EVENT %s -- %s -- %f -- %i",
 		     eventType.toStdString().c_str(), source.c_str(),vol,  newvol);
@@ -301,9 +301,7 @@ void MidiAgent::NewObsEvent(QString eventType, QString eventData) {
 		//device->midiout->send_message()
 		
 		this->midiout->send_message(hello.control_change(1, 1, newvol));
-		this->midiout->send_message(hello.control_change(2, 1, newvol));
 		this->midiout->send_message(hello.control_change(1, 2, newvol));
-		this->midiout->send_message(hello.control_change(2, 2, newvol));
 	}
 	
 	//blog(1, "OBS EVENT %s -- %s", eventType.toStdString().c_str(),eventData.toStdString().c_str());

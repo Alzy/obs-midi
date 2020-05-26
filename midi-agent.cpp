@@ -190,7 +190,7 @@ void MidiAgent::ClosePort()
 
 
 string MidiAgent::GetName() { return name; }
-string MidiAgent::GetOutName(){ return outname; }
+string MidiAgent::GetOutName(){return outname;}
 
 int MidiAgent::GetPort() { return port; }
 bool MidiAgent::isEnabled() { return enabled; }

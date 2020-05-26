@@ -109,7 +109,7 @@ class MidiAgent: public QObject {
 		static void HandleInput(const rtmidi::message &message, void *userData);
 		void TriggerInputCommand(MidiHook *hook, int midiVal);
 		void SendMessage(std::string name, std::string mType, int mIndex, int channel);
-
+		string outname;
 		vector<MidiHook*> GetMidiHooks();
 		void AddMidiHook(MidiHook *hook);
 		void RemoveMidiHook(MidiHook *hook);
@@ -124,7 +124,7 @@ class MidiAgent: public QObject {
 		rtmidi::midi_in *midiin;
 		rtmidi::midi_out *midiout;
 		string name;
-		string outname;
+		
 
 		int port;
 		bool enabled;

@@ -37,7 +37,7 @@ public:
 	void on_btn_configure_clicked();
 	int on_check_enabled_stateChanged(bool state);
 	void on_item_select();
-
+	void selectOutput(int x);
 private Q_SLOTS:
 	void ToggleShowHide();
 

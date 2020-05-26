@@ -49,14 +49,14 @@ void DeviceManager::Load(obs_data_t* data)
 		if (device->isEnabled())
 		{
 			int portNumber = GetPortNumberByDeviceName(device->GetName().c_str());
-			int outport = GetOutPortNumberByDeviceName(device->GetOutName().c_str());
+			int outPort = GetOutPortNumberByDeviceName(device->GetOutName().c_str());
 			
 			if (portNumber != -1 )
 			{
 				device->OpenPort(portNumber);
 			}
-			if (outport != -1) {
-				device->OpenOutPort(outport);
+			if (outPort != -1) {
+				device->OpenOutPort(outPort);
 			}
 
 		}

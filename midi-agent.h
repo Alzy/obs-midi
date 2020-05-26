@@ -121,7 +121,7 @@ class MidiAgent: public QObject {
 		rtmidi::midi_out *midiout;
 		string name;
 		string outname;
-
+		bool sending;
 		int port;
 		bool enabled;
 		bool connected;

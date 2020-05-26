@@ -150,9 +150,8 @@ void MidiAgent::Load(obs_data_t * data)
 
 }
 void MidiAgent::SendMessage(std::string name, std::string mType, int mIndex, int channel) {
-
-	emit this->SendNewUnknownMessage(QString::fromStdString(name), QString::fromStdString(mType), mIndex, channel);
 	
+	emit this->SendNewUnknownMessage(QString::fromStdString(name), QString::fromStdString(mType), mIndex, channel);
 }
 
 /* Will open the port and enable this MidiAgent
@@ -221,7 +220,7 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 	auto byt = message.bytes;
 	auto norc = Utils::get_midi_note_or_control(message);
 	auto value = Utils::get_midi_value(message);
-	
+	self->sending = true;
 	/***** Send Messages to emit function *****/
 	self->SendMessage(self->name, mType, norc, mchannel);
 
@@ -304,30 +303,42 @@ obs_data_t* MidiAgent::GetData() {
 }
 /*Handle OBS events*/
 void MidiAgent::NewObsEvent(QString eventType, QString eventData) {
-	OBSDataAutoRelease data = obs_data_create_from_json(eventData.toStdString().c_str());
-	rtmidi::message* hello = new rtmidi::message();
-	
+	if (!this->sending) {
+
+		OBSDataAutoRelease data = obs_data_create_from_json(
+			eventData.toStdString().c_str());
+		rtmidi::message *hello = new rtmidi::message();
+
+		// ON EVENT TYPE Find matching hook, pull data from that hook, and do thing.
+
+		if (eventType == QString("SourceVolumeChanged")) {
+			double vol = obs_data_get_double(data, "volume");
+
+			uint8_t newvol = Utils::mapper2(cbrt(vol));
+			std::string source =
+				obs_data_get_string(data, "sourceName");
+			blog(1, "OBS EVENT %s -- %s -- %f -- %i",
+			     eventType.toStdString().c_str(), source.c_str(),
+			     vol, newvol);
+
+			//auto device = dm->GetMidiDeviceByName(this.name);
+			//device->midiout->send_message()
+
+			//this->midiout->send_message(hello->control_change(channel, (index/norc), newvol));
+			//sends to channel 1, control 1
+			this->midiout->send_message(
+				hello->control_change(1, 1, newvol));
+			//sends to channel 1, control 2
+			this->midiout->send_message(
+				hello->control_change(1, 2, newvol));
+		}
+
+		blog(1, "OBS EVENT- MidiAgent.cpp %s -- %s",
+		     eventType.toStdString().c_str(),
+		     eventData.toStdString().c_str());
 		
-	// ON EVENT TYPE Find matching hook, pull data from that hook, and do thing. 
-	
-	if (eventType == QString("SourceVolumeChanged")) {
-		double vol = obs_data_get_double(data, "volume");
-
-		uint8_t newvol = Utils::mapper2(cbrt(vol));
-		std::string source = obs_data_get_string(data, "sourceName");
-		blog(1, "OBS EVENT %s -- %s -- %f -- %i",
-		     eventType.toStdString().c_str(), source.c_str(),vol,  newvol);
-	
-		//auto device = dm->GetMidiDeviceByName(this.name);
-		//device->midiout->send_message()
-
-
-		//this->midiout->send_message(hello->control_change(channel, (index/norc), newvol));
-		//sends to channel 1, control 1
-		this->midiout->send_message(hello->control_change(1, 1, newvol));
-		//sends to channel 1, control 2
-		this->midiout->send_message(hello->control_change(1, 2, newvol));
+	} else {
+		this->sending = false;
 	}
 	
-	//blog(1, "OBS EVENT %s -- %s", eventType.toStdString().c_str(),eventData.toStdString().c_str());
 }

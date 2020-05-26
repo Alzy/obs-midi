@@ -94,20 +94,18 @@ class MidiAgent: public QObject {
 
 		void OpenPort(int inport);
 		void OpenOutPort(int outport);
-
 		void ClosePort();
 
 		string GetName();
 		string GetOutName();
-
+		void SetOutName(string oname);
 		int GetPort();
 		bool isEnabled();
 		bool isConnected();
 
 		static void HandleInput(const rtmidi::message &message, void *userData);
 		void TriggerInputCommand(MidiHook *hook, int midiVal);
-		void SendMessage(std::string name, std::string mType, int mIndex, int channel);
-		string outname;
+		void SendMessage(std::string names, std::string mType, int mIndex, int channel);
 		vector<MidiHook*> GetMidiHooks();
 		void AddMidiHook(MidiHook *hook);
 		void RemoveMidiHook(MidiHook *hook);
@@ -116,19 +114,17 @@ class MidiAgent: public QObject {
 	public slots:
 		void NewObsEvent(QString eventType, QString eventData);
 	signals:
-		void SendNewUnknownMessage(QString name, QString mtype, int msgindex, int channel);
+		void SendNewUnknownMessage(QString names, QString mtype, int msgindex, int channel);
 	private:
 		
 		rtmidi::midi_in *midiin;
 		rtmidi::midi_out *midiout;
 		string name;
-		
+		string outname;
 
 		int port;
 		bool enabled;
 		bool connected;
 		bool bidirectional;
 		vector<MidiHook*> midiHooks;
-		
-
 };

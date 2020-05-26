@@ -21,14 +21,20 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <obs-frontend-api/obs-frontend-api.h>
 #include <util/config-file.h>
 #include <QtCore/QString>
+#include <set>
+#include <QtCore/QObject>
+#include <QtCore/QMutex>
 #include <QtCore/QSharedPointer>
+#include <QtCore/QVariantHash>
+#include <QtCore/QThreadPool>
 #include <vector>
 #include "midi-agent.h"
-
+#include "rpc/RpcEvent.h"
 using namespace std;
 
-class DeviceManager {
-	public:
+class DeviceManager: public QObject {
+	Q_OBJECT
+public:
 		DeviceManager();
 		~DeviceManager();
 		void Load(obs_data_t* data);
@@ -44,7 +50,7 @@ class DeviceManager {
 		void SendMidi(QString mtype, int channel, int norc,
 			      int value);
 		obs_data_t* GetData();
-	
+		void broadcast(const RpcEvent &event);
 	private:
 		rtmidi::midi_in *rtMidi;
 		rtmidi::midi_out *MO;

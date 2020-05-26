@@ -28,7 +28,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <string>
 #include <iostream>
 #include "obs-controller.h"
-
+#include "rpc/RpcEvent.h"
 using namespace std;
 
 class MidiHook {
@@ -110,6 +110,8 @@ class MidiAgent: public QObject {
 		void RemoveMidiHook(MidiHook *hook);
 		void ClearMidiHooks();
 		obs_data_t* GetData();
+	public slots:
+		void NewObsEvent(RpcEvent event);
 	signals:
 		void SendNewUnknownMessage(QString name, QString mtype, int msgindex, int channel);
 	private:

@@ -27,15 +27,17 @@ void ___data_item_release(obs_data_item_t *);
 using OBSDataItemAutoRelease =
 	OBSRef<obs_data_item_t *, ___data_item_dummy_addref,
 	       ___data_item_release>;
-
-
+class events;
 class Config;
 class DeviceManager;
+
+typedef std::shared_ptr<events> eventsPtr;
 typedef std::shared_ptr<Config> ConfigPtr;
 typedef std::shared_ptr<DeviceManager> DeviceManagerPtr;
 
 ConfigPtr GetConfig();
 DeviceManagerPtr GetDeviceManager();
+eventsPtr GetEventsSystem();
 
 #define OBS_MIDI_VERSION "0.1"
 #define blog(level, msg, ...) blog(level, "[obs-midi] " msg, ##__VA_ARGS__)

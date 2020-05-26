@@ -80,6 +80,7 @@ set(obs-midi_SOURCES
 	forms/configwindow.cpp
         obs-midi.cpp
 	events.cpp
+	rpc/RpcEvent.cpp
 
 )
 
@@ -93,6 +94,7 @@ list(APPEND obs-midi_HEADERS
 	forms/configwindow.h
         obs-midi.h
 	events.h
+	rpc/RpcEvent.h
 
 )
 

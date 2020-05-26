@@ -103,6 +103,8 @@ MidiAgent::MidiAgent()
 	midiin = new rtmidi::midi_in();
 	midiout = new rtmidi::midi_out();
 	midiin->set_callback([this](const auto &message) { HandleInput(message, this); });
+	
+
 }
 
 MidiAgent::~MidiAgent()
@@ -136,6 +138,8 @@ void MidiAgent::Load(obs_data_t * data)
 			obs_data_get_string(hookData, "action")
 		);
 		AddMidiHook(mh);
+		
+		
 	}
 
 }
@@ -224,6 +228,7 @@ vector<MidiHook*> MidiAgent::GetMidiHooks()
 */
 void MidiAgent::AddMidiHook(MidiHook* hook)
 {
+
 	midiHooks.push_back(hook);
 }
 
@@ -261,4 +266,8 @@ obs_data_t* MidiAgent::GetData() {
 	}
 	obs_data_set_array(data, "hooks", arrayData);
 	return data;
+}
+/*Handle OBS events*/
+void MidiAgent::NewObsEvent(RpcEvent event) {
+
 }

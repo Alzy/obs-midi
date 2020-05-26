@@ -159,3 +159,7 @@ void DeviceManager::SendMidi(QString mtype, int channel, int norc, int value)
 	//***Need to add message Deletion here***//
 
 }
+void DeviceManager::broadcast(const RpcEvent& event)
+{
+	blog(1, "OBS EVENT ");
+};

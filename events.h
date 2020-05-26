@@ -20,22 +20,30 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #pragma once
 
 #include <obs.hpp>
-#include <obs-frontend-api.h>
+#include <obs-frontend-api/obs-frontend-api.h>
 #include <util/platform.h>
+#include "obs-midi.h"
+#include "device-manager.h"
 
 #include <QtWidgets/QListWidgetItem>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QTimer>
+#include "rpc/RpcEvent.h"
+#include <vector>
+#include <QObject>
+#include <functional>
+#include <map>
+#include <string>
+#include <iostream>
+//#include "WSServer.h"
 
-#include "WSServer.h"
-
-class WSEvents : public QObject
+class events : public QObject
 {
 Q_OBJECT
 
 public:
-	explicit WSEvents(WSServerPtr srv);
-	~WSEvents();
+	explicit events(DeviceManagerPtr srv);
+	~events();
 
 	void connectSourceSignals(obs_source_t* source);
 	void disconnectSourceSignals(obs_source_t* source);
@@ -57,18 +65,19 @@ public:
 	void OnBroadcastCustomMessage(QString realm, obs_data_t* data);
 
 	bool HeartbeatIsActive;
-
+signals:
+	void obsEvent(RpcEvent event);
 private slots:
 	void StreamStatus();
 	void Heartbeat();
 	void TransitionDurationChanged(int ms);
 
 private:
-	WSServerPtr _srv;
+	DeviceManagerPtr _srv;
 	QTimer streamStatusTimer;
 	QTimer heartbeatTimer;
 	os_cpu_usage_info_t* cpuUsageInfo;
-
+	
 	bool pulse;
 
 	uint64_t _streamStarttime;

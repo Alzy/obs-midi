@@ -81,13 +81,13 @@ vector <string> DeviceManager::GetPortsList()
 vector<string> DeviceManager::GetOutPortsList()
 {
 	opl.clear();
-	vector<string> ports;
+	vector<string> outports;
 	int portCount = MO->get_port_count();
 	for (int i = 0; i < portCount; i++) {
-		ports.push_back(MO->get_port_name(i));
+		outports.push_back(MO->get_port_name(i));
 		opl.append(QString::fromStdString(MO->get_port_name(i)));
 	}
-	return ports;
+	return outports;
 }
 QStringList DeviceManager::GetOPL() {
 	return opl;
@@ -106,17 +106,7 @@ int DeviceManager::GetPortNumberByDeviceName(const char* deviceName)
 		return -1;
 	}
 }
-/*	std::string dn = deviceName;
-	auto y = dn.size();
-	dn.resize(y - 2);
-	vector <string> portsList = GetPortsList();
-	auto it = find(portsList.begin(), portsList.end(), dn);
-	if (it != portsList.end()) {
-		return distance(portsList.begin(), it);
-	}
-	else {
-		return -1;
-	}*/
+
 /* Returns the port number of the specified device.
  * If the device isn't found (possibly due to being disconnected), returns -1
  */

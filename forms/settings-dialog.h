@@ -51,4 +51,6 @@ private:
 	Ui::ConfigWindow* cwin;
 	bool hidedebugitems = true;
 	bool loadingdevices=false;
+	QMetaObject::Connection desconnect; 
+	bool starting = true;
 };

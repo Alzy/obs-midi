@@ -26,8 +26,8 @@
 #include "events.h"
 
 #include "obs-midi.h"
-#include "Config.h"
-#include "Utils.h"
+#include "config.h"
+#include "utils.h"
 //#include "rpc/RpcEvent.h"
 
 #define STATUS_INTERVAL 2000

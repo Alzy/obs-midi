@@ -284,7 +284,7 @@ obs_data_t* MidiAgent::GetData() {
 /*Handle OBS events*/
 void MidiAgent::NewObsEvent(QString eventType, QString eventData) {
 	OBSDataAutoRelease data = obs_data_create_from_json(eventData.toStdString().c_str());
-	rtmidi::message hello = new rtmidi::message();
+	rtmidi::message* hello = new rtmidi::message();
 	
 		
 
@@ -300,8 +300,8 @@ void MidiAgent::NewObsEvent(QString eventType, QString eventData) {
 		//auto device = dm->GetMidiDeviceByName(this.name);
 		//device->midiout->send_message()
 		
-		this->midiout->send_message(hello.control_change(1, 1, newvol));
-		this->midiout->send_message(hello.control_change(1, 2, newvol));
+		this->midiout->send_message(hello->control_change(1, 1, newvol));
+		this->midiout->send_message(hello->control_change(1, 2, newvol));
 	}
 	
 	//blog(1, "OBS EVENT %s -- %s", eventType.toStdString().c_str(),eventData.toStdString().c_str());

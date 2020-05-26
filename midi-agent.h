@@ -111,18 +111,20 @@ class MidiAgent: public QObject {
 		void RemoveMidiHook(MidiHook *hook);
 		void ClearMidiHooks();
 		obs_data_t* GetData();
+		
 	public slots:
 		void NewObsEvent(QString eventType, QString eventData);
 	signals:
 		void SendNewUnknownMessage(QString names, QString mtype, int msgindex, int channel);
 	private:
-		
+		void send(string type, int channel, int norc, int value=0);
 		rtmidi::midi_in *midiin;
 		rtmidi::midi_out *midiout;
 		string name;
 		string outname;
 		bool sending;
 		int port;
+		int lastscenebtn;
 		bool enabled;
 		bool connected;
 		bool bidirectional;

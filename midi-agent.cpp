@@ -307,7 +307,11 @@ void MidiAgent::NewObsEvent(QString eventType, QString eventData) {
 
 		OBSDataAutoRelease data = obs_data_create_from_json(
 			eventData.toStdString().c_str());
-		rtmidi::message *hello = new rtmidi::message();
+
+		MidiAgent *self = static_cast<MidiAgent *>(this);
+		if (self->enabled == false || self->connected == false) {
+			return;
+		}
 
 		// ON EVENT TYPE Find matching hook, pull data from that hook, and do thing.
 
@@ -323,16 +327,41 @@ void MidiAgent::NewObsEvent(QString eventType, QString eventData) {
 
 			//auto device = dm->GetMidiDeviceByName(this.name);
 			//device->midiout->send_message()
+			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
+				if (self->midiHooks.at(i)->command ==
+					    "Set Volume" &&
+				    self->midiHooks.at(i)->param1 == source) {
+					this->send(self->midiHooks.at(i)->type, self->midiHooks.at(i)->mchan, self->midiHooks.at(i)->index,  newvol);
+				}
+			}
+		} else if (eventType == QString("SwitchScenes")) {
+			std::string source =
+				obs_data_get_string(data, "scene-name");
+			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
+				if (self->midiHooks.at(i)->command ==
+					    "Set Current Scene" &&
+				    self->midiHooks.at(i)->param1 == source) {
+					this->send("note_off", self->midiHooks.at(i)->mchan, lastscenebtn,  0);
 
-			//this->midiout->send_message(hello->control_change(channel, (index/norc), newvol));
-			//sends to channel 1, control 1
-			this->midiout->send_message(
-				hello->control_change(1, 1, newvol));
-			//sends to channel 1, control 2
-			this->midiout->send_message(
-				hello->control_change(1, 2, newvol));
-		}
+					this->send("note_on", self->midiHooks.at(i)->mchan, self->midiHooks.at(i)->index,  1);
+					lastscenebtn =self->midiHooks.at(i)->index;
+				}
+			}
 
+		} else if (eventType == QString("TransitionBegin")) {
+			std::string from =obs_data_get_string(data, "from-scene");
+			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
+				if (self->midiHooks.at(i)->command =="Set Current Scene" && self->midiHooks.at(i)->param1 == from) {
+					this->send("note_on",  self->midiHooks.at(i)->mchan,  self->midiHooks.at(i)->index,  0);
+					this->send("note_off", self->midiHooks.at(i)->mchan, self->midiHooks.at(i)->index,0);
+				}
+				
+			}
+
+		} 
+	
+		
+		
 		blog(1, "OBS EVENT- MidiAgent.cpp %s -- %s",
 		     eventType.toStdString().c_str(),
 		     eventData.toStdString().c_str());
@@ -340,5 +369,18 @@ void MidiAgent::NewObsEvent(QString eventType, QString eventData) {
 	} else {
 		this->sending = false;
 	}
+	
+}
+void MidiAgent::send(string type, int channel, int norc, int value) {
+	rtmidi::message *hello = new rtmidi::message();
+	if (type == "control_change") {
+		this->midiout->send_message(hello->control_change(channel, norc, value));
+	} else if (type == "note_on") {
+		this->midiout->send_message(hello->note_on(channel, norc, value));
+
+	} else if (type == "note_off") {
+		this->midiout->send_message(hello->note_off(channel, norc, value));
+	} 
+	
 	
 }

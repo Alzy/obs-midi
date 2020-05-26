@@ -67,6 +67,7 @@ void SettingsDialog::setCheck(bool x)
 void SettingsDialog::SetAvailableDevices()
 {
 	auto midiDevices = GetDeviceManager()->GetPortsList();
+	auto midiOutDevices = GetDeviceManager()->GetOPL();
 	this->ui->list_midi_dev->clear();
 
 	if (midiDevices.size() == 0){
@@ -75,11 +76,18 @@ void SettingsDialog::SetAvailableDevices()
 		this->ui->btn_configure->setEnabled(false);
 		return;
 	}
-
+	this->ui->outbox->insertItems(0, midiOutDevices);
 	for (int i = 0; i < midiDevices.size(); i++) {
 		this->ui->list_midi_dev->addItem(midiDevices.at(i).c_str());
 	}
+
 	this->ui->list_midi_dev->setCurrentRow(0);
+	auto selectedDeviceName = ui->list_midi_dev->item(0)->text().toStdString();
+	auto device = GetDeviceManager()->GetMidiDeviceByName(selectedDeviceName.c_str());
+	QString text =
+		QString::fromStdString(std::string(device->GetOutName()));
+	ui->outbox->setCurrentText(text);
+	
 }
 
 
@@ -103,19 +111,22 @@ void SettingsDialog::on_btn_configure_clicked()
 int SettingsDialog::on_check_enabled_stateChanged(bool state)
 {
 	auto selectedDeviceName = ui->list_midi_dev->currentItem()->text().toStdString();
-
+	auto selectedOutDeviceName = ui->outbox->currentText().toStdString();
 	auto device = GetDeviceManager()->GetMidiDeviceByName(selectedDeviceName.c_str());
+	
 	if (state == true) {
 		blog(LOG_INFO, "Item enabled: %s", selectedDeviceName.c_str());
 		int devicePort = GetDeviceManager()->GetPortNumberByDeviceName(selectedDeviceName.c_str());
-		int deviceOutPort = GetDeviceManager()->GetOutPortNumberByDeviceName(selectedDeviceName.c_str());
-		if (device == NULL)
+		int deviceOutPort = GetDeviceManager()->GetOutPortNumberByDeviceName(selectedOutDeviceName.c_str());
+		if (device == NULL )
 		{
 			GetDeviceManager()->RegisterMidiDevice(devicePort,deviceOutPort);
 		}
 		else
 		{
-			device->OpenPort(devicePort,deviceOutPort);
+			device->OpenPort(devicePort);
+		
+			device->OpenOutPort(deviceOutPort);
 		}
 	}
 	else {
@@ -125,6 +136,7 @@ int SettingsDialog::on_check_enabled_stateChanged(bool state)
 		}
 		blog(LOG_INFO, "Item disabled: %s", selectedDeviceName.c_str());
 	}
+	//ui->outbox->setCurrentText(QString::fromStdString(device->GetOutName()));
 	ui->btn_configure->setEnabled(state);
 	GetConfig()->Save();
 	return state;
@@ -138,11 +150,13 @@ void SettingsDialog::on_item_select()
 	{
 		ui->check_enabled->setChecked(true);
 		ui->btn_configure->setEnabled(true);
+		ui->outbox->setCurrentText(QString::fromStdString(device->GetOutName()));
 
 	}
 	else {
 		ui->check_enabled->setChecked(false);
 		ui->btn_configure->setEnabled(false);
+		//ui->outbox->setCurrentText(QString::fromStdString(device->GetOutName()));
 
 
 	}

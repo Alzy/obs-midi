@@ -102,6 +102,7 @@ MidiAgent::MidiAgent()
 {
 	
 	name = "Midi Device (uninit)";
+	outname = "Midi Out Device (uninit)";
 	midiin = new rtmidi::midi_in();
 	midiout = new rtmidi::midi_out();
 	midiin->set_callback([this](const auto &message) { HandleInput(message, this); });
@@ -154,17 +155,27 @@ void MidiAgent::SendMessage(std::string name, std::string mType, int mIndex, int
 
 /* Will open the port and enable this MidiAgent
 */
-void MidiAgent::OpenPort(int inport, int outport)
+void MidiAgent::OpenPort(int inport)
 {
 	midiin->open_port(inport);
 
-	midiout->open_port(outport);
+	
 	name = midiin->get_port_name(inport);
-	outname = midiout->get_port_name(outport);
 	enabled = true;
 	connected = true;
 	blog(LOG_INFO, "MIDI device connected In: [%d] %s", inport, name.c_str());
-	blog(LOG_INFO, "MIDI device connected Out: [%d] %s", outport, outname.c_str());
+}
+void MidiAgent::OpenOutPort(int outport)
+{
+
+
+	midiout->open_port(outport);
+	outname = midiout->get_port_name(outport);
+	enabled = true;
+	connected = true;
+
+	blog(LOG_INFO, "MIDI device connected Out: [%d] %s", outport,
+	     outname.c_str());
 }
 
 /* Will close the port and disable this MidiAgent

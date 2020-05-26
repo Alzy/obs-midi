@@ -49,12 +49,16 @@ void DeviceManager::Load(obs_data_t* data)
 		if (device->isEnabled())
 		{
 			int portNumber = GetPortNumberByDeviceName(device->GetName().c_str());
-			int outport = 1;
+			int outport = GetOutPortNumberByDeviceName(device->GetOutName().c_str());
 			
-			if (portNumber != -1)
+			if (portNumber != -1 )
 			{
-				device->OpenPort(portNumber, outport);
+				device->OpenPort(portNumber);
 			}
+			if (outport != -1) {
+				device->OpenOutPort(outport);
+			}
+
 		}
 	}
 }
@@ -76,15 +80,19 @@ vector <string> DeviceManager::GetPortsList()
  */
 vector<string> DeviceManager::GetOutPortsList()
 {
+	opl.clear();
 	vector<string> ports;
 	int portCount = MO->get_port_count();
 	for (int i = 0; i < portCount; i++) {
 		ports.push_back(MO->get_port_name(i));
+		opl.append(QString::fromStdString(MO->get_port_name(i)));
 	}
 	return ports;
 }
-
-/* Returns the port number of the specified device.
+QStringList DeviceManager::GetOPL() {
+	return opl;
+}
+	/* Returns the port number of the specified device.
  * If the device isn't found (possibly due to being disconnected), returns -1
  */
 int DeviceManager::GetPortNumberByDeviceName(const char* deviceName)
@@ -112,9 +120,11 @@ int DeviceManager::GetPortNumberByDeviceName(const char* deviceName)
 /* Returns the port number of the specified device.
  * If the device isn't found (possibly due to being disconnected), returns -1
  */
-int DeviceManager::GetOutPortNumberByDeviceName(const char *deviceName)
+int DeviceManager::GetOutPortNumberByDeviceName(const char* deviceName)
 {
+	
 	vector<string> portsList = GetOutPortsList();
+	
 	auto it = find(portsList.begin(), portsList.end(), deviceName);
 	if (it != portsList.end()) {
 		return distance(portsList.begin(), it);
@@ -156,10 +166,11 @@ vector <MidiHook*> DeviceManager::GetMidiHooksByDeviceName(const char* deviceNam
 */
 void DeviceManager::RegisterMidiDevice(int port, int outport)
 {
-	MidiAgent* midiIn = new MidiAgent();
-	midiIn->OpenPort(port, outport);
+	MidiAgent* midiA = new MidiAgent();
+	midiA->OpenPort(port);
+	midiA->OpenOutPort(outport);
 
-	midiAgents.push_back(midiIn);
+	midiAgents.push_back(midiA);
 
 }
 

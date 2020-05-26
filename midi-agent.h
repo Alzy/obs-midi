@@ -94,7 +94,9 @@ class MidiAgent: public QObject {
 		~MidiAgent();
 		void Load(obs_data_t* data);
 
-		void OpenPort(int inport, int outport);
+		void OpenPort(int inport);
+		void OpenOutPort(int outport);
+
 		void ClosePort();
 
 		string GetName();

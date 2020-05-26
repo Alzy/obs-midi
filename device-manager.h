@@ -42,12 +42,12 @@ public:
 		vector <string> GetPortsList();
 		int GetPortNumberByDeviceName(const char* deviceName);
 		vector<string> GetOutPortsList();
-		int GetOutPortNumberByDeviceName(const char *deviceName);
-
+		int GetOutPortNumberByDeviceName(const char* deviceName);
+		QStringList opl;
 		vector<MidiAgent*> GetActiveMidiDevices();
 		MidiAgent* GetMidiDeviceByName(const char* deviceName);
 		vector <MidiHook *> GetMidiHooksByDeviceName(const char* deviceName);
-
+		QStringList GetOPL();
 		void RegisterMidiDevice(int port, int outport);
 		void SendMidi(QString mtype, int channel, int norc,
 			      int value);

@@ -308,7 +308,7 @@ void MidiAgent::NewObsEvent(QString eventType, QString eventData) {
 	rtmidi::message* hello = new rtmidi::message();
 	
 		
-
+	// ON EVENT TYPE Find matching hook, pull data from that hook, and do thing. 
 	
 	if (eventType == QString("SourceVolumeChanged")) {
 		double vol = obs_data_get_double(data, "volume");
@@ -320,8 +320,12 @@ void MidiAgent::NewObsEvent(QString eventType, QString eventData) {
 	
 		//auto device = dm->GetMidiDeviceByName(this.name);
 		//device->midiout->send_message()
-		
+
+
+		//this->midiout->send_message(hello->control_change(channel, (index/norc), newvol));
+		//sends to channel 1, control 1
 		this->midiout->send_message(hello->control_change(1, 1, newvol));
+		//sends to channel 1, control 2
 		this->midiout->send_message(hello->control_change(1, 2, newvol));
 	}
 	

@@ -161,5 +161,35 @@ void DeviceManager::SendMidi(QString mtype, int channel, int norc, int value)
 }
 void DeviceManager::broadcast(const RpcEvent& event)
 {
-	blog(1, "OBS EVENT ");
+	OBSDataAutoRelease eventData = obs_data_create();
+
+	QString updateType = event.updateType();
+	obs_data_set_string(eventData, "update-type",
+			    updateType.toUtf8().constData());
+
+	std::optional<uint64_t> streamTime = event.streamTime();
+	if (streamTime.has_value()) {
+		QString streamingTimecode =
+			Utils::nsToTimestamp(streamTime.value());
+		obs_data_set_string(eventData, "stream-timecode",
+				    streamingTimecode.toUtf8().constData());
+	}
+
+	std::optional<uint64_t> recordingTime = event.recordingTime();
+	if (recordingTime.has_value()) {
+		QString recordingTimecode =
+			Utils::nsToTimestamp(recordingTime.value());
+		obs_data_set_string(eventData, "rec-timecode",
+				    recordingTimecode.toUtf8().constData());
+	}
+
+	OBSData additionalFields = event.additionalFields();
+	if (additionalFields) {
+		obs_data_apply(eventData, additionalFields);
+	}
+
+	
+	
+	blog(1, "OBS EVENT %s -- %s", event.updateType().toStdString().c_str(),
+	     std::string(obs_data_get_json(eventData)).c_str());
 };

@@ -36,7 +36,7 @@ public:
 	void SetAvailableDevices();
 	void on_btn_configure_clicked();
 	int on_check_enabled_stateChanged(bool state);
-	void on_item_select();
+	void on_item_select(QString curitem);
 	
 
 private Q_SLOTS:

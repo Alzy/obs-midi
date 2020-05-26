@@ -58,7 +58,6 @@ public:
 		type = obs_data_get_string(data, "type");
 		index = obs_data_get_int(data, "index");
 		mchan = obs_data_get_int(data, "mchan");
-		bidirectional = obs_data_get_bool(data, "bidirectional");
 		action = obs_data_get_string(data, "action");
 		command = obs_data_get_string(data, "command");
 		param1 = obs_data_get_string(data, "param1");
@@ -71,7 +70,6 @@ public:
 		obs_data_set_string(data, "type", type.c_str());
 		obs_data_set_int(data, "index", index);
 		obs_data_set_int(data, "mchan", mchan);
-		obs_data_set_bool(data, "bidirectional", bidirectional);
 		obs_data_set_string(data, "action", action.c_str());
 		obs_data_set_string(data, "command", command.c_str());
 		obs_data_set_string(data, "param1", param1.c_str());
@@ -129,6 +127,7 @@ class MidiAgent: public QObject {
 		int port;
 		bool enabled;
 		bool connected;
+		bool bidirectional;
 		vector<MidiHook*> midiHooks;
 		
 

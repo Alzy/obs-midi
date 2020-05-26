@@ -125,6 +125,8 @@ void MidiAgent::Load(obs_data_t * data)
 	name = obs_data_get_string(data, "name");
 	outname = obs_data_get_string(data, "outname");
 	enabled = obs_data_get_bool(data, "enabled");
+	bidirectional = obs_data_get_bool(data, "bidirectional");
+
 	obs_data_array_t* hooksData = obs_data_get_array(data, "hooks");
 	size_t hooksCount = obs_data_array_count(hooksData);
 	for (size_t i = 0; i < hooksCount; i++)
@@ -288,6 +290,7 @@ obs_data_t* MidiAgent::GetData() {
 	obs_data_set_string(data, "outname", outname.c_str());
 
 	obs_data_set_bool(data, "enabled", enabled);
+	obs_data_set_bool(data, "bidirectional", bidirectional);
 
 	obs_data_array_t* arrayData = obs_data_array_create();
 	for (int i = 0; i < midiHooks.size(); i++)

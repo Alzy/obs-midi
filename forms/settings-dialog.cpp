@@ -36,7 +36,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 SettingsDialog::SettingsDialog(QWidget *parent):QDialog(parent, Qt::Dialog),ui(new Ui::SettingsDialog)
 {
 	ui->setupUi(this);
-	connect(ui->list_midi_dev, &QListWidget::itemSelectionChanged, this, &SettingsDialog::on_item_select);
+	connect(ui->list_midi_dev, &QListWidget::currentTextChanged, this, &SettingsDialog::on_item_select);
 	connect(ui->check_enabled, &QCheckBox::stateChanged, this, &SettingsDialog::on_check_enabled_stateChanged);
 	connect(ui->btn_configure, &QPushButton::clicked, this,&SettingsDialog::on_btn_configure_clicked);
 	connect(ui->outbox, SIGNAL(currentTextChanged(QString)), this, SLOT(selectOutput(QString)));
@@ -148,20 +148,23 @@ int SettingsDialog::on_check_enabled_stateChanged(bool state)
 	}
 	//ui->outbox->setCurrentText(QString::fromStdString(device->GetOutName()));
 	ui->btn_configure->setEnabled(state);
+	ui->outbox->setEnabled(state);
 	GetConfig()->Save();
 	return state;
 }
 
-void SettingsDialog::on_item_select()
+void SettingsDialog::on_item_select(QString curitem)
 {
+	auto texting = curitem.toStdString();
 	// Pull info on if device is enabled, if so set true if not set false
-	auto device = GetDeviceManager()->GetMidiDeviceByName(this->ui->list_midi_dev->currentItem()->text().toStdString().c_str());
+	auto device = GetDeviceManager()->GetMidiDeviceByName(curitem.toStdString().c_str());
 	if (device != NULL && device->isEnabled())
 	{
 		ui->check_enabled->setChecked(true);
 		ui->btn_configure->setEnabled(true);
 		ui->outbox->setEnabled(true);
-		ui->outbox->setCurrentText(QString::fromStdString(device->GetOutName()));
+		auto on = device->GetOutName();
+		ui->outbox->setCurrentText(QString::fromStdString(on));
 		
 
 	}

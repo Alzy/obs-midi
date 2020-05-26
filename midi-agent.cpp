@@ -169,7 +169,13 @@ void MidiAgent::OpenOutPort(int outport)
 {
 
 
-	midiout->open_port(outport);
+	try {
+		midiout->open_port(outport);
+	} catch (rtmidi::midi_exception &error) {
+	
+
+		blog(1, " Opening out port error ");
+	}
 	outname = midiout->get_port_name(outport);
 	enabled = true;
 	connected = true;

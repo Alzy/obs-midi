@@ -39,8 +39,7 @@ SettingsDialog::SettingsDialog(QWidget *parent):QDialog(parent, Qt::Dialog),ui(n
 	connect(ui->list_midi_dev, &QListWidget::itemSelectionChanged, this, &SettingsDialog::on_item_select);
 	connect(ui->check_enabled, &QCheckBox::stateChanged, this, &SettingsDialog::on_check_enabled_stateChanged);
 	connect(ui->btn_configure, &QPushButton::clicked, this,&SettingsDialog::on_btn_configure_clicked);
-	connect(ui->outbox, SIGNAL(currentIndexChanged(int)), this, SLOT(selectOutput(int)));
-	this->ui->list_midi_dev->setCurrentRow(0);
+	connect(ui->outbox, SIGNAL(currentTextChanged(QString)), this, SLOT(selectOutput(QString)));
 }
 
 
@@ -76,7 +75,10 @@ void SettingsDialog::SetAvailableDevices()
 		this->ui->btn_configure->setEnabled(false);
 		return;
 	}
+	loadingdevices = true;
+	this->ui->outbox->clear();
 	this->ui->outbox->insertItems(0, midiOutDevices);
+	loadingdevices = false;
 	for (int i = 0; i < midiDevices.size(); i++) {
 		this->ui->list_midi_dev->addItem(midiDevices.at(i).c_str());
 	}
@@ -84,7 +86,7 @@ void SettingsDialog::SetAvailableDevices()
 	//
 	
 	
-	//this->ui->list_midi_dev->setCurrentRow(0);
+	this->ui->list_midi_dev->setCurrentRow(0);
 }
 
 
@@ -104,23 +106,14 @@ void SettingsDialog::on_btn_configure_clicked()
 	
 }
 
-void SettingsDialog::selectOutput(int x) {
-	auto selectedDeviceName =ui->list_midi_dev->item(0)->text().toStdString();
-	auto device = GetDeviceManager()->GetMidiDeviceByName(selectedDeviceName.c_str());
-	device->outname = ui->outbox->currentText().toStdString();
-	GetConfig()->Save();
-	//device->
-	/*
-	std::string name = device->GetOutName();
-	if (name.size() == 0) {
-		blog(1, "No outdevice");
-	} else {
-
-		blog(1, "outdevice");
-		//QString text = QString::fromStdString(name);
-		//ui->outbox->setCurrentText(text);
+void SettingsDialog::selectOutput(QString selectedDeviceName) {
+	if (!loadingdevices) {
+		auto selectedDevice =	ui->list_midi_dev->currentItem()->text().toStdString();
+		auto device = GetDeviceManager()->GetMidiDeviceByName(selectedDevice.c_str());
+		device->outname = selectedDeviceName.toStdString();
+		GetConfig()->Save();
 	}
-	*/
+
 }
 
 int SettingsDialog::on_check_enabled_stateChanged(bool state)
@@ -140,8 +133,10 @@ int SettingsDialog::on_check_enabled_stateChanged(bool state)
 		else
 		{
 			device->OpenPort(devicePort);
-		
-			device->OpenOutPort(deviceOutPort);
+			if (deviceOutPort != -1) {
+				device->OpenOutPort(deviceOutPort);
+			}
+			
 		}
 	}
 	else {
@@ -165,13 +160,15 @@ void SettingsDialog::on_item_select()
 	{
 		ui->check_enabled->setChecked(true);
 		ui->btn_configure->setEnabled(true);
+		ui->outbox->setEnabled(true);
 		ui->outbox->setCurrentText(QString::fromStdString(device->GetOutName()));
+		
 
 	}
 	else {
 		ui->check_enabled->setChecked(false);
 		ui->btn_configure->setEnabled(false);
-		//ui->outbox->setCurrentText(QString::fromStdString(device->GetOutName()));
+		ui->outbox->setEnabled(false);
 
 
 	}

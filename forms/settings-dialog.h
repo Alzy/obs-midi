@@ -37,14 +37,18 @@ public:
 	void on_btn_configure_clicked();
 	int on_check_enabled_stateChanged(bool state);
 	void on_item_select();
-	void selectOutput(int x);
+	
+
 private Q_SLOTS:
 	void ToggleShowHide();
-
+	
+public slots:
+	void selectOutput(QString item);
 
 private:
 	Ui::SettingsDialog* ui;
 	
 	Ui::ConfigWindow* cwin;
 	bool hidedebugitems = true;
+	bool loadingdevices=false;
 };

@@ -41,16 +41,20 @@ public:
 
 		vector <string> GetPortsList();
 		int GetPortNumberByDeviceName(const char* deviceName);
+		vector<string> GetOutPortsList();
+		int GetOutPortNumberByDeviceName(const char *deviceName);
 
 		vector<MidiAgent*> GetActiveMidiDevices();
 		MidiAgent* GetMidiDeviceByName(const char* deviceName);
 		vector <MidiHook *> GetMidiHooksByDeviceName(const char* deviceName);
 
-		void RegisterMidiDevice(int port);
+		void RegisterMidiDevice(int port, int outport);
 		void SendMidi(QString mtype, int channel, int norc,
 			      int value);
 		obs_data_t* GetData();
 		void broadcast(const RpcEvent &event);
+signals:
+		void bcast(QString updateType, QString eventData);
 	private:
 		rtmidi::midi_in *rtMidi;
 		rtmidi::midi_out *MO;

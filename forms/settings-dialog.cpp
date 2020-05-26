@@ -108,13 +108,14 @@ int SettingsDialog::on_check_enabled_stateChanged(bool state)
 	if (state == true) {
 		blog(LOG_INFO, "Item enabled: %s", selectedDeviceName.c_str());
 		int devicePort = GetDeviceManager()->GetPortNumberByDeviceName(selectedDeviceName.c_str());
+		int deviceOutPort = GetDeviceManager()->GetOutPortNumberByDeviceName(selectedDeviceName.c_str());
 		if (device == NULL)
 		{
-			GetDeviceManager()->RegisterMidiDevice(devicePort);
+			GetDeviceManager()->RegisterMidiDevice(devicePort,deviceOutPort);
 		}
 		else
 		{
-			device->OpenPort(devicePort);
+			device->OpenPort(devicePort,deviceOutPort);
 		}
 	}
 	else {

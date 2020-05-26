@@ -39,6 +39,7 @@ typedef bool(*RecordingPausedFunction)();
 namespace Utils {
 	// MIDI Utils
 	float mapper(int x);
+	int mapper2(double x);
 	bool is_number(const std::string& s);
 	std::string getMidiMessageType(int in);
 	std::vector <const char*> GetVideoSourceNames();

@@ -35,6 +35,7 @@ DeviceManager::~DeviceManager()
 void DeviceManager::Load(obs_data_t* data)
 {
 	vector <string> portsList = GetPortsList();
+	vector<string> outPortsList = GetOutPortsList();
 	obs_data_array_t* devicesData = obs_data_get_array(data, "devices");
 	size_t deviceCount = obs_data_array_count(devicesData);
 	for (size_t i = 0; i < deviceCount; i++)
@@ -43,13 +44,16 @@ void DeviceManager::Load(obs_data_t* data)
 		MidiAgent* device = new MidiAgent();
 		device->Load(deviceData);
 		midiAgents.push_back(device);
-
+		connect(this, SIGNAL(bcast(QString, QString)), device,
+			SLOT(NewObsEvent(QString, QString)));
 		if (device->isEnabled())
 		{
 			int portNumber = GetPortNumberByDeviceName(device->GetName().c_str());
+			int outport = 1;
+			
 			if (portNumber != -1)
 			{
-				device->OpenPort(portNumber);
+				device->OpenPort(portNumber, outport);
 			}
 		}
 	}
@@ -68,6 +72,17 @@ vector <string> DeviceManager::GetPortsList()
 	}
 	return ports;
 }
+/* Returns vector list of Port Names 
+ */
+vector<string> DeviceManager::GetOutPortsList()
+{
+	vector<string> ports;
+	int portCount = MO->get_port_count();
+	for (int i = 0; i < portCount; i++) {
+		ports.push_back(MO->get_port_name(i));
+	}
+	return ports;
+}
 
 /* Returns the port number of the specified device.
  * If the device isn't found (possibly due to being disconnected), returns -1
@@ -80,6 +95,30 @@ int DeviceManager::GetPortNumberByDeviceName(const char* deviceName)
 		return distance(portsList.begin(), it);
 	}
 	else {
+		return -1;
+	}
+}
+/*	std::string dn = deviceName;
+	auto y = dn.size();
+	dn.resize(y - 2);
+	vector <string> portsList = GetPortsList();
+	auto it = find(portsList.begin(), portsList.end(), dn);
+	if (it != portsList.end()) {
+		return distance(portsList.begin(), it);
+	}
+	else {
+		return -1;
+	}*/
+/* Returns the port number of the specified device.
+ * If the device isn't found (possibly due to being disconnected), returns -1
+ */
+int DeviceManager::GetOutPortNumberByDeviceName(const char *deviceName)
+{
+	vector<string> portsList = GetOutPortsList();
+	auto it = find(portsList.begin(), portsList.end(), deviceName);
+	if (it != portsList.end()) {
+		return distance(portsList.begin(), it);
+	} else {
 		return -1;
 	}
 }
@@ -115,12 +154,13 @@ vector <MidiHook*> DeviceManager::GetMidiHooksByDeviceName(const char* deviceNam
 /* Registers a midi device.
  * Will create, store and enable a midi device.
 */
-void DeviceManager::RegisterMidiDevice(int port)
+void DeviceManager::RegisterMidiDevice(int port, int outport)
 {
 	MidiAgent* midiIn = new MidiAgent();
-	midiIn->OpenPort(port);
+	midiIn->OpenPort(port, outport);
 
 	midiAgents.push_back(midiIn);
+
 }
 
 
@@ -145,17 +185,7 @@ obs_data_t* DeviceManager::GetData()
 void DeviceManager::SendMidi(QString mtype, int channel, int norc, int value)
 
 {
-	rtmidi::message hello = new rtmidi::message();
-	if (mtype == "control_change"){
-		hello.control_change(channel, norc, value);
-	} else if (mtype == "note_on") {
-		hello.note_on(channel, norc, value);
-	} else if (mtype == "note_off") {
-		hello.note_off(channel, norc, value);
-	}
-	if (hello.size() != 0) {
-		MO->send_message(hello);
-	}
+	
 	//***Need to add message Deletion here***//
 
 }
@@ -190,6 +220,6 @@ void DeviceManager::broadcast(const RpcEvent& event)
 
 	
 	
-	blog(1, "OBS EVENT %s -- %s", event.updateType().toStdString().c_str(),
-	     std::string(obs_data_get_json(eventData)).c_str());
+	//blog(1, "OBS EVENT %s -- %s", event.updateType().toStdString().c_str(),obs_data_get_json(eventData));
+	emit bcast(event.updateType(), QString::fromStdString(obs_data_get_json(eventData)));
 };

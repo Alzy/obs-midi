@@ -26,6 +26,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "midi-agent.h"
 #include "obs-midi.h"
 #include "obs-controller.h"
+#include "device-manager.h"
 using namespace std;
 
 
@@ -97,8 +98,9 @@ map<string, function<void(MidiHook *hook, int midiVal)>> funcMap = {
 ////////////////
 // MIDI AGENT //
 ////////////////
-MidiAgent::MidiAgent()
+MidiAgent::MidiAgent() 
 {
+	
 	name = "Midi Device (uninit)";
 	midiin = new rtmidi::midi_in();
 	midiout = new rtmidi::midi_out();
@@ -120,6 +122,7 @@ MidiAgent::~MidiAgent()
 void MidiAgent::Load(obs_data_t * data)
 {
 	name = obs_data_get_string(data, "name");
+	outname = obs_data_get_string(data, "outname");
 	enabled = obs_data_get_bool(data, "enabled");
 	obs_data_array_t* hooksData = obs_data_get_array(data, "hooks");
 	size_t hooksCount = obs_data_array_count(hooksData);
@@ -151,14 +154,17 @@ void MidiAgent::SendMessage(std::string name, std::string mType, int mIndex, int
 
 /* Will open the port and enable this MidiAgent
 */
-void MidiAgent::OpenPort(int port)
+void MidiAgent::OpenPort(int inport, int outport)
 {
-	midiin->open_port(port);
-	midiout->open_port(port);
-	name = midiin->get_port_name(port);
+	midiin->open_port(inport);
+
+	midiout->open_port(outport);
+	name = midiin->get_port_name(inport);
+	outname = midiout->get_port_name(outport);
 	enabled = true;
 	connected = true;
-	blog(LOG_INFO, "MIDI device connected: [%d] %s", port, name.c_str());
+	blog(LOG_INFO, "MIDI device connected In: [%d] %s", inport, name.c_str());
+	blog(LOG_INFO, "MIDI device connected Out: [%d] %s", outport, outname.c_str());
 }
 
 /* Will close the port and disable this MidiAgent
@@ -173,6 +179,8 @@ void MidiAgent::ClosePort()
 
 
 string MidiAgent::GetName() { return name; }
+string MidiAgent::GetOutName(){ return outname; }
+
 int MidiAgent::GetPort() { return port; }
 bool MidiAgent::isEnabled() { return enabled; }
 bool MidiAgent::isConnected() { return connected; }
@@ -228,7 +236,11 @@ vector<MidiHook*> MidiAgent::GetMidiHooks()
 */
 void MidiAgent::AddMidiHook(MidiHook* hook)
 {
-
+	
+	
+	
+	
+	//connect()
 	midiHooks.push_back(hook);
 }
 
@@ -256,6 +268,8 @@ void MidiAgent::ClearMidiHooks()
 obs_data_t* MidiAgent::GetData() {
 	obs_data_t* data = obs_data_create();
 	obs_data_set_string(data, "name", name.c_str());
+	obs_data_set_string(data, "outname", outname.c_str());
+
 	obs_data_set_bool(data, "enabled", enabled);
 
 	obs_data_array_t* arrayData = obs_data_array_create();
@@ -268,6 +282,29 @@ obs_data_t* MidiAgent::GetData() {
 	return data;
 }
 /*Handle OBS events*/
-void MidiAgent::NewObsEvent(RpcEvent event) {
+void MidiAgent::NewObsEvent(QString eventType, QString eventData) {
+	OBSDataAutoRelease data = obs_data_create_from_json(eventData.toStdString().c_str());
+	rtmidi::message hello = new rtmidi::message();
+	
+		
 
+	
+	if (eventType == QString("SourceVolumeChanged")) {
+		double vol = obs_data_get_double(data, "volume");
+
+		int newvol = Utils::mapper2(cbrt(vol));
+		std::string source = obs_data_get_string(data, "sourceName");
+		blog(1, "OBS EVENT %s -- %s -- %f -- %i",
+		     eventType.toStdString().c_str(), source.c_str(),vol,  newvol);
+	
+		//auto device = dm->GetMidiDeviceByName(this.name);
+		//device->midiout->send_message()
+		
+		this->midiout->send_message(hello.control_change(1, 1, newvol));
+		this->midiout->send_message(hello.control_change(2, 1, newvol));
+		this->midiout->send_message(hello.control_change(1, 2, newvol));
+		this->midiout->send_message(hello.control_change(2, 2, newvol));
+	}
+	
+	//blog(1, "OBS EVENT %s -- %s", eventType.toStdString().c_str(),eventData.toStdString().c_str());
 }

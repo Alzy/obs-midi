@@ -358,7 +358,30 @@ void MidiAgent::NewObsEvent(QString eventType, QString eventData) {
 				
 			}
 
-		} 
+		}else if (eventType == QString("SourceMuteStateChanged")) {
+			std::string from =obs_data_get_string(data, "sourceName");
+			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
+				if (self->midiHooks.at(i)->command =="Toggle Mute" && self->midiHooks.at(i)->param1 == from) {
+					bool muted =obs_data_get_bool(data, "muted");
+					this->send("note_on",  self->midiHooks.at(i)->mchan,  self->midiHooks.at(i)->index,  muted);
+					//this->send("note_off", self->midiHooks.at(i)->mchan, self->midiHooks.at(i)->index,0);
+				}
+				
+			}
+
+		}else if (eventType == QString("SourceMuteStateChanged")) {
+			std::string from =obs_data_get_string(data, "sourceName");
+			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
+				if (self->midiHooks.at(i)->command =="Set Mute" && self->midiHooks.at(i)->param1 == from) {
+					bool muted =obs_data_get_bool(data, "muted");
+					this->send("note_on",  self->midiHooks.at(i)->mchan,  self->midiHooks.at(i)->index,  muted);
+					//this->send("note_off", self->midiHooks.at(i)->mchan, self->midiHooks.at(i)->index,0);
+				}
+				
+			}
+
+		}
+		
 	
 		
 		

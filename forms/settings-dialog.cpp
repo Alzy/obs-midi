@@ -39,6 +39,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) :QDialog(parent, Qt::Dialog), ui
 	connect(ui->list_midi_dev, &QListWidget::currentTextChanged, this, &SettingsDialog::on_item_select);
 	connect(ui->check_enabled, &QCheckBox::stateChanged, this, &SettingsDialog::on_check_enabled_stateChanged);
 	connect(ui->btn_configure, &QPushButton::clicked, this, &SettingsDialog::on_btn_configure_clicked);
+
 	SetAvailableDevices();
 	
 }
@@ -67,13 +68,21 @@ void SettingsDialog::setCheck(bool x)
 
 void SettingsDialog::SetAvailableDevices()
 {
-	auto midiOutDevices = GetDeviceManager()->GetOPL();
-
+	
+	auto midiOutDevices = GetDeviceManager()->GetOPL();\
 	loadingdevices = true;
 	this->ui->outbox->clear();
 	this->ui->outbox->insertItems(0, midiOutDevices);
 	loadingdevices = false;
 	auto midiDevices = GetDeviceManager()->GetPortsList();
+	if (!starting) {
+		this->ui->outbox->setCurrentText(
+			GetDeviceManager()
+				->GetMidiDeviceByName(midiDevices.at(0).c_str())
+				->GetOutName()
+				.c_str());
+	}
+
 	this->ui->list_midi_dev->clear();
 	this->ui->check_enabled->setEnabled(false);
 	this->ui->btn_configure->setEnabled(false);
@@ -90,13 +99,13 @@ void SettingsDialog::SetAvailableDevices()
 	for (int i = 0; i < midiDevices.size(); i++) {
 		this->ui->list_midi_dev->addItem(midiDevices.at(i).c_str());
 	}
-	this->ui->outbox->setCurrentText(GetDeviceManager()->GetMidiDeviceByName(midiDevices.at(0).c_str())->GetOutName().c_str());
 	if (starting) {
 		
-		desconnect = connect(ui->outbox, SIGNAL(currentTextChanged(QString)), this,
-			SLOT(selectOutput(QString)));
+		desconnect = connect(ui->outbox, SIGNAL(currentTextChanged(QString)), this,	SLOT(selectOutput(QString)));
 		starting = false;
 	}
+	
+
 		
 	
 	//this->ui->list_midi_dev->setCurrentRow(0);

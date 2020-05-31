@@ -23,55 +23,53 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "midi-agent.h"
 #include "obs-midi.h"
 
+namespace OBSController {
+// BUTTON ACTIONS
+void SetCurrentScene(const char *sceneName);
+void SetPreviewScene(const char *sceneName);
+void SetCurrentSceneCollection(QString sceneCollection);
+void ResetSceneItem(const char *sceneName, const char *itemName);
+void TransitionToProgram();
+void TransitionToProgram(QString transitionName, int transitionDuration = 300);
+void SetCurrentTransition(QString name);
+void SetTransitionDuration(int duration); // can also be used with cc
 
-namespace OBSController
-{
-	// BUTTON ACTIONS
-	void SetCurrentScene(const char *sceneName);
-	void SetPreviewScene(const char *sceneName);
-	void SetCurrentSceneCollection(QString sceneCollection);
-	void ResetSceneItem(const char *sceneName, const char *itemName);
-	void TransitionToProgram();
-	void TransitionToProgram(QString transitionName, int transitionDuration = 300);
-	void SetCurrentTransition(QString name);
-	void SetTransitionDuration(int duration); // can also be used with cc
+void SetSourceVisibility();    // doesn't exist??
+void ToggleSourceVisibility(); //doesn't exist?
 
-	void SetSourceVisibility(); // doesn't exist??
-	void ToggleSourceVisibility(); //doesn't exist?
+void ToggleMute(QString sourceName);
+void SetMute(QString sourceName, bool mute);
 
-	void ToggleMute(QString sourceName);
-	void SetMute(QString sourceName, bool mute);
+void StartStopStreaming();
+void StartStreaming();
+void StopStreaming();
 
-	void StartStopStreaming();
-	void StartStreaming();
-	void StopStreaming();
+void StartStopRecording();
+void StartRecording();
+void StopRecording();
+void PauseRecording();
+void ResumeRecording();
 
-	void StartStopRecording();
-	void StartRecording();
-	void StopRecording();
-	void PauseRecording();
-	void ResumeRecording();
+void StartStopReplayBuffer();
+void StartReplayBuffer();
+void StopReplayBuffer();
+void SaveReplayBuffer();
 
-	void StartStopReplayBuffer();
-	void StartReplayBuffer();
-	void StopReplayBuffer();
-	void SaveReplayBuffer();
+void SetCurrentProfile(QString profileName);
+void SetTextGDIPlusText();
+void SetBrowserSourceURL();
+void ReloadBrowserSource();
+void TakeSourceScreenshot(QString source);
+void EnableSourceFilter();
+void DisableSourceFilter();
+void ToggleSourceFilter();
 
-	void SetCurrentProfile(QString profileName);
-	void SetTextGDIPlusText();
-	void SetBrowserSourceURL();
-	void ReloadBrowserSource();
-	void TakeSourceScreenshot(QString source);
-	void EnableSourceFilter();
-	void DisableSourceFilter();
-	void ToggleSourceFilter();
-
-	// CC ACTIONS
-	void SetVolume(QString source, float volume);
-	void SetSyncOffset(QString sourceName, int64_t sourceSyncOffset);
-	void SetSourcePosition();
-	void SetSourceRotation();
-	void SetSourceScale();
-	void SetGainFilter();
-	void SetOpacity();
+// CC ACTIONS
+void SetVolume(QString source, float volume);
+void SetSyncOffset(QString sourceName, int64_t sourceSyncOffset);
+void SetSourcePosition();
+void SetSourceRotation();
+void SetSourceScale();
+void SetGainFilter();
+void SetOpacity();
 };

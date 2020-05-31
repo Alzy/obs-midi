@@ -24,24 +24,16 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #include "../obs-midi.h"
 
-class RpcEvent
-{
+class RpcEvent {
 public:
-	explicit RpcEvent(
-		const QString& updateType,
-		std::optional<uint64_t> streamTime, std::optional<uint64_t> recordingTime,
-		obs_data_t* additionalFields = nullptr
-	);
+	explicit RpcEvent(const QString &updateType,
+			  std::optional<uint64_t> streamTime,
+			  std::optional<uint64_t> recordingTime,
+			  obs_data_t *additionalFields = nullptr);
 
-	const QString& updateType() const
-	{
-		return _updateType;
-	}
+	const QString &updateType() const { return _updateType; }
 
-	const std::optional<uint64_t> streamTime() const
-	{
-		return _streamTime;
-	}
+	const std::optional<uint64_t> streamTime() const { return _streamTime; }
 
 	const std::optional<uint64_t> recordingTime() const
 	{

@@ -33,68 +33,68 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <obs-module.h>
 #include <util/config-file.h>
 
-typedef void(*PauseRecordingFunction)(bool);
-typedef bool(*RecordingPausedFunction)();
+typedef void (*PauseRecordingFunction)(bool);
+typedef bool (*RecordingPausedFunction)();
 
 namespace Utils {
-	// MIDI Utils
-	float mapper(int x);
-	int mapper2(double x);
-	bool is_number(const std::string& s);
-	std::string getMidiMessageType(int in);
-	std::vector <const char*> GetVideoSourceNames();
-	std::vector <const char*> GetAudioSourceNames();
+// MIDI Utils
+float mapper(int x);
+int mapper2(double x);
+bool is_number(const std::string &s);
+std::string getMidiMessageType(int in);
+std::vector<const char *> GetVideoSourceNames();
+std::vector<const char *> GetAudioSourceNames();
 
-	obs_data_array_t* StringListToArray(char** strings, const char* key);
-	obs_data_array_t* GetSceneItems(obs_source_t* source);
-	obs_data_t* GetSceneItemData(obs_sceneitem_t* item);
-	// These functions support nested lookup into groups
-	obs_sceneitem_t* GetSceneItemFromName(obs_scene_t* scene, QString name);
-	obs_sceneitem_t* GetSceneItemFromId(obs_scene_t* scene, int64_t id);
-	obs_sceneitem_t* GetSceneItemFromItem(obs_scene_t* scene, obs_data_t* item);
-	obs_sceneitem_t* GetSceneItemFromRequestField(obs_scene_t* scene, obs_data_item_t* dataItem);
+obs_data_array_t *StringListToArray(char **strings, const char *key);
+obs_data_array_t *GetSceneItems(obs_source_t *source);
+obs_data_t *GetSceneItemData(obs_sceneitem_t *item);
+// These functions support nested lookup into groups
+obs_sceneitem_t *GetSceneItemFromName(obs_scene_t *scene, QString name);
+obs_sceneitem_t *GetSceneItemFromId(obs_scene_t *scene, int64_t id);
+obs_sceneitem_t *GetSceneItemFromItem(obs_scene_t *scene, obs_data_t *item);
+obs_sceneitem_t *GetSceneItemFromRequestField(obs_scene_t *scene,
+					      obs_data_item_t *dataItem);
 
-	obs_scene_t* GetSceneFromNameOrCurrent(QString sceneName);
-	obs_data_t* GetSceneItemPropertiesData(obs_sceneitem_t* item);
+obs_scene_t *GetSceneFromNameOrCurrent(QString sceneName);
+obs_data_t *GetSceneItemPropertiesData(obs_sceneitem_t *item);
 
-	obs_data_t* GetSourceFilterInfo(obs_source_t* filter, bool includeSettings);
-	obs_data_array_t* GetSourceFiltersList(obs_source_t* source, bool includeSettings);
+obs_data_t *GetSourceFilterInfo(obs_source_t *filter, bool includeSettings);
+obs_data_array_t *GetSourceFiltersList(obs_source_t *source,
+				       bool includeSettings);
 
-	bool IsValidAlignment(const uint32_t alignment);
+bool IsValidAlignment(const uint32_t alignment);
 
-	obs_data_array_t* GetScenes();
-	obs_data_t* GetSceneData(obs_source_t* source);
+obs_data_array_t *GetScenes();
+obs_data_t *GetSceneData(obs_source_t *source);
 
-	// TODO contribute a proper frontend API method for this to OBS and remove this hack
-	QSpinBox* GetTransitionDurationControl();
-	int GetTransitionDuration(obs_source_t* transition);
-	obs_source_t* GetTransitionFromName(QString transitionName);
-	bool SetTransitionByName(QString transitionName);
-	obs_data_t* GetTransitionData(obs_source_t* transition);
+// TODO contribute a proper frontend API method for this to OBS and remove this hack
+QSpinBox *GetTransitionDurationControl();
+int GetTransitionDuration(obs_source_t *transition);
+obs_source_t *GetTransitionFromName(QString transitionName);
+bool SetTransitionByName(QString transitionName);
+obs_data_t *GetTransitionData(obs_source_t *transition);
 
-	QString OBSVersionString();
+QString OBSVersionString();
 
-	QSystemTrayIcon* GetTrayIcon();
-	void SysTrayNotify(
-		QString text,
-		QSystemTrayIcon::MessageIcon n,
-		QString title = QString("obs-websocket"));
+QSystemTrayIcon *GetTrayIcon();
+void SysTrayNotify(QString text, QSystemTrayIcon::MessageIcon n,
+		   QString title = QString("obs-websocket"));
 
-	const char* GetRecordingFolder();
-	bool SetRecordingFolder(const char* path);
+const char *GetRecordingFolder();
+bool SetRecordingFolder(const char *path);
 
-	QString ParseDataToQueryString(obs_data_t* data);
-	obs_hotkey_t* FindHotkeyByName(QString name);
+QString ParseDataToQueryString(obs_data_t *data);
+obs_hotkey_t *FindHotkeyByName(QString name);
 
-	bool ReplayBufferEnabled();
-	void StartReplayBuffer();
-	bool IsRPHotkeySet();
-	const char* GetFilenameFormatting();
-	bool SetFilenameFormatting(const char* filenameFormatting);
-	bool inrange(int low, int high, int x);
-	std::string mtype_to_string(rtmidi::message_type);
+bool ReplayBufferEnabled();
+void StartReplayBuffer();
+bool IsRPHotkeySet();
+const char *GetFilenameFormatting();
+bool SetFilenameFormatting(const char *filenameFormatting);
+bool inrange(int low, int high, int x);
+std::string mtype_to_string(rtmidi::message_type);
 
-	int get_midi_note_or_control(rtmidi::message mess);
-	int get_midi_value(rtmidi::message mess);
-	QString nsToTimestamp(uint64_t ns);
+int get_midi_note_or_control(rtmidi::message mess);
+int get_midi_value(rtmidi::message mess);
+QString nsToTimestamp(uint64_t ns);
 };

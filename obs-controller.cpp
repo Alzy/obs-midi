@@ -23,8 +23,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 using namespace std;
 
-
-
 ////////////////////
 // BUTTON ACTIONS //
 ////////////////////
@@ -75,7 +73,7 @@ void OBSController::SetCurrentSceneCollection(QString sceneCollection)
 /**
 * Reset a scene item.
 */
-void OBSController::ResetSceneItem(const char * sceneName, const char * itemName)
+void OBSController::ResetSceneItem(const char *sceneName, const char *itemName)
 {
 	OBSScene scene = Utils::GetSceneFromNameOrCurrent(sceneName);
 	if (!scene) {
@@ -86,7 +84,8 @@ void OBSController::ResetSceneItem(const char * sceneName, const char * itemName
 	obs_data_set_string(params, "scene-name", sceneName);
 	OBSDataItemAutoRelease itemField = obs_data_item_byname(params, "item");
 
-	OBSSceneItemAutoRelease sceneItem = Utils::GetSceneItemFromRequestField(scene, itemField);
+	OBSSceneItemAutoRelease sceneItem =
+		Utils::GetSceneItemFromRequestField(scene, itemField);
 	if (!sceneItem) {
 		throw("specified scene item doesn't exist");
 	}
@@ -105,12 +104,12 @@ void OBSController::TransitionToProgram()
 	obs_frontend_preview_program_trigger_transition();
 }
 
-
 /**
  * Transitions the currently previewed scene to the main output using specified transition.
  * transitionDuration is optional. (milliseconds)
  */
-void OBSController::TransitionToProgram(QString transitionName, int transitionDuration)
+void OBSController::TransitionToProgram(QString transitionName,
+					int transitionDuration)
 {
 	if (!obs_frontend_preview_program_mode_active()) {
 		throw("studio mode not enabled");
@@ -160,7 +159,8 @@ void OBSController::ToggleMute(QString sourceName)
 		throw("sourceName is empty");
 	}
 
-	OBSSourceAutoRelease source = obs_get_source_by_name(sourceName.toUtf8());
+	OBSSourceAutoRelease source =
+		obs_get_source_by_name(sourceName.toUtf8());
 	if (!source) {
 		throw("sourceName not found");
 	}
@@ -177,7 +177,8 @@ void OBSController::SetMute(QString sourceName, bool mute)
 		throw("sourceName is empty");
 	}
 
-	OBSSourceAutoRelease source = obs_get_source_by_name(sourceName.toUtf8());
+	OBSSourceAutoRelease source =
+		obs_get_source_by_name(sourceName.toUtf8());
 	if (!source) {
 		throw("specified source doesn't exist");
 	}
@@ -221,7 +222,8 @@ void OBSController::StopStreaming()
  */
 void OBSController::StartStopRecording()
 {
-	(obs_frontend_recording_active() ? obs_frontend_recording_stop() : obs_frontend_recording_start());
+	(obs_frontend_recording_active() ? obs_frontend_recording_stop()
+					 : obs_frontend_recording_start());
 }
 
 /**
@@ -314,7 +316,8 @@ void OBSController::SaveReplayBuffer()
 		throw("replay buffer not active");
 	}
 
-	OBSOutputAutoRelease replayOutput = obs_frontend_get_replay_buffer_output();
+	OBSOutputAutoRelease replayOutput =
+		obs_frontend_get_replay_buffer_output();
 
 	calldata_t cd = {0};
 	proc_handler_t *ph = obs_output_get_proc_handler(replayOutput);
@@ -346,8 +349,6 @@ void OBSController::DisableSourceFilter() {}
 
 void OBSController::ToggleSourceFilter() {}
 
-
-
 ////////////////
 // CC ACTIONS //
 ////////////////
@@ -372,7 +373,8 @@ void OBSController::SetSyncOffset(QString sourceName, int64_t sourceSyncOffset)
 		throw("source name is empty");
 	}
 
-	OBSSourceAutoRelease source = obs_get_source_by_name(sourceName.toUtf8());
+	OBSSourceAutoRelease source =
+		obs_get_source_by_name(sourceName.toUtf8());
 	if (!source) {
 		throw("specified source doesn't exist");
 	}

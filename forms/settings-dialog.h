@@ -22,35 +22,30 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "configwindow.h"
 #include "midi-agent.h"
 
-
-
-
-class SettingsDialog : public QDialog
-{
+class SettingsDialog : public QDialog {
 	Q_OBJECT
 
 public:
-	SettingsDialog(QWidget* parent);
+	SettingsDialog(QWidget *parent);
 	~SettingsDialog();
 	void setCheck(bool check);
 	void SetAvailableDevices();
 	void on_btn_configure_clicked();
 	int on_check_enabled_stateChanged(bool state);
 	void on_item_select(QString curitem);
-	
 
 private Q_SLOTS:
 	void ToggleShowHide();
-	
+
 public slots:
 	void selectOutput(QString item);
 
 private:
-	Ui::SettingsDialog* ui;
-	
-	Ui::ConfigWindow* cwin;
+	Ui::SettingsDialog *ui;
+
+	Ui::ConfigWindow *cwin;
 	bool hidedebugitems = true;
-	bool loadingdevices=false;
-	QMetaObject::Connection desconnect; 
+	bool loadingdevices = false;
+	QMetaObject::Connection desconnect;
 	bool starting = true;
 };

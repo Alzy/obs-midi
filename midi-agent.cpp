@@ -317,16 +317,12 @@ void MidiAgent::NewObsEvent(QString eventType, QString eventData) {
 
 		if (eventType == QString("SourceVolumeChanged")) {
 			double vol = obs_data_get_double(data, "volume");
-
 			uint8_t newvol = Utils::mapper2(cbrt(vol));
 			std::string source =
 				obs_data_get_string(data, "sourceName");
 			blog(1, "OBS EVENT %s -- %s -- %f -- %i",
 			     eventType.toStdString().c_str(), source.c_str(),
 			     vol, newvol);
-
-			//auto device = dm->GetMidiDeviceByName(this.name);
-			//device->midiout->send_message()
 			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
 				if (self->midiHooks.at(i)->command ==
 					    "Set Volume" &&
@@ -364,7 +360,6 @@ void MidiAgent::NewObsEvent(QString eventType, QString eventData) {
 				if (self->midiHooks.at(i)->command =="Toggle Mute" && self->midiHooks.at(i)->param1 == from) {
 					bool muted =obs_data_get_bool(data, "muted");
 					this->send("note_on",  self->midiHooks.at(i)->mchan,  self->midiHooks.at(i)->index,  muted);
-					//this->send("note_off", self->midiHooks.at(i)->mchan, self->midiHooks.at(i)->index,0);
 				}
 				
 			}
@@ -375,7 +370,6 @@ void MidiAgent::NewObsEvent(QString eventType, QString eventData) {
 				if (self->midiHooks.at(i)->command =="Set Mute" && self->midiHooks.at(i)->param1 == from) {
 					bool muted =obs_data_get_bool(data, "muted");
 					this->send("note_on",  self->midiHooks.at(i)->mchan,  self->midiHooks.at(i)->index,  muted);
-					//this->send("note_off", self->midiHooks.at(i)->mchan, self->midiHooks.at(i)->index,0);
 				}
 				
 			}

@@ -11,10 +11,9 @@
 #include "device-manager.h"
 #include "midi-agent.h"
 
-ConfigWindow::ConfigWindow(std::string devn) : ui(new Ui::ConfigWindow)
+ConfigWindow::ConfigWindow(QString devn) : ui(new Ui::ConfigWindow)
 {
-	//this->setAttribute(Qt::WA_DeleteOnClose);
-	devicename = devn;
+	devicename = devn.toStdString();
 	//Setup the UI
 	ui->setupUi(this);
 	
@@ -24,8 +23,8 @@ ConfigWindow::ConfigWindow(std::string devn) : ui(new Ui::ConfigWindow)
 	auto hooks =
 		devicemanager->GetMidiHooksByDeviceName(devicename.c_str());
 	///HOOK up the Message Handler
-	connect(device, SIGNAL(SendNewUnknownMessage(QString, QString, int)),
-		this, SLOT(domessage(QString, QString, int)));
+	connect(device, SIGNAL(SendNewUnknownMessage(QString, QString, int, int)),
+		this, SLOT(domessage(QString, QString, int, int)));/// name, mtype, norc, channel
 	
 	this->setWindowTitle(this->windowTitle() + "  " +
 			     QString::fromStdString(devicename));
@@ -37,10 +36,7 @@ ConfigWindow::ConfigWindow(std::string devn) : ui(new Ui::ConfigWindow)
 	
 		for (int i = 0; i < hooks.size(); i++) {
 			int rc = ui->tableWidget->rowCount();
-			AddRowFromHooks(rc, hooks.at(i)->type, hooks.at(i)->index,
-					false, hooks.at(i)->action,
-					hooks.at(i)->command, hooks.at(i)->param1,
-					hooks.at(i)->param2, hooks.at(i)->param3);
+			AddRowFromHooks(rc, hooks.at(i)->type, hooks.at(i)->mchan, hooks.at(i)->index, hooks.at(i)->bidirectional, hooks.at(i)->action, hooks.at(i)->command, hooks.at(i)->param1, hooks.at(i)->param2, hooks.at(i)->param3);
 		}
 	}
 	
@@ -59,7 +55,7 @@ ConfigWindow::ConfigWindow(std::string devn) : ui(new Ui::ConfigWindow)
 	connect(ui->cb_param1, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
 	//connect(ui->cb_param2, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
 	//connect(ui->cb_param3, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
-	//connect(ui->checkBox, SIGNAL(stateChanged(int)), this,SLOT(sendToTable()));
+	connect(ui->checkBox, SIGNAL(stateChanged(int)), this,SLOT(sendToTable()));
 	//connect(ui->cb_atype, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
 	connect(ui->cb_action, SIGNAL(currentTextChanged(QString)), this, SLOT(chooseOptions1(QString)));
 	connect(ui->btnDel, SIGNAL(clicked()), this, SLOT(deleterow()));
@@ -89,23 +85,22 @@ void ConfigWindow::select(int row, int col)
 {
 	dirty = true;
 	ui->lin_mtype->setText(ui->tableWidget->item(row, 0)->text());
-	ui->num_mchan->display(ui->tableWidget->item(row, 1)->text().toInt());
-	ui->checkBox->setChecked(QVariant(ui->tableWidget->item(row, 2)->text()).toBool());
-	ui->cb_atype->setCurrentText(ui->tableWidget->item(row, 3)->text());
-	ui->cb_action->setCurrentText(ui->tableWidget->item(row, 4)->text());
-	ui->cb_param1->setCurrentText(ui->tableWidget->item(row, 5)->text());
-	ui->cb_param2->setCurrentText(ui->tableWidget->item(row, 6)->text());
-	ui->cb_param3->setCurrentText(ui->tableWidget->item(row, 7)->text());
+	ui->channel->display(ui->tableWidget->item(row, 1)->text().toInt());
+	ui->num_mchan->display(ui->tableWidget->item(row, 2)->text().toInt());
+	ui->checkBox->setChecked(QVariant(ui->tableWidget->item(row, 3)->text()).toBool());
+	ui->cb_atype->setCurrentText(ui->tableWidget->item(row, 4)->text());
+	ui->cb_action->setCurrentText(ui->tableWidget->item(row, 5)->text());
+	ui->cb_param1->setCurrentText(ui->tableWidget->item(row, 6)->text());
+	ui->cb_param2->setCurrentText(ui->tableWidget->item(row, 7)->text());
+	ui->cb_param3->setCurrentText(ui->tableWidget->item(row, 8)->text());
 	dirty = false;
 }
-void ConfigWindow::AddRowFromHooks(int rc, std::string type, int index, bool bid,
-			     std::string action, std::string command,
-			     std::string param1, std::string param2,
-			     std::string param3)
+void ConfigWindow::AddRowFromHooks(int rc, std::string type, int channel,  int index, bool bid, std::string action, std::string command,  std::string param1, std::string param2, std::string param3)
 {
 
 		ui->tableWidget->insertRow(rc);
 		QTableWidgetItem *newItem = new QTableWidgetItem();
+		QTableWidgetItem *newItem1 = new QTableWidgetItem();
 		QTableWidgetItem *newItem2 = new QTableWidgetItem();
 		QTableWidgetItem *newItem3 = new QTableWidgetItem();
 		QTableWidgetItem *newItem4 = new QTableWidgetItem();
@@ -115,8 +110,9 @@ void ConfigWindow::AddRowFromHooks(int rc, std::string type, int index, bool bid
 		QTableWidgetItem *newItem8 = new QTableWidgetItem();
 		//load rows from hooks		
 		newItem->setText(QString::fromStdString(type)); //Message Type
-		newItem2->setText(QString::number(index)); //message channel
-		newItem3->setText(QVariant(false).toString()); //Bidirectional
+		newItem1->setText(QString::number(channel)); //message Channel
+		newItem2->setText(QString::number(index)); //message Note or Control
+		newItem3->setText(QVariant(bid).toString()); //Bidirectional
 		newItem4->setText(QString::fromStdString(action)); //Action Type
 		newItem5->setText(QString::fromStdString(command)); //Action
 		newItem6->setText(QString::fromStdString(param1)); //Option 1
@@ -124,23 +120,27 @@ void ConfigWindow::AddRowFromHooks(int rc, std::string type, int index, bool bid
 		newItem8->setText(QString::fromStdString(param3));        //Option 3
 		//Set items		
 		ui->tableWidget->setItem(rc, 0, newItem);
-		ui->tableWidget->setItem(rc, 1, newItem2);
-		ui->tableWidget->setItem(rc, 2, newItem3);
-		ui->tableWidget->setItem(rc, 3, newItem4);
-		ui->tableWidget->setItem(rc, 4, newItem5);
-		ui->tableWidget->setItem(rc, 5, newItem6);
-		ui->tableWidget->setItem(rc, 6, newItem7);
-		ui->tableWidget->setItem(rc, 7, newItem8);
+		ui->tableWidget->setItem(rc, 1, newItem1);
+		ui->tableWidget->setItem(rc, 2, newItem2);
+		ui->tableWidget->setItem(rc, 3, newItem3);
+		ui->tableWidget->setItem(rc, 4, newItem4);
+		ui->tableWidget->setItem(rc, 5, newItem5);
+		ui->tableWidget->setItem(rc, 6, newItem6);
+		ui->tableWidget->setItem(rc, 7, newItem7);
+		ui->tableWidget->setItem(rc, 8, newItem8);
 		//Set Default sidebar
 		if (rc == 1) {
 			select(0, 1);
 		}
 }
-void  ConfigWindow::insertRow(QString mtype,int mindex)
+
+//Create Default row
+void  ConfigWindow::insertRow(QString mtype,int mindex, int channel)
 {
 	int rc = ui->tableWidget->rowCount();
 	ui->tableWidget->insertRow(rc );
 	QTableWidgetItem *newItem = new QTableWidgetItem();
+	QTableWidgetItem *newItem1 = new QTableWidgetItem();
 	QTableWidgetItem *newItem2 = new QTableWidgetItem();
 	QTableWidgetItem *newItem3 = new QTableWidgetItem();
 	QTableWidgetItem *newItem4 = new QTableWidgetItem();
@@ -150,8 +150,9 @@ void  ConfigWindow::insertRow(QString mtype,int mindex)
 	QTableWidgetItem *newItem8 = new QTableWidgetItem();
 	
 	newItem->setText(mtype); //Message Type
+	newItem1->setText(QString::number(channel)); //message channel
 	newItem2->setText(QString::number(mindex));   //message channel
-	//newItem3->setCheckState(false); //Bidirectional
+	newItem3->setText("false"); //Bidirectional
 	
 	if (mtype == "control_change") {
 		newItem4->setText("Fader"); //Action Type
@@ -166,14 +167,15 @@ void  ConfigWindow::insertRow(QString mtype,int mindex)
 	newItem7->setText("");   //Option 2
 	newItem8->setText("");   //Option 3
 	
-	ui->tableWidget->setItem(rc , 0, newItem);
-	ui->tableWidget->setItem(rc, 1, newItem2);
-	ui->tableWidget->setItem(rc, 2, newItem3);
-	ui->tableWidget->setItem(rc, 3, newItem4);
-	ui->tableWidget->setItem(rc, 4, newItem5);
-	ui->tableWidget->setItem(rc, 5, newItem6);
-	ui->tableWidget->setItem(rc, 6, newItem7);
-	ui->tableWidget->setItem(rc, 7, newItem8);
+	ui->tableWidget->setItem(rc, 0, newItem);
+	ui->tableWidget->setItem(rc, 1, newItem1);
+	ui->tableWidget->setItem(rc, 2, newItem2);
+	ui->tableWidget->setItem(rc, 3, newItem3);
+	ui->tableWidget->setItem(rc, 4, newItem4);
+	ui->tableWidget->setItem(rc, 5, newItem5);
+	ui->tableWidget->setItem(rc, 6, newItem6);
+	ui->tableWidget->setItem(rc, 7, newItem7);
+	ui->tableWidget->setItem(rc, 8, newItem8);
 
 	
 }
@@ -193,13 +195,14 @@ void ConfigWindow::save() {
 		MidiHook *mh = new MidiHook;
 		//map values
 		mh->type = ui->tableWidget->item(i, 0)->text().toStdString();
-		mh->index =ui->tableWidget->item(i, 1)->text().toInt();
-		//mh->bidirectional = ui->tableWidget->item(i, 2)->text;
-		mh->action = ui->tableWidget->item(i, 3)->text().toStdString();
-		mh->command = ui->tableWidget->item(i, 4)->text().toStdString();
-		mh->param1 = ui->tableWidget->item(i, 5)->text().toStdString();
-		mh->param2 = ui->tableWidget->item(i, 6)->text().toStdString();
-		mh->param3 = ui->tableWidget->item(i, 7)->text().toStdString();		
+		mh->mchan =ui->tableWidget->item(i, 1)->text().toInt();
+		mh->index =ui->tableWidget->item(i, 2)->text().toInt();	
+		mh->bidirectional = QVariant(ui->tableWidget->item(i, 3)->text()).toBool();
+		mh->action = ui->tableWidget->item(i, 4)->text().toStdString();
+		mh->command = ui->tableWidget->item(i, 5)->text().toStdString();
+		mh->param1 = ui->tableWidget->item(i, 6)->text().toStdString();
+		mh->param2 = ui->tableWidget->item(i, 7)->text().toStdString();
+		mh->param3 = ui->tableWidget->item(i, 8)->text().toStdString();		
 		dev->AddMidiHook(mh);
 		
 	};
@@ -212,12 +215,12 @@ void ConfigWindow::save() {
 	
 }
 /************************** Message Handler for UI ***************************************/
-	void ConfigWindow::domessage(QString namein, QString mtype, int mchan)
+	void ConfigWindow::domessage(QString namein, QString mtype, int norc, int channel)
 {
 		if (namein == QString::fromStdString(devicename)) {
-		if (inrow(mchan, mtype)) {
+		if (inrow(norc, mtype, channel)) {
 			blog(1, "domessage");
-			insertRow(mtype, mchan);
+			insertRow(mtype, norc, channel);
 		}
 		}
 	
@@ -227,23 +230,26 @@ void ConfigWindow::save() {
 bool ConfigWindow::inrow(int x) {
 int rows = ui->tableWidget->rowCount();
 	for (int i = 0; i < rows; ++i) {
-		if (ui->tableWidget->item(i, 1)->text() ==
+		if (ui->tableWidget->item(i, 2)->text() ==
 		    QString::number(x)) {
 			return true;
 		}
 	}
 	return false;
 }
-bool ConfigWindow::inrow(int x, QString mtype)
+bool ConfigWindow::inrow(int norc, QString mtype, int channel)
 {
-	auto fitems = ui->tableWidget->findItems(QString::number(x), 0);
+	auto fitems = ui->tableWidget->findItems(QString::number(norc), 0);
 	int itemcount = fitems.size();
 		for (int i = 0; i < itemcount; ++i) {
-		
-		if (ui->tableWidget->item(fitems.at(i)->row(), 0)
-				    ->text() == mtype) {
-				return false;
+			// Only Check Collumn 2 (Note or control)
+
+			if (fitems.at(i)->column() == 2) {
+			
+				if (ui->tableWidget->item(fitems.at(i)->row(), 0)->text() == mtype) {
+					return false;
 			}
+		}
 			
 		}
 	return true;
@@ -254,13 +260,15 @@ void ConfigWindow::sendToTable() {
 		if (ui->tableWidget->rowCount() > 0) {
 			int rc =ui->tableWidget->selectedItems()[0]->row();
 			ui->tableWidget->item(rc, 0)->setText(ui->lin_mtype->text());//mtype
-			ui->tableWidget->item(rc, 1)->setText(QString::number(ui->num_mchan->intValue()));               //mindex
-			ui->tableWidget->item(rc, 2)->setText(QVariant(ui->checkBox->isChecked()).toString()); //bool
-			ui->tableWidget->item(rc, 3)->setText(ui->cb_atype->currentText());//atype
-			ui->tableWidget->item(rc, 4)->setText(ui->cb_action->currentText());   //action
-			ui->tableWidget->item(rc, 5)->setText(ui->cb_param1->currentText());
-			ui->tableWidget->item(rc, 6)->setText(ui->cb_param2->currentText());
-			ui->tableWidget->item(rc, 7)->setText(ui->cb_param3->currentText());
+		
+			ui->tableWidget->item(rc, 1)->setText(QString::number(ui->channel->intValue()));               //Channel
+			ui->tableWidget->item(rc, 2)->setText(QString::number(ui->num_mchan->intValue()));               //mindex
+			ui->tableWidget->item(rc, 3)->setText(QVariant(ui->checkBox->isChecked()).toString()); //bool
+			ui->tableWidget->item(rc, 4)->setText(ui->cb_atype->currentText());//atype
+			ui->tableWidget->item(rc, 5)->setText(ui->cb_action->currentText());   //action
+			ui->tableWidget->item(rc, 6)->setText(ui->cb_param1->currentText());
+			ui->tableWidget->item(rc, 7)->setText(ui->cb_param2->currentText());
+			ui->tableWidget->item(rc, 8)->setText(ui->cb_param3->currentText());
 		} // If rowcount  > 0
 	}//Dirty
 }//Send to Table

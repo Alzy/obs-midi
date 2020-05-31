@@ -9,6 +9,7 @@
 #include <utility>
 #include "obs-midi.h"
 
+
 #include "rtmidi17/rtmidi17.hpp"
 #include "forms/settings-dialog.h"
 #include <QtWidgets/QAction>
@@ -17,6 +18,7 @@
 #include "device-manager.h"
 #include "utils.h"
 #include "midi-agent.h"
+#include "events.h"
 using namespace std;
 
 void ___source_dummy_addref(obs_source_t *) {}
@@ -36,6 +38,7 @@ OBS_MODULE_USE_DEFAULT_LOCALE("obs-midi", "en-US")
 ConfigPtr _config;
 DeviceManagerPtr _deviceManager;
 
+eventsPtr _eventsSystem;
 
 
 
@@ -54,28 +57,23 @@ bool obs_module_load(void)
 	_config->Load();
 
 	// Signal Router Setup
-	
+	_eventsSystem = eventsPtr(new events(_deviceManager));
+
 
 	// UI SETUP
 	QMainWindow *mainWindow = (QMainWindow *)obs_frontend_get_main_window();
 	SettingsDialog *settingsDialog = new SettingsDialog(mainWindow);
-
 	const char* menuActionText = obs_module_text("OBS MIDI Settings");
-
 	QAction* menuAction = (QAction*)obs_frontend_add_tools_menu_qaction(menuActionText);
+	QObject::connect(menuAction, SIGNAL(triggered()), settingsDialog,SLOT(ToggleShowHide()));
 
-			 
-	QObject::connect(menuAction, &QAction::triggered, [settingsDialog] {
-		// The settings dialog belongs to the main window. Should be ok
-		// to pass the pointer to this QAction belonging to the main window
-		settingsDialog->ToggleShowHide();
-		if (settingsDialog->isVisible()) {
-			auto devNames = _deviceManager->GetPortsList();
-			settingsDialog->SetAvailableDevices(devNames);
-			
-
+	// Setup event handler to start the server once OBS is ready
+	auto eventCallback = [](enum obs_frontend_event event, void *param) {
+		if (event == OBS_FRONTEND_EVENT_FINISHED_LOADING) {
+			obs_frontend_remove_event_callback((obs_frontend_event_cb)param, nullptr);
 		}
-	});
+	};
+	obs_frontend_add_event_callback(eventCallback, (void*)(obs_frontend_event_cb)eventCallback);
 	
 	return true;
 }
@@ -84,7 +82,8 @@ bool obs_module_load(void)
 void obs_module_unload()
 {
 	_config.reset();
-
+	_eventsSystem.reset();
+	_deviceManager.reset();
 	blog(LOG_INFO, "goodbye!");
 }
 
@@ -101,4 +100,8 @@ DeviceManagerPtr GetDeviceManager()
 	return _deviceManager;
 }
 
+eventsPtr GetEventsSystem()
+{
+	return _eventsSystem;
+}
 

@@ -39,6 +39,7 @@ typedef bool(*RecordingPausedFunction)();
 namespace Utils {
 	// MIDI Utils
 	float mapper(int x);
+	int mapper2(double x);
 	bool is_number(const std::string& s);
 	std::string getMidiMessageType(int in);
 	std::vector <const char*> GetVideoSourceNames();
@@ -47,7 +48,6 @@ namespace Utils {
 	obs_data_array_t* StringListToArray(char** strings, const char* key);
 	obs_data_array_t* GetSceneItems(obs_source_t* source);
 	obs_data_t* GetSceneItemData(obs_sceneitem_t* item);
-
 	// These functions support nested lookup into groups
 	obs_sceneitem_t* GetSceneItemFromName(obs_scene_t* scene, QString name);
 	obs_sceneitem_t* GetSceneItemFromId(obs_scene_t* scene, int64_t id);

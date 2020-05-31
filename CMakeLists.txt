@@ -79,7 +79,9 @@ set(obs-midi_SOURCES
         forms/settings-dialog.cpp
 	forms/configwindow.cpp
         obs-midi.cpp
-	
+	events.cpp
+	rpc/RpcEvent.cpp
+
 )
 
 list(APPEND obs-midi_HEADERS
@@ -91,8 +93,9 @@ list(APPEND obs-midi_HEADERS
         forms/settings-dialog.h
 	forms/configwindow.h
         obs-midi.h
-	
-	
+	events.h
+	rpc/RpcEvent.h
+
 )
 
 add_library(obs-midi MODULE

@@ -27,19 +27,19 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 using namespace std;
 
 class Config {
-	public:
-		Config();
-		~Config();
-		void Load();
-		void Save();
-		void SetDefaults();
-		config_t* GetConfigStore();
+public:
+	Config();
+	~Config();
+	void Load();
+	void Save();
+	void SetDefaults();
+	config_t *GetConfigStore();
 
-		bool DebugEnabled;
-		bool AlertsEnabled;
+	bool DebugEnabled;
+	bool AlertsEnabled;
 
-		bool SettingsLoaded;
+	bool SettingsLoaded;
 
-	private:
-		static void OnFrontendEvent(enum obs_frontend_event event, void* param);
+private:
+	static void OnFrontendEvent(enum obs_frontend_event event, void *param);
 };

@@ -32,32 +32,32 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "rpc/RpcEvent.h"
 using namespace std;
 
-class DeviceManager: public QObject {
+class DeviceManager : public QObject {
 	Q_OBJECT
 public:
-		DeviceManager();
-		~DeviceManager();
-		void Load(obs_data_t* data);
+	DeviceManager();
+	~DeviceManager();
+	void Load(obs_data_t *data);
 
-		vector <string> GetPortsList();
-		int GetPortNumberByDeviceName(const char* deviceName);
-		vector<string> GetOutPortsList();
-		int GetOutPortNumberByDeviceName(const char* deviceName);
-		QStringList opl;
-		vector<MidiAgent*> GetActiveMidiDevices();
-		MidiAgent* GetMidiDeviceByName(const char* deviceName);
-		vector <MidiHook *> GetMidiHooksByDeviceName(const char* deviceName);
-		QStringList GetOPL();
-		void RegisterMidiDevice(int port, int outport);
-		void SendMidi(QString mtype, int channel, int norc,
-			      int value);
-		obs_data_t* GetData();
-		void broadcast(const RpcEvent &event);
+	vector<string> GetPortsList();
+	int GetPortNumberByDeviceName(const char *deviceName);
+	vector<string> GetOutPortsList();
+	int GetOutPortNumberByDeviceName(const char *deviceName);
+	QStringList opl;
+	vector<MidiAgent *> GetActiveMidiDevices();
+	MidiAgent *GetMidiDeviceByName(const char *deviceName);
+	vector<MidiHook *> GetMidiHooksByDeviceName(const char *deviceName);
+	QStringList GetOPL();
+	void RegisterMidiDevice(int port, int outport);
+	void SendMidi(QString mtype, int channel, int norc, int value);
+	obs_data_t *GetData();
+	void broadcast(const RpcEvent &event);
 signals:
-		void bcast(QString updateType, QString eventData);
-	private:
-		rtmidi::midi_in *rtMidi;
-		rtmidi::midi_out *MO;
+	void bcast(QString updateType, QString eventData);
 
-		vector<MidiAgent*> midiAgents;
+private:
+	rtmidi::midi_in *rtMidi;
+	rtmidi::midi_out *MO;
+
+	vector<MidiAgent *> midiAgents;
 };

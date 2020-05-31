@@ -37,19 +37,18 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <iostream>
 //#include "WSServer.h"
 
-class events : public QObject
-{
-Q_OBJECT
+class events : public QObject {
+	Q_OBJECT
 
 public:
 	explicit events(DeviceManagerPtr srv);
 	~events();
 
-	void connectSourceSignals(obs_source_t* source);
-	void disconnectSourceSignals(obs_source_t* source);
+	void connectSourceSignals(obs_source_t *source);
+	void disconnectSourceSignals(obs_source_t *source);
 
-	void connectFilterSignals(obs_source_t* filter);
-	void disconnectFilterSignals(obs_source_t* filter);
+	void connectFilterSignals(obs_source_t *filter);
+	void disconnectFilterSignals(obs_source_t *filter);
 
 	void hookTransitionPlaybackEvents();
 	void unhookTransitionPlaybackEvents();
@@ -59,10 +58,10 @@ public:
 
 	QString getStreamingTimecode();
 	QString getRecordingTimecode();
-	
-	obs_data_t* GetStats();
 
-	void OnBroadcastCustomMessage(QString realm, obs_data_t* data);
+	obs_data_t *GetStats();
+
+	void OnBroadcastCustomMessage(QString realm, obs_data_t *data);
 
 	bool HeartbeatIsActive;
 signals:
@@ -76,8 +75,8 @@ private:
 	DeviceManagerPtr _srv;
 	QTimer streamStatusTimer;
 	QTimer heartbeatTimer;
-	os_cpu_usage_info_t* cpuUsageInfo;
-	
+	os_cpu_usage_info_t *cpuUsageInfo;
+
 	bool pulse;
 
 	uint64_t _streamStarttime;
@@ -85,8 +84,8 @@ private:
 	uint64_t _lastBytesSent;
 	uint64_t _lastBytesSentTime;
 
-	void broadcastUpdate(const char* updateType,
-		obs_data_t* additionalFields);
+	void broadcastUpdate(const char *updateType,
+			     obs_data_t *additionalFields);
 
 	void OnSceneChange();
 	void OnSceneListChange();
@@ -121,34 +120,36 @@ private:
 
 	void OnExit();
 
-	static void FrontendEventHandler(
-		enum obs_frontend_event event, void* privateData);
+	static void FrontendEventHandler(enum obs_frontend_event event,
+					 void *privateData);
 
-	static void OnTransitionBegin(void* param, calldata_t* data);
-	static void OnTransitionEnd(void* param, calldata_t* data);
-	static void OnTransitionVideoEnd(void* param, calldata_t* data);
+	static void OnTransitionBegin(void *param, calldata_t *data);
+	static void OnTransitionEnd(void *param, calldata_t *data);
+	static void OnTransitionVideoEnd(void *param, calldata_t *data);
 
-	static void OnSourceCreate(void* param, calldata_t* data);
-	static void OnSourceDestroy(void* param, calldata_t* data);
+	static void OnSourceCreate(void *param, calldata_t *data);
+	static void OnSourceDestroy(void *param, calldata_t *data);
 
-	static void OnSourceVolumeChange(void* param, calldata_t* data);
-	static void OnSourceMuteStateChange(void* param, calldata_t* data);
-	static void OnSourceAudioSyncOffsetChanged(void* param, calldata_t* data);
-	static void OnSourceAudioMixersChanged(void* param, calldata_t* data);
+	static void OnSourceVolumeChange(void *param, calldata_t *data);
+	static void OnSourceMuteStateChange(void *param, calldata_t *data);
+	static void OnSourceAudioSyncOffsetChanged(void *param,
+						   calldata_t *data);
+	static void OnSourceAudioMixersChanged(void *param, calldata_t *data);
 
-	static void OnSourceRename(void* param, calldata_t* data);
+	static void OnSourceRename(void *param, calldata_t *data);
 
-	static void OnSourceFilterAdded(void* param, calldata_t* data);
-	static void OnSourceFilterRemoved(void* param, calldata_t* data);
-	static void OnSourceFilterVisibilityChanged(void* param, calldata_t* data);
-	static void OnSourceFilterOrderChanged(void* param, calldata_t* data);
+	static void OnSourceFilterAdded(void *param, calldata_t *data);
+	static void OnSourceFilterRemoved(void *param, calldata_t *data);
+	static void OnSourceFilterVisibilityChanged(void *param,
+						    calldata_t *data);
+	static void OnSourceFilterOrderChanged(void *param, calldata_t *data);
 
-	static void OnSceneReordered(void* param, calldata_t* data);
-	static void OnSceneItemAdd(void* param, calldata_t* data);
-	static void OnSceneItemDelete(void* param, calldata_t* data);
-	static void OnSceneItemVisibilityChanged(void* param, calldata_t* data);
-	static void OnSceneItemLockChanged(void* param, calldata_t* data);
-	static void OnSceneItemTransform(void* param, calldata_t* data);
-	static void OnSceneItemSelected(void* param, calldata_t* data);
-	static void OnSceneItemDeselected(void* param, calldata_t* data);
+	static void OnSceneReordered(void *param, calldata_t *data);
+	static void OnSceneItemAdd(void *param, calldata_t *data);
+	static void OnSceneItemDelete(void *param, calldata_t *data);
+	static void OnSceneItemVisibilityChanged(void *param, calldata_t *data);
+	static void OnSceneItemLockChanged(void *param, calldata_t *data);
+	static void OnSceneItemTransform(void *param, calldata_t *data);
+	static void OnSceneItemSelected(void *param, calldata_t *data);
+	static void OnSceneItemDeselected(void *param, calldata_t *data);
 };

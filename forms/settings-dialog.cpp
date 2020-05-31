@@ -75,12 +75,18 @@ void SettingsDialog::SetAvailableDevices()
 	this->ui->outbox->insertItems(0, midiOutDevices);
 	loadingdevices = false;
 	auto midiDevices = GetDeviceManager()->GetPortsList();
-	if (!starting) {
-		this->ui->outbox->setCurrentText(
-			GetDeviceManager()
-				->GetMidiDeviceByName(midiDevices.at(0).c_str())
-				->GetOutName()
-				.c_str());
+	if (starting) {
+
+		#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+			//define something for Windows (32-bit and 64-bit, this part is common)
+			this->ui->outbox->setCurrentIndex(1);
+		#elif __linux__
+			this->ui->outbox->setCurrentIndex(0);
+			// linux
+		#elif __unix__ // all unices not caught above
+			this->ui->outbox->setCurrentIndex(0);
+			// Unix
+		#endif
 	}
 
 	this->ui->list_midi_dev->clear();
@@ -98,17 +104,17 @@ void SettingsDialog::SetAvailableDevices()
 
 	for (int i = 0; i < midiDevices.size(); i++) {
 		this->ui->list_midi_dev->addItem(midiDevices.at(i).c_str());
+		
 	}
 	if (starting) {
 		
 		desconnect = connect(ui->outbox, SIGNAL(currentTextChanged(QString)), this,	SLOT(selectOutput(QString)));
 		starting = false;
 	}
-	
 
 		
 	
-	//this->ui->list_midi_dev->setCurrentRow(0);
+	this->ui->list_midi_dev->setCurrentRow(0);
 	
 }
 

@@ -24,7 +24,7 @@ Currently There is only a windows build, But as this uses the RTMIDI library, an
 
 # Build instructions 
 in your obs-studio/plugins folder
-1. ```git clone --recursive https://github.com/Alzy/obs-midi```
+1. ```git clone --recursive https://github.com/Alzy/obs-midi.git```
 2. Append to CMakeLists.txt  
   * ```add_subdirectory(obs-midi)```
  Go back to your obs Build directory

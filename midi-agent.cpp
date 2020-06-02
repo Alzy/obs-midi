@@ -25,6 +25,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "utils.h"
 #include "midi-agent.h"
 #include "obs-midi.h"
+#include "config.h"
 #include "obs-controller.h"
 #include "device-manager.h"
 using namespace std;
@@ -507,6 +508,43 @@ void MidiAgent::NewObsEvent(QString eventType, QString eventData)
 						   muted);
 				}
 			}
+		} else if (eventType == QString("SourceRenamed")) {
+			std::string from =
+				obs_data_get_string(data, "previousName");
+			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
+				if (self->midiHooks.at(i)->param1 == from) {
+					self->midiHooks.at(i)->param1 = obs_data_get_string(data, "newName");
+					self->GetData(); 
+					
+				}
+			}
+		} else if (eventType == QString("SourceDestroyed")) {
+			std::string from = obs_data_get_string(data, "sourceName");
+			
+			auto mh = midiHooks;	
+			mh.erase(
+				std::remove_if(
+					mh.begin(), mh.end(),
+					[from, this](const MidiHook *e) {
+						if (e->param1 == from) {
+							blog(1,
+							     "deleted hook -- %s -- %s",
+							     e->param1.c_str(),
+							     e->type.c_str());
+							return e;
+						}
+					}),
+				mh.end());
+
+				
+				
+				
+				GetConfig()->Save();
+				//GetConfig()->Load();
+				//GetConfig()->GetConfigStore();
+				
+				
+			
 		}
 
 		blog(1, "OBS EVENT- MidiAgent.cpp %s -- %s",

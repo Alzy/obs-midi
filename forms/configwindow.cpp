@@ -246,7 +246,7 @@ void ConfigWindow::domessage(QString namein, QString mtype, int norc,
 }
 int ConfigWindow::getRow(int norc, QString mtype, int channel)
 {
-	
+
 	auto fitems = ui->tableWidget->findItems(QString::number(norc), 0);
 	int itemcount = fitems.size();
 	for (int i = 0; i < itemcount; ++i) {
@@ -261,9 +261,8 @@ int ConfigWindow::getRow(int norc, QString mtype, int channel)
 		}
 	}
 	return -1;
-
 }
-	/************Checks if item exists in tow*************/
+/************Checks if item exists in tow*************/
 bool ConfigWindow::inrow(int x)
 {
 	int rows = ui->tableWidget->rowCount();

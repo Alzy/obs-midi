@@ -57,7 +57,8 @@ public slots:
 	void chooseAtype(QString index);
 	void clearTable();
 	int getRow(int norc, QString mtype, int channel);
-	private:
+
+private:
 	Ui::ConfigWindow *ui;
 	bool dirty;
 	QStringList ScenesList;

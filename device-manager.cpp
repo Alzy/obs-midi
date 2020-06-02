@@ -149,6 +149,7 @@ DeviceManager::GetMidiHooksByDeviceName(const char *deviceName)
 */
 void DeviceManager::RegisterMidiDevice(int port, int outport)
 {
+
 	MidiAgent *midiA = new MidiAgent();
 	midiA->OpenPort(port);
 	midiA->OpenOutPort(outport);

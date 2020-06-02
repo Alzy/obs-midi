@@ -518,33 +518,26 @@ void MidiAgent::NewObsEvent(QString eventType, QString eventData)
 					
 				}
 			}
-		} else if (eventType == QString("SourceDestroyed")) {
-			std::string from = obs_data_get_string(data, "sourceName");
-			
-			auto mh = midiHooks;	
-			mh.erase(
-				std::remove_if(
-					mh.begin(), mh.end(),
-					[from, this](const MidiHook *e) {
-						if (e->param1 == from) {
-							blog(1,
-							     "deleted hook -- %s -- %s",
-							     e->param1.c_str(),
-							     e->type.c_str());
-							return e;
-						}
-					}),
-				mh.end());
+		} else if (eventType == QString("Exiting")) {
+			closing = true;
 
-				
-				
-				
+		}else if (eventType == QString("SourceDestroyed")) {
+			if (!closing) {
+				std::string from =
+					obs_data_get_string(data, "sourceName");
+
+				for (unsigned i = 0; i < self->midiHooks.size();
+				     i++) {
+					if (self->midiHooks.at(i)->param1 ==
+					    from) {
+						self->RemoveMidiHook(
+							self->midiHooks.at(i));
+						self->GetData();
+						i--;
+					}
+				}
 				GetConfig()->Save();
-				//GetConfig()->Load();
-				//GetConfig()->GetConfigStore();
-				
-				
-			
+			}
 		}
 
 		blog(1, "OBS EVENT- MidiAgent.cpp %s -- %s",

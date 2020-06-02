@@ -140,5 +140,6 @@ private:
 	bool enabled;
 	bool connected;
 	bool bidirectional;
+	bool closing=false;
 	vector<MidiHook *> midiHooks;
 };

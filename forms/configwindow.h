@@ -56,8 +56,8 @@ public slots:
 	//Combobox Actions
 	void chooseAtype(QString index);
 	void clearTable();
-
-private:
+	int getRow(int norc, QString mtype, int channel);
+	private:
 	Ui::ConfigWindow *ui;
 	bool dirty;
 	QStringList ScenesList;

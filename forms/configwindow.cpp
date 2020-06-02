@@ -238,10 +238,32 @@ void ConfigWindow::domessage(QString namein, QString mtype, int norc,
 		if (inrow(norc, mtype, channel)) {
 			blog(1, "domessage");
 			insertRow(mtype, norc, channel);
+		} else {
+			ui->tableWidget->selectRow(
+				getRow(norc, mtype, channel));
 		}
 	}
 }
-/************Checks if item exists in tow*************/
+int ConfigWindow::getRow(int norc, QString mtype, int channel)
+{
+	
+	auto fitems = ui->tableWidget->findItems(QString::number(norc), 0);
+	int itemcount = fitems.size();
+	for (int i = 0; i < itemcount; ++i) {
+		// Only Check Collumn 2 (Note or control)
+
+		if (fitems.at(i)->column() == 2) {
+
+			if (ui->tableWidget->item(fitems.at(i)->row(), 0)
+				    ->text() == mtype) {
+				return fitems.at(i)->row();
+			}
+		}
+	}
+	return -1;
+
+}
+	/************Checks if item exists in tow*************/
 bool ConfigWindow::inrow(int x)
 {
 	int rows = ui->tableWidget->rowCount();

@@ -27,6 +27,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "obs-midi.h"
 #include "config.h"
 #include "obs-controller.h"
+#include "RtMidi17/rtmidi17.hpp"
 #include "device-manager.h"
 using namespace std;
 
@@ -249,22 +250,30 @@ void MidiAgent::SendMessage(std::string name, std::string mType, int mIndex,
 */
 void MidiAgent::OpenPort(int inport)
 {
-	midiin->open_port(inport);
+	try {
 
-	name = midiin->get_port_name(inport);
-	enabled = true;
-	connected = true;
-	blog(LOG_INFO, "MIDI device connected In: [%d] %s", inport,
-	     name.c_str());
+		midiin->open_port(inport);
+
+		name = midiin->get_port_name(inport);
+		enabled = true;
+		connected = true;
+		blog(LOG_INFO, "MIDI device connected In: [%d] %s", inport,
+		     name.c_str());
+
+	} catch (const rtmidi::midi_exception &error) {
+		
+		
+		blog(1, "unable to open port %i -- &s", inport, error.what());
+	}
 }
 void MidiAgent::OpenOutPort(int outport)
 {
 
 	try {
 		midiout->open_port(outport);
-	} catch (rtmidi::midi_exception &error) {
+	} catch (const rtmidi::midi_exception &error) {
 
-		blog(1, " Opening out port error ");
+		blog(1, " Opening out port -- %i -- exception -- %s ", outport,error.what());
 	}
 	outname = midiout->get_port_name(outport);
 	enabled = true;

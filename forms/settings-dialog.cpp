@@ -142,27 +142,33 @@ int SettingsDialog::on_check_enabled_stateChanged(bool state)
 {
 
 	if (state == true) {
+		
 		auto selectedDeviceName =
-			ui->list_midi_dev->currentItem()->text().toStdString();
+			ui->list_midi_dev->currentItem()
+				->text()
+				.toStdString();
 		auto selectedOutDeviceName =
 			ui->outbox->currentText().toStdString();
 		auto device = GetDeviceManager()->GetMidiDeviceByName(
 			selectedDeviceName.c_str());
-		blog(LOG_INFO, "Item enabled: %s", selectedDeviceName.c_str());
-		int devicePort = GetDeviceManager()->GetPortNumberByDeviceName(
+		blog(LOG_INFO, "Item enabled: %s",
 			selectedDeviceName.c_str());
+		int devicePort =
+			GetDeviceManager()->GetPortNumberByDeviceName(
+				selectedDeviceName.c_str());
 		int deviceOutPort =
 			GetDeviceManager()->GetOutPortNumberByDeviceName(
 				selectedOutDeviceName.c_str());
 		if (device == NULL) {
-			GetDeviceManager()->RegisterMidiDevice(devicePort,
-							       deviceOutPort);
+			GetDeviceManager()->RegisterMidiDevice(
+				devicePort, deviceOutPort);
 		} else {
 			device->OpenPort(devicePort);
 			if (deviceOutPort != -1) {
 				device->OpenOutPort(deviceOutPort);
 			}
 		}
+		
 	}
 
 	//ui->outbox->setCurrentText(QString::fromStdString(device->GetOutName()));

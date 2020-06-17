@@ -111,7 +111,8 @@ public:
 	int GetPort();
 	bool isEnabled();
 	bool isConnected();
-
+	bool isBidirectional();
+	bool setBidirectional(bool state);
 	static void HandleInput(const rtmidi::message &message, void *userData);
 	void TriggerInputCommand(MidiHook *hook, int midiVal);
 	void SendMessage(std::string names, std::string mType, int mIndex,

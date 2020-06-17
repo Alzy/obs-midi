@@ -39,6 +39,8 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 		&SettingsDialog::on_item_select);
 	connect(ui->check_enabled, &QCheckBox::stateChanged, this,
 		&SettingsDialog::on_check_enabled_stateChanged);
+	connect(ui->bidirectional, &QCheckBox::stateChanged, this,
+		&SettingsDialog::on_bid_enabled_stateChanged);
 	connect(ui->btn_configure, &QPushButton::clicked, this,
 		&SettingsDialog::on_btn_configure_clicked);
 
@@ -75,43 +77,46 @@ void SettingsDialog::SetAvailableDevices()
 	this->ui->outbox->insertItems(0, midiOutDevices);
 	loadingdevices = false;
 	auto midiDevices = GetDeviceManager()->GetPortsList();
-	if (starting) {
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-		//define something for Windows (32-bit and 64-bit, this part is common)
-		this->ui->outbox->setCurrentIndex(1);
-#elif __linux__
-		this->ui->outbox->setCurrentIndex(0);
-		// linux
-#elif __unix__ // all unices not caught above
-		this->ui->outbox->setCurrentIndex(0);
-		// Unix
-#endif
-	}
 
 	this->ui->list_midi_dev->clear();
 	this->ui->check_enabled->setEnabled(false);
 	this->ui->btn_configure->setEnabled(false);
 	this->ui->outbox->setEnabled(false);
+	
 	if (midiDevices.size() == 0) {
 		this->ui->list_midi_dev->addItem("No Devices Available");
 	} else if (midiDevices.size() > 0) {
 		this->ui->check_enabled->setEnabled(true);
-		this->ui->btn_configure->setEnabled(true);
-		this->ui->outbox->setEnabled(true);
+		this->ui->btn_configure->setEnabled(false);
+		this->ui->outbox->setEnabled(false);
 	}
 
 	for (int i = 0; i < midiDevices.size(); i++) {
 		this->ui->list_midi_dev->addItem(midiDevices.at(i).c_str());
 	}
-	if (starting) {
 
-		desconnect = connect(ui->outbox,
-				     SIGNAL(currentTextChanged(QString)), this,
-				     SLOT(selectOutput(QString)));
+	if (starting) {
+		
+#		if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+		//define something for Windows (32-bit and 64-bit, this part is common)
+		this->ui->outbox->setCurrentIndex(1);
+		#elif __linux__
+		this->ui->outbox->setCurrentIndex(0);
+		// linux
+		#elif __unix__ // all unices not caught above
+		this->ui->outbox->setCurrentIndex(0);
+		// Unix
+		#endif
+		if (midiDevices.size() != 0) {
+			desconnect = connect(
+				ui->outbox, SIGNAL(currentTextChanged(QString)),
+				this, SLOT(selectOutput(QString)));
+		}
 		starting = false;
 	}
 
+	this->ui->list_midi_dev->setCurrentRow(-1);
 	this->ui->list_midi_dev->setCurrentRow(0);
 }
 
@@ -134,6 +139,7 @@ void SettingsDialog::selectOutput(QString selectedDeviceName)
 		auto device = GetDeviceManager()->GetMidiDeviceByName(
 			selectedDevice.c_str());
 		device->SetOutName(selectedDeviceName.toStdString());
+		
 		GetConfig()->Save();
 	}
 }
@@ -143,12 +149,10 @@ int SettingsDialog::on_check_enabled_stateChanged(bool state)
 
 	if (state == true) {
 		
-		auto selectedDeviceName =
-			ui->list_midi_dev->currentItem()
+		auto selectedDeviceName =ui->list_midi_dev->currentItem()
 				->text()
 				.toStdString();
-		auto selectedOutDeviceName =
-			ui->outbox->currentText().toStdString();
+		auto selectedOutDeviceName =ui->outbox->currentText().toStdString();
 		auto device = GetDeviceManager()->GetMidiDeviceByName(
 			selectedDeviceName.c_str());
 		blog(LOG_INFO, "Item enabled: %s",
@@ -162,18 +166,26 @@ int SettingsDialog::on_check_enabled_stateChanged(bool state)
 		if (device == NULL) {
 			GetDeviceManager()->RegisterMidiDevice(
 				devicePort, deviceOutPort);
-		} else {
+			device = GetDeviceManager()->GetMidiDeviceByName(
+				selectedDeviceName.c_str());
 			device->OpenPort(devicePort);
-			if (deviceOutPort != -1) {
-				device->OpenOutPort(deviceOutPort);
-			}
+			device->OpenOutPort(deviceOutPort);
+		} else {
+			
+			device->OpenPort(devicePort);
+			device->OpenOutPort(deviceOutPort);
+			
 		}
+
 		
+
 	}
 
 	//ui->outbox->setCurrentText(QString::fromStdString(device->GetOutName()));
 	ui->btn_configure->setEnabled(state);
-	ui->outbox->setEnabled(state);
+	ui->bidirectional->setEnabled(state);
+	ui->bidirectional->setChecked(true);
+	ui->outbox->setEnabled(true);
 	GetConfig()->Save();
 	return state;
 }
@@ -182,12 +194,13 @@ void SettingsDialog::on_item_select(QString curitem)
 {
 	auto texting = curitem.toStdString();
 	// Pull info on if device is enabled, if so set true if not set false
-	auto device = GetDeviceManager()->GetMidiDeviceByName(
-		curitem.toStdString().c_str());
+	auto device = GetDeviceManager()->GetMidiDeviceByName(curitem.toStdString().c_str());
 	if (device != NULL && device->isEnabled()) {
 		ui->check_enabled->setChecked(true);
 		ui->btn_configure->setEnabled(true);
 		ui->outbox->setEnabled(true);
+		ui->bidirectional->setEnabled(true);
+		ui->bidirectional->setChecked(device->isBidirectional());
 		auto on = device->GetOutName();
 		ui->outbox->setCurrentText(QString::fromStdString(on));
 
@@ -195,10 +208,24 @@ void SettingsDialog::on_item_select(QString curitem)
 		ui->check_enabled->setChecked(false);
 		ui->btn_configure->setEnabled(false);
 		ui->outbox->setEnabled(false);
+		ui->bidirectional->setEnabled(false);
 	}
 }
+int SettingsDialog::on_bid_enabled_stateChanged(bool state) {
+	auto device = GetDeviceManager()->GetMidiDeviceByName(ui->list_midi_dev->currentItem()->text().toStdString().c_str());
+	if (state) {
+		return 1;
+		device->setBidirectional(state);
 
-SettingsDialog::~SettingsDialog()
+	} else {
+		return 0;
+		device->setBidirectional(state);
+	}
+	GetConfig()->Save();
+	GetConfig()->Load();
+}
+
+	SettingsDialog::~SettingsDialog()
 {
 
 	loadingdevices = false;

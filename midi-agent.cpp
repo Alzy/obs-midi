@@ -303,7 +303,25 @@ string MidiAgent::GetOutName()
 }
 void MidiAgent::SetOutName(string oname)
 {
+	if (outname != oname) {
+		midiout->close_port();
+		OpenOutPort(GetDeviceManager()->GetOutPortNumberByDeviceName(oname.c_str()));
+	}
 	outname = oname;
+}
+bool MidiAgent::setBidirectional(bool state) {
+	bidirectional = state;
+	if (!state) {
+		midiout->close_port();
+
+	} else {
+		if (midiout->is_port_open() ) {
+			midiout->close_port();
+		}
+		OpenOutPort(GetDeviceManager()->GetOutPortNumberByDeviceName(
+			outname.c_str()));
+	}
+	return state;
 }
 
 int MidiAgent::GetPort()
@@ -313,6 +331,10 @@ int MidiAgent::GetPort()
 bool MidiAgent::isEnabled()
 {
 	return enabled;
+}
+bool MidiAgent::isBidirectional()
+{
+	return bidirectional;
 }
 bool MidiAgent::isConnected()
 {

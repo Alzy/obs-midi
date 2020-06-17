@@ -55,6 +55,7 @@ Config::~Config()
  */
 void Config::Load()
 {
+	SetDefaults();
 	config_t *obsConfig = GetConfigStore();
 
 	DebugEnabled = config_get_bool(obsConfig, SECTION_NAME, PARAM_DEBUG);

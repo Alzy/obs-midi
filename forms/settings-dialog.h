@@ -33,7 +33,7 @@ public:
 	void on_btn_configure_clicked();
 	int on_check_enabled_stateChanged(bool state);
 	void on_item_select(QString curitem);
-
+	int on_bid_enabled_stateChanged(bool state);
 private Q_SLOTS:
 	void ToggleShowHide();
 

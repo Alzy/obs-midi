@@ -224,6 +224,8 @@ void ConfigWindow::save()
 		dev->AddMidiHook(mh);
 	};
 	conf->Save();
+	conf->Load();
+	reloadEvents();
 	if (!clearpressed) {
 
 		//ui->btnBack->click();

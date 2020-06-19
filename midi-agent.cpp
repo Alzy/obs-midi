@@ -27,7 +27,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "obs-midi.h"
 #include "config.h"
 #include "obs-controller.h"
-#include "rtmidi17/rtmidi17.hpp"
+#include "RtMidi17/rtmidi17.hpp"
 #include "device-manager.h"
 using namespace std;
 

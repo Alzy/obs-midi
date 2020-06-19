@@ -49,8 +49,6 @@ elseif(WIN32)
     set(obs-midi_DEPS
             ${obs-midi_DEPS}
             winmm.lib)
-elseif(UNIX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpic")
 endif()
 
 

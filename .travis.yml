@@ -1,0 +1,13 @@
+language: cpp
+compiler: clang
+os:
+- windows
+
+
+git:
+  depth: 3
+# safelist
+  branches:
+    only:
+    - master
+    - stable

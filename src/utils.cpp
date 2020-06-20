@@ -23,7 +23,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <QtCore/QDir>
 #include <QtCore/QUrl>
 
-#include <obs-frontend-api/obs-frontend-api.h>
+#include <obs-frontend-api.h>
 #include <obs.hpp>
 #include <util/platform.h>
 
@@ -140,10 +140,10 @@ int Utils::get_midi_value(rtmidi::message mess)
 		/*****************Messages to work on ***************
 		// Standard Message
 		case rtmidi::message_type:: POLY_PRESSURE : bytetopullfrom = 0;break;
-	
+
 		case rtmidi::message_type:: PROGRAM_CHANGE : bytetopullfrom = 0;break;
 		case rtmidi::message_type:: AFTERTOUCH : bytetopullfrom = 0;break;
-	
+
 		// System Common Messages
 		case rtmidi::message_type:: SYSTEM_EXCLUSIVE : bytetopullfrom = 0;break;
 		case rtmidi::message_type:: TIME_CODE : bytetopullfrom = 0;break;
@@ -242,7 +242,7 @@ std::string Utils::getMidiMessageType(int in)
 	} else
 		return "";
 
-	/* Future Message types to be worked on	
+	/* Future Message types to be worked on
 	if (inrange(128, 143, in)) {
 		return "note_off";
 	} else if (inrange(144, 159, in)) {
@@ -986,7 +986,7 @@ bool Utils::SetFilenameFormatting(const char *filenameFormatting)
  * @property {double} `width` Scene item width (base source width multiplied by the horizontal scaling factor)
  * @property {double} `height` Scene item height (base source height multiplied by the vertical scaling factor)
  * @property {String (optional)} `parentGroupName` Name of the item's parent (if this item belongs to a group)
- * @property {Array<SceneItemTransform> (optional)} `groupChildren` List of children (if this item is a group) 
+ * @property {Array<SceneItemTransform> (optional)} `groupChildren` List of children (if this item is a group)
  */
 obs_data_t *Utils::GetSceneItemPropertiesData(obs_sceneitem_t *sceneItem)
 {

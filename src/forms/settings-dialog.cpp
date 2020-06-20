@@ -13,7 +13,7 @@ You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>
 */
 
-#include <obs-frontend-api/obs-frontend-api.h>
+#include <obs-frontend-api.h>
 #include <obs-module.h>
 #include <obs-data.h>
 #include <string>
@@ -83,7 +83,7 @@ void SettingsDialog::SetAvailableDevices()
 	this->ui->check_enabled->setEnabled(false);
 	this->ui->btn_configure->setEnabled(false);
 	this->ui->outbox->setEnabled(false);
-	
+
 	if (midiDevices.size() == 0) {
 		this->ui->list_midi_dev->addItem("No Devices Available");
 	} else if (midiDevices.size() > 0) {
@@ -97,7 +97,7 @@ void SettingsDialog::SetAvailableDevices()
 	}
 
 	if (starting) {
-		
+
 #		if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
 		//define something for Windows (32-bit and 64-bit, this part is common)
 		this->ui->outbox->setCurrentIndex(1);
@@ -139,7 +139,7 @@ void SettingsDialog::selectOutput(QString selectedDeviceName)
 		auto device = GetDeviceManager()->GetMidiDeviceByName(
 			selectedDevice.c_str());
 		device->SetOutName(selectedDeviceName.toStdString());
-		
+
 		GetConfig()->Save();
 	}
 }
@@ -148,7 +148,7 @@ int SettingsDialog::on_check_enabled_stateChanged(bool state)
 {
 
 	if (state == true) {
-		
+
 		auto selectedDeviceName =ui->list_midi_dev->currentItem()
 				->text()
 				.toStdString();
@@ -171,13 +171,13 @@ int SettingsDialog::on_check_enabled_stateChanged(bool state)
 			device->OpenPort(devicePort);
 			device->OpenOutPort(deviceOutPort);
 		} else {
-			
+
 			device->OpenPort(devicePort);
 			device->OpenOutPort(deviceOutPort);
-			
+
 		}
 
-		
+
 
 	}
 

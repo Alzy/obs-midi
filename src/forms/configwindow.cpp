@@ -5,7 +5,7 @@
 #include "ui_configwindow.h"
 #include <QtWidgets>
 #include <QTableWidget>
-#include <obs-frontend-api/obs-frontend-api.h>
+#include <obs-frontend-api.h>
 #include "obs-midi.h"
 #include "config.h"
 #include "device-manager.h"

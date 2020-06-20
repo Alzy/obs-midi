@@ -120,20 +120,20 @@ target_link_libraries(obs-midi
         if(UNIX AND NOT APPLE)
         	include(GNUInstallDirs)
 
-        	set_target_properties(obs-websocket PROPERTIES PREFIX "")
-        	target_link_libraries(obs-websocket obs-frontend-api)
+        	set_target_properties(obs-midi PROPERTIES PREFIX "")
+        	target_link_libraries(obs-midi obs-frontend-api)
 
         	file(GLOB locale_files data/locale/*.ini)
 
         	if(${USE_UBUNTU_FIX})
-        		install(TARGETS obs-websocket
+        		install(TARGETS obs-midi
         			LIBRARY DESTINATION "/usr/lib/obs-plugins")
         	endif()
-        	install(TARGETS obs-websocket
+        	install(TARGETS obs-midi
         		LIBRARY DESTINATION "${CMAKE_INSTALL_FULL_LIBDIR}/obs-plugins")
 
         	install(FILES ${locale_files}
-        		DESTINATION "${CMAKE_INSTALL_FULL_DATAROOTDIR}/obs/obs-plugins/obs-websocket/locale")
+        		DESTINATION "${CMAKE_INSTALL_FULL_DATAROOTDIR}/obs/obs-plugins/obs-midi/locale")
         endif()
         # --- End of section ---
 
@@ -142,8 +142,8 @@ target_link_libraries(obs-midi
         	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -fvisibility=default")
 
         	set(CMAKE_SKIP_RPATH TRUE)
-        	set_target_properties(obs-websocket PROPERTIES PREFIX "")
-        	target_link_libraries(obs-websocket "${OBS_FRONTEND_LIB}")
+        	set_target_properties(obs-midi PROPERTIES PREFIX "")
+        	target_link_libraries(obs-midi "${OBS_FRONTEND_LIB}")
         endif()
         # -- End of section --
 

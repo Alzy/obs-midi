@@ -106,4 +106,4 @@ target_link_libraries(obs-midi
         Qt5::Widgets
         libobs)
 
-install_obs_plugin_with_data(obs-midi data)
+#install_obs_plugin_with_data(obs-midi data)

@@ -29,29 +29,11 @@ set(obs-midi_DEPS RtMidi17)
 
 include_directories(RtMidi17)
 
-if(APPLE)
-    find_library(COREMIDI CoreMIDI)
-    include_directories(${COREMIDI})
-    find_library(COREAUDIO CoreAudio)
-    include_directories(${COREAUDIO})
-    find_library(COREFOUNDATION CoreFoundation)
-    include_directories(${COREFOUNDATION})
-
-    set(obs-midi_DEPS
-            ${obs-midi_DEPS}
-            ${COREMIDI}
-            ${COREAUDIO}
-            ${COREFOUNDATION})
-elseif(WIN32)
-    set(obs-midi_DEPS
-            ${obs-midi_DEPS}
-            winmm.lib)
-endif()
-
 
 
 
 # OBS MIDI
+set(CMAKE_PREFIX_PATH "${QTDIR}")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
@@ -59,9 +41,18 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+add_definitions(-DASIO_STANDALONE)
+
+if (WIN32 OR APPLE)
+	include(external/FindLibObs.cmake)
+endif()
+
+find_package(LibObs REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
 
 include_directories(
+"${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api"
+
         SYSTEM
 	${Qt5Core_INCLUDES}
 	${Qt5Widgets_INCLUDES}
@@ -105,5 +96,55 @@ target_link_libraries(obs-midi
         Qt5::Core
         Qt5::Widgets
         libobs)
+
+
+        if(APPLE)
+            find_library(COREMIDI CoreMIDI)
+            include_directories(${COREMIDI})
+            find_library(COREAUDIO CoreAudio)
+            include_directories(${COREAUDIO})
+            find_library(COREFOUNDATION CoreFoundation)
+            include_directories(${COREFOUNDATION})
+
+            set(obs-midi_DEPS
+                    ${obs-midi_DEPS}
+                    ${COREMIDI}
+                    ${COREAUDIO}
+                    ${COREFOUNDATION})
+        elseif(WIN32)
+            set(obs-midi_DEPS
+                    ${obs-midi_DEPS}
+                    winmm.lib)
+        endif()
+        # --- Linux-specific build settings and tasks ---
+        if(UNIX AND NOT APPLE)
+        	include(GNUInstallDirs)
+
+        	set_target_properties(obs-websocket PROPERTIES PREFIX "")
+        	target_link_libraries(obs-websocket obs-frontend-api)
+
+        	file(GLOB locale_files data/locale/*.ini)
+
+        	if(${USE_UBUNTU_FIX})
+        		install(TARGETS obs-websocket
+        			LIBRARY DESTINATION "/usr/lib/obs-plugins")
+        	endif()
+        	install(TARGETS obs-websocket
+        		LIBRARY DESTINATION "${CMAKE_INSTALL_FULL_LIBDIR}/obs-plugins")
+
+        	install(FILES ${locale_files}
+        		DESTINATION "${CMAKE_INSTALL_FULL_DATAROOTDIR}/obs/obs-plugins/obs-websocket/locale")
+        endif()
+        # --- End of section ---
+
+        # -- OS X specific build settings and tasks --
+        if(APPLE)
+        	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -fvisibility=default")
+
+        	set(CMAKE_SKIP_RPATH TRUE)
+        	set_target_properties(obs-websocket PROPERTIES PREFIX "")
+        	target_link_libraries(obs-websocket "${OBS_FRONTEND_LIB}")
+        endif()
+        # -- End of section --
 
 #install_obs_plugin_with_data(obs-midi data)

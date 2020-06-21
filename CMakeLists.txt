@@ -90,6 +90,7 @@ add_library(obs-midi MODULE
         ${obs-midi_HEADERS})
 
 target_link_libraries(obs-midi
+ 				"${OBS_FRONTEND_LIB}"
         ${obs-midi_DEPS}
         obs-frontend-api
         Qt5::Core

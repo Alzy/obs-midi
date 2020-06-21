@@ -27,7 +27,7 @@ add_subdirectory(src/RtMidi17)
 
 set(obs-midi_DEPS RtMidi17)
 
-include_directories(RtMidi17)
+include_directories(src/RtMidi17)
 
 
 

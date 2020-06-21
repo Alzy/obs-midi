@@ -21,7 +21,7 @@ echo "[obs-midi] Updating Homebrew.."
 brew update >/dev/null
 echo "[obs-midi] Checking installed Homebrew formulas.."
 BREW_PACKAGES=$(brew list)
-BREW_DEPENDENCIES="jack speexdsp ccache swig mbedtls"
+BREW_DEPENDENCIES="jack jack2 speexdsp ccache swig mbedtls"
 
 for DEPENDENCY in ${BREW_DEPENDENCIES}; do
     if echo "${BREW_PACKAGES}" | grep -q "^${DEPENDENCY}\$"; then

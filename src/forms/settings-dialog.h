@@ -19,8 +19,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <QtWidgets/QDialog>
 #include "ui_settings-dialog.h"
 #include "ui_configwindow.h"
-#include "configwindow.h"
-#include "midi-agent.h"
+#include <configwindow.h>
+#include <midi-agent.h>
 
 class SettingsDialog : public QDialog {
 	Q_OBJECT

@@ -6,10 +6,10 @@
 #include <QtWidgets>
 #include <QTableWidget>
 #include <obs-frontend-api.h>
-#include "obs-midi.h"
-#include "config.h"
-#include "device-manager.h"
-#include "midi-agent.h"
+#include <obs-midi.h>
+#include <config.h>
+#include <device-manager.h>
+#include <midi-agent.h>
 
 ConfigWindow::ConfigWindow(QString devn) : ui(new Ui::ConfigWindow)
 {

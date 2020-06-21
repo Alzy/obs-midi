@@ -20,11 +20,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <map>
 #include <iostream>
 #include <utility>
-#include "midi-agent.h"
+#include <midi-agent.h>
 
-#include "obs-midi.h"
-#include "device-manager.h"
-#include "config.h"
+#include <obs-midi.h>
+#include <device-manager.h>
+#include <config.h>
 #include "settings-dialog.h"
 #include "ui_configwindow.h"
 #include "configwindow.h"

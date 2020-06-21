@@ -23,7 +23,7 @@ endif()
 ##################
 
 # RTMIDI
-add_subdirectory(RtMidi17)
+add_subdirectory(src/RtMidi17)
 
 set(obs-midi_DEPS RtMidi17)
 

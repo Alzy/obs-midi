@@ -28,7 +28,7 @@ Currently a WIP
   * Select your controller, hit configure, Toggle a button and fader, remap it to an action and hit save!
 
 
-Currently There is only a windows build, But as this uses the RTMIDI library, and is cross-platform compatible, we may release a binary for mac or windows.
+Currently runs on Windows and Linux, And is Untested on MAC
 
 # Build instructions
 in your obs-studio/plugins folder

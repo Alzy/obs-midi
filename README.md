@@ -31,7 +31,7 @@ Currently a WIP
 Currently runs on Windows and Linux, And is Untested on MAC
 
 # Build instructions
-in your obs-studio/plugins folder
+In your obs-studio/plugins folder
 1. ```git clone --recursive https://github.com/Alzy/obs-midi.git```
 2. Append to CMakeLists.txt  
   * ```add_subdirectory(obs-midi)```

@@ -97,53 +97,135 @@ target_link_libraries(obs-midi
         libobs)
 
 
-        if(APPLE)
-            find_library(COREMIDI CoreMIDI)
-            include_directories(${COREMIDI})
-            find_library(COREAUDIO CoreAudio)
-            include_directories(${COREAUDIO})
-            find_library(COREFOUNDATION CoreFoundation)
-            include_directories(${COREFOUNDATION})
 
-            set(obs-midi_DEPS
-                    ${obs-midi_DEPS}
-                    ${COREMIDI}
-                    ${COREAUDIO}
-                    ${COREFOUNDATION})
-        elseif(WIN32)
-            set(obs-midi_DEPS
-                    ${obs-midi_DEPS}
-                    winmm.lib)
-        endif()
-        # --- Linux-specific build settings and tasks ---
-        if(UNIX AND NOT APPLE)
-        	include(GNUInstallDirs)
+# --- Windows-specific build settings and tasks ---
+if(WIN32)
+	if(NOT DEFINED OBS_FRONTEND_LIB)
+		set(OBS_FRONTEND_LIB "OBS_FRONTEND_LIB-NOTFOUND" CACHE FILEPATH "OBS frontend library")
+		message(FATAL_ERROR "Could not find OBS Frontend API's library !")
+	endif()
 
-        	set_target_properties(obs-midi PROPERTIES PREFIX "")
-        	target_link_libraries(obs-midi obs-frontend-api)
+    if(MSVC)
+        # Enable Multicore Builds and disable FH4 (to not depend on VCRUNTIME140_1.DLL)
+	    add_definitions(/MP /d2FH4-)
+    endif()
 
-        	file(GLOB locale_files data/locale/*.ini)
+	add_definitions(-D_midiPP_CPP11_STL_)
 
-        	if(${USE_UBUNTU_FIX})
-        		install(TARGETS obs-midi
-        			LIBRARY DESTINATION "/usr/lib/obs-plugins")
-        	endif()
-        	install(TARGETS obs-midi
-        		LIBRARY DESTINATION "${CMAKE_INSTALL_FULL_LIBDIR}/obs-plugins")
+	if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+		set(ARCH_NAME "64bit")
+		set(OBS_BUILDDIR_ARCH "build64")
+	else()
+		set(ARCH_NAME "32bit")
+		set(OBS_BUILDDIR_ARCH "build32")
+	endif()
 
-        	install(FILES ${locale_files}
-        		DESTINATION "${CMAKE_INSTALL_FULL_DATAROOTDIR}/obs/obs-plugins/obs-midi/locale")
-        endif()
-        # --- End of section ---
+	include_directories(
+		"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/UI"
+	)
 
-        # -- OS X specific build settings and tasks --
-        if(APPLE)
-        	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -fvisibility=default")
+	target_link_libraries(obs-midi
+		"${OBS_FRONTEND_LIB}")
 
-        	set(CMAKE_SKIP_RPATH TRUE)
-        	set_target_properties(obs-midi PROPERTIES PREFIX "")
-        	target_link_libraries(obs-midi "${OBS_FRONTEND_LIB}")
-        endif()
-        # -- End of section --
+	# --- Release package helper ---
+	# The "release" folder has a structure similar OBS' one on Windows
+	set(RELEASE_DIR "${PROJECT_SOURCE_DIR}/release")
 
-#install_obs_plugin_with_data(obs-midi data)
+	add_custom_command(TARGET obs-midi POST_BUILD
+		# If config is Release, package release files
+		COMMAND if $<CONFIG:Release>==1 (
+			"${CMAKE_COMMAND}" -E make_directory
+			"${RELEASE_DIR}/data/obs-plugins/obs-midi"
+			"${RELEASE_DIR}/obs-plugins/${ARCH_NAME}")
+
+		COMMAND if $<CONFIG:Release>==1 ("${CMAKE_COMMAND}" -E copy_directory
+			"${PROJECT_SOURCE_DIR}/data"
+			"${RELEASE_DIR}/data/obs-plugins/obs-midi")
+
+		COMMAND if $<CONFIG:Release>==1 ("${CMAKE_COMMAND}" -E copy
+			"$<TARGET_FILE:obs-midi>"
+			"${RELEASE_DIR}/obs-plugins/${ARCH_NAME}")
+
+		# In Release mode, copy Qt image format plugins
+		COMMAND if $<CONFIG:Release>==1 (
+			"${CMAKE_COMMAND}" -E copy
+			"${QTDIR}/plugins/imageformats/qjpeg.dll"
+			"${RELEASE_DIR}/bin/${ARCH_NAME}/imageformats/qjpeg.dll")
+		COMMAND if $<CONFIG:RelWithDebInfo>==1 (
+			"${CMAKE_COMMAND}" -E copy
+			"${QTDIR}/plugins/imageformats/qjpeg.dll"
+			"${RELEASE_DIR}/bin/${ARCH_NAME}/imageformats/qjpeg.dll")
+
+		# If config is RelWithDebInfo, package release files
+		COMMAND if $<CONFIG:RelWithDebInfo>==1 (
+			"${CMAKE_COMMAND}" -E make_directory
+			"${RELEASE_DIR}/data/obs-plugins/obs-midi"
+			"${RELEASE_DIR}/obs-plugins/${ARCH_NAME}")
+
+		COMMAND if $<CONFIG:RelWithDebInfo>==1 ("${CMAKE_COMMAND}" -E copy_directory
+			"${PROJECT_SOURCE_DIR}/data"
+			"${RELEASE_DIR}/data/obs-plugins/obs-midi")
+
+		COMMAND if $<CONFIG:RelWithDebInfo>==1 ("${CMAKE_COMMAND}" -E copy
+			"$<TARGET_FILE:obs-midi>"
+			"${RELEASE_DIR}/obs-plugins/${ARCH_NAME}")
+
+		COMMAND if $<CONFIG:RelWithDebInfo>==1 ("${CMAKE_COMMAND}" -E copy
+			"$<TARGET_PDB_FILE:obs-midi>"
+			"${RELEASE_DIR}/obs-plugins/${ARCH_NAME}")
+
+		# Copy to obs-studio dev environment for immediate testing
+		COMMAND if $<CONFIG:Debug>==1 (
+			"${CMAKE_COMMAND}" -E copy
+				"$<TARGET_FILE:obs-midi>"
+				"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/rundir/$<CONFIG>/obs-plugins/${ARCH_NAME}")
+
+		COMMAND if $<CONFIG:Debug>==1 (
+			"${CMAKE_COMMAND}" -E copy
+				"$<TARGET_PDB_FILE:obs-midi>"
+				"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/rundir/$<CONFIG>/obs-plugins/${ARCH_NAME}")
+
+		COMMAND if $<CONFIG:Debug>==1 (
+			"${CMAKE_COMMAND}" -E make_directory
+				"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/rundir/$<CONFIG>/data/obs-plugins/obs-midi")
+
+		COMMAND if $<CONFIG:Debug>==1 (
+			"${CMAKE_COMMAND}" -E copy_directory
+				"${PROJECT_SOURCE_DIR}/data"
+				"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/rundir/$<CONFIG>/data/obs-plugins/obs-midi")
+	)
+	# --- End of sub-section ---
+
+endif()
+# --- End of section ---
+
+# --- Linux-specific build settings and tasks ---
+if(UNIX AND NOT APPLE)
+	include(GNUInstallDirs)
+
+	set_target_properties(obs-midi PROPERTIES PREFIX "")
+	target_link_libraries(obs-midi obs-frontend-api)
+
+	file(GLOB locale_files data/locale/*.ini)
+
+	if(${USE_UBUNTU_FIX})
+		install(TARGETS obs-midi
+			LIBRARY DESTINATION "/usr/lib/obs-plugins")
+	endif()
+	install(TARGETS obs-midi
+		LIBRARY DESTINATION "${CMAKE_INSTALL_FULL_LIBDIR}/obs-plugins")
+
+	install(FILES ${locale_files}
+		DESTINATION "${CMAKE_INSTALL_FULL_DATAROOTDIR}/obs/obs-plugins/obs-midi/locale")
+endif()
+# --- End of section ---
+
+# -- OS X specific build settings and tasks --
+if(APPLE)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -fvisibility=default")
+
+	set(CMAKE_SKIP_RPATH TRUE)
+	set_target_properties(obs-midi PROPERTIES PREFIX "")
+	target_link_libraries(obs-midi "${OBS_FRONTEND_LIB}")
+endif()
+# -- End of section --

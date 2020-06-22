@@ -1,7 +1,6 @@
 variables:
   isReleaseMode: ${{ startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}
-  env:
-    WHK: $(webhookkey)
+
 
 trigger:
   branches:
@@ -29,7 +28,6 @@ jobs:
       env:
         CHECKOUT_REF: $(Build.SourceBranch)
         GH_TOKEN: $(GithubToken)
-        WHK: $(webhookkey)
 
 - job: 'Build_Windows'
   pool:
@@ -123,6 +121,8 @@ jobs:
         pathtoPublish: './package'
         artifactName: 'windows_build'
     - task: ado-discord-webhook@1
+      env:
+        WHK: $(webhookkey)
       inputs:
         pathtoPublish: './package'
         artifactName: 'windows_build'
@@ -155,6 +155,8 @@ jobs:
         pathtoPublish: './package'
         artifactName: 'deb_build'
     - task: ado-discord-webhook@1
+      env:
+        WHK: $(webhookkey)
       inputs:
         pathtoPublish: './package'
         artifactName: 'deb_build'
@@ -189,6 +191,8 @@ jobs:
         pathtoPublish: './release'
         artifactName: 'macos_build'
     - task: ado-discord-webhook@1
+      env:
+        WHK: $(webhookkey)
       inputs:
         pathtoPublish: './package'
         artifactName: 'macos_build'

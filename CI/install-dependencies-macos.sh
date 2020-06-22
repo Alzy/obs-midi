@@ -8,7 +8,13 @@ if [ "${OSTYPE}" != "Darwin" ]; then
     echo "[obs-midi - Error] macOS install dependencies script can be run on Darwin-type OS only."
     exit 1
 fi
-
+HAS_PORT=$(type port 2>/dev/null)
+if [ "${HAS_PORT}" = "" ]; then
+    echo "[obs-midi - Error] Please install MacPorts to build obs-midi on macOS."
+    exit 1
+fi
+sudo port selfupdate
+sudo port install jack
 HAS_BREW=$(type brew 2>/dev/null)
 
 if [ "${HAS_BREW}" = "" ]; then
@@ -21,7 +27,7 @@ echo "[obs-midi] Updating Homebrew.."
 brew update >/dev/null
 echo "[obs-midi] Checking installed Homebrew formulas.."
 BREW_PACKAGES=$(brew list)
-BREW_DEPENDENCIES="jack jack2 speexdsp ccache swig mbedtls"
+BREW_DEPENDENCIES="speexdsp ccache swig mbedtls"
 
 for DEPENDENCY in ${BREW_DEPENDENCIES}; do
     if echo "${BREW_PACKAGES}" | grep -q "^${DEPENDENCY}\$"; then

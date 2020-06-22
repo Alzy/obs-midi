@@ -130,7 +130,8 @@ if(WIN32)
 	# --- Release package helper ---
 	# The "release" folder has a structure similar OBS' one on Windows
 	set(RELEASE_DIR "${PROJECT_SOURCE_DIR}/release")
-
+		"${CMAKE_COMMAND}" -E make_directory
+		"${RELEASE_DIR}"
 	add_custom_command(TARGET obs-midi POST_BUILD
 		# If config is Release, package release files
 		COMMAND if $<CONFIG:Release>==1 (

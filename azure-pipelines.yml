@@ -1,10 +1,4 @@
 variables:
-- task: ado-discord-webhook@1
-  inputs:
-    channelId: '724444696822415420'
-    webhookKey: 'H-QaYhWJo7d3EQyntGprayL_6Ljn5kK0sHwsnYrSXVCgH-zp-mZ2QCnu7wDNXG4daCTO'
-    name: 'AzureBot'
-    messageType: 'embeds'
   isReleaseMode: ${{ startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}
 
 trigger:
@@ -124,7 +118,7 @@ jobs:
       inputs:
         pathtoPublish: './package'
         artifactName: 'windows_build'
-
+        
 - job: 'Build_Linux'
   pool:
     vmImage: 'ubuntu-18.04'

@@ -1,0 +1,74 @@
+#!/bin/sh
+
+
+
+OSTYPE=$(uname)
+
+if [ "${OSTYPE}" != "Darwin" ]; then
+    echo "[obs-midi - Error] macOS install dependencies script can be run on Darwin-type OS only."
+    exit 1
+fi
+HAS_PORT=$(type port 2>/dev/null)
+if [ "${HAS_PORT}" = "" ]; then
+  echo "[obs-midi - Error] Mac Ports not installed, Building and installing macports"
+  curl -O https://distfiles.macports.org/MacPorts/MacPorts-2.6.2.tar.bz2
+  tar xf MacPorts-2.6.2.tar.bz2
+  cd MacPorts-2.6.2/
+  ./configure
+   make
+   sudo make install
+   export PATH=/usr/local/git/bin:/usr/local/bin:$PATH
+fi
+sudo port -v selfupdate
+
+sudo port install jack
+HAS_BREW=$(type brew 2>/dev/null)
+
+if [ "${HAS_BREW}" = "" ]; then
+    echo "[obs-midi - Error] Please install Homebrew (https://www.brew.sh/) to build obs-midi on macOS."
+    exit 1
+fi
+
+# OBS Studio deps
+echo "[obs-midi] Updating Homebrew.."
+brew update >/dev/null
+echo "[obs-midi] Checking installed Homebrew formulas.."
+BREW_PACKAGES=$(brew list)
+BREW_DEPENDENCIES="speexdsp ccache swig mbedtls"
+
+for DEPENDENCY in ${BREW_DEPENDENCIES}; do
+    if echo "${BREW_PACKAGES}" | grep -q "^${DEPENDENCY}\$"; then
+        echo "[obs-midi] Upgrading OBS-Studio dependency '${DEPENDENCY}'.."
+        brew upgrade ${DEPENDENCY} 2>/dev/null
+    else
+        echo "[obs-midi] Installing OBS-Studio dependency '${DEPENDENCY}'.."
+        brew install ${DEPENDENCY} 2>/dev/null
+    fi
+done
+
+# qtmidis deps
+echo "[obs-midi] Installing obs-midi dependency 'QT 5.10.1'.."
+# =!= NOTICE =!=
+# When building QT5 from sources on macOS 10.13+, use local qt5 formula:
+# brew install ./CI/macos/qt.rb
+# Pouring from the bottle is much quicker though, so use bottle for now.
+# =!= NOTICE =!=
+
+brew install https://gist.githubusercontent.com/DDRBoxman/b3956fab6073335a4bf151db0dcbd4ad/raw/ed1342a8a86793ea8c10d8b4d712a654da121ace/qt.rb
+
+# Pin this version of QT5 to avoid `brew upgrade`
+# upgrading it to incompatible version
+brew pin qt
+
+# Fetch and install Packages app
+# =!= NOTICE =!=
+# Installs a LaunchDaemon under /Library/LaunchDaemons/fr.whitebox.packages.build.dispatcher.plist
+# =!= NOTICE =!=
+
+HAS_PACKAGES=$(type packagesbuild 2>/dev/null)
+
+if [ "${HAS_PACKAGES}" = "" ]; then
+    echo "[obs-midi] Installing Packaging app (might require password due to 'sudo').."
+    curl -o './Packages.pkg' --retry-connrefused -s --retry-delay 1 'https://s3-us-west-2.amazonaws.com/obs-nightly/Packages.pkg'
+    sudo installer -pkg ./Packages.pkg -target /
+fi

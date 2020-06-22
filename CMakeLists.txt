@@ -110,7 +110,6 @@ if(WIN32)
 	    add_definitions(/MP /d2FH4-)
     endif()
 
-	add_definitions(-D_midiPP_CPP11_STL_)
 
 	if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 		set(ARCH_NAME "64bit")

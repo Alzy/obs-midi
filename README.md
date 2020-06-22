@@ -51,3 +51,4 @@ in your obs-studio/plugins folder
  # Special thanks to the following projects
  * [RTMidi17](https://github.com/jcelerier/RtMidi17) An amazing modernized RTMIDI library
  * [OBSWebsocket](https://github.com/Palakis/obs-websocket/) from which much code was borrowed for interfacing with obs
+ * [Midi2OBS](https://github.com/lebaston100/MIDItoOBS) Where I got my start playing with this

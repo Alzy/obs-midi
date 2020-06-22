@@ -121,8 +121,6 @@ jobs:
         pathtoPublish: './package'
         artifactName: 'windows_build'
     - task: ado-discord-webhook@1
-      env:
-        WHK: $(webhookkey)
       inputs:
         pathtoPublish: './package'
         artifactName: 'windows_build'
@@ -130,6 +128,8 @@ jobs:
       WHK: $(WHK)
       name: 'Azure'
       messageType: 'embeds'
+      env:
+        WHK: $(webhookkey)
 - job: 'Build_Linux'
   pool:
     vmImage: 'ubuntu-18.04'
@@ -155,8 +155,7 @@ jobs:
         pathtoPublish: './package'
         artifactName: 'deb_build'
     - task: ado-discord-webhook@1
-      env:
-        WHK: $(webhookkey)
+
       inputs:
         pathtoPublish: './package'
         artifactName: 'deb_build'
@@ -164,6 +163,9 @@ jobs:
       WHK: $(WHK)
       name: 'Azure'
       messageType: 'embeds'
+      env:
+        WHK: $(webhookkey)
+
 - job: 'Build_macOS'
   pool:
     vmImage: 'macos-10.14'
@@ -191,8 +193,7 @@ jobs:
         pathtoPublish: './release'
         artifactName: 'macos_build'
     - task: ado-discord-webhook@1
-      env:
-        WHK: $(webhookkey)
+
       inputs:
         pathtoPublish: './package'
         artifactName: 'macos_build'
@@ -200,3 +201,5 @@ jobs:
       WHK: $(WHK)
       name: 'Azure'
       messageType: 'embeds'
+      env:
+        WHK: $(webhookkey)

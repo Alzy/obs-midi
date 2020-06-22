@@ -9,9 +9,15 @@ if [ "${OSTYPE}" != "Darwin" ]; then
     exit 1
 fi
 HAS_PORT=$(type port 2>/dev/null)
-if [ "${HAS_PORT}" = "   " ]; then
-    echo "[obs-midi - Error] Please install MacPorts to build obs-midi on macOS."
-    exit 1
+if [ "${HAS_PORT}" = "" ]; then
+  echo "[obs-midi - Error] Mac Ports not installed, Building and installing macports"
+  curl -O https://distfiles.macports.org/MacPorts/MacPorts-2.6.2.tar.bz2
+  tar xf MacPorts-2.6.2.tar.bz2
+  cd MacPorts-2.6.2/
+  ./configure
+   make
+   sudo make install
+   
 fi
 sudo port selfupdate
 sudo port install jack

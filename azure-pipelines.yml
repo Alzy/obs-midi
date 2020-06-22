@@ -1,5 +1,7 @@
 variables:
   isReleaseMode: ${{ startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}
+  env:
+    WHK: $(webhookkey)
 
 trigger:
   branches:
@@ -27,6 +29,7 @@ jobs:
       env:
         CHECKOUT_REF: $(Build.SourceBranch)
         GH_TOKEN: $(GithubToken)
+        WHK: $(webhookkey)
 
 - job: 'Build_Windows'
   pool:
@@ -47,6 +50,7 @@ jobs:
     - script: ./CI/install-qt-win.cmd
       displayName: 'Install Qt'
       env:
+
         QtBaseDir: $(QtBaseDir)
 
     - task: Cache@2
@@ -118,7 +122,14 @@ jobs:
       inputs:
         pathtoPublish: './package'
         artifactName: 'windows_build'
-        
+    - task: ado-discord-webhook@1
+      inputs:
+        pathtoPublish: './package'
+        artifactName: 'windows_build'
+      channelId: '724444696822415420'
+      WHK: $(WHK)
+      name: 'Azure'
+      messageType: 'embeds'
 - job: 'Build_Linux'
   pool:
     vmImage: 'ubuntu-18.04'
@@ -143,7 +154,14 @@ jobs:
       inputs:
         pathtoPublish: './package'
         artifactName: 'deb_build'
-
+    - task: ado-discord-webhook@1
+      inputs:
+        pathtoPublish: './package'
+        artifactName: 'deb_build'
+      channelId: '724444696822415420'
+      WHK: $(WHK)
+      name: 'Azure'
+      messageType: 'embeds'
 - job: 'Build_macOS'
   pool:
     vmImage: 'macos-10.14'
@@ -170,3 +188,11 @@ jobs:
       inputs:
         pathtoPublish: './release'
         artifactName: 'macos_build'
+    - task: ado-discord-webhook@1
+      inputs:
+        pathtoPublish: './package'
+        artifactName: 'macos_build'
+      channelId: '724444696822415420'
+      WHK: $(WHK)
+      name: 'Azure'
+      messageType: 'embeds'

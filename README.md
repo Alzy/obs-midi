@@ -36,12 +36,12 @@ In your obs-studio/plugins folder
 2. Append to CMakeLists.txt  
   * ```add_subdirectory(obs-midi)```
  Go back to your OBS Build directory
- ## windows
+ ## Windows
  1. run ```cmake-gui.exe```
  2. click ```configure```
  3. click ```generate```
  4. click ```open project```
- 5. in visual studio, right click on the obs-studio solution and click build
+ 5. In visual studio, right click on the obs-studio solution and click build
  ## Linux
  1. Rerun cmake using your normal options
  2. rerun ```make -j4```

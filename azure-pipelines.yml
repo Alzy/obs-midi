@@ -120,11 +120,7 @@ jobs:
       inputs:
         pathtoPublish: './package'
         artifactName: 'windows_build'
-    - task: PublishBuildArtifacts@1
-      displayName: 'Upload package artifacts for staging'
-      inputs:
-        pathtoPublish: $(Build.ArtifactStagingDirectory)
-        artifactName: 'windows_build'
+
 - job: 'Build_Linux'
   pool:
     vmImage: 'ubuntu-18.04'
@@ -149,11 +145,7 @@ jobs:
       inputs:
         pathtoPublish: './package'
         artifactName: 'deb_build'
-    - task: PublishBuildArtifacts@1
-      displayName: 'Upload package artifacts for staging'
-      inputs:
-        pathtoPublish: $(Build.ArtifactStagingDirectory)
-        artifactName: 'deb_build'
+
 - job: 'Build_macOS'
   pool:
     vmImage: 'macos-10.14'
@@ -179,9 +171,4 @@ jobs:
     - task: PublishBuildArtifacts@1
       inputs:
         pathtoPublish: './release'
-        artifactName: 'macos_build'
-    - task: PublishBuildArtifacts@1
-      displayName: 'Upload package artifacts for staging'
-      inputs:
-        pathtoPublish: $(Build.ArtifactStagingDirectory)
         artifactName: 'macos_build'

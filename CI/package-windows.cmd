@@ -1,6 +1,6 @@
 mkdir package
 cd package
-
+dir D:\a\1\s\
 git rev-parse --short HEAD > package-version.txt
 set /p PackageVersion=<package-version.txt
 del package-version.txt

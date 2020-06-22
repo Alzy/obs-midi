@@ -3,9 +3,9 @@
 
 Use MIDI devices to trigger events in OBS and visa versa.
 
-Currently a WIP
 
-# Status
+
+# Status -- WIP
 ## Windows
 [![Build Status](https://dev.azure.com/cpyarger0055/OBS-Midi/_apis/build/status/OBS-Midi?branchName=master&jobName=Build_Windows)](https://dev.azure.com/cpyarger0055/OBS-Midi/_build/latest?definitionId=5&branchName=master)
 ## macOS

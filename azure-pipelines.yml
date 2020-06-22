@@ -160,6 +160,15 @@ jobs:
     - script: ./CI/build-macos.sh
       displayName: 'Build obs-midi'
 
+    - script: ./CI/package-macos.sh
+          displayName: 'Package obs-midi'
+          env:
+            RELEASE_MODE: $(isReleaseMode)
+            CODE_SIGNING_IDENTITY: $(secrets.macOS.codeSigningIdentity)
+            INSTALLER_SIGNING_IDENTITY: $(secrets.macOS.installerSigningIdentity)
+            AC_USERNAME: $(secrets.macOS.notarization.username)
+            AC_PASSWORD: $(secrets.macOS.notarization.password)
+            AC_PROVIDER_SHORTNAME: $(secrets.macOS.notarization.providerShortName)
 
     - task: PublishBuildArtifacts@1
       inputs:

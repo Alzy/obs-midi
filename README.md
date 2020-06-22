@@ -28,7 +28,7 @@ Currently a WIP
   * Select your controller, hit configure, Toggle a button and fader, remap it to an action and hit save!
 
 
-Currently runs on Windows and Linux, And is Untested on MAC
+Currently runs on Windows and Linux, and is untested on MAC
 
 # Build instructions
 In your obs-studio/plugins folder

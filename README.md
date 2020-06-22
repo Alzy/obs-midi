@@ -35,7 +35,7 @@ In your obs-studio/plugins folder
 1. ```git clone --recursive https://github.com/Alzy/obs-midi.git```
 2. Append to CMakeLists.txt  
   * ```add_subdirectory(obs-midi)```
- Go back to your obs Build directory
+ Go back to your OBS Build directory
  ## windows
  1. run ```cmake-gui.exe```
  2. click ```configure```

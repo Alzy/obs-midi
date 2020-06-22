@@ -9,7 +9,7 @@ if [ "${OSTYPE}" != "Darwin" ]; then
     exit 1
 fi
 HAS_PORT=$(type port 2>/dev/null)
-if [ "${HAS_PORT}" = "" ]; then
+if [ "${HAS_PORT}" = "   " ]; then
     echo "[obs-midi - Error] Please install MacPorts to build obs-midi on macOS."
     exit 1
 fi

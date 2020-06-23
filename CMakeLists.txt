@@ -210,7 +210,7 @@ if(WIN32)
 
 endif()
 # --- End of section ---
-
+endif()
 # --- Linux-specific build settings and tasks ---
 if(UNIX AND NOT APPLE)
 	include(GNUInstallDirs)
@@ -241,4 +241,3 @@ if(APPLE)
 	target_link_libraries(obs-midi "${OBS_FRONTEND_LIB}")
 endif()
 # -- End of section --
-endif()

@@ -33,7 +33,7 @@ public:
 
 	//MakeCombos
 	void AddRowFromHooks(int row, std::string mtype, int channel,
-			     int mindex, bool bid, std::string atype,
+			     int mindex, std::string atype,
 			     std::string action, std::string option1,
 			     std::string option2, std::string option3);
 	bool inrow(int x);

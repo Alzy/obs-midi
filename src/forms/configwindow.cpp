@@ -410,7 +410,7 @@ void ConfigWindow::deleterow()
 		}
 
 	} catch (const std::exception &e) {
-		blog(ERROR, "Delete Row Failure - %s", e.what());
+		blog(1, "Delete Row Failure - %s", e.what());
 		return;
 	}
 };

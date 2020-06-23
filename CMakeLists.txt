@@ -93,23 +93,30 @@ add_library(obs-midi MODULE
         ${obs-midi_SOURCES}
         ${obs-midi_HEADERS})
 
+if(WIN32 OR LINUX)
+	if (${isAzure})
 
-if (${isAzure})
-
-target_link_libraries(obs-midi
-				"${OBS_FRONTEND_LIB}"
-				${obs-midi_DEPS}
-				Qt5::Core
-				Qt5::Widgets
-				libobs)
+	target_link_libraries(obs-midi
+					"${OBS_FRONTEND_LIB}"
+					${obs-midi_DEPS}
+					Qt5::Core
+					Qt5::Widgets
+					libobs)
+	else()
+	target_link_libraries(obs-midi
+					obs-frontend-api
+					${obs-midi_DEPS}
+					Qt5::Core
+					Qt5::Widgets
+					libobs)
+  endif()
 else()
-target_link_libraries(obs-midi
-				obs-frontend-api
-				${obs-midi_DEPS}
-				Qt5::Core
-				Qt5::Widgets
-				libobs)
-
+	target_link_libraries(obs-midi
+					"${OBS_FRONTEND_LIB}"
+					${obs-midi_DEPS}
+					Qt5::Core
+					Qt5::Widgets
+					libobs)
 endif()
 if (${isAzure})
 # --- Windows-specific build settings and tasks ---

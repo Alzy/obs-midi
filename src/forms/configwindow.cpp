@@ -5,7 +5,11 @@
 #include "ui_configwindow.h"
 #include <QtWidgets>
 #include <QTableWidget>
+#if isAzure
 #include <obs-frontend-api.h>
+#else
+#include <obs-frontend-api/obs-frontend-api.h>
+#endif
 #include "../obs-midi.h"
 #include "../config.h"
 #include "../device-manager.h"

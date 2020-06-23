@@ -18,7 +18,12 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #pragma once
 
+#if isAzure
 #include <obs-frontend-api.h>
+#else
+#include <obs-frontend-api/obs-frontend-api.h>
+#endif
+
 #include <util/config-file.h>
 #include <QtCore/QString>
 #include <set>

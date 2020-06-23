@@ -15,7 +15,13 @@ You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>
 */
 
+#if isAzure
 #include <obs-frontend-api.h>
+#include "rtmidi17/rtmidi17.hpp"
+#else
+#include <obs-frontend-api/obs-frontend-api.h>
+#include "RtMidi17/rtmidi17.hpp"
+#endif
 #include <QtCore/QTime>
 //#include <Python.h>
 #include <functional>
@@ -27,7 +33,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "obs-midi.h"
 #include "config.h"
 #include "obs-controller.h"
-#include "rtmidi17/rtmidi17.hpp"
+
 #include "device-manager.h"
 using namespace std;
 

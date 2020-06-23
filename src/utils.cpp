@@ -23,7 +23,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <QtCore/QDir>
 #include <QtCore/QUrl>
 
+#if isAzure
 #include <obs-frontend-api.h>
+#else
+#include <obs-frontend-api/obs-frontend-api.h>
+#endif
 #include <obs.hpp>
 #include <util/platform.h>
 

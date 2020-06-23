@@ -41,6 +41,7 @@ jobs:
     QTDIR32: '$(QtBaseDir)\5.10.1\msvc2017'
     QTDIR64: '$(QtBaseDir)\5.10.1\msvc2017_64'
     OBSPath: 'D:\obs-studio'
+    isAzure: 1
   steps:
     - checkout: self
       submodules: true
@@ -79,6 +80,7 @@ jobs:
         QTDIR32: $(QTDIR32)
         QTDIR64: $(QTDIR64)
         OBSPath: $(OBSPath)
+        isAzure: $(isAzure)
 
     - task: MSBuild@1
       displayName: 'Build OBS Studio 32-bit'
@@ -99,6 +101,7 @@ jobs:
         QTDIR32: $(QTDIR32)
         QTDIR64: $(QTDIR64)
         OBSPath: $(OBSPath)
+        isAzure: $(isAzure)
 
     - task: MSBuild@1
       displayName: 'Build obs-midi 32-bit'

@@ -1,7 +1,13 @@
 
 #include <iostream>
 #include <obs-module.h>
+#if isAzure
 #include <obs-frontend-api.h>
+#include "rtmidi17/rtmidi17.hpp"
+#else
+#include <obs-frontend-api/obs-frontend-api.h>
+#include "RtMidi17/rtmidi17.hpp"
+#endif
 #include <obs-data.h>
 #include <string>
 #include <map>
@@ -9,7 +15,7 @@
 #include <utility>
 #include "obs-midi.h"
 
-#include "rtmidi17/rtmidi17.hpp"
+
 #include "forms/settings-dialog.h"
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMainWindow>

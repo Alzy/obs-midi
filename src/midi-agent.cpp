@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>
 */
 
-#if defined(isAzure)
+#if __has_include(<obs-frontend-api.h>)
 #include <obs-frontend-api.h>
 #include "rtmidi17/rtmidi17.hpp"
 #else

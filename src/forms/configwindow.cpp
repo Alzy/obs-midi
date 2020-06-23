@@ -5,7 +5,7 @@
 #include "ui_configwindow.h"
 #include <QtWidgets>
 #include <QTableWidget>
-#if defined(isAzure)
+#if __has_include(<obs-frontend-api.h>)
 #include <obs-frontend-api.h>
 #else
 #include <obs-frontend-api/obs-frontend-api.h>

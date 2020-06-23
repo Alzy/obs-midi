@@ -17,7 +17,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #pragma once
 
-#if defined(isAzure)
+#if __has_include(<obs-frontend-api.h>)
 #include <obs-frontend-api.h>
 #include "rtmidi17/rtmidi17.hpp"
 #else

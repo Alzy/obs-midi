@@ -1,7 +1,7 @@
 
 #include <iostream>
 #include <obs-module.h>
-#if isAzure
+#if __has_include(<obs-frontend-api.h>)
 #include <obs-frontend-api.h>
 #include "rtmidi17/rtmidi17.hpp"
 #else

@@ -8,20 +8,7 @@ if [ "${OSTYPE}" != "Darwin" ]; then
     echo "[obs-midi - Error] macOS install dependencies script can be run on Darwin-type OS only."
     exit 1
 fi
-HAS_PORT=$(type port 2>/dev/null)
-if [ "${HAS_PORT}" = "" ]; then
-  echo "[obs-midi - Error] Mac Ports not installed, Building and installing macports"
-  curl -O https://distfiles.macports.org/MacPorts/MacPorts-2.6.2.tar.bz2
-  tar xf MacPorts-2.6.2.tar.bz2
-  cd MacPorts-2.6.2/
-  ./configure
-   make
-   sudo make install
-   export PATH=/usr/local/git/bin:/usr/local/bin:$PATH
-fi
-sudo port -v selfupdate
 
-sudo port install jack
 HAS_BREW=$(type brew 2>/dev/null)
 
 if [ "${HAS_BREW}" = "" ]; then

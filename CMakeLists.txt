@@ -48,7 +48,9 @@ if (isAzure)
 	endif()
 	find_package(LibObs REQUIRED)
 endif()
-
+if (APPLE)
+	include(external/FindLibObs.cmake)
+endif()
 
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
 

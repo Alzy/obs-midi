@@ -93,26 +93,18 @@ add_library(obs-midi MODULE
         ${obs-midi_SOURCES}
         ${obs-midi_HEADERS})
 
-if (isAzure)
-	target_link_libraries(obs-midi
-	 				"${OBS_FRONTEND_LIB}"
-	        ${obs-midi_DEPS}
-	        Qt5::Core
-	        Qt5::Widgets
-	        libobs)
-else()
+
+
 target_link_libraries(obs-midi
-				obs-frontend-api
+				"${OBS_FRONTEND_LIB}"
 				${obs-midi_DEPS}
 				Qt5::Core
 				Qt5::Widgets
 				libobs)
-endif()
-
-
 
 if (isAzure)
 # --- Windows-specific build settings and tasks ---
+message(WARNING "IS AZURE")
 if(WIN32)
 	if(NOT DEFINED OBS_FRONTEND_LIB)
 		set(OBS_FRONTEND_LIB "OBS_FRONTEND_LIB-NOTFOUND" CACHE FILEPATH "OBS frontend library")

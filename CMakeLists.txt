@@ -102,7 +102,7 @@ target_link_libraries(obs-midi
 				Qt5::Widgets
 				libobs)
 
-if (${isAzure})
+if (${isAzure} = "true")
 # --- Windows-specific build settings and tasks ---
 message(WARNING "IS AZURE")
 if(WIN32)

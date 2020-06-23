@@ -41,7 +41,7 @@ jobs:
     QTDIR32: '$(QtBaseDir)\5.10.1\msvc2017'
     QTDIR64: '$(QtBaseDir)\5.10.1\msvc2017_64'
     OBSPath: 'D:\obs-studio'
-    isAzure: true
+    isAzure: 'true'
   steps:
     - checkout: self
       submodules: true

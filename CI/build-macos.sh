@@ -19,7 +19,6 @@ fi
 echo "[obs-midi] Building 'obs-midi' for macOS."
 mkdir -p build && cd build
 cmake .. \
-  -DisAzure=true\ 
 	-DQTDIR=/usr/local/opt/qt \
 	-DLIBOBS_INCLUDE_DIR=../../obs-studio/libobs \
 	-DLIBOBS_LIB=../../obs-studio/libobs \

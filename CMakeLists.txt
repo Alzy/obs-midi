@@ -42,20 +42,21 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_definitions(-DASIO_STANDALONE)
-
-if (WIN32 OR APPLE)
-	include(external/FindLibObs.cmake)
+if (isAzure)
+	if (WIN32 OR APPLE)
+		include(external/FindLibObs.cmake)
+	endif()
+	find_package(LibObs REQUIRED)
 endif()
 
-find_package(LibObs REQUIRED)
+
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
 
 include_directories(
-"${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api"
-
+				"${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api"
         SYSTEM
-	${Qt5Core_INCLUDES}
-	${Qt5Widgets_INCLUDES}
+				${Qt5Core_INCLUDES}
+				${Qt5Widgets_INCLUDES}
         "${CMAKE_SOURCE_DIR}/UI")
 
 set(obs-midi_SOURCES
@@ -89,15 +90,25 @@ add_library(obs-midi MODULE
         ${obs-midi_SOURCES}
         ${obs-midi_HEADERS})
 
+if (isAzure)
+	target_link_libraries(obs-midi
+	 				"${OBS_FRONTEND_LIB}"
+	        ${obs-midi_DEPS}
+	        Qt5::Core
+	        Qt5::Widgets
+	        libobs)
+else()
 target_link_libraries(obs-midi
- 				"${OBS_FRONTEND_LIB}"
-        ${obs-midi_DEPS}
-        Qt5::Core
-        Qt5::Widgets
-        libobs)
+				obs-frontend-api
+				${obs-midi_DEPS}
+				Qt5::Core
+				Qt5::Widgets
+				libobs)
+endif()
 
 
 
+if (isAzure)
 # --- Windows-specific build settings and tasks ---
 if(WIN32)
 	if(NOT DEFINED OBS_FRONTEND_LIB)
@@ -227,3 +238,4 @@ if(APPLE)
 	target_link_libraries(obs-midi "${OBS_FRONTEND_LIB}")
 endif()
 # -- End of section --
+endif()

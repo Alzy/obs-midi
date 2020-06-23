@@ -17,12 +17,17 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #pragma once
 
+#if isAzure
 #include <obs-frontend-api.h>
+#include "rtmidi17/rtmidi17.hpp"
+#else
+#include <obs-frontend-api/obs-frontend-api.h>
+#include "RtMidi17/rtmidi17.hpp"
+#endif
 #include <QtCore/QString>
 #include <QtCore/QSharedPointer>
 #include <vector>
 #include <QObject>
-#include "rtmidi17/rtmidi17.hpp"
 #include <functional>
 #include <map>
 #include <string>

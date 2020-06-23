@@ -16,7 +16,11 @@ You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>
 */
 
+#if isAzure
 #include <obs-frontend-api.h>
+#else
+#include <obs-frontend-api/obs-frontend-api.h>
+#endif
 
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QTime>

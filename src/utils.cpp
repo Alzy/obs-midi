@@ -72,7 +72,7 @@ bool Utils::inrange(int low, int high, int x)
 }
 int Utils::get_midi_note_or_control(rtmidi::message mess)
 {
-	int bytetopullfrom;
+	int bytetopullfrom=-1;
 	switch (mess.get_message_type()) {
 	case rtmidi::message_type::INVALID:
 		break;
@@ -116,13 +116,12 @@ int Utils::get_midi_note_or_control(rtmidi::message mess)
 	case rtmidi::message_type:: SYSTEM_RESET : bytetopullfrom = 0;break;
 	****************************************************/
 	}
-	auto ret = mess.bytes.at(bytetopullfrom);
 
 	return mess[bytetopullfrom];
 }
 int Utils::get_midi_value(rtmidi::message mess)
 {
-	int bytetopullfrom;
+	int bytetopullfrom=-1;
 	switch (mess.get_message_type()) {
 	case rtmidi::message_type::INVALID:
 		break;
@@ -169,7 +168,7 @@ int Utils::get_midi_value(rtmidi::message mess)
 		case rtmidi::message_type:: SYSTEM_RESET : bytetopullfrom = 0;break;
   			*/
 	}
-	auto ret = mess.bytes.at(bytetopullfrom);
+	
 	return mess[bytetopullfrom];
 }
 

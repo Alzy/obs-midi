@@ -15,7 +15,6 @@
 #include <utility>
 #include "obs-midi.h"
 
-
 #include "forms/settings-dialog.h"
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMainWindow>
@@ -104,7 +103,8 @@ eventsPtr GetEventsSystem()
 	return _eventsSystem;
 }
 
-void reloadEvents() {
+void reloadEvents()
+{
 	_eventsSystem.reset();
 	_eventsSystem = eventsPtr(new events(_deviceManager));
 	// Setup event handler to start the server once OBS is ready
@@ -116,5 +116,4 @@ void reloadEvents() {
 	};
 	obs_frontend_add_event_callback(
 		eventCallback, (void *)(obs_frontend_event_cb)eventCallback);
-
 }

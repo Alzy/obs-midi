@@ -18,10 +18,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #pragma once
 #if __has_include(<obs-frontend-api.h>)
-
 #include "rtmidi17/rtmidi17.hpp"
 #else
-
 #include "RtMidi17/rtmidi17.hpp"
 #endif
 #include <stdio.h>

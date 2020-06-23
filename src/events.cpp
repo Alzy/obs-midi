@@ -20,11 +20,8 @@
 #include <inttypes.h>
 #include <util/platform.h>
 #include <media-io/video-io.h>
-
 #include <QtWidgets/QPushButton>
-
 #include "events.h"
-
 #include "obs-midi.h"
 #include "config.h"
 #include "utils.h"

@@ -41,6 +41,7 @@ jobs:
     QTDIR32: '$(QtBaseDir)\5.10.1\msvc2017'
     QTDIR64: '$(QtBaseDir)\5.10.1\msvc2017_64'
     OBSPath: 'D:\obs-studio'
+    isAzure: 'true'
   steps:
     - checkout: self
       submodules: true
@@ -79,6 +80,7 @@ jobs:
         QTDIR32: $(QTDIR32)
         QTDIR64: $(QTDIR64)
         OBSPath: $(OBSPath)
+        isAzure: $(isAzure)
 
     - task: MSBuild@1
       displayName: 'Build OBS Studio 32-bit'
@@ -99,6 +101,7 @@ jobs:
         QTDIR32: $(QTDIR32)
         QTDIR64: $(QTDIR64)
         OBSPath: $(OBSPath)
+        isAzure: $(isAzure)
 
     - task: MSBuild@1
       displayName: 'Build obs-midi 32-bit'
@@ -128,6 +131,7 @@ jobs:
       BUILD_REASON: $(Build.Reason)
       BRANCH_SHORT_NAME: $(Build.SourceBranchName)
       BRANCH_FULL_NAME: $(Build.SourceBranch)
+      isAzure: true
   steps:
     - checkout: self
       submodules: true
@@ -137,6 +141,8 @@ jobs:
 
     - script: ./CI/build-ubuntu.sh
       displayName: 'Build obs-midi'
+      env:
+        isAzure: $(isAzure)
 
     - script: ./CI/package-ubuntu.sh
       displayName: 'Package obs-midi'
@@ -149,6 +155,8 @@ jobs:
 - job: 'Build_macOS'
   pool:
     vmImage: 'macos-10.14'
+    variables:
+      isAzure: true
   steps:
     - checkout: self
       submodules: true
@@ -161,7 +169,8 @@ jobs:
 
     - script: ./CI/build-macos.sh
       displayName: 'Build obs-midi'
-
+      env:
+        isAzure: $(isAzure)
     - script: ./CI/package-macos.sh
       displayName: 'Package obs-midi'
       env:

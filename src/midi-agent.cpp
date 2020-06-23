@@ -15,7 +15,13 @@ You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>
 */
 
+#if __has_include(<obs-frontend-api.h>)
 #include <obs-frontend-api.h>
+#include "rtmidi17/rtmidi17.hpp"
+#else
+#include <obs-frontend-api/obs-frontend-api.h>
+#include "RtMidi17/rtmidi17.hpp"
+#endif
 #include <QtCore/QTime>
 //#include <Python.h>
 #include <functional>
@@ -27,7 +33,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "obs-midi.h"
 #include "config.h"
 #include "obs-controller.h"
-#include "rtmidi17/rtmidi17.hpp"
+
 #include "device-manager.h"
 using namespace std;
 
@@ -262,7 +268,6 @@ void MidiAgent::OpenPort(int inport)
 
 	} catch (const rtmidi::midi_exception &error) {
 
-
 		blog(1, "unable to open port %i -- &s", inport, error.what());
 	}
 }
@@ -273,7 +278,8 @@ void MidiAgent::OpenOutPort(int outport)
 		midiout->open_port(outport);
 	} catch (const rtmidi::midi_exception &error) {
 
-		blog(1, " Opening out port -- %i -- exception -- %s ", outport,error.what());
+		blog(1, " Opening out port -- %i -- exception -- %s ", outport,
+		     error.what());
 	}
 	outname = midiout->get_port_name(outport);
 	enabled = true;
@@ -305,17 +311,19 @@ void MidiAgent::SetOutName(string oname)
 {
 	if (outname != oname) {
 		midiout->close_port();
-		OpenOutPort(GetDeviceManager()->GetOutPortNumberByDeviceName(oname.c_str()));
+		OpenOutPort(GetDeviceManager()->GetOutPortNumberByDeviceName(
+			oname.c_str()));
 	}
 	outname = oname;
 }
-bool MidiAgent::setBidirectional(bool state) {
+bool MidiAgent::setBidirectional(bool state)
+{
 	bidirectional = state;
 	if (!state) {
 		midiout->close_port();
 
 	} else {
-		if (midiout->is_port_open() ) {
+		if (midiout->is_port_open()) {
 			midiout->close_port();
 		}
 		OpenOutPort(GetDeviceManager()->GetOutPortNumberByDeviceName(
@@ -544,15 +552,16 @@ void MidiAgent::NewObsEvent(QString eventType, QString eventData)
 				obs_data_get_string(data, "previousName");
 			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
 				if (self->midiHooks.at(i)->param1 == from) {
-					self->midiHooks.at(i)->param1 = obs_data_get_string(data, "newName");
+					self->midiHooks.at(i)->param1 =
+						obs_data_get_string(data,
+								    "newName");
 					self->GetData();
-
 				}
 			}
 		} else if (eventType == QString("Exiting")) {
 			closing = true;
 
-		}else if (eventType == QString("SourceDestroyed")) {
+		} else if (eventType == QString("SourceDestroyed")) {
 			if (!closing) {
 				std::string from =
 					obs_data_get_string(data, "sourceName");

@@ -5,7 +5,11 @@
 #include "ui_configwindow.h"
 #include <QtWidgets>
 #include <QTableWidget>
+#if __has_include(<obs-frontend-api.h>)
 #include <obs-frontend-api.h>
+#else
+#include <obs-frontend-api/obs-frontend-api.h>
+#endif
 #include "../obs-midi.h"
 #include "../config.h"
 #include "../device-manager.h"
@@ -406,6 +410,7 @@ void ConfigWindow::deleterow()
 		}
 
 	} catch (const std::exception &e) {
+		blog(1, "Delete Row Failure - %s", e.what());
 		return;
 	}
 };

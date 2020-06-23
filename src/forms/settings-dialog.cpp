@@ -13,7 +13,11 @@ You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>
 */
 
+#if __has_include(<obs-frontend-api.h>)
 #include <obs-frontend-api.h>
+#else
+#include <obs-frontend-api/obs-frontend-api.h>
+#endif
 #include <obs-module.h>
 #include <obs-data.h>
 #include <string>
@@ -77,7 +81,6 @@ void SettingsDialog::SetAvailableDevices()
 	loadingdevices = false;
 	auto midiDevices = GetDeviceManager()->GetPortsList();
 
-
 	this->ui->list_midi_dev->clear();
 	this->ui->check_enabled->setEnabled(false);
 	this->ui->btn_configure->setEnabled(false);
@@ -97,16 +100,16 @@ void SettingsDialog::SetAvailableDevices()
 
 	if (starting) {
 
-#		if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
 		//define something for Windows (32-bit and 64-bit, this part is common)
 		this->ui->outbox->setCurrentIndex(1);
-		#elif __linux__
+#elif __linux__
 		this->ui->outbox->setCurrentIndex(0);
-		// linux
-		#elif __unix__ // all unices not caught above
+// linux
+#elif __unix__ // all unices not caught above
 		this->ui->outbox->setCurrentIndex(0);
-		// Unix
-		#endif
+// Unix
+#endif
 		if (midiDevices.size() != 0) {
 			desconnect = connect(
 				ui->outbox, SIGNAL(currentTextChanged(QString)),
@@ -148,23 +151,21 @@ int SettingsDialog::on_check_enabled_stateChanged(bool state)
 
 	if (state == true) {
 
-		auto selectedDeviceName =ui->list_midi_dev->currentItem()
-				->text()
-				.toStdString();
-		auto selectedOutDeviceName =ui->outbox->currentText().toStdString();
+		auto selectedDeviceName =
+			ui->list_midi_dev->currentItem()->text().toStdString();
+		auto selectedOutDeviceName =
+			ui->outbox->currentText().toStdString();
 		auto device = GetDeviceManager()->GetMidiDeviceByName(
 			selectedDeviceName.c_str());
-		blog(LOG_INFO, "Item enabled: %s",
+		blog(LOG_INFO, "Item enabled: %s", selectedDeviceName.c_str());
+		int devicePort = GetDeviceManager()->GetPortNumberByDeviceName(
 			selectedDeviceName.c_str());
-		int devicePort =
-			GetDeviceManager()->GetPortNumberByDeviceName(
-				selectedDeviceName.c_str());
 		int deviceOutPort =
 			GetDeviceManager()->GetOutPortNumberByDeviceName(
 				selectedOutDeviceName.c_str());
 		if (device == NULL) {
-			GetDeviceManager()->RegisterMidiDevice(
-				devicePort, deviceOutPort);
+			GetDeviceManager()->RegisterMidiDevice(devicePort,
+							       deviceOutPort);
 			device = GetDeviceManager()->GetMidiDeviceByName(
 				selectedDeviceName.c_str());
 			device->OpenPort(devicePort);
@@ -173,11 +174,7 @@ int SettingsDialog::on_check_enabled_stateChanged(bool state)
 
 			device->OpenPort(devicePort);
 			device->OpenOutPort(deviceOutPort);
-
 		}
-
-
-
 	}
 
 	//ui->outbox->setCurrentText(QString::fromStdString(device->GetOutName()));
@@ -193,7 +190,8 @@ void SettingsDialog::on_item_select(QString curitem)
 {
 	auto texting = curitem.toStdString();
 	// Pull info on if device is enabled, if so set true if not set false
-	auto device = GetDeviceManager()->GetMidiDeviceByName(curitem.toStdString().c_str());
+	auto device = GetDeviceManager()->GetMidiDeviceByName(
+		curitem.toStdString().c_str());
 	if (device != NULL && device->isEnabled()) {
 		ui->check_enabled->setChecked(true);
 		ui->btn_configure->setEnabled(true);
@@ -210,8 +208,10 @@ void SettingsDialog::on_item_select(QString curitem)
 		ui->bidirectional->setEnabled(false);
 	}
 }
-int SettingsDialog::on_bid_enabled_stateChanged(bool state) {
-	auto device = GetDeviceManager()->GetMidiDeviceByName(ui->list_midi_dev->currentItem()->text().toStdString().c_str());
+int SettingsDialog::on_bid_enabled_stateChanged(bool state)
+{
+	auto device = GetDeviceManager()->GetMidiDeviceByName(
+		ui->list_midi_dev->currentItem()->text().toStdString().c_str());
 	if (state) {
 		return 1;
 		device->setBidirectional(state);
@@ -224,7 +224,7 @@ int SettingsDialog::on_bid_enabled_stateChanged(bool state) {
 	GetConfig()->Load();
 }
 
-	SettingsDialog::~SettingsDialog()
+SettingsDialog::~SettingsDialog()
 {
 
 	loadingdevices = false;

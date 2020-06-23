@@ -1,7 +1,13 @@
 
 #include <iostream>
 #include <obs-module.h>
+#if __has_include(<obs-frontend-api.h>)
 #include <obs-frontend-api.h>
+#include "rtmidi17/rtmidi17.hpp"
+#else
+#include <obs-frontend-api/obs-frontend-api.h>
+#include "RtMidi17/rtmidi17.hpp"
+#endif
 #include <obs-data.h>
 #include <string>
 #include <map>
@@ -9,7 +15,6 @@
 #include <utility>
 #include "obs-midi.h"
 
-#include "rtmidi17/rtmidi17.hpp"
 #include "forms/settings-dialog.h"
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMainWindow>
@@ -98,7 +103,8 @@ eventsPtr GetEventsSystem()
 	return _eventsSystem;
 }
 
-void reloadEvents() {
+void reloadEvents()
+{
 	_eventsSystem.reset();
 	_eventsSystem = eventsPtr(new events(_deviceManager));
 	// Setup event handler to start the server once OBS is ready
@@ -110,5 +116,4 @@ void reloadEvents() {
 	};
 	obs_frontend_add_event_callback(
 		eventCallback, (void *)(obs_frontend_event_cb)eventCallback);
-
 }

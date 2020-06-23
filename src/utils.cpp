@@ -23,7 +23,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <QtCore/QDir>
 #include <QtCore/QUrl>
 
+#if __has_include(<obs-frontend-api.h>)
 #include <obs-frontend-api.h>
+#else
+#include <obs-frontend-api/obs-frontend-api.h>
+#endif
 #include <obs.hpp>
 #include <util/platform.h>
 
@@ -68,7 +72,7 @@ bool Utils::inrange(int low, int high, int x)
 }
 int Utils::get_midi_note_or_control(rtmidi::message mess)
 {
-	int bytetopullfrom;
+	int bytetopullfrom=-1;
 	switch (mess.get_message_type()) {
 	case rtmidi::message_type::INVALID:
 		break;
@@ -112,13 +116,12 @@ int Utils::get_midi_note_or_control(rtmidi::message mess)
 	case rtmidi::message_type:: SYSTEM_RESET : bytetopullfrom = 0;break;
 	****************************************************/
 	}
-	auto ret = mess.bytes.at(bytetopullfrom);
 
 	return mess[bytetopullfrom];
 }
 int Utils::get_midi_value(rtmidi::message mess)
 {
-	int bytetopullfrom;
+	int bytetopullfrom=-1;
 	switch (mess.get_message_type()) {
 	case rtmidi::message_type::INVALID:
 		break;
@@ -165,7 +168,7 @@ int Utils::get_midi_value(rtmidi::message mess)
 		case rtmidi::message_type:: SYSTEM_RESET : bytetopullfrom = 0;break;
   			*/
 	}
-	auto ret = mess.bytes.at(bytetopullfrom);
+	
 	return mess[bytetopullfrom];
 }
 

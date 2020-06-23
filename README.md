@@ -28,15 +28,17 @@ Use MIDI devices to trigger events in OBS and visa versa.
   * Select your controller, hit configure, Toggle a button and fader, remap it to an action and hit save!
 
 
+
 Currently runs on Windows and Linux, and is untested on MAC
+
 
 # Build instructions
 In your obs-studio/plugins folder
 1. ```git clone --recursive https://github.com/Alzy/obs-midi.git```
 2. Append to CMakeLists.txt  
   * ```add_subdirectory(obs-midi)```
- Go back to your obs Build directory
- ## windows
+ Go back to your OBS Build directory
+ ## Windows
  1. run ```cmake-gui.exe```
  2. click ```configure```
  3. click ```generate```

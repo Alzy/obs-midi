@@ -42,7 +42,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_definitions(-DASIO_STANDALONE)
-if (isAzure)
+if (${isAzure})
 	if (WIN32 OR APPLE)
 		include(external/FindLibObs.cmake)
 	endif()
@@ -94,6 +94,7 @@ add_library(obs-midi MODULE
         ${obs-midi_HEADERS})
 
 
+if (${isAzure})
 
 target_link_libraries(obs-midi
 				"${OBS_FRONTEND_LIB}"
@@ -101,106 +102,114 @@ target_link_libraries(obs-midi
 				Qt5::Core
 				Qt5::Widgets
 				libobs)
-
-if (${isAzure} = "true")
-# --- Windows-specific build settings and tasks ---
-message(WARNING "IS AZURE")
-if(WIN32)
-	if(NOT DEFINED OBS_FRONTEND_LIB)
-		set(OBS_FRONTEND_LIB "OBS_FRONTEND_LIB-NOTFOUND" CACHE FILEPATH "OBS frontend library")
-		message(FATAL_ERROR "Could not find OBS Frontend API's library !")
-	endif()
-
-    if(MSVC)
-        # Enable Multicore Builds and disable FH4 (to not depend on VCRUNTIME140_1.DLL)
-	    add_definitions(/MP /d2FH4-)
-    endif()
-
-
-	if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-		set(ARCH_NAME "64bit")
-		set(OBS_BUILDDIR_ARCH "build64")
-	else()
-		set(ARCH_NAME "32bit")
-		set(OBS_BUILDDIR_ARCH "build32")
-	endif()
-
-	include_directories(
-		"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/UI"
-	)
-
-	target_link_libraries(obs-midi
-		"${OBS_FRONTEND_LIB}")
-
-	# --- Release package helper ---
-	# The "release" folder has a structure similar OBS' one on Windows
-	set(RELEASE_DIR "${PROJECT_SOURCE_DIR}/release")
-	add_custom_command(TARGET obs-midi POST_BUILD
-		# If config is Release, package release files
-		COMMAND if $<CONFIG:Release>==1 (
-			"${CMAKE_COMMAND}" -E make_directory
-			"${RELEASE_DIR}/data/obs-plugins/obs-midi"
-			"${RELEASE_DIR}/obs-plugins/${ARCH_NAME}")
-
-		COMMAND if $<CONFIG:Release>==1 ("${CMAKE_COMMAND}" -E copy_directory
-			"${PROJECT_SOURCE_DIR}/data"
-			"${RELEASE_DIR}/data/obs-plugins/obs-midi")
-
-		COMMAND if $<CONFIG:Release>==1 ("${CMAKE_COMMAND}" -E copy
-			"$<TARGET_FILE:obs-midi>"
-			"${RELEASE_DIR}/obs-plugins/${ARCH_NAME}")
-
-		# In Release mode, copy Qt image format plugins
-		COMMAND if $<CONFIG:Release>==1 (
-			"${CMAKE_COMMAND}" -E copy
-			"${QTDIR}/plugins/imageformats/qjpeg.dll"
-			"${RELEASE_DIR}/bin/${ARCH_NAME}/imageformats/qjpeg.dll")
-		COMMAND if $<CONFIG:RelWithDebInfo>==1 (
-			"${CMAKE_COMMAND}" -E copy
-			"${QTDIR}/plugins/imageformats/qjpeg.dll"
-			"${RELEASE_DIR}/bin/${ARCH_NAME}/imageformats/qjpeg.dll")
-
-		# If config is RelWithDebInfo, package release files
-		COMMAND if $<CONFIG:RelWithDebInfo>==1 (
-			"${CMAKE_COMMAND}" -E make_directory
-			"${RELEASE_DIR}/data/obs-plugins/obs-midi"
-			"${RELEASE_DIR}/obs-plugins/${ARCH_NAME}")
-
-		COMMAND if $<CONFIG:RelWithDebInfo>==1 ("${CMAKE_COMMAND}" -E copy_directory
-			"${PROJECT_SOURCE_DIR}/data"
-			"${RELEASE_DIR}/data/obs-plugins/obs-midi")
-
-		COMMAND if $<CONFIG:RelWithDebInfo>==1 ("${CMAKE_COMMAND}" -E copy
-			"$<TARGET_FILE:obs-midi>"
-			"${RELEASE_DIR}/obs-plugins/${ARCH_NAME}")
-
-		COMMAND if $<CONFIG:RelWithDebInfo>==1 ("${CMAKE_COMMAND}" -E copy
-			"$<TARGET_PDB_FILE:obs-midi>"
-			"${RELEASE_DIR}/obs-plugins/${ARCH_NAME}")
-
-		# Copy to obs-studio dev environment for immediate testing
-		COMMAND if $<CONFIG:Debug>==1 (
-			"${CMAKE_COMMAND}" -E copy
-				"$<TARGET_FILE:obs-midi>"
-				"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/rundir/$<CONFIG>/obs-plugins/${ARCH_NAME}")
-
-		COMMAND if $<CONFIG:Debug>==1 (
-			"${CMAKE_COMMAND}" -E copy
-				"$<TARGET_PDB_FILE:obs-midi>"
-				"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/rundir/$<CONFIG>/obs-plugins/${ARCH_NAME}")
-
-		COMMAND if $<CONFIG:Debug>==1 (
-			"${CMAKE_COMMAND}" -E make_directory
-				"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/rundir/$<CONFIG>/data/obs-plugins/obs-midi")
-
-		COMMAND if $<CONFIG:Debug>==1 (
-			"${CMAKE_COMMAND}" -E copy_directory
-				"${PROJECT_SOURCE_DIR}/data"
-				"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/rundir/$<CONFIG>/data/obs-plugins/obs-midi")
-	)
-	# --- End of sub-section ---
+else()
+target_link_libraries(obs-midi
+				obs-frontend-api
+				${obs-midi_DEPS}
+				Qt5::Core
+				Qt5::Widgets
+				libobs)
 
 endif()
+if (${isAzure})
+# --- Windows-specific build settings and tasks ---
+	message(WARNING "IS AZURE")
+	if(WIN32)
+		if(NOT DEFINED OBS_FRONTEND_LIB)
+			set(OBS_FRONTEND_LIB "OBS_FRONTEND_LIB-NOTFOUND" CACHE FILEPATH "OBS frontend library")
+			message(FATAL_ERROR "Could not find OBS Frontend API's library !")
+		endif()
+
+	    if(MSVC)
+	        # Enable Multicore Builds and disable FH4 (to not depend on VCRUNTIME140_1.DLL)
+		    add_definitions(/MP /d2FH4-)
+	    endif()
+
+
+		if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+			set(ARCH_NAME "64bit")
+			set(OBS_BUILDDIR_ARCH "build64")
+		else()
+			set(ARCH_NAME "32bit")
+			set(OBS_BUILDDIR_ARCH "build32")
+		endif()
+
+		include_directories(
+			"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/UI"
+		)
+
+		target_link_libraries(obs-midi
+			"${OBS_FRONTEND_LIB}")
+
+		# --- Release package helper ---
+		# The "release" folder has a structure similar OBS' one on Windows
+		set(RELEASE_DIR "${PROJECT_SOURCE_DIR}/release")
+		add_custom_command(TARGET obs-midi POST_BUILD
+			# If config is Release, package release files
+			COMMAND if $<CONFIG:Release>==1 (
+				"${CMAKE_COMMAND}" -E make_directory
+				"${RELEASE_DIR}/data/obs-plugins/obs-midi"
+				"${RELEASE_DIR}/obs-plugins/${ARCH_NAME}")
+
+			COMMAND if $<CONFIG:Release>==1 ("${CMAKE_COMMAND}" -E copy_directory
+				"${PROJECT_SOURCE_DIR}/data"
+				"${RELEASE_DIR}/data/obs-plugins/obs-midi")
+
+			COMMAND if $<CONFIG:Release>==1 ("${CMAKE_COMMAND}" -E copy
+				"$<TARGET_FILE:obs-midi>"
+				"${RELEASE_DIR}/obs-plugins/${ARCH_NAME}")
+
+			# In Release mode, copy Qt image format plugins
+			COMMAND if $<CONFIG:Release>==1 (
+				"${CMAKE_COMMAND}" -E copy
+				"${QTDIR}/plugins/imageformats/qjpeg.dll"
+				"${RELEASE_DIR}/bin/${ARCH_NAME}/imageformats/qjpeg.dll")
+			COMMAND if $<CONFIG:RelWithDebInfo>==1 (
+				"${CMAKE_COMMAND}" -E copy
+				"${QTDIR}/plugins/imageformats/qjpeg.dll"
+				"${RELEASE_DIR}/bin/${ARCH_NAME}/imageformats/qjpeg.dll")
+
+			# If config is RelWithDebInfo, package release files
+			COMMAND if $<CONFIG:RelWithDebInfo>==1 (
+				"${CMAKE_COMMAND}" -E make_directory
+				"${RELEASE_DIR}/data/obs-plugins/obs-midi"
+				"${RELEASE_DIR}/obs-plugins/${ARCH_NAME}")
+
+			COMMAND if $<CONFIG:RelWithDebInfo>==1 ("${CMAKE_COMMAND}" -E copy_directory
+				"${PROJECT_SOURCE_DIR}/data"
+				"${RELEASE_DIR}/data/obs-plugins/obs-midi")
+
+			COMMAND if $<CONFIG:RelWithDebInfo>==1 ("${CMAKE_COMMAND}" -E copy
+				"$<TARGET_FILE:obs-midi>"
+				"${RELEASE_DIR}/obs-plugins/${ARCH_NAME}")
+
+			COMMAND if $<CONFIG:RelWithDebInfo>==1 ("${CMAKE_COMMAND}" -E copy
+				"$<TARGET_PDB_FILE:obs-midi>"
+				"${RELEASE_DIR}/obs-plugins/${ARCH_NAME}")
+
+			# Copy to obs-studio dev environment for immediate testing
+			COMMAND if $<CONFIG:Debug>==1 (
+				"${CMAKE_COMMAND}" -E copy
+					"$<TARGET_FILE:obs-midi>"
+					"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/rundir/$<CONFIG>/obs-plugins/${ARCH_NAME}")
+
+			COMMAND if $<CONFIG:Debug>==1 (
+				"${CMAKE_COMMAND}" -E copy
+					"$<TARGET_PDB_FILE:obs-midi>"
+					"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/rundir/$<CONFIG>/obs-plugins/${ARCH_NAME}")
+
+			COMMAND if $<CONFIG:Debug>==1 (
+				"${CMAKE_COMMAND}" -E make_directory
+					"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/rundir/$<CONFIG>/data/obs-plugins/obs-midi")
+
+			COMMAND if $<CONFIG:Debug>==1 (
+				"${CMAKE_COMMAND}" -E copy_directory
+					"${PROJECT_SOURCE_DIR}/data"
+					"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/rundir/$<CONFIG>/data/obs-plugins/obs-midi")
+		)
+		# --- End of sub-section ---
+
+	endif()
 # --- End of section ---
 endif()
 # --- Linux-specific build settings and tasks ---

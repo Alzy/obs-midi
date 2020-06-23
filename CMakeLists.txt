@@ -93,29 +93,32 @@ add_library(obs-midi MODULE
         ${obs-midi_SOURCES}
         ${obs-midi_HEADERS})
 
+if(WIN32 OR LINUX)
+	if (${isAzure})
 
-if (${isAzure})
-
-target_link_libraries(obs-midi
-				"${OBS_FRONTEND_LIB}"
-				${obs-midi_DEPS}
-				Qt5::Core
-				Qt5::Widgets
-				libobs)
+	target_link_libraries(obs-midi
+					"${OBS_FRONTEND_LIB}"
+					${obs-midi_DEPS}
+					Qt5::Core
+					Qt5::Widgets
+					libobs)
+	else()
+	target_link_libraries(obs-midi
+					obs-frontend-api
+					${obs-midi_DEPS}
+					Qt5::Core
+					Qt5::Widgets
+					libobs)
+  endif()
 else()
-target_link_libraries(obs-midi
-				obs-frontend-api
-				${obs-midi_DEPS}
-				Qt5::Core
-				Qt5::Widgets
-				libobs)
-
-<<<<<<< HEAD
+	target_link_libraries(obs-midi
+					"${OBS_FRONTEND_LIB}"
+					${obs-midi_DEPS}
+					Qt5::Core
+					Qt5::Widgets
+					libobs)
 endif()
 if (${isAzure})
-=======
-if (${isAzure} = "true")
->>>>>>> 269346d... vxcbgn
 # --- Windows-specific build settings and tasks ---
 	message(WARNING "IS AZURE")
 	if(WIN32)
@@ -214,8 +217,10 @@ if (${isAzure} = "true")
 		# --- End of sub-section ---
 
 	endif()
-# --- End of section ---
+	# --- End of section ---
 endif()
+# -- End of if AZURE
+
 # --- Linux-specific build settings and tasks ---
 if(UNIX AND NOT APPLE)
 	include(GNUInstallDirs)
@@ -240,7 +245,6 @@ endif()
 # -- OS X specific build settings and tasks --
 if(APPLE)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -fvisibility=default")
-
 	set(CMAKE_SKIP_RPATH TRUE)
 	set_target_properties(obs-midi PROPERTIES PREFIX "")
 	target_link_libraries(obs-midi "${OBS_FRONTEND_LIB}")

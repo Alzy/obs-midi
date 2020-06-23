@@ -17,7 +17,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 */
 
 #pragma once
-#if isAzure
+#if defined(isAzure)
+
 #include "rtmidi17/rtmidi17.hpp"
 #else
 

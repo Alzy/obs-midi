@@ -3,15 +3,15 @@
 
 Use MIDI devices to trigger events in OBS and visa versa.
 
-Currently a WIP
 
-# Status
+
+# Status -- WIP
 ## Windows
-[![Build Status](https://dev.azure.com/cpyarger0055/cpyarger/_apis/build/status/cpyarger.obs-midi?branchName=master&jobName=Build_Windows)](https://dev.azure.com/cpyarger0055/cpyarger/_build/latest?definitionId=4&branchName=master)
+[![Build Status](https://dev.azure.com/cpyarger0055/OBS-Midi/_apis/build/status/OBS-Midi?branchName=master&jobName=Build_Windows)](https://dev.azure.com/cpyarger0055/OBS-Midi/_build/latest?definitionId=5&branchName=master)
 ## macOS
-[![Build Status](https://dev.azure.com/cpyarger0055/cpyarger/_apis/build/status/cpyarger.obs-midi?branchName=master&jobName=Build_macOS)](https://dev.azure.com/cpyarger0055/cpyarger/_build/latest?definitionId=4&branchName=master)
+[![Build Status](https://dev.azure.com/cpyarger0055/OBS-Midi/_apis/build/status/OBS-Midi?branchName=master&jobName=Build_macOS)](https://dev.azure.com/cpyarger0055/OBS-Midi/_build/latest?definitionId=5&branchName=master)
 ## Linux
-[![Build Status](https://dev.azure.com/cpyarger0055/cpyarger/_apis/build/status/cpyarger.obs-midi?branchName=master&jobName=Build_Linux)](https://dev.azure.com/cpyarger0055/cpyarger/_build/latest?definitionId=4&branchName=master)
+[![Build Status](https://dev.azure.com/cpyarger0055/OBS-Midi/_apis/build/status/OBS-Midi?branchName=master&jobName=Build_Linux)](https://dev.azure.com/cpyarger0055/OBS-Midi/_build/latest?definitionId=5&branchName=master)
 # Installing
 
 
@@ -28,7 +28,9 @@ Currently a WIP
   * Select your controller, hit configure, Toggle a button and fader, remap it to an action and hit save!
 
 
-Currently runs on Windows and Linux, And is untested on MAC
+
+Currently runs on Windows and Linux, and is untested on MAC
+
 
 # Build instructions
 In your obs-studio/plugins folder

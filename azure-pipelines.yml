@@ -167,7 +167,12 @@ jobs:
         webhookKey: 'H-QaYhWJo7d3EQyntGprayL_6Ljn5kK0sHwsnYrSXVCgH-zp-mZ2QCnu7wDNXG4daCTO'
         name: 'Azurebot'
         messageType: 'embeds'
-        content: '[{title: "Azure Pipelines Build -- OBS-MIDI", description: "Linux Build Successful", author: {name: "Azure DevOps"}}]'
+        content: "[{title: 'Azure Pipelines Build -- OBS-MIDI',
+         description: 'Linux Build Successful',
+          author: {
+            name: 'Azure DevOps'
+            }
+            }]"
 
 - job: 'Build_macOS'
   pool:

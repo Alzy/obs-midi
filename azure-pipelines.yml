@@ -119,7 +119,13 @@ jobs:
 
     - script: ./CI/package-windows.cmd
       displayName: 'Package obs-midi'
-
+    - task: ado-discord-webhook@1
+      inputs:
+        channelId: '724444696822415420'
+        webhookKey: 'H-QaYhWJo7d3EQyntGprayL_6Ljn5kK0sHwsnYrSXVCgH-zp-mZ2QCnu7wDNXG4daCTO'
+        name: 'Azurebot'
+        messageType: 'content'
+        content: '[{ title: "OBS-Midi Windows build Successful" }]'
     - task: PublishBuildArtifacts@1
       displayName: 'Upload package artifacts'
       inputs:
@@ -153,7 +159,13 @@ jobs:
       inputs:
         pathtoPublish: './package'
         artifactName: 'deb_build'
-
+    - task: ado-discord-webhook@1
+      inputs:
+        channelId: '724444696822415420'
+        webhookKey: 'H-QaYhWJo7d3EQyntGprayL_6Ljn5kK0sHwsnYrSXVCgH-zp-mZ2QCnu7wDNXG4daCTO'
+        name: 'Azurebot'
+        messageType: 'content'
+        content: '[{ title: "OBS-Midi Linuxbuild Successful" }]'
 - job: 'Build_macOS'
   pool:
     vmImage: 'macos-10.14'
@@ -183,3 +195,10 @@ jobs:
       inputs:
         pathtoPublish: './release'
         artifactName: 'macos_build'
+    - task: ado-discord-webhook@1
+      inputs:
+        channelId: '724444696822415420'
+        webhookKey: 'H-QaYhWJo7d3EQyntGprayL_6Ljn5kK0sHwsnYrSXVCgH-zp-mZ2QCnu7wDNXG4daCTO'
+        name: 'Azurebot'
+        messageType: 'content'
+        content: '[{ title: "OBS-Midi MacOS Successful" }]'

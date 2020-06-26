@@ -24,5 +24,6 @@ PAGER="cat" sudo checkinstall -y --type=debian --fstrans=no --nodoc \
 	--pkgsource="https://github.com/alzy/obs-midi" \
 	--requires="obs-studio \(\>= 25.0.7\), libqt5core5a, libqt5widgets5, qt5-image-formats-plugins" \
 	--pakdir="../package"
+	sudo chmod 777 ../package
 cp obs-midi-Linux-$GIT_HASH-x64.tar.gz ../package/
 sudo chmod ao+r ../package/*

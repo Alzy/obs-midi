@@ -124,8 +124,14 @@ jobs:
         channelId: '724444696822415420'
         webhookKey: 'H-QaYhWJo7d3EQyntGprayL_6Ljn5kK0sHwsnYrSXVCgH-zp-mZ2QCnu7wDNXG4daCTO'
         name: 'Azurebot'
-        messageType: 'content'
-        content: '[{ title: "OBS-Midi Windows build Successful" }]'
+        messageType: 'embeds'
+        content: '[{
+          title: "Azure Pipelines Build -- OBS-MIDI",
+          description: "Windows Build Successful", 
+          author: {
+                    name: "Azure DevOps"
+                  } 
+          }]'
     - task: PublishBuildArtifacts@1
       displayName: 'Upload package artifacts'
       inputs:
@@ -164,8 +170,14 @@ jobs:
         channelId: '724444696822415420'
         webhookKey: 'H-QaYhWJo7d3EQyntGprayL_6Ljn5kK0sHwsnYrSXVCgH-zp-mZ2QCnu7wDNXG4daCTO'
         name: 'Azurebot'
-        messageType: 'content'
-        content: '[{ title: "OBS-Midi Linuxbuild Successful" }]'
+        messageType: 'embeds'
+        content: '[{
+          title: "Azure Pipelines Build -- OBS-MIDI",
+          description: "Linux Build Successful", 
+          author: {
+                    name: "Azure DevOps"
+                  } 
+          }]'
 - job: 'Build_macOS'
   pool:
     vmImage: 'macos-10.14'
@@ -200,5 +212,11 @@ jobs:
         channelId: '724444696822415420'
         webhookKey: 'H-QaYhWJo7d3EQyntGprayL_6Ljn5kK0sHwsnYrSXVCgH-zp-mZ2QCnu7wDNXG4daCTO'
         name: 'Azurebot'
-        messageType: 'content'
-        content: '[{ title: "OBS-Midi MacOS Successful" }]'
+        messageType: 'embeds'
+        content: '[{
+          title: "Azure Pipelines build -- OBS-MIDI",
+          description: "Mac OS Build Successful", 
+          author: {
+                    name: "Azure DevOps"
+                  } 
+          }]'

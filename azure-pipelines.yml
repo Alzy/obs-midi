@@ -120,6 +120,7 @@ jobs:
     - script: ./CI/package-windows.cmd
       displayName: 'Package obs-midi'
     - task: ado-discord-webhook@1
+      displayName: 'Send Discord Notification'
       inputs:
         channelId: '724444696822415420'
         webhookKey: 'H-QaYhWJo7d3EQyntGprayL_6Ljn5kK0sHwsnYrSXVCgH-zp-mZ2QCnu7wDNXG4daCTO'
@@ -166,6 +167,7 @@ jobs:
         pathtoPublish: './package'
         artifactName: 'deb_build'
     - task: ado-discord-webhook@1
+      displayName: 'Send Discord Notification'
       inputs:
         channelId: '724444696822415420'
         webhookKey: 'H-QaYhWJo7d3EQyntGprayL_6Ljn5kK0sHwsnYrSXVCgH-zp-mZ2QCnu7wDNXG4daCTO'
@@ -208,6 +210,7 @@ jobs:
         pathtoPublish: './release'
         artifactName: 'macos_build'
     - task: ado-discord-webhook@1
+      displayName: 'Send Discord Notification'
       inputs:
         channelId: '724444696822415420'
         webhookKey: 'H-QaYhWJo7d3EQyntGprayL_6Ljn5kK0sHwsnYrSXVCgH-zp-mZ2QCnu7wDNXG4daCTO'

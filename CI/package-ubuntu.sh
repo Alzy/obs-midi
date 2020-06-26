@@ -13,7 +13,7 @@ cd ./build
 ls -l
 mkdir -p obs-studio/plugins/64bit/
 cp ./obs-midi.so obs-studio/plugins/64bit/
-tar -czvf obs-midi-Linux-$GIT_HASH-x64.tar.gz
+tar -czvf obs-midi-Linux-$GIT_HASH-x64.tar.gz obs-studio
 cp obs-midi-Linux-$GIT_HASH-x64.tar.gz ../package
 PAGER="cat" sudo checkinstall -y --type=debian --fstrans=no --nodoc \
 	--backup=no --deldoc=yes --install=no \

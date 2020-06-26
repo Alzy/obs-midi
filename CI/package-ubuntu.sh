@@ -11,12 +11,16 @@ fi
 
 cd ./build
 ls -l
+mkdir -p obs-studio/plugins/64bit/
+cp ./obs-midi.so obs-studio/plugins/64bit/
+tar -czvf obs-midi-Linux-$GIT_HASH-x64.tar.gz
+cp obs-midi-Linux-$GIT_HASH-x64.tar.gz ../package
 PAGER="cat" sudo checkinstall -y --type=debian --fstrans=no --nodoc \
 	--backup=no --deldoc=yes --install=no \
 	--pkgname=obs-midi --pkgversion="$PKG_VERSION" \
-	--pkglicense="GPLv2.0" --maintainer="stephane.lepin@gmail.com" \
+	--pkglicense="GPLv2.0" --maintainer="cpyarger@gmail.com" \
 	--pkggroup="video" \
-	--pkgsource="https://github.com/Palakis/obs-midi" \
+	--pkgsource="https://github.com/alzy/obs-midi" \
 	--requires="obs-studio \(\>= 25.0.7\), libqt5core5a, libqt5widgets5, qt5-image-formats-plugins" \
 	--pakdir="../package"
 

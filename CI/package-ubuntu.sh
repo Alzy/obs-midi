@@ -10,7 +10,7 @@ if [[ "$BRANCH_FULL_NAME" =~ "^refs/tags/" ]]; then
 fi
 
 cd ./build
-
+ls -l
 PAGER="cat" sudo checkinstall -y --type=debian --fstrans=no --nodoc \
 	--backup=no --deldoc=yes --install=no \
 	--pkgname=obs-midi --pkgversion="$PKG_VERSION" \

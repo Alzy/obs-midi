@@ -47,13 +47,10 @@ jobs:
   steps:
     - checkout: self
       submodules: true
-
     - script: ./CI/install-qt-win.cmd
       displayName: 'Install Qt'
       env:
-
         QtBaseDir: $(QtBaseDir)
-
     - task: Cache@2
       displayName: Restore cached OBS Studio dependencies
       inputs:
@@ -61,10 +58,8 @@ jobs:
         restoreKeys: |
           obsdeps | "$(Agent.OS)"
         path: $(DepsBasePath)
-
     - script: ./CI/download-obs-deps.cmd
       displayName: 'Download OBS Studio dependencies'
-
     - task: Cache@2
       displayName: Restore cached OBS Studio builds
       inputs:
@@ -72,7 +67,6 @@ jobs:
         restoreKeys: |
           obs | "$(Agent.OS)"
         path: $(OBSPath)
-
     - script: ./CI/prepare-obs-windows.cmd
       displayName: 'Checkout & CMake OBS Studio'
       env:
@@ -83,19 +77,16 @@ jobs:
         QTDIR64: $(QTDIR64)
         OBSPath: $(OBSPath)
         isAzure: $(isAzure)
-
     - task: MSBuild@1
       displayName: 'Build OBS Studio 32-bit'
       inputs:
         msbuildArguments: '/m /p:Configuration=$(build_config)'
         solution: '$(OBSPath)\build32\obs-studio.sln'
-
     - task: MSBuild@1
       displayName: 'Build OBS Studio 64-bit'
       inputs:
         msbuildArguments: '/m /p:Configuration=$(build_config)'
         solution: '$(OBSPath)\build64\obs-studio.sln'
-
     - script: ./CI/prepare-windows.cmd
       displayName: 'CMake obs-midi'
       env:
@@ -104,13 +95,11 @@ jobs:
         QTDIR64: $(QTDIR64)
         OBSPath: $(OBSPath)
         isAzure: $(isAzure)
-
     - task: MSBuild@1
       displayName: 'Build obs-midi 32-bit'
       inputs:
         msbuildArguments: '/m /p:Configuration=$(build_config)'
         solution: '.\build32\obs-midi.sln'
-
     - task: MSBuild@1
       displayName: 'Build obs-midi 64-bit'
       inputs:
@@ -119,7 +108,6 @@ jobs:
 
     - script: ./CI/package-windows.cmd
       displayName: 'Package obs-midi'
-
     - task: PublishBuildArtifacts@1
       displayName: 'Upload package artifacts'
       inputs:
@@ -137,18 +125,14 @@ jobs:
   steps:
     - checkout: self
       submodules: true
-
     - script: ./CI/install-dependencies-ubuntu.sh
       displayName: 'Install dependencies'
-
     - script: ./CI/build-ubuntu.sh
       displayName: 'Build obs-midi'
       env:
         isAzure: $(isAzure)
-
     - script: ./CI/package-ubuntu.sh
       displayName: 'Package obs-midi'
-
     - task: PublishBuildArtifacts@1
       inputs:
         pathtoPublish: './package'
@@ -162,13 +146,10 @@ jobs:
   steps:
     - checkout: self
       submodules: true
-
     - script: ./CI/install-dependencies-macos.sh
       displayName: 'Install dependencies'
-
     - script: ./CI/install-build-obs-macos.sh
       displayName: 'Build OBS'
-
     - script: ./CI/build-macos.sh
       displayName: 'Build obs-midi'
       env:
@@ -177,8 +158,6 @@ jobs:
       displayName: 'Package obs-midi'
       env:
           RELEASE_MODE: false
-
-
     - task: PublishBuildArtifacts@1
       inputs:
         pathtoPublish: './release'

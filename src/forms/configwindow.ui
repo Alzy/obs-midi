@@ -54,11 +54,6 @@
      </column>
      <column>
       <property name="text">
-       <string>Bidirectional</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
        <string>Action Type</string>
       </property>
      </column>

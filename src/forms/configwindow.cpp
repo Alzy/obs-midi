@@ -71,8 +71,7 @@ ConfigWindow::ConfigWindow(QString devn) : ui(new Ui::ConfigWindow)
 		SLOT(sendToTable()));
 	//connect(ui->cb_param2, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
 	//connect(ui->cb_param3, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
-	connect(ui->checkBox, SIGNAL(stateChanged(int)), this,
-		SLOT(sendToTable()));
+
 	//connect(ui->cb_atype, SIGNAL(currentIndexChanged(int)), this,SLOT(sendToTable()));
 	connect(ui->cb_action, SIGNAL(currentTextChanged(QString)), this,
 		SLOT(chooseOptions1(QString)));
@@ -114,7 +113,7 @@ void ConfigWindow::select(int row, int col)
 	dirty = false;
 }
 void ConfigWindow::AddRowFromHooks(int rc, std::string type, int channel,
-				   int index, bool bid, std::string action,
+				   int index,  std::string action,
 				   std::string command, std::string param1,
 				   std::string param2, std::string param3)
 {

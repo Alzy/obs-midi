@@ -92,9 +92,9 @@ list(APPEND obs-midi_HEADERS
 add_library(obs-midi MODULE
         ${obs-midi_SOURCES}
         ${obs-midi_HEADERS})
-
+if (${isAzure})
 if(WIN32 OR LINUX)
-	if (${isAzure})
+	
 
 	target_link_libraries(obs-midi
 					"${OBS_FRONTEND_LIB}"
@@ -102,14 +102,9 @@ if(WIN32 OR LINUX)
 					Qt5::Core
 					Qt5::Widgets
 					libobs)
-	else()
-	target_link_libraries(obs-midi
-					obs-frontend-api
-					${obs-midi_DEPS}
-					Qt5::Core
-					Qt5::Widgets
-					libobs)
-  endif()
+	
+
+
 else()
 	target_link_libraries(obs-midi
 					"${OBS_FRONTEND_LIB}"
@@ -250,3 +245,13 @@ if(APPLE)
 	target_link_libraries(obs-midi "${OBS_FRONTEND_LIB}")
 endif()
 # -- End of section --
+else()
+	target_link_libraries(obs-midi
+					obs-frontend-api
+					${obs-midi_DEPS}
+					Qt5::Core
+					Qt5::Widgets
+					libobs)
+install_obs_plugin_with_data(obs-midi data)
+endif() 
+#is azure endif

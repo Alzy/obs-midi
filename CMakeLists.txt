@@ -56,41 +56,61 @@ endif()
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
 
 include_directories(
-	"${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api"
+				"${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api"
         SYSTEM
-	${Qt5Core_INCLUDES}
-	${Qt5Widgets_INCLUDES}
+				${Qt5Core_INCLUDES}
+				${Qt5Widgets_INCLUDES}
         "${CMAKE_SOURCE_DIR}/UI")
 
 set(obs-midi_SOURCES
-  	src/utils.cpp
+  src/utils.cpp
 	src/config.cpp
 	src/midi-agent.cpp
 	src/device-manager.cpp
 	src/obs-controller.cpp
-	src/forms/settings-dialog.cpp
+  src/forms/settings-dialog.cpp
 	src/forms/configwindow.cpp
-	src/obs-midi.cpp
+  src/obs-midi.cpp
 	src/events.cpp
-	src/rpc/RpcEvent.cpp)
+	src/rpc/RpcEvent.cpp
+
+)
 
 list(APPEND obs-midi_HEADERS
-    	src/utils.h
-	src/config.h
-	src/midi-agent.h
-	src/device-manager.h
-	src/obs-controller.h
-	src/forms/settings-dialog.h
-	src/forms/configwindow.h
-    	src/obs-midi.h
-	src/events.h
-	src/rpc/RpcEvent.h)
+    src/utils.h
+		src/config.h
+	  src/midi-agent.h
+	  src/device-manager.h
+	  src/obs-controller.h
+    src/forms/settings-dialog.h
+	  src/forms/configwindow.h
+    src/obs-midi.h
+	  src/events.h
+	  src/rpc/RpcEvent.h
+)
 
 add_library(obs-midi MODULE
         ${obs-midi_SOURCES}
         ${obs-midi_HEADERS})
 
 if(WIN32 OR LINUX)
+	if (${isAzure})
+
+	target_link_libraries(obs-midi
+					"${OBS_FRONTEND_LIB}"
+					${obs-midi_DEPS}
+					Qt5::Core
+					Qt5::Widgets
+					libobs)
+	else()
+	target_link_libraries(obs-midi
+					obs-frontend-api
+					${obs-midi_DEPS}
+					Qt5::Core
+					Qt5::Widgets
+					libobs)
+  endif()
+else()
 	target_link_libraries(obs-midi
 					"${OBS_FRONTEND_LIB}"
 					${obs-midi_DEPS}
@@ -98,7 +118,7 @@ if(WIN32 OR LINUX)
 					Qt5::Widgets
 					libobs)
 endif()
-
+if (${isAzure})
 # --- Windows-specific build settings and tasks ---
 	message(WARNING "IS AZURE")
 	if(WIN32)
@@ -198,7 +218,8 @@ endif()
 
 	endif()
 	# --- End of section ---
-
+endif()
+# -- End of if AZURE
 
 # --- Linux-specific build settings and tasks ---
 if(UNIX AND NOT APPLE)
@@ -223,25 +244,9 @@ endif()
 
 # -- OS X specific build settings and tasks --
 if(APPLE)
-	target_link_libraries(obs-midi
-					"${OBS_FRONTEND_LIB}"
-					${obs-midi_DEPS}
-					Qt5::Core
-					Qt5::Widgets
-					libobs)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -fvisibility=default")
 	set(CMAKE_SKIP_RPATH TRUE)
 	set_target_properties(obs-midi PROPERTIES PREFIX "")
 	target_link_libraries(obs-midi "${OBS_FRONTEND_LIB}")
 endif()
 # -- End of section --
-#else()
-#	target_link_libraries(obs-midi
-#					obs-frontend-api
-#					${obs-midi_DEPS}
-#					Qt5::Core
-#					Qt5::Widgets
-#					libobs)
-#install_obs_plugin_with_data(obs-midi data)
- 
-#is azure endif

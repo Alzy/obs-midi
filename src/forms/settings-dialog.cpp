@@ -33,9 +33,9 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "configwindow.h"
 #include <qdialogbuttonbox.h>
 #include <qcheckbox.h>
-
+#include "../version.h"
 SettingsDialog::SettingsDialog(QWidget *parent)
-	: QDialog(parent, Qt::Dialog), ui(new Ui::SettingsDialog)
+	: QDialog(parent, Qt::Dialog), ui(new Ui::SettingsDialogDialog)
 {
 	ui->setupUi(this);
 	connect(ui->list_midi_dev, &QListWidget::currentTextChanged, this,
@@ -46,8 +46,14 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 		&SettingsDialog::on_bid_enabled_stateChanged);
 	connect(ui->btn_configure, &QPushButton::clicked, this,
 		&SettingsDialog::on_btn_configure_clicked);
-
 	SetAvailableDevices();
+	//ui->SettingsDialog->
+	QString title;
+	title.append("OBS MIDI Settings -- Branch: ");
+	title.append(GIT_BRANCH);
+	title.append(" -- Commit: ");
+	title.append(GIT_COMMIT_HASH);
+	this->setWindowTitle(title);
 }
 
 void SettingsDialog::ToggleShowHide()

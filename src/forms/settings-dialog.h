@@ -21,6 +21,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "ui_configwindow.h"
 #include "configwindow.h"
 #include "../midi-agent.h"
+#include "../version.h"
 
 class SettingsDialog : public QDialog {
 	Q_OBJECT
@@ -41,7 +42,7 @@ public slots:
 	void selectOutput(QString item);
 
 private:
-	Ui::SettingsDialog *ui;
+	Ui::SettingsDialogDialog *ui;
 
 	Ui::ConfigWindow *cwin;
 	bool hidedebugitems = true;

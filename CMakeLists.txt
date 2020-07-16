@@ -24,11 +24,8 @@ endif()
 
 # RTMIDI
 add_subdirectory(src/RtMidi17)
-
 set(obs-midi_DEPS RtMidi17)
-
 include_directories(src/RtMidi17)
-
 
 
 
@@ -55,89 +52,61 @@ endif()
 
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
 
-#qt5_add_resources(midi_qrc_sources src/Forms/midi.qrc)
 include_directories(
-	"${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api"
+				"${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api"
         SYSTEM
-	${Qt5Core_INCLUDES}
-	${Qt5Widgets_INCLUDES}
+				${Qt5Core_INCLUDES}
+				${Qt5Widgets_INCLUDES}
         "${CMAKE_SOURCE_DIR}/UI")
-	
-execute_process(
-  COMMAND git rev-parse --abbrev-ref HEAD
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  OUTPUT_VARIABLE GIT_BRANCH
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-# Get the latest abbreviated commit hash of the working branch
-execute_process(
-  COMMAND git log -1 --format=%h
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  OUTPUT_VARIABLE GIT_COMMIT_HASH
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/version.h.in
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/version.h
-)
-
 
 set(obs-midi_SOURCES
-        ${midi_ui_headers}
-        src/utils.cpp
+  src/utils.cpp
 	src/config.cpp
 	src/midi-agent.cpp
 	src/device-manager.cpp
 	src/obs-controller.cpp
-        src/forms/settings-dialog.cpp
+  src/forms/settings-dialog.cpp
 	src/forms/configwindow.cpp
-	src/obs-midi.cpp
+  src/obs-midi.cpp
 	src/events.cpp
 	src/rpc/RpcEvent.cpp
-	)
+
+)
 
 list(APPEND obs-midi_HEADERS
-	src/utils.h
-	src/config.h
-	src/midi-agent.h
-	src/device-manager.h
-	src/obs-controller.h
-	src/forms/settings-dialog.h
-	src/forms/configwindow.h
-	src/obs-midi.h
-	src/events.h
-	src/rpc/RpcEvent.h
-	src/version.h
-		
+    src/utils.h
+		src/config.h
+	  src/midi-agent.h
+	  src/device-manager.h
+	  src/obs-controller.h
+    src/forms/settings-dialog.h
+	  src/forms/configwindow.h
+    src/obs-midi.h
+	  src/events.h
+	  src/rpc/RpcEvent.h
 )
-set(obs-midi_UI 
 
-	src/forms/settings-dialog.ui
-	src/forms/configwindow.ui
-)
-qt5_wrap_ui(obs-midi_UI_HEADERS ${obs-midi_UI})
 add_library(obs-midi MODULE
-	${obs-midi_UI_HEADERS}
         ${obs-midi_SOURCES}
         ${obs-midi_HEADERS})
-set_target_properties(obs-midi PROPERTIES FOLDER "plugins/obs-midi")
-set_target_properties(RtMidi17 PROPERTIES FOLDER "plugins/obs-midi")
-if ( ${isAzure})
-if(WIN32 OR LINUX)
 
+if(WIN32 OR LINUX)
+	if (${isAzure})
 
 	target_link_libraries(obs-midi
 					"${OBS_FRONTEND_LIB}"
 					${obs-midi_DEPS}
 					Qt5::Core
 					Qt5::Widgets
-					libobs
-					window-control)
-
-
-
+					libobs)
+	else()
+	target_link_libraries(obs-midi
+					obs-frontend-api
+					${obs-midi_DEPS}
+					Qt5::Core
+					Qt5::Widgets
+					libobs)
+  endif()
 else()
 	target_link_libraries(obs-midi
 					"${OBS_FRONTEND_LIB}"
@@ -146,12 +115,10 @@ else()
 					Qt5::Widgets
 					libobs)
 endif()
-endif()#azure
+if (${isAzure})
 # --- Windows-specific build settings and tasks ---
-
-
-if(WIN32)
-	if (${isAzure})
+	message(WARNING "IS AZURE")
+	if(WIN32)
 		if(NOT DEFINED OBS_FRONTEND_LIB)
 			set(OBS_FRONTEND_LIB "OBS_FRONTEND_LIB-NOTFOUND" CACHE FILEPATH "OBS frontend library")
 			message(FATAL_ERROR "Could not find OBS Frontend API's library !")
@@ -246,12 +213,10 @@ if(WIN32)
 		)
 		# --- End of sub-section ---
 
-		
-	endif()# -- End of if AZURE
-
-
-endif()# --- End of win---
-
+	endif()
+	# --- End of section ---
+endif()
+# -- End of if AZURE
 
 # --- Linux-specific build settings and tasks ---
 if(UNIX AND NOT APPLE)
@@ -282,8 +247,3 @@ if(APPLE)
 	target_link_libraries(obs-midi "${OBS_FRONTEND_LIB}")
 endif()
 # -- End of section --
-if(NOT ${isAzure})	
-	target_link_libraries(obs-midi	obs-frontend-api ${obs-midi_DEPS} Qt5::Core Qt5::Widgets libobs)	
-	install_obs_plugin_with_data(obs-midi data)	
-endif()
-

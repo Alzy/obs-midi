@@ -42,7 +42,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_definitions(-DASIO_STANDALONE)
-if (${isAzure})
+if (DEFINED ${isAzure})
 	if (WIN32 OR APPLE)
 		include(external/FindLibObs.cmake)
 	endif()
@@ -57,12 +57,12 @@ find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
 
 #qt5_add_resources(midi_qrc_sources src/Forms/midi.qrc)
 include_directories(
-				"${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api"
-
+	"${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api"
         SYSTEM
-				${Qt5Core_INCLUDES}
-				${Qt5Widgets_INCLUDES}
+	${Qt5Core_INCLUDES}
+	${Qt5Widgets_INCLUDES}
         "${CMAKE_SOURCE_DIR}/UI")
+	
 execute_process(
   COMMAND git rev-parse --abbrev-ref HEAD
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -82,9 +82,11 @@ configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/include/version.h.in
   ${CMAKE_CURRENT_SOURCE_DIR}/src/version.h
 )
+
+
 set(obs-midi_SOURCES
-${midi_ui_headers}
-  src/utils.cpp
+        ${midi_ui_headers}
+        src/utils.cpp
 	src/config.cpp
 	src/midi-agent.cpp
 	src/device-manager.cpp
@@ -107,8 +109,8 @@ list(APPEND obs-midi_HEADERS
 	src/obs-midi.h
 	src/events.h
 	src/rpc/RpcEvent.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/version.h
-		#"${CMAKE_SOURCE_DIR}/UI/window-control.hpp"
+	src/version.h
+		
 )
 set(obs-midi_UI 
 
@@ -122,7 +124,7 @@ add_library(obs-midi MODULE
         ${obs-midi_HEADERS})
 set_target_properties(obs-midi PROPERTIES FOLDER "plugins/obs-midi")
 set_target_properties(RtMidi17 PROPERTIES FOLDER "plugins/obs-midi")
-if (${isAzure})
+if (DEFINED ${isAzure})
 if(WIN32 OR LINUX)
 
 
@@ -144,12 +146,12 @@ else()
 					Qt5::Widgets
 					libobs)
 endif()
-endif()
+endif()#azure
 # --- Windows-specific build settings and tasks ---
 
 
 if(WIN32)
-	if (${isAzure})
+	if (DEFINED ${isAzure})
 		if(NOT DEFINED OBS_FRONTEND_LIB)
 			set(OBS_FRONTEND_LIB "OBS_FRONTEND_LIB-NOTFOUND" CACHE FILEPATH "OBS frontend library")
 			message(FATAL_ERROR "Could not find OBS Frontend API's library !")

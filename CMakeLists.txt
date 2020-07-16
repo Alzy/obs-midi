@@ -42,7 +42,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_definitions(-DASIO_STANDALONE)
-if (DEFINED ${isAzure})
+if (${isAzure})
 	if (WIN32 OR APPLE)
 		include(external/FindLibObs.cmake)
 	endif()
@@ -124,7 +124,7 @@ add_library(obs-midi MODULE
         ${obs-midi_HEADERS})
 set_target_properties(obs-midi PROPERTIES FOLDER "plugins/obs-midi")
 set_target_properties(RtMidi17 PROPERTIES FOLDER "plugins/obs-midi")
-if (DEFINED ${isAzure})
+if ( ${isAzure})
 if(WIN32 OR LINUX)
 
 
@@ -151,7 +151,7 @@ endif()#azure
 
 
 if(WIN32)
-	if (DEFINED ${isAzure})
+	if (${isAzure})
 		if(NOT DEFINED OBS_FRONTEND_LIB)
 			set(OBS_FRONTEND_LIB "OBS_FRONTEND_LIB-NOTFOUND" CACHE FILEPATH "OBS frontend library")
 			message(FATAL_ERROR "Could not find OBS Frontend API's library !")
@@ -282,5 +282,8 @@ if(APPLE)
 	target_link_libraries(obs-midi "${OBS_FRONTEND_LIB}")
 endif()
 # -- End of section --
-
+if(NOT DEFINED ${isAzure})	
+	target_link_libraries(obs-midi	obs-frontend-api ${obs-midi_DEPS} Qt5::Core Qt5::Widgets libobs)	
+	install_obs_plugin_with_data(obs-midi data)	
+endif()
 

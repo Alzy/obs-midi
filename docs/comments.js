@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
-const parseComments = require('parse-comments');
+const ParseComments = require('parse-comments');
 const config = require('./config.json');
 
 /**
@@ -14,7 +14,7 @@ const parseFiles = files => {
     let response = [];
     files.forEach(file => {
         const f = fs.readFileSync(file, 'utf8').toString();
-        response = response.concat(parseComments(f));
+        response = response.concat(new ParseComments(f));
     });
 
     return response;

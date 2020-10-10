@@ -4,7 +4,7 @@
   "description": "Documentation for Alzy/obs-midi project",
   "main": "docs.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"Warning: no test specified\" && exit 0",
     "docs": "node ./docs.js",
     "comments": "node ./comments.js",
     "build": "npm run comments && npm run docs"

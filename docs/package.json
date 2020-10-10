@@ -16,6 +16,6 @@
     "handlebars": "^4.0.10",
     "handlebars-helpers": "^0.9.6",
     "markdown-toc": "^1.1.0",
-    "parse-comments": "^0.4.3"
+    "parse-comments": "^1.0.0"
   }
 }

@@ -1,7 +1,7 @@
 {
   "name": "obs-midi-docs",
   "version": "1.0.0",
-  "description": "",
+  "description": "Documentation for Alzy/obs-midi project",
   "main": "docs.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

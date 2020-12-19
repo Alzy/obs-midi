@@ -116,6 +116,9 @@ void Config::OnFrontendEvent(enum obs_frontend_event event, void *param)
 	auto config = reinterpret_cast<Config *>(param);
 
 	if (event == OBS_FRONTEND_EVENT_PROFILE_CHANGED) {
+		auto deviceManager = GetDeviceManager();
+		deviceManager->Unload();
+
 		config->SetDefaults();
 		config->Load();
 	}

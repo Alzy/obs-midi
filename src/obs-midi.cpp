@@ -41,12 +41,11 @@ OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE("obs-midi", "en-US")
 ConfigPtr _config;
 DeviceManagerPtr _deviceManager;
-
 eventsPtr _eventsSystem;
 
 bool obs_module_load(void)
 {
-	blog(LOG_INFO, "MIDI LOADED ");
+	blog(LOG_INFO, "MIDI LOADED :)");
 
 	// Device Manager Setup
 	_deviceManager = DeviceManagerPtr(new DeviceManager());

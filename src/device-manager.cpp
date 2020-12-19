@@ -25,8 +25,9 @@ DeviceManager::DeviceManager()
 
 DeviceManager::~DeviceManager()
 {
-	rtMidi->~midi_in();
-	MO->~midi_out();
+	Unload();
+	delete rtMidi;
+	delete MO;
 }
 
 /* Load the Device Manager from saved Config Store data.
@@ -61,6 +62,18 @@ void DeviceManager::Load(obs_data_t *data)
 	}
 }
 
+
+void DeviceManager::Unload()
+{
+	blog(LOG_INFO, "UNLOADING DEVICE MANAGER");
+	for (auto agent : midiAgents)
+	{
+		delete agent;
+	}
+	midiAgents.clear();
+}
+
+
 /* Returns vector list of Port Names 
  */
 vector<string> DeviceManager::GetPortsList()
@@ -72,6 +85,8 @@ vector<string> DeviceManager::GetPortsList()
 	}
 	return ports;
 }
+
+
 /* Returns vector list of Port Names 
  */
 vector<string> DeviceManager::GetOutPortsList()
@@ -89,6 +104,8 @@ QStringList DeviceManager::GetOPL()
 {
 	return opl;
 }
+
+
 /* Returns the port number of the specified device.
  * If the device isn't found (possibly due to being disconnected), returns -1
  */
@@ -102,6 +119,7 @@ int DeviceManager::GetPortNumberByDeviceName(const char *deviceName)
 		return -1;
 	}
 }
+
 
 /* Returns the port number of the specified device.
  * If the device isn't found (possibly due to being disconnected), returns -1
@@ -119,10 +137,12 @@ int DeviceManager::GetOutPortNumberByDeviceName(const char *deviceName)
 	}
 }
 
+
 vector<MidiAgent *> DeviceManager::GetActiveMidiDevices()
 {
 	return midiAgents;
 }
+
 
 MidiAgent *DeviceManager::GetMidiDeviceByName(const char *deviceName)
 {
@@ -134,6 +154,7 @@ MidiAgent *DeviceManager::GetMidiDeviceByName(const char *deviceName)
 	return NULL;
 }
 
+
 vector<MidiHook *>
 DeviceManager::GetMidiHooksByDeviceName(const char *deviceName)
 {
@@ -144,18 +165,19 @@ DeviceManager::GetMidiHooksByDeviceName(const char *deviceName)
 	throw("no midi hooks for this device");
 }
 
+
 /* Registers a midi device.
  * Will create, store and enable a midi device.
 */
 void DeviceManager::RegisterMidiDevice(int port, int outport)
 {
-
 	MidiAgent *midiA = new MidiAgent();
 	midiA->OpenPort(port);
 	midiA->OpenOutPort(outport);
 
 	midiAgents.push_back(midiA);
 }
+
 
 /* Get this Device Manager state as OBS Data. (includes devices and their midi hooks)
 * This is needed to Serialize the state in the config.
@@ -175,12 +197,15 @@ obs_data_t *DeviceManager::GetData()
 	return data;
 }
 
+
 void DeviceManager::SendMidi(QString mtype, int channel, int norc, int value)
 
 {
 
 	//***Need to add message Deletion here***//
 }
+
+
 void DeviceManager::broadcast(const RpcEvent &event)
 {
 	OBSDataAutoRelease eventData = obs_data_create();

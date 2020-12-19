@@ -269,3 +269,8 @@ if(APPLE)
 	target_link_libraries(obs-midi "${OBS_FRONTEND_LIB}")
 endif()
 # -- End of section --
+
+
+
+# -- Fixes issue where plugin isn't copied to rundir plugins directory on local build --
+install_obs_plugin_with_data(obs-midi data)

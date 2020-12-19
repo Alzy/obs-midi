@@ -56,6 +56,7 @@ public:
 		: type(midiMessageType),
 		  index(midiChannelIndex),
 		  mchan(midiChannel),
+		  bidirectional(bidirectionals),
 		  command(OBSCommand),
 		  param1(p1),
 		  param2(p2),

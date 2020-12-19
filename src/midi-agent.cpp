@@ -211,6 +211,7 @@ MidiAgent::MidiAgent()
 
 MidiAgent::~MidiAgent()
 {
+	ClearMidiHooks();
 	ClosePort();
 	delete midiin;
 	delete midiout;

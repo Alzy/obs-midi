@@ -43,6 +43,7 @@ public:
 	DeviceManager();
 	~DeviceManager();
 	void Load(obs_data_t *data);
+	void Unload();
 
 	vector<string> GetPortsList();
 	int GetPortNumberByDeviceName(const char *deviceName);

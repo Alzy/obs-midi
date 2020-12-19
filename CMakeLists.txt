@@ -273,4 +273,9 @@ endif()
 
 
 # -- Fixes issue where plugin isn't copied to rundir plugins directory on local build --
-install_obs_plugin_with_data(obs-midi data)
+if(WIN32)
+	if (${isAzure})
+	else ()
+		install_obs_plugin_with_data(obs-midi data)
+	endif()
+endif()

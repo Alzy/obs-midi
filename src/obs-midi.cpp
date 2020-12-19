@@ -45,7 +45,7 @@ eventsPtr _eventsSystem;
 
 bool obs_module_load(void)
 {
-	blog(LOG_INFO, "MIDI LOADED :)");
+	blog(LOG_INFO, "MIDI LOADED! :)");
 
 	// Device Manager Setup
 	_deviceManager = DeviceManagerPtr(new DeviceManager());

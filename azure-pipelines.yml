@@ -146,18 +146,23 @@ jobs:
   steps:
     - checkout: self
       submodules: true
+
     - script: ./CI/install-dependencies-macos.sh
       displayName: 'Install dependencies'
+
     - script: ./CI/install-build-obs-macos.sh
       displayName: 'Build OBS'
+
     - script: ./CI/build-macos.sh
       displayName: 'Build obs-midi'
       env:
         isAzure: $(isAzure)
+
     - script: ./CI/package-macos.sh
       displayName: 'Package obs-midi'
       env:
           RELEASE_MODE: false
+
     - task: PublishBuildArtifacts@1
       inputs:
         pathtoPublish: './release'

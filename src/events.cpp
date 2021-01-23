@@ -1157,7 +1157,7 @@ void events::OnSourceVolumeChange(void *param, calldata_t *data)
 {
 	auto self = reinterpret_cast<events *>(param);
 
-	OBSSourceAutoRelease source = calldata_get_pointer<obs_source_t>(data, "source");
+	OBSSource source = calldata_get_pointer<obs_source_t>(data, "source");
 	if (!source) {
 		return;
 	}
@@ -1171,6 +1171,7 @@ void events::OnSourceVolumeChange(void *param, calldata_t *data)
 	obs_data_set_string(fields, "sourceName", obs_source_get_name(source));
 	obs_data_set_double(fields, "volume", volume);
 	self->broadcastUpdate("SourceVolumeChanged", fields);
+	obs_source_release(source);
 }
 
 /**

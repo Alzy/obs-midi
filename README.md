@@ -15,7 +15,7 @@ Use MIDI devices to trigger events in OBS and visa versa.
 # Installing
 
 
-1. Grab the zip from the [OBS-Midi Releases Page](https://github.com/Alzy/obs-midi/releases/tag/v0.1.0)
+1. Grab the zip from the [OBS-Midi Releases Page](https://github.com/Alzy/obs-midi/releases)
 
 2. Copy the files in the zip to  your obs plugins directory.
 

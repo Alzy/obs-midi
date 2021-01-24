@@ -3,12 +3,10 @@ This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-
 You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>
 */
@@ -29,25 +27,23 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "../device-manager.h"
 #include "../config.h"
 #include "settings-dialog.h"
-#include "ui_configwindow.h"
-#include "configwindow.h"
 #include <qdialogbuttonbox.h>
 #include <qcheckbox.h>
 #include "../version.h"
-SettingsDialog::SettingsDialog(QWidget *parent)
-	: QDialog(parent, Qt::Dialog), ui(new Ui::SettingsDialogDialog)
+	PluginWindow::PluginWindow(QWidget *parent)
+	: QDialog(parent, Qt::Dialog),
+	ui(new Ui::PluginWindow)
 {
 	ui->setupUi(this);
 	connect(ui->list_midi_dev, &QListWidget::currentTextChanged, this,
-		&SettingsDialog::on_item_select);
+		&PluginWindow::on_item_select);
 	connect(ui->check_enabled, &QCheckBox::stateChanged, this,
-		&SettingsDialog::on_check_enabled_stateChanged);
+		&PluginWindow::on_check_enabled_stateChanged);
 	connect(ui->bidirectional, &QCheckBox::stateChanged, this,
-		&SettingsDialog::on_bid_enabled_stateChanged);
-	connect(ui->btn_configure, &QPushButton::clicked, this,
-		&SettingsDialog::on_btn_configure_clicked);
+		&PluginWindow::on_bid_enabled_stateChanged);
+
 	SetAvailableDevices();
-	//ui->SettingsDialog->
+	//ui->PluginWindow->
 	QString title;
 	title.append("OBS MIDI Settings -- Branch: ");
 	title.append(GIT_BRANCH);
@@ -56,7 +52,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 	this->setWindowTitle(title);
 }
 
-void SettingsDialog::ToggleShowHide()
+void PluginWindow::ToggleShowHide()
 {
 
 	if (!isVisible()) {
@@ -71,13 +67,13 @@ void SettingsDialog::ToggleShowHide()
 	}
 }
 
-void SettingsDialog::setCheck(bool x)
+void PluginWindow::setCheck(bool x)
 {
 	this->ui->check_enabled->setChecked(x);
-	this->ui->btn_configure->setEnabled(x);
+	
 }
 
-void SettingsDialog::SetAvailableDevices()
+void PluginWindow::SetAvailableDevices()
 {
 
 	auto midiOutDevices = GetDeviceManager()->GetOPL();
@@ -89,14 +85,12 @@ void SettingsDialog::SetAvailableDevices()
 
 	this->ui->list_midi_dev->clear();
 	this->ui->check_enabled->setEnabled(false);
-	this->ui->btn_configure->setEnabled(false);
 	this->ui->outbox->setEnabled(false);
 
 	if (midiDevices.size() == 0) {
 		this->ui->list_midi_dev->addItem("No Devices Available");
 	} else if (midiDevices.size() > 0) {
 		this->ui->check_enabled->setEnabled(true);
-		this->ui->btn_configure->setEnabled(false);
 		this->ui->outbox->setEnabled(false);
 	}
 
@@ -128,18 +122,9 @@ void SettingsDialog::SetAvailableDevices()
 	this->ui->list_midi_dev->setCurrentRow(0);
 }
 
-void SettingsDialog::on_btn_configure_clicked()
-{
 
-	blog(LOG_INFO, "Configure button clicked");
-	ConfigWindow *cwin =
-		new ConfigWindow(ui->list_midi_dev->currentItem()->text());
-	blog(LOG_INFO, "new config window created");
-	cwin->exec();
-	blog(LOG_INFO, "execute config window");
-}
 
-void SettingsDialog::selectOutput(QString selectedDeviceName)
+void PluginWindow::selectOutput(QString selectedDeviceName)
 {
 	if (!loadingdevices) {
 		auto selectedDevice =
@@ -152,7 +137,7 @@ void SettingsDialog::selectOutput(QString selectedDeviceName)
 	}
 }
 
-int SettingsDialog::on_check_enabled_stateChanged(bool state)
+int PluginWindow::on_check_enabled_stateChanged(bool state)
 {
 
 	if (state == true) {
@@ -184,7 +169,6 @@ int SettingsDialog::on_check_enabled_stateChanged(bool state)
 	}
 
 	//ui->outbox->setCurrentText(QString::fromStdString(device->GetOutName()));
-	ui->btn_configure->setEnabled(state);
 	ui->bidirectional->setEnabled(state);
 	ui->bidirectional->setChecked(true);
 	ui->outbox->setEnabled(true);
@@ -192,7 +176,7 @@ int SettingsDialog::on_check_enabled_stateChanged(bool state)
 	return state;
 }
 
-void SettingsDialog::on_item_select(QString curitem)
+void PluginWindow::on_item_select(QString curitem)
 {
 	auto texting = curitem.toStdString();
 	// Pull info on if device is enabled, if so set true if not set false
@@ -200,7 +184,6 @@ void SettingsDialog::on_item_select(QString curitem)
 		curitem.toStdString().c_str());
 	if (device != NULL && device->isEnabled()) {
 		ui->check_enabled->setChecked(true);
-		ui->btn_configure->setEnabled(true);
 		ui->outbox->setEnabled(true);
 		ui->bidirectional->setEnabled(true);
 		ui->bidirectional->setChecked(device->isBidirectional());
@@ -209,12 +192,11 @@ void SettingsDialog::on_item_select(QString curitem)
 
 	} else {
 		ui->check_enabled->setChecked(false);
-		ui->btn_configure->setEnabled(false);
 		ui->outbox->setEnabled(false);
 		ui->bidirectional->setEnabled(false);
 	}
 }
-int SettingsDialog::on_bid_enabled_stateChanged(bool state)
+int PluginWindow::on_bid_enabled_stateChanged(bool state)
 {
 	auto device = GetDeviceManager()->GetMidiDeviceByName(
 		ui->list_midi_dev->currentItem()->text().toStdString().c_str());
@@ -230,7 +212,7 @@ int SettingsDialog::on_bid_enabled_stateChanged(bool state)
 	GetConfig()->Load();
 }
 
-SettingsDialog::~SettingsDialog()
+PluginWindow::~PluginWindow()
 {
 
 	loadingdevices = false;
@@ -238,3 +220,4 @@ SettingsDialog::~SettingsDialog()
 	disconnect(desconnect);
 	delete ui;
 }
+

@@ -18,17 +18,15 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <vector>
 #include <QtWidgets/QDialog>
 #include "ui_settings-dialog.h"
-#include "ui_configwindow.h"
-#include "configwindow.h"
 #include "../midi-agent.h"
 #include "../version.h"
 
-class SettingsDialog : public QDialog {
+class PluginWindow : public QDialog {
 	Q_OBJECT
 
 public:
-	SettingsDialog(QWidget *parent);
-	~SettingsDialog();
+	PluginWindow(QWidget *parent);
+	~PluginWindow();
 	void setCheck(bool check);
 	void SetAvailableDevices();
 	void on_btn_configure_clicked();
@@ -42,9 +40,8 @@ public slots:
 	void selectOutput(QString item);
 
 private:
-	Ui::SettingsDialogDialog *ui;
+	Ui::PluginWindow *ui;
 
-	Ui::ConfigWindow *cwin;
 	bool hidedebugitems = true;
 	bool loadingdevices = false;
 	QMetaObject::Connection desconnect;

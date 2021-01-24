@@ -59,11 +59,11 @@ bool obs_module_load(void)
 
 	// UI SETUP
 	QMainWindow *mainWindow = (QMainWindow *)obs_frontend_get_main_window();
-	SettingsDialog *settingsDialog = new SettingsDialog(mainWindow);
+	PluginWindow *pluginWindow = new PluginWindow(mainWindow);
 	const char *menuActionText = obs_module_text("OBS MIDI Settings");
 	QAction *menuAction =
 		(QAction *)obs_frontend_add_tools_menu_qaction(menuActionText);
-	QObject::connect(menuAction, SIGNAL(triggered()), settingsDialog,
+	QObject::connect(menuAction, SIGNAL(triggered()), pluginWindow,
 			 SLOT(ToggleShowHide()));
 
 	// Setup event handler to start the server once OBS is ready

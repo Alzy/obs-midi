@@ -244,13 +244,10 @@ void MidiAgent::Load(obs_data_t *data)
 		AddMidiHook(mh);
 	}
 }
-void MidiAgent::SendMessage(std::string name, std::string mType, int mIndex,
-			    int channel)
+void MidiAgent::SendMessage(MidiMessage mess)
 {
 
-	emit this->SendNewUnknownMessage(QString::fromStdString(name),
-					 QString::fromStdString(mType), mIndex,
-					 channel);
+	emit this->SendNewUnknownMessage(mess);
 }
 
 /* Will open the port and enable this MidiAgent
@@ -369,7 +366,15 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 	auto value = Utils::get_midi_value(message);
 	self->sending = true;
 	/***** Send Messages to emit function *****/
-	self->SendMessage(self->name, mType, norc, mchannel);
+	QString y;
+	QString z;
+	MidiMessage x;
+	x.device_name = y.fromStdString(self->name);
+	x.message_type = z.fromStdString(mType);
+	x.NORC = norc;
+	x.channel = mchannel;
+	x.value = value;
+	self->SendMessage(x);
 
 	/** check if hook exists for this note or cc index and launch it **/
 	//Eventually add channel to this check.

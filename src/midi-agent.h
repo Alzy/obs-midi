@@ -33,7 +33,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <string>
 #include <iostream>
 #include "obs-controller.h"
-#include "obs-controller.h"
 #include "rpc/RpcEvent.h"
 #include "utils.h"
 using namespace std;
@@ -121,8 +120,7 @@ public:
 	bool setBidirectional(bool state);
 	static void HandleInput(const rtmidi::message &message, void *userData);
 	void TriggerInputCommand(MidiHook *hook, int midiVal);
-	void SendMessage(std::string names, std::string mType, int mIndex,
-			 int channel);
+	void SendMessage(MidiMessage mess);
 	vector<MidiHook *> GetMidiHooks();
 	void AddMidiHook(MidiHook *hook);
 	void RemoveMidiHook(MidiHook *hook);
@@ -132,8 +130,7 @@ public:
 public slots:
 	void NewObsEvent(QString eventType, QString eventData);
 signals:
-	void SendNewUnknownMessage(QString names, QString mtype, int msgindex,
-				   int channel);
+	void SendNewUnknownMessage(MidiMessage);
 
 private:
 	void send(string type, int channel, int norc, int value = 0);

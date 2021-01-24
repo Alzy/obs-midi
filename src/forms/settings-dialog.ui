@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>1144</width>
     <height>600</height>
    </rect>
   </property>
@@ -213,21 +213,12 @@
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
            <spacer name="horizontalSpacer">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>13</width>
+              <width>40</width>
               <height>20</height>
              </size>
             </property>
@@ -579,21 +570,12 @@
           </item>
           <item>
            <spacer name="horizontalSpacer_2">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>13</width>
+              <width>40</width>
               <height>20</height>
              </size>
             </property>
@@ -602,7 +584,7 @@
           <item alignment="Qt::AlignTop">
            <widget class="QFrame" name="wid_Action">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -622,7 +604,7 @@
             <property name="frameShape">
              <enum>QFrame::StyledPanel</enum>
             </property>
-            <layout class="QFormLayout" name="formLayout_10">
+            <layout class="QGridLayout" name="gridLayout_4">
              <item row="0" column="0">
               <widget class="QLabel" name="label_obs_action">
                <property name="sizePolicy">
@@ -728,7 +710,7 @@
              <item row="1" column="1">
               <widget class="QComboBox" name="cb_obs_output_action">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -750,10 +732,23 @@
                </property>
               </widget>
              </item>
-             <item row="3" column="0" colspan="2">
-              <widget class="QSplitter" name="splitter_2">
+             <item row="2" column="0">
+              <widget class="Line" name="line">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0" colspan="2" alignment="Qt::AlignVCenter">
+              <widget class="QSplitter" name="splitter_2">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -1162,43 +1157,54 @@
                </widget>
               </widget>
              </item>
-             <item row="2" column="0" colspan="2">
-              <widget class="Line" name="line">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QFrame" name="frame_2">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_3">
+             <item row="0" column="0">
+              <widget class="QPushButton" name="btn_add">
+               <property name="text">
+                <string>Add Mapping</string>
                </property>
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QPushButton" name="btn_delete">
+               <property name="text">
+                <string>Delete Mapping</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QPushButton" name="btn_reset">
+               <property name="text">
+                <string>Reset Mapping</string>
                </property>
               </widget>
              </item>
             </layout>
            </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_3">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>13</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
           </item>
          </layout>
         </widget>
@@ -1286,8 +1292,39 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="obs-midi-resources.qrc"/>
- </resources>
- <connections/>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>slider_value</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinbox_value</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>384</x>
+     <y>382</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>439</x>
+     <y>377</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinbox_value</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>slider_value</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>447</x>
+     <y>370</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>420</x>
+     <y>368</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

@@ -1,20 +1,3 @@
-/*
-obs-websocket
-Copyright (C) 2016-2017	Stéphane Lepin <stephane.lepin@gmail.com>
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along
-with this program. If not, see <https://www.gnu.org/licenses/>
-*/
 
 #include <iostream>
 #include <map>
@@ -22,7 +5,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <QtWidgets/QMainWindow>
 #include <QtCore/QDir>
 #include <QtCore/QUrl>
-
 #if __has_include(<obs-frontend-api.h>)
 #include <obs-frontend-api.h>
 #else
@@ -31,13 +13,30 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <obs.hpp>
 #include <util/platform.h>
 
-#include "obs-midi.h"
-
 #include "utils.h"
-#include "config.h"
 
-Q_DECLARE_METATYPE(OBSScene);
+//***********************************UTILS*****************************************//
 
+const QHash<obs_bounds_type, QString> boundTypeNames = {
+	{OBS_BOUNDS_STRETCH, "OBS_BOUNDS_STRETCH"},
+	{OBS_BOUNDS_SCALE_INNER, "OBS_BOUNDS_SCALE_INNER"},
+	{OBS_BOUNDS_SCALE_OUTER, "OBS_BOUNDS_SCALE_OUTER"},
+	{OBS_BOUNDS_SCALE_TO_WIDTH, "OBS_BOUNDS_SCALE_TO_WIDTH"},
+	{OBS_BOUNDS_SCALE_TO_HEIGHT, "OBS_BOUNDS_SCALE_TO_HEIGHT"},
+	{OBS_BOUNDS_MAX_ONLY, "OBS_BOUNDS_MAX_ONLY"},
+	{OBS_BOUNDS_NONE, "OBS_BOUNDS_NONE"},
+};
+
+QString getBoundsNameFromType(obs_bounds_type type)
+{
+	QString fallback = boundTypeNames.value(OBS_BOUNDS_NONE);
+	return boundTypeNames.value(type, fallback);
+}
+
+obs_bounds_type getBoundsTypeFromName(QString name)
+{
+	return boundTypeNames.key(name);
+}
 float Utils::mapper(int x)
 
 {
@@ -65,228 +64,15 @@ bool Utils::is_number(const std::string &s)
 		++it;
 	return !s.empty() && it == s.end();
 }
+bool Utils::isJSon(QString val)
+{
+	return (val.startsWith(QChar('[')) || val.startsWith(QChar('{')));
+}
 bool Utils::inrange(int low, int high, int x)
 {
 
 	return ((x - low) <= (high - low));
 }
-int Utils::get_midi_note_or_control(rtmidi::message mess)
-{
-	int bytetopullfrom=-1;
-	switch (mess.get_message_type()) {
-	case rtmidi::message_type::INVALID:
-		break;
-	case rtmidi::message_type::NOTE_OFF:
-		bytetopullfrom = 1;
-		break;
-	case rtmidi::message_type::NOTE_ON:
-		bytetopullfrom = 1;
-		break;
-	case rtmidi::message_type::PITCH_BEND:
-		bytetopullfrom = 0;
-		break;
-
-	case rtmidi::message_type::CONTROL_CHANGE:
-		bytetopullfrom = 1;
-		break;
-		/*****************Messages to work on ***************
-	// Standard Message
-	case rtmidi::message_type:: POLY_PRESSURE : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: PROGRAM_CHANGE : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: AFTERTOUCH : bytetopullfrom = 0;break;
-
-	// System Common Messages
-	case rtmidi::message_type:: SYSTEM_EXCLUSIVE : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: TIME_CODE : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: SONG_POS_POINTER : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: SONG_SELECT : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: RESERVED1 : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: RESERVED2 : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: TUNE_REQUEST : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: EOX : bytetopullfrom = 0;break;
-
-	// System Realtime Messages
-	case rtmidi::message_type:: TIME_CLOCK : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: RESERVED3 : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: START : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: CONTINUE : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: STOP : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: RESERVED4 : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: ACTIVE_SENSING : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: SYSTEM_RESET : bytetopullfrom = 0;break;
-	****************************************************/
-	}
-
-	return mess[bytetopullfrom];
-}
-int Utils::get_midi_value(rtmidi::message mess)
-{
-	int bytetopullfrom=-1;
-	switch (mess.get_message_type()) {
-	case rtmidi::message_type::INVALID:
-		break;
-
-	case rtmidi::message_type::PITCH_BEND:
-		bytetopullfrom = 1;
-		break;
-	case rtmidi::message_type::CONTROL_CHANGE:
-		bytetopullfrom = 2;
-		break;
-
-	case rtmidi::message_type::NOTE_OFF:
-		bytetopullfrom = 2;
-		break;
-	case rtmidi::message_type::NOTE_ON:
-		bytetopullfrom = 2;
-		break;
-
-		/*****************Messages to work on ***************
-		// Standard Message
-		case rtmidi::message_type:: POLY_PRESSURE : bytetopullfrom = 0;break;
-
-		case rtmidi::message_type:: PROGRAM_CHANGE : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: AFTERTOUCH : bytetopullfrom = 0;break;
-
-		// System Common Messages
-		case rtmidi::message_type:: SYSTEM_EXCLUSIVE : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: TIME_CODE : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: SONG_POS_POINTER : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: SONG_SELECT : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: RESERVED1 : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: RESERVED2 : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: TUNE_REQUEST : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: EOX : bytetopullfrom = 0;break;
-
-		// System Realtime Messages
-		case rtmidi::message_type:: TIME_CLOCK : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: RESERVED3 : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: START : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: CONTINUE : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: STOP : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: RESERVED4 : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: ACTIVE_SENSING : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: SYSTEM_RESET : bytetopullfrom = 0;break;
-  			*/
-	}
-	
-	return mess[bytetopullfrom];
-}
-
-std::string Utils::mtype_to_string(rtmidi::message_type mess)
-{
-	switch (mess) {
-	case rtmidi::message_type::INVALID:
-		return "INVALID";
-	// Standard Message
-	case rtmidi::message_type::NOTE_OFF:
-		return "note_off";
-	case rtmidi::message_type::NOTE_ON:
-		return "note_on";
-	case rtmidi::message_type::POLY_PRESSURE:
-		return "POLY_PRESSURE";
-	case rtmidi::message_type::CONTROL_CHANGE:
-		return "control_change";
-	case rtmidi::message_type::PROGRAM_CHANGE:
-		return "PROGRAM_CHANGE";
-	case rtmidi::message_type::AFTERTOUCH:
-		return "AFTERTOUCH";
-	case rtmidi::message_type::PITCH_BEND:
-		return "PITCH_BEND";
-
-	// System Common Messages
-	case rtmidi::message_type::SYSTEM_EXCLUSIVE:
-		return "SYSTEM_EXCLUSIVE";
-	case rtmidi::message_type::TIME_CODE:
-		return "TIME_CODE";
-	case rtmidi::message_type::SONG_POS_POINTER:
-		return "SONG_POS_POINTER";
-	case rtmidi::message_type::SONG_SELECT:
-		return "SONG_SELECT";
-	case rtmidi::message_type::RESERVED1:
-		return "RESERVED1";
-	case rtmidi::message_type::RESERVED2:
-		return "RESERVED2";
-	case rtmidi::message_type::TUNE_REQUEST:
-		return "TUNE_REQUEST";
-	case rtmidi::message_type::EOX:
-		return "EOX";
-
-	// System Realtime Messages
-	case rtmidi::message_type::TIME_CLOCK:
-		return "TIME_CLOCK";
-	case rtmidi::message_type::RESERVED3:
-		return "RESERVED3";
-	case rtmidi::message_type::START:
-		return "START";
-	case rtmidi::message_type::CONTINUE:
-		return "CONTINUE";
-	case rtmidi::message_type::STOP:
-		return "STOP";
-	case rtmidi::message_type::RESERVED4:
-		return "RESERVED4";
-	case rtmidi::message_type::ACTIVE_SENSING:
-		return "ACTIVE_SENSING";
-	case rtmidi::message_type::SYSTEM_RESET:
-		return "SYSTEM_RESET";
-	}
-}
-
-std::string Utils::getMidiMessageType(int in)
-{
-	//currently sets from a few  non breaking returns, will need to have message format structs to return here instead
-	if (inrange(128, 143, in)) {
-		return "note_off";
-	} else if (inrange(144, 159, in)) {
-		return "note_on";
-	} else if (inrange(176, 191, in)) {
-		return "control_change";
-	} else if (inrange(192, 207, in)) {
-		return "program_change";
-	} else
-		return "";
-
-	/* Future Message types to be worked on
-	if (inrange(128, 143, in)) {
-		return "note_off";
-	} else if (inrange(144, 159, in)) {
-		return "note_on";
-	} else if (inrange(160, 175, in)) {
-		return "poly_aftertouch";
-	} else if (inrange(176, 191, in)) {
-		return "control_change";
-	} else 	if (inrange(192, 207, in)) {
-		return "program_change";
-	} else 	if (inrange(208, 223, in)) {
-		return "chan_aftertouch";
-	} else 	if (inrange(224, 239, in)) {
-		return "pitch_bend";
-	} else if (inrange(240, 255, in)) {
-		return "system";
-	} else
-		return "";*/
-}
-
-const QHash<obs_bounds_type, QString> boundTypeNames = {
-	{OBS_BOUNDS_STRETCH, "OBS_BOUNDS_STRETCH"},
-	{OBS_BOUNDS_SCALE_INNER, "OBS_BOUNDS_SCALE_INNER"},
-	{OBS_BOUNDS_SCALE_OUTER, "OBS_BOUNDS_SCALE_OUTER"},
-	{OBS_BOUNDS_SCALE_TO_WIDTH, "OBS_BOUNDS_SCALE_TO_WIDTH"},
-	{OBS_BOUNDS_SCALE_TO_HEIGHT, "OBS_BOUNDS_SCALE_TO_HEIGHT"},
-	{OBS_BOUNDS_MAX_ONLY, "OBS_BOUNDS_MAX_ONLY"},
-	{OBS_BOUNDS_NONE, "OBS_BOUNDS_NONE"},
-};
-
-QString getBoundsNameFromType(obs_bounds_type type)
-{
-	QString fallback = boundTypeNames.value(OBS_BOUNDS_NONE);
-	return boundTypeNames.value(type, fallback);
-}
-
-obs_bounds_type getBoundsTypeFromName(QString name)
-{
-	return boundTypeNames.key(name);
-}
-
 obs_data_array_t *Utils::StringListToArray(char **strings, const char *key)
 {
 	obs_data_array_t *list = obs_data_array_create();
@@ -635,6 +421,84 @@ obs_data_array_t *Utils::GetScenes()
 	return scenes;
 }
 
+OBSDataArrayAutoRelease Utils::GetSceneArray(QString name)
+{
+	OBSDataArrayAutoRelease sceneArray = obs_data_array_create();
+
+	auto sceneEnumProc = [](obs_scene_t *scene, obs_sceneitem_t *item,
+				void *privateData) -> bool {
+		obs_data_array_t *sceneArray = (obs_data_array_t *)privateData;
+
+		OBSDataAutoRelease scdata = obs_data_create();
+		auto x = obs_sceneitem_get_source(item);
+		OBSDataAutoRelease sdata = GetSceneData(x);
+
+		obs_data_set_string(scdata, "name",
+				    obs_data_get_string(sdata, "name"));
+		obs_data_array_push_back(sceneArray, scdata);
+
+		return true;
+	};
+
+	obs_scene_enum_items(GetSceneFromNameOrCurrent(name), sceneEnumProc,
+			     sceneArray);
+
+	return sceneArray;
+}
+
+OBSDataArrayAutoRelease Utils::GetSourceArray()
+{
+	OBSDataArrayAutoRelease sourcesArray = obs_data_array_create();
+
+	auto sourceEnumProc = [](void *privateData,
+				 obs_source_t *source) -> bool {
+		obs_data_array_t *sourcesArray =
+			(obs_data_array_t *)privateData;
+
+		OBSDataAutoRelease sourceData = obs_data_create();
+		auto scene = obs_scene_from_source(source);
+
+		obs_data_set_string(sourceData, "name",
+				    obs_source_get_name(source));
+		obs_data_set_string(sourceData, "typeId",
+				    obs_source_get_id(source));
+		obs_data_set_string(sourceData, "dname",
+				    obs_source_get_display_name(
+					    obs_source_get_name(source)));
+
+		QString typeString = "";
+		enum obs_source_type sourceType = obs_source_get_type(source);
+		switch (sourceType) {
+		case OBS_SOURCE_TYPE_INPUT:
+			typeString = "input";
+			break;
+
+		case OBS_SOURCE_TYPE_FILTER:
+			typeString = "filter";
+			break;
+
+		case OBS_SOURCE_TYPE_TRANSITION:
+			typeString = "transition";
+			break;
+
+		case OBS_SOURCE_TYPE_SCENE:
+			typeString = "scene";
+			break;
+
+		default:
+			typeString = "unknown";
+			break;
+		}
+		obs_data_set_string(sourceData, "type", typeString.toUtf8());
+
+		obs_data_array_push_back(sourcesArray, sourceData);
+		//obs_scene_release(scene);
+		return true;
+	};
+	obs_enum_sources(sourceEnumProc, sourcesArray);
+
+	return sourcesArray;
+}
 obs_data_t *Utils::GetSceneData(obs_source_t *source)
 {
 	OBSDataArrayAutoRelease sceneItems = GetSceneItems(source);
@@ -644,12 +508,6 @@ obs_data_t *Utils::GetSceneData(obs_source_t *source)
 	obs_data_set_array(sceneData, "sources", sceneItems);
 
 	return sceneData;
-}
-
-QSpinBox *Utils::GetTransitionDurationControl()
-{
-	QMainWindow *window = (QMainWindow *)obs_frontend_get_main_window();
-	return window->findChild<QSpinBox *>("transitionDuration");
 }
 
 int Utils::GetTransitionDuration(obs_source_t *transition)
@@ -750,31 +608,6 @@ QString Utils::OBSVersionString()
 	QString result = QString("%1.%2.%3").arg(major).arg(minor).arg(patch);
 
 	return result;
-}
-
-QSystemTrayIcon *Utils::GetTrayIcon()
-{
-	QMainWindow *main = (QMainWindow *)obs_frontend_get_main_window();
-	if (!main)
-		return nullptr;
-
-	QList<QSystemTrayIcon *> trays =
-		main->findChildren<QSystemTrayIcon *>();
-	return trays.isEmpty() ? nullptr : trays.first();
-}
-
-void Utils::SysTrayNotify(QString text, QSystemTrayIcon::MessageIcon icon,
-			  QString title)
-{
-	if (!GetConfig()->AlertsEnabled ||
-	    !QSystemTrayIcon::isSystemTrayAvailable() ||
-	    !QSystemTrayIcon::supportsMessages()) {
-		return;
-	}
-
-	QSystemTrayIcon *trayIcon = GetTrayIcon();
-	if (trayIcon)
-		trayIcon->showMessage(title, text, icon);
 }
 
 const char *Utils::GetRecordingFolder()
@@ -1169,16 +1002,16 @@ QString Utils::nsToTimestamp(uint64_t ns)
 
 /* Returns a vector list of source names for sources with video
 */
-vector<const char *> Utils::GetVideoSourceNames()
+QStringList Utils::GetMediaSourceNames()
 {
-	vector<const char *> sourceNames;
+	QStringList sourceNames;
 	obs_enum_sources(
 		[](void *data, obs_source_t *source) {
-			auto &sn = *static_cast<vector<const char *> *>(data);
-			bool hasAudio = (obs_source_get_output_flags(source) &
-					 OBS_SOURCE_VIDEO);
-			if (hasAudio) {
-				sn.push_back(obs_source_get_name(source));
+			QStringList *sn = static_cast<QStringList *>(data);
+			bool isMedia = (obs_source_get_output_flags(source) &
+					OBS_SOURCE_CONTROLLABLE_MEDIA);
+			if (isMedia) {
+				sn->append(obs_source_get_name(source));
 			}
 
 			return true;
@@ -1190,18 +1023,16 @@ vector<const char *> Utils::GetVideoSourceNames()
 
 /* Returns a vector list of source names for sources with audio
 */
-vector<const char *> Utils::GetAudioSourceNames()
+QStringList Utils::GetAudioSourceNames()
 {
-	vector<const char *> sourceNames;
+	QStringList sourceNames;
 	obs_enum_sources(
 		[](void *data, obs_source_t *source) {
-			auto &sn = *static_cast<vector<const char *> *>(data);
+			QStringList *sn = static_cast<QStringList *>(data);
 			bool hasAudio = (obs_source_get_output_flags(source) &
 					 OBS_SOURCE_AUDIO);
 			if (hasAudio) {
-				sn.push_back(obs_source_get_name(source)
-
-				);
+				sn->append(obs_source_get_name(source));
 			}
 			return true;
 		},
@@ -1209,3 +1040,254 @@ vector<const char *> Utils::GetAudioSourceNames()
 
 	return sourceNames;
 }
+
+QStringList Utils::GetTransitionsList()
+{
+	QStringList names;
+	OBSSourceAutoRelease currentTransition =
+		obs_frontend_get_current_transition();
+	obs_frontend_source_list transitionList = {};
+	obs_frontend_get_transitions(&transitionList);
+
+	OBSDataArrayAutoRelease transitions = obs_data_array_create();
+	for (size_t i = 0; i < transitionList.sources.num; i++) {
+		OBSSource transition = transitionList.sources.array[i];
+
+		names.append(obs_source_get_name(transition));
+	}
+	obs_frontend_source_list_free(&transitionList);
+	return names;
+}
+
+QStringList Utils::GetSceneItemsList(QString scenename)
+{
+
+	QStringList SceneItemsList;
+
+	const char *sceneName = scenename.toStdString().c_str();
+	OBSSourceAutoRelease sceneSource = obs_get_source_by_name(sceneName);
+	OBSScene scene = obs_scene_from_source(sceneSource);
+
+	OBSDataArrayAutoRelease sceneItemArray = obs_data_array_create();
+
+	auto sceneItemEnumProc = [](obs_scene_t *, obs_sceneitem_t *item,
+				    void *privateData) -> bool {
+		obs_data_array_t *sceneItemArray =
+			(obs_data_array_t *)privateData;
+
+		OBSDataAutoRelease sceneItemData = obs_data_create();
+
+		OBSSource source = obs_sceneitem_get_source(item);
+
+		obs_data_set_string(sceneItemData, "sourceName",
+				    obs_source_get_name(source));
+
+		obs_data_array_push_back(sceneItemArray, sceneItemData);
+		return true;
+	};
+	obs_scene_enum_items(scene, sceneItemEnumProc, sceneItemArray);
+
+	for (int i = 0; i < obs_data_array_count(sceneItemArray); i++) {
+		SceneItemsList.append(obs_data_get_string(
+			obs_data_array_item(sceneItemArray, i), "sourceName"));
+	}
+	return SceneItemsList;
+}
+
+int Utils::get_midi_note_or_control(rtmidi::message mess)
+{
+	int bytetopullfrom = -1;
+	switch (mess.get_message_type()) {
+	case rtmidi::message_type::INVALID:
+		break;
+	case rtmidi::message_type::NOTE_OFF:
+		bytetopullfrom = 1;
+		break;
+	case rtmidi::message_type::NOTE_ON:
+		bytetopullfrom = 1;
+		break;
+	case rtmidi::message_type::PITCH_BEND:
+		bytetopullfrom = 0;
+		break;
+
+	case rtmidi::message_type::CONTROL_CHANGE:
+		bytetopullfrom = 1;
+		break;
+		/*****************Messages to work on ***************
+	// Standard Message
+	case rtmidi::message_type:: POLY_PRESSURE : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: PROGRAM_CHANGE : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: AFTERTOUCH : bytetopullfrom = 0;break;
+	// System Common Messages
+	case rtmidi::message_type:: SYSTEM_EXCLUSIVE : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: TIME_CODE : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: SONG_POS_POINTER : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: SONG_SELECT : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: RESERVED1 : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: RESERVED2 : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: TUNE_REQUEST : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: EOX : bytetopullfrom = 0;break;
+	// System Realtime Messages
+	case rtmidi::message_type:: TIME_CLOCK : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: RESERVED3 : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: START : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: CONTINUE : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: STOP : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: RESERVED4 : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: ACTIVE_SENSING : bytetopullfrom = 0;break;
+	case rtmidi::message_type:: SYSTEM_RESET : bytetopullfrom = 0;break;
+	****************************************************/
+	}
+
+	return mess[bytetopullfrom];
+}
+int Utils::get_midi_value(rtmidi::message mess)
+{
+	int bytetopullfrom = -1;
+	switch (mess.get_message_type()) {
+	case rtmidi::message_type::INVALID:
+		break;
+
+	case rtmidi::message_type::PITCH_BEND:
+		bytetopullfrom = 1;
+		break;
+	case rtmidi::message_type::CONTROL_CHANGE:
+		bytetopullfrom = 2;
+		break;
+
+	case rtmidi::message_type::NOTE_OFF:
+		bytetopullfrom = 2;
+		break;
+	case rtmidi::message_type::NOTE_ON:
+		bytetopullfrom = 2;
+		break;
+
+		/*****************Messages to work on ***************
+		// Standard Message
+		case rtmidi::message_type:: POLY_PRESSURE : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: PROGRAM_CHANGE : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: AFTERTOUCH : bytetopullfrom = 0;break;
+		// System Common Messages
+		case rtmidi::message_type:: SYSTEM_EXCLUSIVE : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: TIME_CODE : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: SONG_POS_POINTER : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: SONG_SELECT : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: RESERVED1 : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: RESERVED2 : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: TUNE_REQUEST : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: EOX : bytetopullfrom = 0;break;
+		// System Realtime Messages
+		case rtmidi::message_type:: TIME_CLOCK : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: RESERVED3 : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: START : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: CONTINUE : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: STOP : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: RESERVED4 : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: ACTIVE_SENSING : bytetopullfrom = 0;break;
+		case rtmidi::message_type:: SYSTEM_RESET : bytetopullfrom = 0;break;
+  			*/
+	}
+
+	return mess[bytetopullfrom];
+}
+
+std::string Utils::mtype_to_string(rtmidi::message_type mess)
+{
+	switch (mess) {
+	case rtmidi::message_type::INVALID:
+		return "INVALID";
+	// Standard Message
+	case rtmidi::message_type::NOTE_OFF:
+		return "note_off";
+	case rtmidi::message_type::NOTE_ON:
+		return "note_on";
+	case rtmidi::message_type::POLY_PRESSURE:
+		return "POLY_PRESSURE";
+	case rtmidi::message_type::CONTROL_CHANGE:
+		return "control_change";
+	case rtmidi::message_type::PROGRAM_CHANGE:
+		return "PROGRAM_CHANGE";
+	case rtmidi::message_type::AFTERTOUCH:
+		return "AFTERTOUCH";
+	case rtmidi::message_type::PITCH_BEND:
+		return "PITCH_BEND";
+
+	// System Common Messages
+	case rtmidi::message_type::SYSTEM_EXCLUSIVE:
+		return "SYSTEM_EXCLUSIVE";
+	case rtmidi::message_type::TIME_CODE:
+		return "TIME_CODE";
+	case rtmidi::message_type::SONG_POS_POINTER:
+		return "SONG_POS_POINTER";
+	case rtmidi::message_type::SONG_SELECT:
+		return "SONG_SELECT";
+	case rtmidi::message_type::RESERVED1:
+		return "RESERVED1";
+	case rtmidi::message_type::RESERVED2:
+		return "RESERVED2";
+	case rtmidi::message_type::TUNE_REQUEST:
+		return "TUNE_REQUEST";
+	case rtmidi::message_type::EOX:
+		return "EOX";
+
+	// System Realtime Messages
+	case rtmidi::message_type::TIME_CLOCK:
+		return "TIME_CLOCK";
+	case rtmidi::message_type::RESERVED3:
+		return "RESERVED3";
+	case rtmidi::message_type::START:
+		return "START";
+	case rtmidi::message_type::CONTINUE:
+		return "CONTINUE";
+	case rtmidi::message_type::STOP:
+		return "STOP";
+	case rtmidi::message_type::RESERVED4:
+		return "RESERVED4";
+	case rtmidi::message_type::ACTIVE_SENSING:
+		return "ACTIVE_SENSING";
+	case rtmidi::message_type::SYSTEM_RESET:
+		return "SYSTEM_RESET";
+	}
+}
+
+std::string Utils::getMidiMessageType(int in)
+{
+	//currently sets from a few  non breaking returns, will need to have message format structs to return here instead
+	if (inrange(128, 143, in)) {
+		return "note_off";
+	} else if (inrange(144, 159, in)) {
+		return "note_on";
+	} else if (inrange(176, 191, in)) {
+		return "control_change";
+	} else if (inrange(192, 207, in)) {
+		return "program_change";
+	} else
+		return "";
+
+	/* Future Message types to be worked on
+	if (inrange(128, 143, in)) {
+		return "note_off";
+	} else if (inrange(144, 159, in)) {
+		return "note_on";
+	} else if (inrange(160, 175, in)) {
+		return "poly_aftertouch";
+	} else if (inrange(176, 191, in)) {
+		return "control_change";
+	} else 	if (inrange(192, 207, in)) {
+		return "program_change";
+	} else 	if (inrange(208, 223, in)) {
+		return "chan_aftertouch";
+	} else 	if (inrange(224, 239, in)) {
+		return "pitch_bend";
+	} else if (inrange(240, 255, in)) {
+		return "system";
+	} else
+		return "";*/
+}
+
+QSpinBox *Utils::GetTransitionDurationControl()
+{
+	QMainWindow *window = (QMainWindow *)obs_frontend_get_main_window();
+	return window->findChild<QSpinBox *>("transitionDuration");
+}
+

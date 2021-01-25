@@ -52,11 +52,11 @@ bool obs_module_load(void)
 
 	// Config Setup
 	_config = ConfigPtr(new Config());
-	_config->Load();
+	
 
 	// Signal Router Setup
 	_eventsSystem = eventsPtr(new events(_deviceManager));
-
+	_config->Load();
 	// UI SETUP
 	QMainWindow *mainWindow = (QMainWindow *)obs_frontend_get_main_window();
 	PluginWindow *pluginWindow = new PluginWindow(mainWindow);

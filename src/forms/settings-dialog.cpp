@@ -32,7 +32,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "../version.h"
 	PluginWindow::PluginWindow(QWidget *parent)
 	: QDialog(parent, Qt::Dialog),
-	ui(new Ui::PluginWindow)
+ui(new Ui::PluginWindow)
 {
 	ui->setupUi(this);
 	connect(ui->list_midi_dev, &QListWidget::currentTextChanged, this,
@@ -49,79 +49,87 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 	title.append(" -- Commit: ");
 	title.append(GIT_COMMIT_HASH);
 	this->setWindowTitle(title);
+	
+	if (ui->list_midi_dev->currentItem()->text()  !=
+		    QString("No Devices Available")) {
 
+		HidePair("extra_1");
+		HidePair("transition");
+		HidePair("audio_source");
+		HidePair("media_source");
+		HidePair("filter");
+		HidePair("scene");
+		HidePair("source");
+		HidePair("item");
+		ui->cb_obs_output_audio_source->addItems(
+			Utils::GetAudioSourceNames());
+		ui->cb_obs_output_media_source->addItems(
+			Utils::GetMediaSourceNames());
+		ui->cb_obs_output_transition->addItems(
+			Utils::GetTransitionsList());
+		get_scene_names();
+		ui->cb_obs_output_scene->addItems(SceneList);
 
+		TranslateActions();
 
-	HidePair("extra_1");
-	HidePair("transition");
-	HidePair("audio_source");
-	HidePair("media_source");
-	HidePair("filter");
-	HidePair("scene");
-	HidePair("source");
-	HidePair("item");
-	ui->cb_obs_output_audio_source->addItems(Utils::GetAudioSourceNames());
-	ui->cb_obs_output_media_source->addItems(Utils::GetMediaSourceNames());
-	ui->cb_obs_output_transition->addItems(Utils::GetTransitionsList());
-	TranslateActions();
+		connect(ui->cb_obs_action, SIGNAL(currentIndexChanged(int)),
+			this, SLOT(obs_actions_filter_select(int)));
+		connect(ui->cb_obs_output_scene,
+			SIGNAL(currentTextChanged(QString)), this,
+			SLOT(GetSources(QString)));
+		connect(ui->cb_obs_output_action,
+			SIGNAL(currentTextChanged(QString)), this,
+			SLOT(obs_actions_select(QString)));
+		connect(ui->cb_obs_output_scene,
+			SIGNAL(currentTextChanged(QString)), this,
+			SLOT(GetSources(QString)));
+		connect(ui->cb_obs_output_source,
+			SIGNAL(currentTextChanged(QString)), this,
+			SLOT(GetFilters(QString)));
 
-	connect(ui->cb_obs_action, SIGNAL(currentIndexChanged(int)), this,
-		SLOT(obs_actions_filter_select(int)));
-	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(GetSources(QString)));
-	connect(ui->cb_obs_output_action, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(obs_actions_select(QString)));
-	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(GetSources(QString)));
-	connect(ui->cb_obs_output_source, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(GetFilters(QString)));
+		//connect all combos to on change
+		connect(ui->cb_obs_output_action,
+			SIGNAL(currentTextChanged(QString)), this,
+			SLOT(onChange()));
+		connect(ui->cb_obs_output_source,
+			SIGNAL(currentTextChanged(QString)), this,
+			SLOT(onChange()));
+		connect(ui->cb_obs_output_source,
+			SIGNAL(currentTextChanged(QString)), this,
+			SLOT(on_source_change(QString)));
+		connect(ui->cb_obs_output_scene,
+			SIGNAL(currentTextChanged(QString)), this,
+			SLOT(on_scene_change(QString)));
+		connect(ui->cb_obs_output_scene,
+			SIGNAL(currentTextChanged(QString)), this,
+			SLOT(onChange()));
+		connect(ui->cb_obs_output_item,
+			SIGNAL(currentTextChanged(QString)), this,
+			SLOT(onChange()));
+		connect(ui->cb_obs_output_filter,
+			SIGNAL(currentTextChanged(QString)), this,
+			SLOT(onChange()));
+		connect(ui->cb_obs_output_transition,
+			SIGNAL(currentTextChanged(QString)), this,
+			SLOT(onChange()));
+		connect(ui->cb_obs_output_audio_source,
+			SIGNAL(currentTextChanged(QString)), this,
+			SLOT(onChange()));
+		connect(ui->cb_obs_output_media_source,
+			SIGNAL(currentTextChanged(QString)), this,
+			SLOT(onChange()));
 
-	//connect all combos to on change
-	connect(ui->cb_obs_output_action, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(onChange()));
-	connect(ui->cb_obs_output_source, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(onChange()));
-	connect(ui->cb_obs_output_source, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(on_source_change(QString)));
-	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(on_scene_change(QString)));
-	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(onChange()));
-	connect(ui->cb_obs_output_item, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(onChange()));
-	connect(ui->cb_obs_output_filter, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(onChange()));
-	connect(ui->cb_obs_output_transition,
-		SIGNAL(currentTextChanged(QString)), this, SLOT(onChange()));
-	connect(ui->cb_obs_output_audio_source,
-		SIGNAL(currentTextChanged(QString)), this, SLOT(onChange()));
-	connect(ui->cb_obs_output_media_source,
-		SIGNAL(currentTextChanged(QString)), this, SLOT(onChange()));
-
-	/**************Connections to mappper****************/
-
-	this->listview = new QListView(this->ui->cb_obs_output_action);
-	this->ui->cb_obs_output_action->setView(this->listview);
-	this->ui->cb_obs_output_action->addItems(AllActions);
-	this->listview->setSizeAdjustPolicy(
-		QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents);
-	ui->cb_obs_output_action->setSizeAdjustPolicy(
-		QComboBox::SizeAdjustPolicy::AdjustToContents);
+		/**************Connections to mappper****************/
+	}
 }
 
 void PluginWindow::ToggleShowHide()
 {
 
 	if (!isVisible()) {
-
 		setVisible(true);
-		HideAllPairs();
-		ShowPair(pairs::Scene);
-		ShowPair(pairs::Audio);
 	}
-
 	else {
-
 		setVisible(false);
 	}
 }
@@ -129,25 +137,29 @@ void PluginWindow::ToggleShowHide()
 void PluginWindow::setCheck(bool x)
 {
 	this->ui->check_enabled->setChecked(x);
-	
 }
 
 void PluginWindow::SetAvailableDevices()
 {
 
 	auto midiOutDevices = GetDeviceManager()->GetOPL();
-	loadingdevices = true;
-	this->ui->outbox->clear();
-	this->ui->outbox->insertItems(0, midiOutDevices);
-	loadingdevices = false;
+	if (midiOutDevices.count() > 0){
+		loadingdevices = true;
+		this->ui->outbox->clear();
+		this->ui->outbox->insertItems(0, midiOutDevices);
+		loadingdevices = false;
+	}
+	
 	auto midiDevices = GetDeviceManager()->GetPortsList();
-
-	this->ui->list_midi_dev->clear();
-	this->ui->check_enabled->setEnabled(false);
-	this->ui->outbox->setEnabled(false);
-
+	if (midiDevices.size() > 0) {
+		this->ui->list_midi_dev->clear();
+		this->ui->check_enabled->setEnabled(false);
+		this->ui->outbox->setEnabled(false);
+	}
+	
 	if (midiDevices.size() == 0) {
 		this->ui->list_midi_dev->addItem("No Devices Available");
+		ui->check_enabled->setChecked(false);
 		ui->tab_configure->setEnabled(false);
 		ui->bidirectional->setEnabled(false);
 		ui->check_enabled->setEnabled(false);
@@ -157,11 +169,13 @@ void PluginWindow::SetAvailableDevices()
 		this->ui->check_enabled->setEnabled(true);
 		this->ui->outbox->setEnabled(false);
 		ui->tab_configure->setEnabled(true);
+		for (int i = 0; i < midiDevices.size(); i++) {
+			this->ui->list_midi_dev->addItem(
+				midiDevices.at(i).c_str());
+		}
 	}
 
-	for (int i = 0; i < midiDevices.size(); i++) {
-		this->ui->list_midi_dev->addItem(midiDevices.at(i).c_str());
-	}
+	
 
 	if (starting) {
 
@@ -321,9 +335,13 @@ void PluginWindow::get_scene_names()
 {
 	obs_frontend_source_list sceneList = {};
 	obs_frontend_get_scenes(&sceneList);
+	SceneList.clear();
 	for (size_t i = 0; i < sceneList.sources.num; i++) {
-		SceneList.append(
-			obs_source_get_name(sceneList.sources.array[i]));
+		if (obs_source_get_name(sceneList.sources.array[i]) != "") {
+
+			SceneList.append(obs_source_get_name(
+				sceneList.sources.array[i]));
+		}
 	}
 	obs_frontend_source_list_free(&sceneList);
 }

@@ -1198,13 +1198,13 @@ std::string Utils::mtype_to_string(rtmidi::message_type mess)
 		return "INVALID";
 	// Standard Message
 	case rtmidi::message_type::NOTE_OFF:
-		return "note_off";
+		return "Note Off";
 	case rtmidi::message_type::NOTE_ON:
-		return "note_on";
+		return "Note On";
 	case rtmidi::message_type::POLY_PRESSURE:
 		return "POLY_PRESSURE";
 	case rtmidi::message_type::CONTROL_CHANGE:
-		return "control_change";
+		return "Control Change";
 	case rtmidi::message_type::PROGRAM_CHANGE:
 		return "PROGRAM_CHANGE";
 	case rtmidi::message_type::AFTERTOUCH:
@@ -1254,13 +1254,13 @@ std::string Utils::getMidiMessageType(int in)
 {
 	//currently sets from a few  non breaking returns, will need to have message format structs to return here instead
 	if (inrange(128, 143, in)) {
-		return "note_off";
+		return "Note Off";
 	} else if (inrange(144, 159, in)) {
-		return "note_on";
+		return "Note On";
 	} else if (inrange(176, 191, in)) {
-		return "control_change";
+		return "Control Change";
 	} else if (inrange(192, 207, in)) {
-		return "program_change";
+		return "Program_Change";
 	} else
 		return "";
 

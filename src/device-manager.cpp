@@ -35,31 +35,35 @@ DeviceManager::~DeviceManager()
  */
 void DeviceManager::Load(obs_data_t *data)
 {
+
 	vector<string> portsList = GetPortsList();
 	vector<string> outPortsList = GetOutPortsList();
 	obs_data_array_t *devicesData = obs_data_get_array(data, "devices");
 	size_t deviceCount = obs_data_array_count(devicesData);
-	for (size_t i = 0; i < deviceCount; i++) {
-		obs_data_t *deviceData = obs_data_array_item(devicesData, i);
-		MidiAgent *device = new MidiAgent();
-		device->Load(deviceData);
-		midiAgents.push_back(device);
-		connect(this, SIGNAL(bcast(QString, QString)), device,
-			SLOT(NewObsEvent(QString, QString)));
-		if (device->isEnabled()) {
-			int portNumber = GetPortNumberByDeviceName(
-				device->GetName().c_str());
-			int outPort = GetOutPortNumberByDeviceName(
-				device->GetOutName().c_str());
 
-			if (portNumber != -1) {
-				device->OpenPort(portNumber);
-			}
-			if (outPort != -1) {
-				device->OpenOutPort(outPort);
+		for (size_t i = 0; i < deviceCount; i++) {
+			obs_data_t *deviceData =
+				obs_data_array_item(devicesData, i);
+			MidiAgent *device = new MidiAgent();
+			device->Load(deviceData);
+			midiAgents.push_back(device);
+			connect(this, SIGNAL(bcast(QString, QString)), device,
+				SLOT(NewObsEvent(QString, QString)));
+			if (device->isEnabled()) {
+				int portNumber = GetPortNumberByDeviceName(
+					device->GetName().c_str());
+				int outPort = GetOutPortNumberByDeviceName(
+					device->GetOutName().c_str());
+
+				if (portNumber != -1) {
+					device->OpenPort(portNumber);
+				}
+				if (outPort != -1) {
+					device->OpenOutPort(outPort);
+				}
 			}
 		}
-	}
+	
 }
 
 

@@ -57,12 +57,15 @@ int Utils::mapper2(double x)
 		out_min);
 }
 
-bool Utils::is_number(const std::string &s)
+bool Utils::is_number(const QString &s)
 {
-	std::string::const_iterator it = s.begin();
-	while (it != s.end() && std::isdigit(*it))
-		++it;
-	return !s.empty() && it == s.end();
+	QRegExp re("\\d*"); // a digit (\d), zero or more times (*)
+	if (re.exactMatch(s)) {
+		return true;
+	} else {
+		return false;
+	}
+	
 }
 bool Utils::isJSon(QString val)
 {
@@ -1191,7 +1194,7 @@ int Utils::get_midi_value(rtmidi::message mess)
 	return mess[bytetopullfrom];
 }
 
-std::string Utils::mtype_to_string(rtmidi::message_type mess)
+QString Utils::mtype_to_string(rtmidi::message_type mess)
 {
 	switch (mess) {
 	case rtmidi::message_type::INVALID:
@@ -1250,7 +1253,7 @@ std::string Utils::mtype_to_string(rtmidi::message_type mess)
 	}
 }
 
-std::string Utils::getMidiMessageType(int in)
+QString Utils::getMidiMessageType(int in)
 {
 	//currently sets from a few  non breaking returns, will need to have message format structs to return here instead
 	if (inrange(128, 143, in)) {

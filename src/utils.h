@@ -56,10 +56,10 @@ namespace Utils {
 class OBSActionsWidget;
 float mapper(int x);
 int mapper2(double x);
-bool is_number(const std::string &s);
+bool is_number(const QString &s);
 bool isJSon(QString val);
 
-std::string getMidiMessageType(int in);
+QString getMidiMessageType(int in);
 QStringList GetMediaSourceNames();
 QStringList GetAudioSourceNames();
 
@@ -111,7 +111,7 @@ bool inrange(int low, int high, int x);
 QStringList GetTransitionsList();
 QStringList GetSceneItemsList(QString scene);
 bool inrange(int low, int high, int x);
-std::string mtype_to_string(rtmidi::message_type);
+QString mtype_to_string(rtmidi::message_type);
 
 int get_midi_note_or_control(rtmidi::message mess);
 int get_midi_value(rtmidi::message mess);

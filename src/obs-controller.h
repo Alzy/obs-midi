@@ -25,10 +25,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 namespace OBSController {
 // BUTTON ACTIONS
-void SetCurrentScene(const char *sceneName);
-void SetPreviewScene(const char *sceneName);
+void SetCurrentScene(QString sceneName);
+void SetPreviewScene(QString sceneName);
 void SetCurrentSceneCollection(QString sceneCollection);
-void ResetSceneItem(const char *sceneName, const char *itemName);
+void ResetSceneItem(QString sceneName, QString itemName);
 void TransitionToProgram();
 void TransitionToProgram(QString transitionName, int transitionDuration = 300);
 void SetCurrentTransition(QString name);

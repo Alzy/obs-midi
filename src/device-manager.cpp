@@ -35,8 +35,8 @@ DeviceManager::~DeviceManager()
  */
 void DeviceManager::Load(obs_data_t *data)
 {
-	vector<string> portsList = GetPortsList();
-	vector<string> outPortsList = GetOutPortsList();
+	QStringList portsList = GetPortsList();
+	QStringList outPortsList = GetOutPortsList();
 	obs_data_array_t *devicesData = obs_data_get_array(data, "devices");
 	size_t deviceCount = obs_data_array_count(devicesData);
 	for (size_t i = 0; i < deviceCount; i++) {
@@ -48,9 +48,9 @@ void DeviceManager::Load(obs_data_t *data)
 			SLOT(NewObsEvent(QString, QString)));
 		if (device->isEnabled()) {
 			int portNumber = GetPortNumberByDeviceName(
-				device->GetName().c_str());
+				device->GetName());
 			int outPort = GetOutPortNumberByDeviceName(
-				device->GetOutName().c_str());
+				device->GetOutName());
 
 			if (portNumber != -1) {
 				device->OpenPort(portNumber);
@@ -76,12 +76,12 @@ void DeviceManager::Unload()
 
 /* Returns vector list of Port Names 
  */
-vector<string> DeviceManager::GetPortsList()
+QStringList DeviceManager::GetPortsList()
 {
-	vector<string> ports;
+	QStringList ports;
 	int portCount = rtMidi->get_port_count();
 	for (int i = 0; i < portCount; i++) {
-		ports.push_back(rtMidi->get_port_name(i));
+		ports.append(QString::fromStdString(rtMidi->get_port_name(i)));
 	}
 	return ports;
 }
@@ -89,13 +89,13 @@ vector<string> DeviceManager::GetPortsList()
 
 /* Returns vector list of Port Names 
  */
-vector<string> DeviceManager::GetOutPortsList()
+QStringList DeviceManager::GetOutPortsList()
 {
 	opl.clear();
-	vector<string> outports;
+	QStringList outports;
 	int portCount = MO->get_port_count();
 	for (int i = 0; i < portCount; i++) {
-		outports.push_back(MO->get_port_name(i));
+		outports.append(QString::fromStdString(MO->get_port_name(i)));
 		opl.append(QString::fromStdString(MO->get_port_name(i)));
 	}
 	return outports;
@@ -109,12 +109,12 @@ QStringList DeviceManager::GetOPL()
 /* Returns the port number of the specified device.
  * If the device isn't found (possibly due to being disconnected), returns -1
  */
-int DeviceManager::GetPortNumberByDeviceName(const char *deviceName)
+int DeviceManager::GetPortNumberByDeviceName(QString deviceName)
 {
-	vector<string> portsList = GetPortsList();
-	auto it = find(portsList.begin(), portsList.end(), deviceName);
-	if (it != portsList.end()) {
-		return distance(portsList.begin(), it);
+	QStringList portsList = GetPortsList();
+	
+	if (portsList.contains(deviceName)) {
+		return portsList.indexOf(deviceName);
 	} else {
 		return -1;
 	}
@@ -124,27 +124,26 @@ int DeviceManager::GetPortNumberByDeviceName(const char *deviceName)
 /* Returns the port number of the specified device.
  * If the device isn't found (possibly due to being disconnected), returns -1
  */
-int DeviceManager::GetOutPortNumberByDeviceName(const char *deviceName)
+int DeviceManager::GetOutPortNumberByDeviceName(QString deviceName)
 {
 
-	vector<string> portsList = GetOutPortsList();
-
-	auto it = find(portsList.begin(), portsList.end(), deviceName);
-	if (it != portsList.end()) {
-		return distance(portsList.begin(), it);
+	QStringList portsList = GetOutPortsList();
+	
+	if (portsList.contains(deviceName)) {
+		return portsList.indexOf(deviceName);
 	} else {
 		return -1;
 	}
 }
 
 
-vector<MidiAgent *> DeviceManager::GetActiveMidiDevices()
+QVector<MidiAgent *> DeviceManager::GetActiveMidiDevices()
 {
 	return midiAgents;
 }
 
 
-MidiAgent *DeviceManager::GetMidiDeviceByName(const char *deviceName)
+MidiAgent *DeviceManager::GetMidiDeviceByName(QString deviceName)
 {
 	for (int i = 0; i < midiAgents.size(); i++) {
 		if (midiAgents.at(i)->GetName() == deviceName) {
@@ -155,10 +154,9 @@ MidiAgent *DeviceManager::GetMidiDeviceByName(const char *deviceName)
 }
 
 
-vector<MidiHook *>
-DeviceManager::GetMidiHooksByDeviceName(const char *deviceName)
+QVector<MidiHook *> DeviceManager::GetMidiHooksByDeviceName(QString deviceName)
 {
-	if (QString(deviceName) != QString("No Devices Available")) {
+	if (deviceName != QString("No Devices Available")) {
 	
 	auto device = GetMidiDeviceByName(deviceName);
 	if (device != NULL) {

@@ -156,7 +156,7 @@ void PluginWindow::SetAvailableDevices()
 	}
 
 	for (int i = 0; i < midiDevices.size(); i++) {
-		this->ui->list_midi_dev->addItem(midiDevices.at(i).c_str());
+		this->ui->list_midi_dev->addItem(midiDevices.at(i));
 	}
 
 	if (starting) {
@@ -192,7 +192,7 @@ void PluginWindow::selectOutput(QString selectedDeviceName)
 			ui->list_midi_dev->currentItem()->text().toStdString();
 		auto device = GetDeviceManager()->GetMidiDeviceByName(
 			selectedDevice.c_str());
-		device->SetOutName(selectedDeviceName.toStdString());
+		device->SetOutName(selectedDeviceName);
 
 		GetConfig()->Save();
 	}
@@ -251,8 +251,7 @@ void PluginWindow::on_item_select(QString curitem)
 		ui->outbox->setEnabled(true);
 		ui->bidirectional->setEnabled(true);
 		ui->bidirectional->setChecked(device->isBidirectional());
-		auto on = device->GetOutName();
-		ui->outbox->setCurrentText(QString::fromStdString(on));
+		ui->outbox->setCurrentText(device->GetOutName());
 
 	} else {
 		ui->check_enabled->setChecked(false);

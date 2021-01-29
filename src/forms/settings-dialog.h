@@ -57,6 +57,7 @@ public slots:
 	void get_transitions();
 	void get_scenes();
 	void add_new_mapping();
+	void add_row_from_hook(MidiHook *hook);
 	
 
 private:
@@ -76,7 +77,7 @@ private:
 	bool listening = false;
 	void get_scene_names();
 
-	
+	bool map_exists();
 private:
 	
 	QGridLayout *layout;

@@ -51,7 +51,20 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 	this->setWindowTitle(title);
 
 
+	if (loadingdevices) {
+		auto devicemanager = GetDeviceManager();
+		auto device = devicemanager->GetMidiDeviceByName(
+			ui->mapping_lbl_device_name->text());
+		auto hooks = devicemanager->GetMidiHooksByDeviceName(
+			ui->mapping_lbl_device_name->text());
+		if (hooks.size() > 0) {
 
+			for (int i = 0; i < hooks.size(); i++) {
+
+				add_row_from_hook(hooks.at(i));
+			}
+		}
+	}
 	HideAllPairs();
 	
 	ui->cb_obs_output_audio_source->addItems(Utils::GetAudioSourceNames());
@@ -81,9 +94,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 	/**************Connections to mappper****************/
 	connect(ui->btn_add, SIGNAL(clicked()), this, SLOT(add_new_mapping()));
-
 	this->ui->cb_obs_output_action->addItems(TranslateActions());
-
+	loadingdevices = true;
 }
 
 void PluginWindow::ToggleShowHide()
@@ -91,6 +103,23 @@ void PluginWindow::ToggleShowHide()
 
 	if (!isVisible()) {
 		setVisible(true);
+		ui->table_mapping->clear();
+		if (loadingdevices) {
+			auto devicemanager = GetDeviceManager();
+			auto device = devicemanager->GetMidiDeviceByName(
+				ui->mapping_lbl_device_name->text());
+			auto hooks = devicemanager->GetMidiHooksByDeviceName(
+				ui->mapping_lbl_device_name->text());
+			if (hooks.size() > 0) {
+
+				for (int i = 0; i < hooks.size(); i++) {
+
+					add_row_from_hook(hooks.at(i));
+				}
+			}
+			set_headers();
+
+		}
 	}
 	else {
 		setVisible(false);
@@ -325,8 +354,8 @@ void PluginWindow::add_midi_device(QString name)
 void PluginWindow::set_headers()
 {
 	ui->table_mapping->setHorizontalHeaderLabels(
-		{"Name", "Enabled", "Status", "Feedback Enabled",
-		 "Feedback Port", "Feedback Status"});
+		{"Channel", "Message Type", "Note or Control", "Action",
+		 "Scene", "Source","Filter","Transition","Item","Audio Source", "Media Source"});
 }
 
 
@@ -748,39 +777,102 @@ QString PluginWindow::untranslate(QString tstring)
 	
 	return Utils::action_to_string(AllActions_raw.at(TranslateActions().indexOf(tstring)));
 }
+bool PluginWindow::map_exists() {
+	return false;
+	
+}
 
-void PluginWindow::add_new_mapping() {
+void PluginWindow::add_new_mapping()
+{
 
+		int row = ui->table_mapping->rowCount();
+		ui->table_mapping->insertRow(row);
+
+		QTableWidgetItem *channelitem = new QTableWidgetItem(
+			QString::number(ui->sb_channel->value()));
+
+		QTableWidgetItem *mtypeitem =
+			new QTableWidgetItem(ui->cb_mtype->currentText());
+		QTableWidgetItem *norcitem = new QTableWidgetItem(
+			QString::number(ui->sb_norc->value()));
+		QTableWidgetItem *actionitem = new QTableWidgetItem(
+			ui->cb_obs_output_action->currentText());
+		QTableWidgetItem *sceneitem = new QTableWidgetItem(
+			ui->cb_obs_output_scene->currentText());
+		QTableWidgetItem *sourceitem = new QTableWidgetItem(
+			ui->cb_obs_output_source->currentText());
+		QTableWidgetItem *filteritem = new QTableWidgetItem(
+			ui->cb_obs_output_filter->currentText());
+		QTableWidgetItem *transitionitem = new QTableWidgetItem(
+			ui->cb_obs_output_transition->currentText());
+		QTableWidgetItem *itemitem = new QTableWidgetItem(
+			ui->cb_obs_output_item->currentText());
+		QTableWidgetItem *audioitem = new QTableWidgetItem(
+			ui->cb_obs_output_audio_source->currentText());
+		QTableWidgetItem *mediaitem = new QTableWidgetItem(
+			ui->cb_obs_output_media_source->currentText());
+
+		ui->table_mapping->setItem(row, 0, channelitem);
+		ui->table_mapping->setItem(row, 1, mtypeitem);
+		ui->table_mapping->setItem(row, 2, norcitem);
+		ui->table_mapping->setItem(row, 3, actionitem);
+		ui->table_mapping->setItem(row, 4, sceneitem);
+		ui->table_mapping->setItem(row, 5, sourceitem);
+		ui->table_mapping->setItem(row, 6, filteritem);
+		ui->table_mapping->setItem(row, 7, transitionitem);
+		ui->table_mapping->setItem(row, 8, itemitem);
+		ui->table_mapping->setItem(row, 9, audioitem);
+		ui->table_mapping->setItem(row, 10, mediaitem);
+
+		MidiHook *newmh = new MidiHook();
+		newmh->channel = ui->sb_channel->value();
+		newmh->message_type = ui->cb_mtype->currentText();
+		newmh->norc = ui->sb_norc->value();
+		newmh->action = ui->cb_obs_output_action->currentText();
+		newmh->scene = ui->cb_obs_output_scene->currentText();
+		newmh->source = ui->cb_obs_output_source->currentText();
+		newmh->filter = ui->cb_obs_action_filter->currentText();
+		newmh->transition = ui->cb_obs_output_transition->currentText();
+		newmh->item = ui->cb_obs_output_item->currentText();
+		newmh->audio_source =
+			ui->cb_obs_output_audio_source->currentText();
+		newmh->media_source =
+			ui->cb_obs_output_media_source->currentText();
+		auto dm = GetDeviceManager();
+		auto dev = dm->GetMidiDeviceByName(
+			ui->mapping_lbl_device_name->text());
+		dev->AddMidiHook(newmh);
+		auto conf = GetConfig();
+		conf->Save();
+	
+}
+
+void PluginWindow::add_row_from_hook(MidiHook * hook) {
 	int row = ui->table_mapping->rowCount();
 	ui->table_mapping->insertRow(row);
-	
+
 	QTableWidgetItem *channelitem =
-		new QTableWidgetItem(QString::number(ui->sb_channel->value()));
+		new QTableWidgetItem(QString::number(hook->channel));
 	QTableWidgetItem *mtypeitem =
-		new QTableWidgetItem(ui->cb_mtype->currentText());
+		new QTableWidgetItem(hook->message_type);
 	QTableWidgetItem *norcitem =
-		new QTableWidgetItem(QString::number(ui->sb_norc->value()));
+		new QTableWidgetItem(QString::number(hook->norc));
 	QTableWidgetItem *actionitem =
-		new QTableWidgetItem(ui->cb_obs_output_action->currentText());
+		new QTableWidgetItem(hook->action);
 	QTableWidgetItem *sceneitem =
-		new QTableWidgetItem(ui->cb_obs_output_scene->currentText());
+		new QTableWidgetItem(hook->scene);
 	QTableWidgetItem *sourceitem =
-		new QTableWidgetItem(ui->cb_obs_output_source->currentText());
+		new QTableWidgetItem(hook->source);
 	QTableWidgetItem *filteritem =
-		new QTableWidgetItem(ui->cb_obs_output_filter->currentText());
-	QTableWidgetItem *transitionitem =
-		new QTableWidgetItem(ui->cb_obs_output_transition->currentText());
+		new QTableWidgetItem(hook->filter);
+	QTableWidgetItem *transitionitem = new QTableWidgetItem(
+		hook->transition);
 	QTableWidgetItem *itemitem =
-		new QTableWidgetItem(ui->cb_obs_output_item->currentText());
-	QTableWidgetItem *audioitem =
-		new QTableWidgetItem(ui->cb_obs_output_audio_source->currentText());
-	QTableWidgetItem *mediaitem =
-		new QTableWidgetItem(ui->cb_obs_output_media_source->currentText());
-
-
-
-
-
+		new QTableWidgetItem(hook->item);
+	QTableWidgetItem *audioitem = new QTableWidgetItem(
+		hook->audio_source);
+	QTableWidgetItem *mediaitem = new QTableWidgetItem(
+		hook->media_source);
 	ui->table_mapping->setItem(row, 0, channelitem);
 	ui->table_mapping->setItem(row, 1, mtypeitem);
 	ui->table_mapping->setItem(row, 2, norcitem);

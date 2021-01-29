@@ -47,9 +47,8 @@ public slots:
 	
 	void obs_actions_select(QString action);
 	void check_advanced_switch(bool state);
-	void edit_action(obs_data_t *TriggerType);
 	void ResetToDefaults();
-	void onChange(QString string);
+	
 	void on_source_change(QString source);
 	void on_scene_change(QString source);
 	bool MapCall(QString plugin, obs_data_t *map);
@@ -68,8 +67,8 @@ private:
 	QMetaObject::Connection desconnect;
 	bool starting = true;
 	QString DeviceFilter;
-	void ShowPair(pairs);
-	void HidePair(pairs);
+	void ShowPair(pairs pair);
+	void HidePair(pairs pair);
 	void HideAllPairs();
 	void add_midi_device(QString Name);
 	void set_headers();
@@ -85,9 +84,6 @@ private:
 	bool switching = false;
 	bool DoMap(obs_data_t *map);
 	QStringList TranslateActions();
-	void ShowIntActions();
-	void ShowStringActions();
-	void ShowBoolActions();
 	void ShowOnly(QList<Actions> shows);
 	void ShowEntry(Actions Entry);
 	void HideEntry(Actions Entry);
@@ -95,10 +91,7 @@ private:
 	void HideAdvancedActions();
 	void HideEntries(QList<Actions> entrys);
 	void ShowEntries(QList<Actions> entrys);
-	QString FirstVisible();
 	QString untranslate(QString translation);
-	void ShowPair(QString pair);
-	void HidePair(QString pair);
 	QListView *listview;
 	QList<Actions> FrontendActions = {
 				Actions::Start_Streaming,

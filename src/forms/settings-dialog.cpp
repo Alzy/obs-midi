@@ -52,14 +52,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 
 
-	HidePair("extra_1");
-	HidePair("transition");
-	HidePair("audio_source");
-	HidePair("media_source");
-	HidePair("filter");
-	HidePair("scene");
-	HidePair("source");
-	HidePair("item");
+	HideAllPairs();
+	
 	ui->cb_obs_output_audio_source->addItems(Utils::GetAudioSourceNames());
 	ui->cb_obs_output_media_source->addItems(Utils::GetMediaSourceNames());
 	ui->cb_obs_output_transition->addItems(Utils::GetTransitionsList());
@@ -68,37 +62,17 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 	TranslateActions();
 
-	connect(ui->cb_obs_action, SIGNAL(currentIndexChanged(int)), this,
+	connect(ui->cb_obs_action_filter, SIGNAL(currentIndexChanged(int)), this,
 		SLOT(obs_actions_filter_select(int)));
 	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(GetSources(QString)));
+		this, SLOT(get_sources(QString)));
 	connect(ui->cb_obs_output_action, SIGNAL(currentTextChanged(QString)),
 		this, SLOT(obs_actions_select(QString)));
 	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(GetSources(QString)));
+		this, SLOT(get_sources(QString)));
 	connect(ui->cb_obs_output_source, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(GetFilters(QString)));
+		this, SLOT(get_filters(QString)));
 
-	//connect all combos to on change
-	connect(ui->cb_obs_output_action, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(onChange(QString)));
-	connect(ui->cb_obs_output_source, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(onChange(QString)));
-
-	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(onChange(QString)));
-	connect(ui->cb_obs_output_item, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(onChange(QString)));
-	connect(ui->cb_obs_output_filter, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(onChange(QString)));
-	connect(ui->cb_obs_output_transition,
-		SIGNAL(currentTextChanged(QString)), this,
-		SLOT(onChange(QString)));
-	connect(ui->cb_obs_output_audio_source,
-		SIGNAL(currentTextChanged(QString)), this,
-		SLOT(onChange(QString)));
-	connect(ui->cb_obs_output_media_source,
-		SIGNAL(currentTextChanged(QString)), this, SLOT(onChange(QString)));
 
 	connect(ui->cb_obs_output_source, SIGNAL(currentTextChanged(QString)),
 		this, SLOT(on_source_change(QString)));
@@ -107,13 +81,9 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 	/**************Connections to mappper****************/
 
-	this->listview = new QListView(this->ui->cb_obs_output_action);
-	this->ui->cb_obs_output_action->setView(this->listview);
+
 	this->ui->cb_obs_output_action->addItems(TranslateActions());
-	this->listview->setSizeAdjustPolicy(
-		QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents);
-	ui->cb_obs_output_action->setSizeAdjustPolicy(
-		QComboBox::SizeAdjustPolicy::AdjustToContents);
+
 }
 
 void PluginWindow::ToggleShowHide()
@@ -362,34 +332,50 @@ void PluginWindow::set_headers()
 
 void PluginWindow::ShowPair(pairs Pair)
 {
+	
 	switch (Pair) {
 	case pairs::Scene:
 		ui->label_obs_output_scene->show();
 		ui->cb_obs_output_scene->show();
+		get_scenes();
+		ui->w_scene->show();
 		break;
 	case pairs::Source:
 		ui->label_obs_output_source->show();
 		ui->cb_obs_output_source->show();
+		get_sources(ui->cb_obs_output_scene->currentText());
+		ui->w_source->show();
 		break;
 	case pairs::Filter:
 		ui->label_obs_output_filter->show();
 		ui->cb_obs_output_filter->show();
+
+		ui->w_filter->show();
 		break;
 	case pairs::Transition:
 		ui->label_obs_output_transition->show();
 		ui->cb_obs_output_transition->show();
+		ui->w_transition->show();
 		break;
 	case pairs::Item:
 		ui->label_obs_output_item->show();
 		ui->cb_obs_output_item->show();
+		ui->w_item->show();
 		break;
 	case pairs::Audio:
+		ui->cb_obs_output_audio_source->clear();
+		ui->cb_obs_output_audio_source->addItems(
+			Utils::GetAudioSourceNames());
 		ui->label_obs_output_audio_source->show();
 		ui->cb_obs_output_audio_source->show();
+		ui->w_audio->show();
 		break;
 	case pairs::Media:
+		ui->cb_obs_output_media_source->clear();
+		ui->cb_obs_output_media_source->addItems(Utils::GetMediaSourceNames());
 		ui->label_obs_output_media_source->show();
 		ui->cb_obs_output_media_source->show();
+		ui->w_media->show();
 		break;
 	}
 }
@@ -399,36 +385,51 @@ void PluginWindow::HidePair(pairs Pair)
 	case pairs::Scene:
 		ui->label_obs_output_scene->hide();
 		ui->cb_obs_output_scene->hide();
+		ui->cb_obs_output_scene->clear();
+
+		ui->w_scene->hide();
 		blog(LOG_DEBUG, "Hide Scene");
 		break;
 	case pairs::Source:
 		ui->label_obs_output_source->hide();
 		ui->cb_obs_output_source->hide();
+		ui->cb_obs_output_source->clear();
+		ui->w_source->hide();
 		blog(LOG_DEBUG, "Hide Source");
 		break;
 	case pairs::Filter:
 		ui->label_obs_output_filter->hide();
 		ui->cb_obs_output_filter->hide();
+		ui->cb_obs_output_filter->clear();
+		ui->w_filter->hide();
 		blog(LOG_DEBUG, "Hide Filter");
 		break;
 	case pairs::Transition:
 		ui->label_obs_output_transition->hide();
 		ui->cb_obs_output_transition->hide();
+		ui->cb_obs_output_transition->clear();
+		ui->w_transition->hide();
 		blog(LOG_DEBUG, "Hide Transition");
 		break;
 	case pairs::Item:
 		ui->label_obs_output_item->hide();
 		ui->cb_obs_output_item->hide();
+		ui->cb_obs_output_item->clear();
+		ui->w_item->hide();
 		blog(LOG_DEBUG, "Hide Item");
 		break;
 	case pairs::Audio:
 		ui->label_obs_output_audio_source->hide();
 		ui->cb_obs_output_audio_source->hide();
+		ui->cb_obs_output_audio_source->clear();
+		ui->w_audio->hide();
 		blog(LOG_DEBUG, "Hide Audio");
 		break;
 	case pairs::Media:
 		ui->label_obs_output_media_source->hide();
 		ui->cb_obs_output_media_source->hide();
+		ui->cb_obs_output_media_source->clear();
+		ui->w_media->hide();
 		blog(LOG_DEBUG, "Hide Media");
 		break;
 	}
@@ -448,7 +449,7 @@ void PluginWindow::HideAllPairs()
 void PluginWindow::ResetToDefaults()
 {
 	ui->cb_obs_output_action->setCurrentIndex(0);
-	ui->cb_obs_action->setCurrentIndex(0);
+	ui->cb_obs_action_filter->setCurrentIndex(0);
 	ui->cb_obs_output_transition->setCurrentIndex(0);
 	ui->cb_obs_output_filter->setCurrentIndex(0);
 	ui->cb_obs_output_scene->setCurrentIndex(0);
@@ -460,59 +461,6 @@ void PluginWindow::get_transitions()
 {
 	ui->cb_obs_output_transition->clear();
 	ui->cb_obs_output_transition->addItems(Utils::GetTransitionsList());
-}
-void PluginWindow::ShowPair(QString Pair)
-{
-	if (Pair == "scene") {
-		ui->label_obs_output_scene->show();
-		ui->cb_obs_output_scene->show();
-		get_scenes();
-	} else if (Pair == "source") {
-		ui->label_obs_output_source->show();
-		ui->cb_obs_output_source->show();
-		get_sources(ui->cb_obs_output_scene->currentText());
-	} else if (Pair == "filter") {
-		ui->label_obs_output_filter->show();
-		ui->cb_obs_output_filter->show();
-		get_filters(ui->cb_obs_output_source->currentText());
-	} else if (Pair == "transition") {
-		ui->label_obs_output_transition->show();
-		ui->cb_obs_output_transition->show();
-	} else if (Pair == "item") {
-		ui->label_obs_output_item->show();
-		ui->cb_obs_output_item->show();
-	} else if (Pair == "audio_source") {
-		ui->label_obs_output_audio_source->show();
-		ui->cb_obs_output_audio_source->show();
-	} else if (Pair == "media_source") {
-		ui->label_obs_output_media_source->show();
-		ui->cb_obs_output_media_source->show();
-	}
-}
-void PluginWindow::HidePair(QString Pair)
-{
-	if (Pair == "scene") {
-		ui->label_obs_output_scene->hide();
-		ui->cb_obs_output_scene->hide();
-	} else if (Pair == "source") {
-		ui->label_obs_output_source->hide();
-		ui->cb_obs_output_source->hide();
-	} else if (Pair == "filter") {
-		ui->label_obs_output_filter->hide();
-		ui->cb_obs_output_filter->hide();
-	} else if (Pair == "transition") {
-		ui->label_obs_output_transition->hide();
-		ui->cb_obs_output_transition->hide();
-	} else if (Pair == "item") {
-		ui->label_obs_output_item->hide();
-		ui->cb_obs_output_item->hide();
-	} else if (Pair == "audio_source") {
-		ui->label_obs_output_audio_source->hide();
-		ui->cb_obs_output_audio_source->hide();
-	} else if (Pair == "media_source") {
-		ui->label_obs_output_media_source->hide();
-		ui->cb_obs_output_media_source->hide();
-	}
 }
 QStringList PluginWindow::TranslateActions()
 {
@@ -526,7 +474,6 @@ QStringList PluginWindow::TranslateActions()
 	return temp;
 
 }
-void PluginWindow::ShowIntActions() {}
 void PluginWindow::on_source_change(QString source)
 {
 	
@@ -541,29 +488,28 @@ void PluginWindow::on_scene_change(QString scene)
 	ui->cb_obs_output_item->clear();
 	ui->cb_obs_output_item->addItems(Utils::GetSceneItemsList(scene));
 }
-void PluginWindow::ShowStringActions() {}
-void PluginWindow::ShowBoolActions() {}
+
 void PluginWindow::ShowOnly(QList<Actions> shows)
 {
 	
-	ui->cb_obs_action->clear();
+	ui->cb_obs_output_action->clear();
 	for (int i = 0; i < shows.size(); i++) {
-		ui->cb_obs_action->addItem(Utils::action_to_string(shows.at(i)));
+		ui->cb_obs_output_action->addItem(obs_module_text(Utils::action_to_string(shows.at(i)).toStdString().c_str()));
 	}
 	
 }
 
 void PluginWindow::ShowEntry(Actions Entry)
 {
-	if (ui->cb_obs_action->findText(Utils::action_to_string(Entry)) < 0) {
-		ui->cb_obs_action->addItem(Utils::action_to_string(Entry));
+	if (ui->cb_obs_output_action->findText(Utils::action_to_string(Entry)) ==-1) {
+		ui->cb_obs_output_action->addItem(obs_module_text(Utils::action_to_string(Entry).toStdString().c_str()));
 	}
 	
 }
 void PluginWindow::HideEntry(Actions Entry)
 {
-	if (ui->cb_obs_action->findText(Utils::action_to_string(Entry)) > 0) {
-		ui->cb_obs_action->removeItem(ui->cb_obs_action->findText(
+	if (ui->cb_obs_output_action->findText(Utils::action_to_string(Entry)) > 0) {
+		ui->cb_obs_output_action->removeItem(ui->cb_obs_output_action->findText(
 			Utils::action_to_string(Entry)));
 	}
 }
@@ -703,165 +649,116 @@ void PluginWindow::obs_actions_filter_select(int selection)
 
 		break;
 	};
-	ui->cb_obs_output_action->setCurrentIndex(0);
 	switching = false;
+	ui->cb_obs_output_action->setCurrentIndex(0);
 }
 
-void PluginWindow::edit_action(obs_data_t *actions)
-{
-	if (QString(obs_data_get_string(actions, "Type")) == QString("OBS")) {
-		ui->cb_obs_output_action->setCurrentText(
-			tr(obs_data_get_string(actions, "action")));
-		ui->cb_obs_output_scene->setCurrentText(
-			QString(obs_data_get_string(actions, "scene")));
-		ui->cb_obs_output_audio_source->setCurrentText(
-			QString(obs_data_get_string(actions, "audio_source")));
-		blog(1, "edit_action-- widget -- %s",
-		     obs_data_get_string(actions, "action"));
-	}
-}
-void PluginWindow::onChange(QString change)
-{
-	
-	obs_data_t *data = obs_data_create();
-	obs_data_set_string(data, "action",
-			    ui->cb_obs_output_action->currentText().toStdString().c_str());
-	obs_data_set_string(
-		data, "scene",
-		ui->cb_obs_output_scene->currentText().toStdString().c_str());
-	obs_data_set_string(
-		data, "source",
-		ui->cb_obs_output_source->currentText().toStdString().c_str());
-	obs_data_set_string(
-		data, "filter",
-		ui->cb_obs_output_filter->currentText().toStdString().c_str());
-	obs_data_set_string(data, "transition",
-			    ui->cb_obs_output_transition->currentText()
-				    .toStdString()
-				    .c_str());
-	obs_data_set_string(
-		data, "item",
-		ui->cb_obs_output_item->currentText().toStdString().c_str());
-	obs_data_set_string(data, "audio_source",
-			    ui->cb_obs_output_audio_source->currentText()
-				    .toStdString()
-				    .c_str());
-	obs_data_set_string(data, "media_source",
-			    ui->cb_obs_output_media_source->currentText()
-				    .toStdString()
-				    .c_str());
-	obs_data_set_string(data, "Type", "OBS");
-	emit(changed(data));
-	//obs_data_release(data);
-}
 
 void PluginWindow::obs_actions_select(QString action)
 {
-	HidePair("extra_1");
-	HidePair("transition");
-	HidePair("audio_source");
-	HidePair("media_source");
-	HidePair("filter");
-	HidePair("scene");
-	HidePair("source");
-	HidePair("item");
-	
-	switch (Utils::string_to_action(action)) {
+	if (!switching) {
+		HideAllPairs();
+
+		switch (Utils::string_to_action(untranslate(action))) {
 		case Actions::Set_Current_Scene:
-			ShowPair("scene");
+			ShowPair(pairs::Scene);
 			break;
 		case Actions::Enable_Source_Filter:
-			ShowPair("scene");
-			ShowPair("source");
-			ShowPair("filter");
+			ShowPair(pairs::Scene);
+			ShowPair(pairs::Source);
+			ShowPair(pairs::Filter);
 			break;
 		case Actions::Disable_Source_Filter:
-			ShowPair("scene");
-			ShowPair("source");
-			ShowPair("filter");
+			ShowPair(pairs::Scene);
+			ShowPair(pairs::Source);
+			ShowPair(pairs::Filter);
 			break;
 		case Actions::Set_Gain_Filter:
-			ShowPair("scene");
-			ShowPair("source");
-			ShowPair("filter");
+			ShowPair(pairs::Scene);
+			ShowPair(pairs::Source);
+			ShowPair(pairs::Filter);
 			break;
 		case Actions::Toggle_Source_Filter:
-			ShowPair("scene");
-			ShowPair("source");
-			ShowPair("filter");
+			ShowPair(pairs::Scene);
+			ShowPair(pairs::Source);
+			ShowPair(pairs::Filter);
 			break;
 		case Actions::Reset_Scene_Item:
-			ShowPair("scene");
-			ShowPair("source");
-			ShowPair("item");
+			ShowPair(pairs::Scene);
+			ShowPair(pairs::Source);
+			ShowPair(pairs::Item);
 			break;
 		case Actions::Set_Scene_Item_Render:
-			ShowPair("scene");
-			ShowPair("source");
-			ShowPair("item");
+			ShowPair(pairs::Scene);
+			ShowPair(pairs::Source);
+			ShowPair(pairs::Item);
 			break;
 		case Actions::Set_Scene_Item_Position:
-			ShowPair("scene");
-			ShowPair("item");
+			ShowPair(pairs::Scene);
+			ShowPair(pairs::Item);
 			break;
 		case Actions::Set_Scene_Item_Transform:
-			ShowPair("scene");
-			ShowPair("item");
+			ShowPair(pairs::Scene);
+			ShowPair(pairs::Item);
 			break;
 		case Actions::Set_Scene_Item_Crop:
-			ShowPair("scene");
-			ShowPair("item");
+			ShowPair(pairs::Scene);
+			ShowPair(pairs::Item);
 			break;
 		case Actions::Set_Scene_Transition_Override:
-			ShowPair("scene");
-			ShowPair("transition");
+			ShowPair(pairs::Scene);
+			ShowPair(pairs::Transition);
 			break;
 		case Actions::Set_Current_Transition:
-			ShowPair("transition");
+			ShowPair(pairs::Transition);
 			break;
 		case Actions::Set_Volume:
-			ShowPair("audio_source");
+			ShowPair(pairs::Audio);
 			break;
 		case Actions::Set_Mute:
-			ShowPair("audio_source");
+			ShowPair(pairs::Audio);
 			break;
 		case Actions::Toggle_Mute:
-			ShowPair("audio_source");
+			ShowPair(pairs::Audio);
 			break;
 		case Actions::Set_Source_Filter_Visibility:
-			ShowPair("source");
-			ShowPair("filter");
+			ShowPair(pairs::Source);
+			ShowPair(pairs::Filter);
 			break;
 		case Actions::Take_Source_Screenshot:
-			ShowPair("source");
-			ShowPair("scene");
+			ShowPair(pairs::Source);
+			ShowPair(pairs::Scene);
 			break;
 		case Actions::Play_Pause_Media:
-			ShowPair("media_source");
+			ShowPair(pairs::Media);
 			break;
 		case Actions::Restart_Media:
-			ShowPair("media_source");
+			ShowPair(pairs::Media);
 			break;
 		case Actions::Stop_Media:
-			ShowPair("media_source");
+			ShowPair(pairs::Media);
 			break;
 		case Actions::Next_Media:
-			ShowPair("media_source");
+			ShowPair(pairs::Media);
 			break;
 		case Actions::Previous_Media:
-			ShowPair("media_source");
+			ShowPair(pairs::Media);
 			break;
 		case Actions::Set_Media_Time:
-			ShowPair("media_source");
+			ShowPair(pairs::Media);
 			break;
 		case Actions::Scrub_Media:
-			ShowPair("media_source");
+			ShowPair(pairs::Media);
 			break;
+		default:
+			HideAllPairs();
+			break;
+		}
 	}
 	
 }
 QString PluginWindow::untranslate(QString tstring)
 {
 	
-	return Utils::action_to_string(static_cast<Actions>(TranslateActions().indexOf(tstring)));
+	return Utils::action_to_string(AllActions_raw.at(TranslateActions().indexOf(tstring)));
 }

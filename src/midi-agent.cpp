@@ -368,11 +368,10 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 	}
 
 	/*************Get Message parts***********/
-	auto mType = Utils::mtype_to_string(message.get_message_type());
+	QString mType = Utils::mtype_to_string(message.get_message_type());
 	int channelnel = message.get_channel();
-	auto byt = message.bytes;
-	auto norc = Utils::get_midi_note_or_control(message);
-	auto value = Utils::get_midi_value(message);
+	int norc = Utils::get_midi_note_or_control(message);
+	int value = Utils::get_midi_value(message);
 	self->sending = true;
 	/***** Send Messages to emit function *****/
 	

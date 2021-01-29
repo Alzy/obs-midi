@@ -81,31 +81,35 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 	//connect all combos to on change
 	connect(ui->cb_obs_output_action, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(onChange()));
+		this, SLOT(onChange(QString)));
 	connect(ui->cb_obs_output_source, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(onChange()));
+		this, SLOT(onChange(QString)));
+
+	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
+		this, SLOT(onChange(QString)));
+	connect(ui->cb_obs_output_item, SIGNAL(currentTextChanged(QString)),
+		this, SLOT(onChange(QString)));
+	connect(ui->cb_obs_output_filter, SIGNAL(currentTextChanged(QString)),
+		this, SLOT(onChange(QString)));
+	connect(ui->cb_obs_output_transition,
+		SIGNAL(currentTextChanged(QString)), this,
+		SLOT(onChange(QString)));
+	connect(ui->cb_obs_output_audio_source,
+		SIGNAL(currentTextChanged(QString)), this,
+		SLOT(onChange(QString)));
+	connect(ui->cb_obs_output_media_source,
+		SIGNAL(currentTextChanged(QString)), this, SLOT(onChange(QString)));
+
 	connect(ui->cb_obs_output_source, SIGNAL(currentTextChanged(QString)),
 		this, SLOT(on_source_change(QString)));
 	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
 		this, SLOT(on_scene_change(QString)));
-	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(onChange()));
-	connect(ui->cb_obs_output_item, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(onChange()));
-	connect(ui->cb_obs_output_filter, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(onChange()));
-	connect(ui->cb_obs_output_transition,
-		SIGNAL(currentTextChanged(QString)), this, SLOT(onChange()));
-	connect(ui->cb_obs_output_audio_source,
-		SIGNAL(currentTextChanged(QString)), this, SLOT(onChange()));
-	connect(ui->cb_obs_output_media_source,
-		SIGNAL(currentTextChanged(QString)), this, SLOT(onChange()));
 
 	/**************Connections to mappper****************/
 
 	this->listview = new QListView(this->ui->cb_obs_output_action);
 	this->ui->cb_obs_output_action->setView(this->listview);
-	this->ui->cb_obs_output_action->addItems(AllActions);
+	this->ui->cb_obs_output_action->addItems(TranslateActions());
 	this->listview->setSizeAdjustPolicy(
 		QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents);
 	ui->cb_obs_output_action->setSizeAdjustPolicy(
@@ -452,38 +456,34 @@ void PluginWindow::ResetToDefaults()
 	ui->cb_obs_output_audio_source->setCurrentIndex(0);
 	ui->cb_obs_output_media_source->setCurrentIndex(0);
 }
-QStringList PluginWindow::GetTransitions()
+void PluginWindow::get_transitions()
 {
-	return Utils::GetTransitionsList();
+	ui->cb_obs_output_transition->clear();
+	ui->cb_obs_output_transition->addItems(Utils::GetTransitionsList());
 }
 void PluginWindow::ShowPair(QString Pair)
 {
 	if (Pair == "scene") {
 		ui->label_obs_output_scene->show();
 		ui->cb_obs_output_scene->show();
-		ui->cb_obs_output_scene->addItems(GetScenes());
+		get_scenes();
 	} else if (Pair == "source") {
 		ui->label_obs_output_source->show();
 		ui->cb_obs_output_source->show();
-		ui->cb_obs_output_source->addItems(
-			GetSources(ui->cb_obs_output_scene->currentText()));
+		get_sources(ui->cb_obs_output_scene->currentText());
 	} else if (Pair == "filter") {
 		ui->label_obs_output_filter->show();
 		ui->cb_obs_output_filter->show();
-		ui->cb_obs_output_filter->addItems(
-			GetFilters(ui->cb_obs_output_source->currentText()));
+		get_filters(ui->cb_obs_output_source->currentText());
 	} else if (Pair == "transition") {
 		ui->label_obs_output_transition->show();
 		ui->cb_obs_output_transition->show();
-
 	} else if (Pair == "item") {
 		ui->label_obs_output_item->show();
 		ui->cb_obs_output_item->show();
-
 	} else if (Pair == "audio_source") {
 		ui->label_obs_output_audio_source->show();
 		ui->cb_obs_output_audio_source->show();
-
 	} else if (Pair == "media_source") {
 		ui->label_obs_output_media_source->show();
 		ui->cb_obs_output_media_source->show();
@@ -514,31 +514,36 @@ void PluginWindow::HidePair(QString Pair)
 		ui->cb_obs_output_media_source->hide();
 	}
 }
-void PluginWindow::TranslateActions()
+QStringList PluginWindow::TranslateActions()
 {
+	QStringList temp;
 	for (int i = 0; i < AllActions_raw.size(); i++) {
-		AllActions.append(obs_module_text(
-			AllActions_raw.at(i).toStdString().c_str()));
+		temp.append(obs_module_text(
+			Utils::action_to_string(AllActions_raw.at(i))
+				.toStdString()
+				.c_str()));
 	}
+	return temp;
+
 }
 void PluginWindow::ShowIntActions() {}
 void PluginWindow::on_source_change(QString source)
 {
-	ui->cb_obs_output_filter->clear();
-	ui->cb_obs_output_filter->addItems(GetFilters(source));
+	
+	get_filters(source);
 	ui->cb_obs_output_item->clear();
 	ui->cb_obs_output_item->addItems(Utils::GetSceneItemsList(source));
 }
 void PluginWindow::on_scene_change(QString scene)
 {
-	ui->cb_obs_output_source->clear();
-	ui->cb_obs_output_source->addItems(GetSources(scene));
+	
+	get_sources(scene);
 	ui->cb_obs_output_item->clear();
 	ui->cb_obs_output_item->addItems(Utils::GetSceneItemsList(scene));
 }
 void PluginWindow::ShowStringActions() {}
 void PluginWindow::ShowBoolActions() {}
-void PluginWindow::ShowOnly(QStringList shows)
+void PluginWindow::ShowOnly(QList<Actions> shows)
 {
 	int count = AllActions.count();
 	for (int i = 0; i < count; i++) {
@@ -554,26 +559,26 @@ QString PluginWindow::FirstVisible()
 	int count = AllActions.count();
 	for (int i = 0; i < count; i++) {
 		if (!listview->isRowHidden(i)) {
-			return AllActions.at(i);
+			return Utils::action_to_string(static_cast<Actions>(i));
 		}
 	}
 }
-void PluginWindow::ShowEntry(QString Entry)
+void PluginWindow::ShowEntry(Actions Entry)
 {
 	int x = AllActions.indexOf(Entry);
 	if (x == -1) {
-		blog(1, "no entry -- %s", Entry.toStdString().c_str());
+		
 	} else {
 		listview->setRowHidden(x, false);
 		listview->adjustSize();
 		ui->cb_obs_output_action->adjustSize();
 	}
 }
-void PluginWindow::HideEntry(QString Entry)
+void PluginWindow::HideEntry(Actions Entry)
 {
 	int x = AllActions.indexOf(Entry);
 	if (x == -1) {
-		blog(1, "no entry -- %s", Entry.toStdString().c_str());
+		
 	} else {
 		listview->setRowHidden(x, true);
 		listview->adjustSize();
@@ -587,7 +592,7 @@ void PluginWindow::ShowAllActions()
 		ShowEntry(AllActions.at(i));
 	}
 }
-void PluginWindow::HideEntries(QStringList entrys)
+void PluginWindow::HideEntries(QList<Actions> entrys)
 {
 	int count = ui->cb_obs_output_action->count();
 
@@ -598,7 +603,7 @@ void PluginWindow::HideEntries(QStringList entrys)
 	}
 	listview->adjustSize();
 }
-void PluginWindow::ShowEntries(QStringList entrys)
+void PluginWindow::ShowEntries(QList<Actions> entrys)
 {
 	int count = ui->cb_obs_output_action->count();
 
@@ -633,54 +638,49 @@ void PluginWindow::HideAdvancedActions()
 	HideEntries(AdvancedSceneActions);
 	HideEntries(AdvancedSourceActions);
 }
-QStringList PluginWindow::GetSources(QString scene)
+void PluginWindow::get_sources(QString scene)
 {
 
-	SL_sources.clear();
 	ui->cb_obs_output_source->clear();
 	auto arrayref = Utils::GetSceneArray(scene);
 	int size = obs_data_array_count(arrayref);
 	for (int i = 0; i < size; i++) {
 		obs_data *item = obs_data_array_item(arrayref, i);
 
-		SL_sources.append(QString(obs_data_get_string(item, "name")));
+		ui->cb_obs_output_source->addItem(
+			QString(obs_data_get_string(item, "name")));
 		obs_data_release(item);
 	}
-	SL_sources.sort();
-	if (!switching) {
-		ui->cb_obs_output_source->addItems(SL_sources);
-	}
 	obs_data_array_release(arrayref);
-	return SL_sources;
+	
 }
-QStringList PluginWindow::GetScenes()
+void PluginWindow::get_scenes()
 {
+	ui->cb_obs_output_scene->clear();
 	obs_data_array *x = Utils::GetScenes();
 	int cnt = obs_data_array_count(x);
 	for (int i = 0; i <= cnt; i++) {
-		auto it = obs_data_array_item(x, i);
-		SL_scenes.append(obs_data_get_string(it, "name"));
+		auto it = obs_data_array_item(x, i);		
+		ui->cb_obs_output_scene->addItem(
+			obs_data_get_string(it, "name"));
 		obs_data_release(it);
 	}
+	
 	obs_data_array_release(x);
-	return SL_scenes;
 }
-QStringList PluginWindow::GetFilters(QString source)
+void PluginWindow::get_filters(QString source)
 {
 
 	ui->cb_obs_output_filter->clear();
-	SL_filters.clear();
 
 	auto x = obs_get_source_by_name(source.toStdString().c_str());
 	OBSDataArrayAutoRelease y = Utils::GetSourceFiltersList(x, false);
 	for (int i = 0; i < obs_data_array_count(y); i++) {
 		OBSDataAutoRelease z = obs_data_array_item(y, i);
-		SL_filters.append(QString(obs_data_get_string(z, "name")));
+		ui->cb_obs_output_filter->addItem(QString(obs_data_get_string(z, "name")));
 	}
-	if (!switching) {
-		ui->cb_obs_output_filter->addItems(SL_filters);
-	}
-	return SL_filters;
+	
+	
 }
 void PluginWindow::check_advanced_switch(bool state)
 {
@@ -721,7 +721,7 @@ void PluginWindow::obs_actions_filter_select(int selection)
 
 		break;
 	};
-	ui->cb_obs_output_action->setCurrentText(FirstVisible());
+	ui->cb_obs_output_action->setCurrentIndex(0);
 	switching = false;
 }
 
@@ -738,16 +738,12 @@ void PluginWindow::edit_action(obs_data_t *actions)
 		     obs_data_get_string(actions, "action"));
 	}
 }
-void PluginWindow::onChange()
+void PluginWindow::onChange(QString change)
 {
+	
 	obs_data_t *data = obs_data_create();
-	obs_data_set_string(
-		data, "action",
-		AllActions_raw
-			.at(AllActions.indexOf(
-				ui->cb_obs_output_action->currentText()))
-			.toStdString()
-			.c_str());
+	obs_data_set_string(data, "action",
+			    ui->cb_obs_output_action->currentText().toStdString().c_str());
 	obs_data_set_string(
 		data, "scene",
 		ui->cb_obs_output_scene->currentText().toStdString().c_str());
@@ -787,151 +783,103 @@ void PluginWindow::obs_actions_select(QString action)
 	HidePair("scene");
 	HidePair("source");
 	HidePair("item");
-	std::map<QString, std::function<void(PluginWindow * here)>> funcMap = {
-		{"control.action.Set_Current_Scene",
-		 [](PluginWindow *here) { here->ShowPair("scene"); }},
-		{"control.action.Start_Streaming",
-		 [](PluginWindow *here) {
-
-		 }},
-		{"control.action.Stop_Streaming",
-		 [](PluginWindow *here) {}},
-		{"control.action.Toggle_Start_Stop_Streaming",
-		 [](PluginWindow *here) {}},
-		{"control.action.Start_Recording",
-		 [](PluginWindow *here) {}},
-		{"control.action.Stop_Recording",
-		 [](PluginWindow *here) {}},
-		{"control.action.Pause_Recording",
-		 [](PluginWindow *here) {}},
-		{"control.action.Unpause_Recording",
-		 [](PluginWindow *here) {}},
-		{"control.action.Start_Replay_Buffer",
-		 [](PluginWindow *here) {}},
-		{"control.action.Stop_Replay_Buffer",
-		 [](PluginWindow *here) {}},
-		{"control.action.Enable_Preview",
-		 [](PluginWindow *here) {}},
-		{"control.action.Disable_Preview",
-		 [](PluginWindow *here) {}},
-		{"control.action.Studio_Mode", [](PluginWindow *here) {}},
-		{"control.action.Transition", [](PluginWindow *here) {}},
-		{"control.action.Reset_Stats", [](PluginWindow *here) {}},
-		//source
-		{"control.action.Enable_Source_Filter",
-		 [](PluginWindow *here) {
-			 here->ShowPair("scene");
-			 here->ShowPair("source");
-			 here->ShowPair("filter");
-		 }},
-		{"control.action.Disable_Source_Filter",
-		 [](PluginWindow *here) {
-			 here->ShowPair("scene");
-			 here->ShowPair("source");
-			 here->ShowPair("filter");
-		 }},
-		{"control.action.Set_Gain_Filter",
-		 [](PluginWindow *here) {
-			 here->ShowPair("scene");
-			 here->ShowPair("source");
-			 here->ShowPair("filter");
-		 }},
-		{"control.action.Toggle_Source_Filter",
-		 [](PluginWindow *here) {
-			 here->ShowPair("scene");
-			 here->ShowPair("source");
-			 here->ShowPair("filter");
-		 }},
-		{"control.action.Reset_Scene_Item",
-		 [](PluginWindow *here) {
-			 here->ShowPair("source");
-
-			 here->ShowPair("scene");
-			 here->ShowPair("item");
-		 }},
-		{"control.action.Set_Scene_Item_Render",
-		 [](PluginWindow *here) {
-			 here->ShowPair("source");
-			 here->ShowPair("scene");
-			 here->ShowPair("item");
-		 }},
-		{"control.action.Set_Scene_Item_Position",
-		 [](PluginWindow *here) {
-			 here->ShowPair("scene");
-			 here->ShowPair("item");
-		 }},
-		{"control.action.Set_Scene_Item_Transform",
-		 [](PluginWindow *here) {
-			 here->ShowPair("scene");
-			 here->ShowPair("item");
-		 }},
-		{"control.action.Set_Scene_Item_Crop",
-		 [](PluginWindow *here) {
-			 here->ShowPair("scene");
-			 here->ShowPair("item");
-		 }},
-		{"control.action.Set_Current_Scene",
-		 [](PluginWindow *here) { here->ShowPair("scene"); }},
-		{"control.action.Set_Scene_Transition_Override",
-		 [](PluginWindow *here) {
-			 here->ShowPair("scene");
-			 here->ShowPair("transition");
-		 }},
-		{"control.action.Set_Current_Transition",
-		 [](PluginWindow *here) { here->ShowPair("transition"); }},
-		{"control.action.Set_Volume",
-		 [](PluginWindow *here) {
-			 here->ShowPair("audio_source");
-		 }},
-		{"control.action.Set_Mute",
-		 [](PluginWindow *here) {
-			 here->ShowPair("audio_source");
-		 }},
-		{"control.action.Toggle_Mute",
-		 [](PluginWindow *here) {
-			 here->ShowPair("audio_source");
-		 }},
-		{"control.action.Set_Source_Name",
-		 [](PluginWindow *here) {}},
-		{"control.action.Set_Sync_Offset",
-		 [](PluginWindow *here) {}},
-		{"control.action.Set_Source_Settings",
-		 [](PluginWindow *here) {}},
-		{"control.action.Set_Source_Filter_Visibility",
-		 [](PluginWindow *here) {
-			 here->ShowPair("source");
-			 here->ShowPair("filter");
-		 }},
-		{"control.action.Set_Audio_Monitor_Type",
-		 [](PluginWindow *here) {}},
-		{"control.action.Take_Source_Screenshot",
-		 [](PluginWindow *here) {
-			 here->ShowPair("source");
-			 here->ShowPair("scene");
-		 }},
-		{"control.action.Play_Pause_Media",
-		 [](PluginWindow *here) { here->ShowPair("media_source"); }},
-		{"control.action.Restart_Media",
-		 [](PluginWindow *here) { here->ShowPair("media_source"); }},
-		{"control.action.Stop_Media",
-		 [](PluginWindow *here) { here->ShowPair("media_source"); }},
-		{"control.action.Next_Media",
-		 [](PluginWindow *here) { here->ShowPair("media_source"); }},
-		{"control.action.Previous_Media",
-		 [](PluginWindow *here) { here->ShowPair("media_source"); }},
-		{"control.action.Set_Media_Time",
-		 [](PluginWindow *here) { here->ShowPair("media_source"); }},
-		{"control.action.Scrub_Media",
-		 [](PluginWindow *here) { here->ShowPair("media_source"); }}
-
-	};
-	try {
-		funcMap[untranslate(action)](this);
-	} catch (std::exception &e) {
-		blog(LOG_DEBUG, "error %s", e.what());
+	
+	switch (Utils::string_to_action(action)) {
+		case Actions::Set_Current_Scene:
+			ShowPair("scene");
+			break;
+		case Actions::Enable_Source_Filter:
+			ShowPair("scene");
+			ShowPair("source");
+			ShowPair("filter");
+			break;
+		case Actions::Disable_Source_Filter:
+			ShowPair("scene");
+			ShowPair("source");
+			ShowPair("filter");
+			break;
+		case Actions::Set_Gain_Filter:
+			ShowPair("scene");
+			ShowPair("source");
+			ShowPair("filter");
+			break;
+		case Actions::Toggle_Source_Filter:
+			ShowPair("scene");
+			ShowPair("source");
+			ShowPair("filter");
+			break;
+		case Actions::Reset_Scene_Item:
+			ShowPair("scene");
+			ShowPair("source");
+			ShowPair("item");
+			break;
+		case Actions::Set_Scene_Item_Render:
+			ShowPair("scene");
+			ShowPair("source");
+			ShowPair("item");
+			break;
+		case Actions::Set_Scene_Item_Position:
+			ShowPair("scene");
+			ShowPair("item");
+			break;
+		case Actions::Set_Scene_Item_Transform:
+			ShowPair("scene");
+			ShowPair("item");
+			break;
+		case Actions::Set_Scene_Item_Crop:
+			ShowPair("scene");
+			ShowPair("item");
+			break;
+		case Actions::Set_Scene_Transition_Override:
+			ShowPair("scene");
+			ShowPair("transition");
+			break;
+		case Actions::Set_Current_Transition:
+			ShowPair("transition");
+			break;
+		case Actions::Set_Volume:
+			ShowPair("audio_source");
+			break;
+		case Actions::Set_Mute:
+			ShowPair("audio_source");
+			break;
+		case Actions::Toggle_Mute:
+			ShowPair("audio_source");
+			break;
+		case Actions::Set_Source_Filter_Visibility:
+			ShowPair("source");
+			ShowPair("filter");
+			break;
+		case Actions::Take_Source_Screenshot:
+			ShowPair("source");
+			ShowPair("scene");
+			break;
+		case Actions::Play_Pause_Media:
+			ShowPair("media_source");
+			break;
+		case Actions::Restart_Media:
+			ShowPair("media_source");
+			break;
+		case Actions::Stop_Media:
+			ShowPair("media_source");
+			break;
+		case Actions::Next_Media:
+			ShowPair("media_source");
+			break;
+		case Actions::Previous_Media:
+			ShowPair("media_source");
+			break;
+		case Actions::Set_Media_Time:
+			ShowPair("media_source");
+			break;
+		case Actions::Scrub_Media:
+			ShowPair("media_source");
+			break;
 	}
+	
 }
 QString PluginWindow::untranslate(QString tstring)
 {
-	return AllActions_raw.at(AllActions.indexOf(tstring));
+	
+	return Utils::action_to_string(static_cast<Actions>(TranslateActions().indexOf(tstring)));
 }

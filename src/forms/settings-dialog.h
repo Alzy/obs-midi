@@ -51,12 +51,12 @@ public slots:
 	
 	void on_source_change(QString source);
 	void on_scene_change(QString source);
-	bool MapCall(QString plugin, obs_data_t *map);
 	void get_sources(QString scene);
 	void obs_actions_filter_select(int);
 	void get_filters(QString Source);
 	void get_transitions();
 	void get_scenes();
+	void add_new_mapping();
 	
 
 private:
@@ -78,11 +78,11 @@ private:
 
 	
 private:
+	
 	QGridLayout *layout;
 	QStringList *items;
 	QString sceneName;
 	bool switching = false;
-	bool DoMap(obs_data_t *map);
 	QStringList TranslateActions();
 	void ShowOnly(QList<Actions> shows);
 	void ShowEntry(Actions Entry);

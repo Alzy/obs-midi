@@ -80,7 +80,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 		this, SLOT(on_scene_change(QString)));
 
 	/**************Connections to mappper****************/
-
+	connect(ui->btn_add, SIGNAL(clicked()), this, SLOT(add_new_mapping()));
 
 	this->ui->cb_obs_output_action->addItems(TranslateActions());
 
@@ -543,22 +543,8 @@ void PluginWindow::ShowEntries(QList<Actions> entrys)
 	listview->adjustSize();
 }
 
-bool PluginWindow::MapCall(QString plugin, obs_data_t *map)
-{
-	if (plugin == "OBS") {
-		return DoMap(map);
-	} else {
-		return false;
-	}
-}
-bool PluginWindow::DoMap(obs_data_t *map)
-{
-	//make map into data array
-	//pull action from data array
-	//map action based on actionsMap
 
-	return false;
-}
+
 void PluginWindow::HideAdvancedActions()
 {
 	HideEntries(AdvancedFilterActions);
@@ -761,4 +747,49 @@ QString PluginWindow::untranslate(QString tstring)
 {
 	
 	return Utils::action_to_string(AllActions_raw.at(TranslateActions().indexOf(tstring)));
+}
+
+void PluginWindow::add_new_mapping() {
+
+	int row = ui->table_mapping->rowCount();
+	ui->table_mapping->insertRow(row);
+	
+	QTableWidgetItem *channelitem =
+		new QTableWidgetItem(QString::number(ui->sb_channel->value()));
+	QTableWidgetItem *mtypeitem =
+		new QTableWidgetItem(ui->cb_mtype->currentText());
+	QTableWidgetItem *norcitem =
+		new QTableWidgetItem(QString::number(ui->sb_norc->value()));
+	QTableWidgetItem *actionitem =
+		new QTableWidgetItem(ui->cb_obs_output_action->currentText());
+	QTableWidgetItem *sceneitem =
+		new QTableWidgetItem(ui->cb_obs_output_scene->currentText());
+	QTableWidgetItem *sourceitem =
+		new QTableWidgetItem(ui->cb_obs_output_source->currentText());
+	QTableWidgetItem *filteritem =
+		new QTableWidgetItem(ui->cb_obs_output_filter->currentText());
+	QTableWidgetItem *transitionitem =
+		new QTableWidgetItem(ui->cb_obs_output_transition->currentText());
+	QTableWidgetItem *itemitem =
+		new QTableWidgetItem(ui->cb_obs_output_item->currentText());
+	QTableWidgetItem *audioitem =
+		new QTableWidgetItem(ui->cb_obs_output_audio_source->currentText());
+	QTableWidgetItem *mediaitem =
+		new QTableWidgetItem(ui->cb_obs_output_media_source->currentText());
+
+
+
+
+
+	ui->table_mapping->setItem(row, 0, channelitem);
+	ui->table_mapping->setItem(row, 1, mtypeitem);
+	ui->table_mapping->setItem(row, 2, norcitem);
+	ui->table_mapping->setItem(row, 3, actionitem);
+	ui->table_mapping->setItem(row, 4, sceneitem);
+	ui->table_mapping->setItem(row, 5, sourceitem);
+	ui->table_mapping->setItem(row, 6, filteritem);
+	ui->table_mapping->setItem(row, 7, transitionitem);
+	ui->table_mapping->setItem(row, 8, itemitem);
+	ui->table_mapping->setItem(row, 9, audioitem);
+	ui->table_mapping->setItem(row, 10, mediaitem);
 }

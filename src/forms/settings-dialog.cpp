@@ -545,51 +545,33 @@ void PluginWindow::ShowStringActions() {}
 void PluginWindow::ShowBoolActions() {}
 void PluginWindow::ShowOnly(QList<Actions> shows)
 {
-	int count = AllActions.count();
-	for (int i = 0; i < count; i++) {
-		if (shows.contains(AllActions.at(i))) {
-			ShowEntry(AllActions.at(i));
-		} else {
-			HideEntry(AllActions.at(i));
-		}
+	
+	ui->cb_obs_action->clear();
+	for (int i = 0; i < shows.size(); i++) {
+		ui->cb_obs_action->addItem(Utils::action_to_string(shows.at(i)));
 	}
+	
 }
-QString PluginWindow::FirstVisible()
-{
-	int count = AllActions.count();
-	for (int i = 0; i < count; i++) {
-		if (!listview->isRowHidden(i)) {
-			return Utils::action_to_string(static_cast<Actions>(i));
-		}
-	}
-}
+
 void PluginWindow::ShowEntry(Actions Entry)
 {
-	int x = AllActions.indexOf(Entry);
-	if (x == -1) {
-		
-	} else {
-		listview->setRowHidden(x, false);
-		listview->adjustSize();
-		ui->cb_obs_output_action->adjustSize();
+	if (ui->cb_obs_action->findText(Utils::action_to_string(Entry)) < 0) {
+		ui->cb_obs_action->addItem(Utils::action_to_string(Entry));
 	}
+	
 }
 void PluginWindow::HideEntry(Actions Entry)
 {
-	int x = AllActions.indexOf(Entry);
-	if (x == -1) {
-		
-	} else {
-		listview->setRowHidden(x, true);
-		listview->adjustSize();
-		ui->cb_obs_output_action->adjustSize();
+	if (ui->cb_obs_action->findText(Utils::action_to_string(Entry)) > 0) {
+		ui->cb_obs_action->removeItem(ui->cb_obs_action->findText(
+			Utils::action_to_string(Entry)));
 	}
 }
 void PluginWindow::ShowAllActions()
 {
 	int count = ui->cb_obs_output_action->count();
 	for (int i = 0; i < count; i++) {
-		ShowEntry(AllActions.at(i));
+		ShowEntry(AllActions_raw.at(i));
 	}
 }
 void PluginWindow::HideEntries(QList<Actions> entrys)
@@ -597,8 +579,8 @@ void PluginWindow::HideEntries(QList<Actions> entrys)
 	int count = ui->cb_obs_output_action->count();
 
 	for (int i = 0; i < count; i++) {
-		if (entrys.contains(AllActions.at(i))) {
-			HideEntry(AllActions.at(i));
+		if (entrys.contains(AllActions_raw.at(i))) {
+			HideEntry(AllActions_raw.at(i));
 		}
 	}
 	listview->adjustSize();
@@ -608,8 +590,8 @@ void PluginWindow::ShowEntries(QList<Actions> entrys)
 	int count = ui->cb_obs_output_action->count();
 
 	for (int i = 0; i < count; i++) {
-		if (entrys.contains(AllActions.at(i))) {
-			ShowEntry(AllActions.at(i));
+		if (entrys.contains(AllActions_raw.at(i))) {
+			ShowEntry(AllActions_raw.at(i));
 		}
 	}
 	listview->adjustSize();

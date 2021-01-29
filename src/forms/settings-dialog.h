@@ -80,8 +80,6 @@ private:
 	
 private:
 	QGridLayout *layout;
-	
-	
 	QStringList *items;
 	QString sceneName;
 	bool switching = false;
@@ -102,104 +100,102 @@ private:
 	void ShowPair(QString pair);
 	void HidePair(QString pair);
 	QListView *listview;
-	QList<Actions> FrontendActions = {Actions::Start_Streaming,
-				   Actions::Stop_Streaming,
-				   Actions::Toggle_Start_Stop_Streaming,
-				   Actions::Start_Recording,
-				   Actions::Stop_Recording,
-				   Actions::Pause_Recording,
-				   Actions::Unpause_Recording,
-				   Actions::Start_Replay_Buffer,
-				   Actions::Stop_Replay_Buffer,
-				   Actions::Enable_Preview,
-				   Actions::Disable_Preview,
-				   Actions::Studio_Mode,
-				   Actions::Do_Transition,
-				   Actions::Reset_Stats};
+	QList<Actions> FrontendActions = {
+				Actions::Start_Streaming,
+				Actions::Stop_Streaming,
+				Actions::Toggle_Start_Stop_Streaming,
+				Actions::Start_Recording,
+				Actions::Stop_Recording,
+				Actions::Pause_Recording,
+				Actions::Unpause_Recording,
+				Actions::Start_Replay_Buffer,
+				Actions::Stop_Replay_Buffer,
+				Actions::Enable_Preview,
+				Actions::Disable_Preview,
+				Actions::Studio_Mode,
+				Actions::Do_Transition,
+				Actions::Reset_Stats};
 
-	QList<Actions> filterActions = {Actions::Enable_Source_Filter,
-				     Actions::Disable_Source_Filter,
-				     Actions::Toggle_Source_Filter};
+	QList<Actions> filterActions = {
+				Actions::Enable_Source_Filter,
+				Actions::Disable_Source_Filter,
+				Actions::Toggle_Source_Filter};
 
-	QList<Actions> sceneActions = {Actions::Reset_Scene_Item,
-				    Actions::Set_Current_Scene,
-				    Actions::Set_Scene_Transition_Override,
-				    Actions::Set_Current_Transition};
+	QList<Actions> sceneActions = {
+				Actions::Reset_Scene_Item,
+				Actions::Set_Current_Scene,
+				Actions::Set_Scene_Transition_Override,
+				Actions::Set_Current_Transition};
 
-	QList<Actions> sourceActions = {Actions::Toggle_Mute,
-				 Actions::Take_Source_Screenshot};
+	QList<Actions> sourceActions = {
+				Actions::Toggle_Mute,
+				Actions::Take_Source_Screenshot};
 
-	QList<Actions> mediaActions = {Actions::Play_Pause_Media,
-				    Actions::Restart_Media,
-				    Actions::Stop_Media,
-				    Actions::Next_Media,
-				    Actions::Previous_Media};
+	QList<Actions> mediaActions = {
+				Actions::Play_Pause_Media,
+				Actions::Restart_Media,
+				Actions::Stop_Media,
+				Actions::Next_Media,
+				Actions::Previous_Media};
 
-	QList<Actions> AllActions = {};
-
-	QList<Actions> AllActions_raw = {Actions::Disable_Preview,
-				  Actions::Disable_Source_Filter,
-				  Actions::Enable_Preview,
-				  Actions::Enable_Source_Filter,
-				  Actions::Next_Media,
-				  Actions::Pause_Recording,
-				  Actions::Play_Pause_Media,
-				  Actions::Previous_Media,
-				  Actions::Reset_Scene_Item,
-				  Actions::Reset_Stats,
-				  Actions::Restart_Media,
-				  Actions::Set_Audio_Monitor_Type,
-				  Actions::Set_Current_Scene,
-				  Actions::Set_Current_Transition,
-				  Actions::Set_Gain_Filter,
-				  Actions::Set_Media_Time,
-				  Actions::Set_Mute,
-				  Actions::Set_Scene_Item_Crop,
-				  Actions::Set_Scene_Item_Position,
-				  Actions::Set_Scene_Item_Render,
-				  Actions::Set_Scene_Item_Transform,
-				  Actions::Set_Scene_Transition_Override,
-				  Actions::Set_Source_Filter_Visibility,
-				  Actions::Set_Source_Name,
-				  Actions::Set_Source_Settings,
-				  Actions::Set_Sync_Offset,
-				  Actions::Set_Volume,
-				  Actions::Start_Recording,
-				  Actions::Start_Replay_Buffer,
-				  Actions::Start_Streaming,
-				  Actions::Stop_Media,
-				  Actions::Stop_Recording,
-				  Actions::Stop_Replay_Buffer,
-				  Actions::Stop_Streaming,
-				  Actions::Studio_Mode,
-				  Actions::Take_Source_Screenshot,
-				  Actions::Toggle_Mute,
-				  Actions::Toggle_Source_Filter,
-				  Actions::Toggle_Start_Stop_Streaming,
-				  Actions::Do_Transition,
-				  Actions::Unpause_Recording};
+	QList<Actions> AllActions_raw = {
+				Actions::Disable_Preview,
+				Actions::Disable_Source_Filter,
+				Actions::Enable_Preview,
+				Actions::Enable_Source_Filter,
+				Actions::Next_Media,
+				Actions::Pause_Recording,
+				Actions::Play_Pause_Media,
+				Actions::Previous_Media,
+				Actions::Reset_Scene_Item,
+				Actions::Reset_Stats,
+				Actions::Restart_Media,
+				Actions::Set_Audio_Monitor_Type,
+				Actions::Set_Current_Scene,
+				Actions::Set_Current_Transition,
+				Actions::Set_Gain_Filter,
+				Actions::Set_Media_Time,
+				Actions::Set_Mute,
+				Actions::Set_Scene_Item_Crop,
+				Actions::Set_Scene_Item_Position,
+				Actions::Set_Scene_Item_Render,
+				Actions::Set_Scene_Item_Transform,
+				Actions::Set_Scene_Transition_Override,
+				Actions::Set_Source_Filter_Visibility,
+				Actions::Set_Source_Name,
+				Actions::Set_Source_Settings,
+				Actions::Set_Sync_Offset,
+				Actions::Set_Volume,
+				Actions::Start_Recording,
+				Actions::Start_Replay_Buffer,
+				Actions::Start_Streaming,
+				Actions::Stop_Media,
+				Actions::Stop_Recording,
+				Actions::Stop_Replay_Buffer,
+				Actions::Stop_Streaming,
+				Actions::Studio_Mode,
+				Actions::Take_Source_Screenshot,
+				Actions::Toggle_Mute,
+				Actions::Toggle_Source_Filter,
+				Actions::Toggle_Start_Stop_Streaming,
+				Actions::Do_Transition,
+				Actions::Unpause_Recording};
 
 	QList<Actions> AdvancedSourceActions = {
-		Actions::Set_Mute,
-					 Actions::Set_Source_Name,
-					 Actions::Set_Sync_Offset,
-					 Actions::Set_Source_Settings,
-					 Actions::Set_Source_Filter_Visibility,
-					 Actions::Set_Audio_Monitor_Type};
-	QList<Actions> AdvancedMediaActions = {Actions::Scrub_Media};
+				Actions::Set_Mute,
+				Actions::Set_Source_Name,
+				Actions::Set_Sync_Offset,
+				Actions::Set_Source_Settings,
+				Actions::Set_Source_Filter_Visibility,
+				Actions::Set_Audio_Monitor_Type};
+	QList<Actions> AdvancedMediaActions = {
+				Actions::Scrub_Media};
 
 	QList < Actions> AdvancedFilterActions = {
-		Actions::Set_Gain_Filter};
-	QList<Actions> AdvancedSceneActions = {Actions::Set_Scene_Item_Render,
-					    Actions::Set_Scene_Item_Position,
-					    Actions::Set_Scene_Item_Transform,
-					    Actions::Set_Scene_Item_Crop};
-
-	QStringList intActions = {
-		"Set Volume",
-		"Set Media Time",
-	};
-
-
-
+				Actions::Set_Gain_Filter};
+	QList<Actions> AdvancedSceneActions = {
+				Actions::Set_Scene_Item_Render,
+				Actions::Set_Scene_Item_Position,
+				Actions::Set_Scene_Item_Transform,
+				Actions::Set_Scene_Item_Crop};
 };

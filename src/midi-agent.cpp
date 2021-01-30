@@ -40,74 +40,84 @@ using namespace std;
 ///////////////////////
 /* MIDI HOOK ROUTES */
 //////////////////////
-
+void MidiAgent::executeAction(MidiHook *hook, int MidiVal, Actions action)
+{
+	switch (action) {
+	case Actions::Set_Current_Scene:
+		OBSController::SetCurrentScene(hook->scene);
+		break;
+	case Actions::Reset_Scene_Item:
+		OBSController::ResetSceneItem(hook->scene, hook->item);
+		break;
+	case Actions::Toggle_Mute:
+		OBSController::ToggleMute(hook->audio_source);
+		break;
+	case Actions::Do_Transition:
+		if (hook->transition.isEmpty()) {
+			OBSController::TransitionToProgram();
+		} else if (hook->duration != -1) {
+			OBSController::TransitionToProgram(hook->transition,
+							   hook->duration);
+		} else {
+			OBSController::TransitionToProgram(hook->transition);
+		}
+		break;
+	case Actions::Set_Current_Transition:
+		OBSController::SetCurrentTransition(hook->transition);
+		break;
+	case Actions::Set_Mute:
+		OBSController::SetMute(hook->audio_source, hook->bool_override);
+		break;
+	case Actions::Toggle_Start_Stop_Streaming:
+		OBSController::StartStopStreaming();
+		break;
+	case Actions::Set_Preview_Scene:
+		OBSController::SetPreviewScene(hook->scene);
+		break;
+	case Actions::Set_Current_Scene_Collection:
+		OBSController::SetCurrentSceneCollection(
+			hook->scene_collection);
+		break;
+	case Actions::Set_Transition_Duration:
+		if (hook->duration != -1) {
+			OBSController::SetTransitionDuration(hook->duration);
+		} else {
+			OBSController::SetTransitionDuration(MidiVal);
+		}
+		break;
+	case Actions::Start_Streaming:
+		OBSController::StartStreaming();
+		break;
+	case Actions::Stop_Streaming:
+		OBSController::StopStreaming();
+		break;
+	case Actions::Start_Recording:
+		OBSController::StartRecording();
+		break;
+	case Actions::Stop_Recording:
+		OBSController::StopRecording();
+		break;
+	case Actions::Start_Replay_Buffer:
+		OBSController::StartReplayBuffer();
+		break;
+	case Actions::Stop_Replay_Buffer:
+		OBSController::StopReplayBuffer();
+		break;
+	case Actions::Set_Volume:
+		OBSController::SetVolume(hook->audio_source,
+					 pow(Utils::mapper(MidiVal), 3.0));
+		break;
+	
+	};
+}
 // BUTTON ACTIONS
 map<QString, function<void(MidiHook *hook, int midiVal)>> funcMap = {
-	{"Set Current Scene",
-	 [](MidiHook *hook, int midiVal) {
-		 OBSController::SetCurrentScene(hook->scene);
-	 }},
-	{"Set Preview Scene",
-	 [](MidiHook *hook, int midiVal) {
-		 OBSController::SetPreviewScene(hook->scene);
-	 }},
-	{"Set Current Scene Collection",
-	 [](MidiHook *hook, int midiVal) {
-		 OBSController::SetCurrentSceneCollection(
-			 hook->scene_collection);
-	 }},
-	{"Reset Scene Item",
-	 [](MidiHook *hook, int midiVal) {
-		 OBSController::ResetSceneItem(hook->scene, hook->item);
-	 }},
-	{"TransitionToProgram",
-	 [](MidiHook *hook, int midiVal) {
-		 if (hook->transition.isEmpty()) {
-			 OBSController::TransitionToProgram();
-		 } else if (hook->duration != -1) {
-			 OBSController::TransitionToProgram(hook->transition,
-							    hook->duration);
-		 } else {
-			 OBSController::TransitionToProgram(hook->transition);
-		 }
-	 }},
-	{"Set Current Transition",
-	 [](MidiHook *hook, int midiVal) {
-		 OBSController::SetCurrentTransition(hook->transition);
-	 }},
-	{"SetTransitionDuration",
-	 [](MidiHook *hook, int midiVal) {
-		 if (hook->duration != -1) {
-			 OBSController::SetTransitionDuration(hook->duration);
-		 } else {
-			 OBSController::SetTransitionDuration(midiVal);
-		 }
-	 }},
-	{"Toggle Mute",
-	 [](MidiHook *hook, int midiVal) {
-		 OBSController::ToggleMute(hook->audio_source);
-	 }},
-	{"Set Mute",
-	 [](MidiHook *hook, int midiVal) {
-		 OBSController::SetMute(hook->audio_source,
-					hook->bool_override);
-	 }},
-	{"Start Stop Streaming",
-	 [](MidiHook *hook, int midiVal) {
-		 OBSController::StartStopStreaming();
-	 }},
-	{"Start Streaming",
-	 [](MidiHook *hook, int midiVal) { OBSController::StartStreaming(); }},
-	{"Stop Streaming",
-	 [](MidiHook *hook, int midiVal) { OBSController::StopStreaming(); }},
+
 	{"Start Stop Recording",
 	 [](MidiHook *hook, int midiVal) {
 		 OBSController::StartStopRecording();
 	 }},
-	{"Start Recording",
-	 [](MidiHook *hook, int midiVal) { OBSController::StartRecording(); }},
-	{"Stop Recording",
-	 [](MidiHook *hook, int midiVal) { OBSController::StopRecording(); }},
+
 	{"Pause Recording",
 	 [](MidiHook *hook, int midiVal) { OBSController::PauseRecording(); }},
 	{"Resume Recording",
@@ -116,14 +126,7 @@ map<QString, function<void(MidiHook *hook, int midiVal)>> funcMap = {
 	 [](MidiHook *hook, int midiVal) {
 		 OBSController::StartStopReplayBuffer();
 	 }},
-	{"Start Replay Buffer",
-	 [](MidiHook *hook, int midiVal) {
-		 OBSController::StartReplayBuffer();
-	 }},
-	{"Stop Replay Buffer",
-	 [](MidiHook *hook, int midiVal) {
-		 OBSController::StopReplayBuffer();
-	 }},
+
 	{"Save Replay Buffer",
 	 [](MidiHook *hook, int midiVal) {
 		 OBSController::SaveReplayBuffer();
@@ -163,8 +166,7 @@ map<QString, function<void(MidiHook *hook, int midiVal)>> funcMap = {
 	// CC ACTIONS
 	{"Set Volume",
 	 [](MidiHook *hook, int midiVal) {
-		 OBSController::SetVolume(hook->audio_source,
-					  pow(Utils::mapper(midiVal), 3.0));
+		 
 	 }},
 	{"Set Sync Offset",
 	 [](MidiHook *hook, int midiVal) {
@@ -395,7 +397,8 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 */
 void MidiAgent::TriggerInputAction(MidiHook *hook, int midiVal)
 {
-	funcMap[hook->action](hook, midiVal);
+	executeAction(hook, midiVal, Utils::string_to_action(Utils::untranslate(hook->action)));
+	//funcMap[hook->action](hook, midiVal);
 }
 
 /* Get the midi hooks for this device

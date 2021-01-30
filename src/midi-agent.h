@@ -130,7 +130,7 @@ public:
 	void OpenPort(int inport);
 	void OpenOutPort(int outport);
 	void ClosePort();
-
+	void executeAction(MidiHook *hook, int MidiVal, Actions action);
 	QString GetName();
 	QString GetOutName();
 	void SetOutName(QString oname);

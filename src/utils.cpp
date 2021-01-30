@@ -1469,3 +1469,19 @@ Actions Utils::string_to_action(QString action)
 		return Actions::Unpause_Recording;
 	}
 }
+QStringList Utils::TranslateActions()
+{
+	QStringList temp;
+	for (int i = 0; i < AllActions_raw.size(); i++) {
+		temp.append(obs_module_text(
+			Utils::action_to_string(AllActions_raw.at(i))
+				.toStdString()
+				.c_str()));
+	}
+	return temp;
+}
+QString Utils::untranslate(QString tstring)
+{
+	return Utils::action_to_string(
+		AllActions_raw.at(TranslateActions().indexOf(tstring)));
+}

@@ -81,7 +81,6 @@ private:
 	QStringList *items;
 	QString sceneName;
 	bool switching = false;
-	QStringList TranslateActions();
 	void ShowOnly(QList<Actions> shows);
 	void ShowEntry(Actions Entry);
 	void HideEntry(Actions Entry);

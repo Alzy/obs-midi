@@ -36,7 +36,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "midi-agent.h"
 #include "rpc/RpcEvent.h"
 
-
 class DeviceManager : public QObject {
 	Q_OBJECT
 public:
@@ -48,7 +47,7 @@ public:
 	QStringList GetPortsList();
 	int GetPortNumberByDeviceName(QString deviceName);
 	QStringList GetOutPortsList();
-	int GetOutPortNumberByDeviceName(QString  deviceName);
+	int GetOutPortNumberByDeviceName(QString deviceName);
 	QStringList opl;
 	QVector<MidiAgent *> GetActiveMidiDevices();
 	MidiAgent *GetMidiDeviceByName(QString deviceName);

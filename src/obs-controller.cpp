@@ -32,7 +32,8 @@ using namespace std;
  */
 void OBSController::SetCurrentScene(QString sceneName)
 {
-	OBSSourceAutoRelease source = obs_get_source_by_name(sceneName.toStdString().c_str());
+	OBSSourceAutoRelease source =
+		obs_get_source_by_name(sceneName.toStdString().c_str());
 
 	if (source) {
 		obs_frontend_set_current_scene(source);
@@ -81,7 +82,8 @@ void OBSController::ResetSceneItem(QString sceneName, QString itemName)
 	}
 
 	obs_data_t *params = obs_data_create();
-	obs_data_set_string(params, "scene-name", sceneName.toStdString().c_str());
+	obs_data_set_string(params, "scene-name",
+			    sceneName.toStdString().c_str());
 	OBSDataItemAutoRelease itemField = obs_data_item_byname(params, "item");
 
 	OBSSceneItemAutoRelease sceneItem =

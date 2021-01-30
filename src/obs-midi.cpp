@@ -52,7 +52,6 @@ bool obs_module_load(void)
 
 	// Config Setup
 	_config = ConfigPtr(new Config());
-	
 
 	// Signal Router Setup
 	_eventsSystem = eventsPtr(new events(_deviceManager));

@@ -65,7 +65,6 @@ bool Utils::is_number(const QString &s)
 	} else {
 		return false;
 	}
-	
 }
 bool Utils::isJSon(QString val)
 {
@@ -1294,94 +1293,94 @@ QSpinBox *Utils::GetTransitionDurationControl()
 	return window->findChild<QSpinBox *>("transitionDuration");
 }
 
-QString Utils::action_to_string(Actions action) {
+QString Utils::action_to_string(Actions action)
+{
 
 	switch (action) {
-		case Actions::Disable_Preview:
-			return "control.action.Disable_Preview";
-		case Actions::Disable_Source_Filter:
-			return "control.action.Disable_Source_Filter";
-		case Actions::Enable_Preview:
-			return "control.action.Enable_Preview";
-		case Actions::Enable_Source_Filter:
-			return "control.action.Enable_Source_Filter";
-		case Actions::Next_Media:
-			return "control.action.Next_Media";
-		case Actions::Pause_Recording:
-			return "control.action.Pause_Recording";
-		case Actions::Play_Pause_Media:
-			return "control.action.Play_Pause_Media";
-		case Actions::Previous_Media:
-			return "control.action.Previous_Media";
-		case Actions::Reset_Scene_Item:
-			return "control.action.Reset_Scene_Item";
-		case Actions::Reset_Stats:
-			return "control.action.Reset_Stats";
-		case Actions::Restart_Media:
-			return "control.action.Restart_Media";
-		case Actions::Set_Audio_Monitor_Type:
-			return "control.action.Set_Audio_Monitor_Type";
-		case Actions::Set_Current_Scene:
-			return "control.action.Set_Current_Scene";
-		case Actions::Set_Current_Transition:
-			return "control.action.Set_Current_Transition";
-		case Actions::Set_Gain_Filter:
-			return "control.action.Set_Gain_Filter";
-		case Actions::Set_Media_Time:
-			return "control.action.Set_Media_Time";
-		case Actions::Set_Mute:
-			return "control.action.Set_Mute";
-		case Actions::Set_Scene_Item_Crop:
-			return "control.action.Set_Scene_Item_Crop";
-		case Actions::Set_Scene_Item_Position:
-			return "control.action.Set_Scene_Item_Position";
-		case Actions::Set_Scene_Item_Render:
-			return "control.action.Set_Scene_Item_Render";
-		case Actions::Set_Scene_Item_Transform:
-			return "control.action.Set_Scene_Item_Transform";
-		case Actions::Set_Scene_Transition_Override:
-			return "control.action.Set_Scene_Transition_Override";
-		case Actions::Set_Source_Filter_Visibility:
-			return "control.action.Set_Source_Filter_Visibility";
-		case Actions::Set_Source_Name:
-			return "control.action.Set_Source_Name";
-		case Actions::Set_Source_Settings:
-			return "control.action.Set_Source_Settings";
-		case Actions::Set_Sync_Offset:
-			return "control.action.Set_Sync_Offset";
-		case Actions::Set_Volume: 
-			return "control.action.Set_Volume";
-		case Actions::Start_Recording: 
-			return "control.action.Start_Recording";
-		case Actions::Start_Replay_Buffer: 
-			return "control.action.Start_Replay_Buffer";
-		case Actions::Start_Streaming: 
-			return "control.action.Start_Streaming";
-		case Actions::Stop_Media: 
-			return "control.action.Stop_Media";
-		case Actions::Stop_Recording: 
-			return "control.action.Stop_Recording";
-		case Actions::Stop_Replay_Buffer: 
-			return "control.action.Stop_Replay_Buffer";
-		case Actions::Stop_Streaming: 
-			return "control.action.Stop_Streaming";
-		case Actions::Studio_Mode: 
-			return "control.action.Studio_Mode";
-		case Actions::Take_Source_Screenshot: 
-			return "control.action.Take_Source_Screenshot";
-		case Actions::Toggle_Mute:
-			return "control.action.Toggle_Mute";
-		case Actions::Toggle_Source_Filter:
-			return "control.action.Toggle_Source_Filter";
-		case Actions::Toggle_Start_Stop_Streaming:
-			return "control.action.Toggle_Start_Stop_Streaming";
-		case Actions::Do_Transition:
-			return "control.action.Transition";
-		case Actions::Unpause_Recording:
-			return "control.action.Unpause_Recording";
+	case Actions::Disable_Preview:
+		return "control.action.Disable_Preview";
+	case Actions::Disable_Source_Filter:
+		return "control.action.Disable_Source_Filter";
+	case Actions::Enable_Preview:
+		return "control.action.Enable_Preview";
+	case Actions::Enable_Source_Filter:
+		return "control.action.Enable_Source_Filter";
+	case Actions::Next_Media:
+		return "control.action.Next_Media";
+	case Actions::Pause_Recording:
+		return "control.action.Pause_Recording";
+	case Actions::Play_Pause_Media:
+		return "control.action.Play_Pause_Media";
+	case Actions::Previous_Media:
+		return "control.action.Previous_Media";
+	case Actions::Reset_Scene_Item:
+		return "control.action.Reset_Scene_Item";
+	case Actions::Reset_Stats:
+		return "control.action.Reset_Stats";
+	case Actions::Restart_Media:
+		return "control.action.Restart_Media";
+	case Actions::Set_Audio_Monitor_Type:
+		return "control.action.Set_Audio_Monitor_Type";
+	case Actions::Set_Current_Scene:
+		return "control.action.Set_Current_Scene";
+	case Actions::Set_Current_Transition:
+		return "control.action.Set_Current_Transition";
+	case Actions::Set_Gain_Filter:
+		return "control.action.Set_Gain_Filter";
+	case Actions::Set_Media_Time:
+		return "control.action.Set_Media_Time";
+	case Actions::Set_Mute:
+		return "control.action.Set_Mute";
+	case Actions::Set_Scene_Item_Crop:
+		return "control.action.Set_Scene_Item_Crop";
+	case Actions::Set_Scene_Item_Position:
+		return "control.action.Set_Scene_Item_Position";
+	case Actions::Set_Scene_Item_Render:
+		return "control.action.Set_Scene_Item_Render";
+	case Actions::Set_Scene_Item_Transform:
+		return "control.action.Set_Scene_Item_Transform";
+	case Actions::Set_Scene_Transition_Override:
+		return "control.action.Set_Scene_Transition_Override";
+	case Actions::Set_Source_Filter_Visibility:
+		return "control.action.Set_Source_Filter_Visibility";
+	case Actions::Set_Source_Name:
+		return "control.action.Set_Source_Name";
+	case Actions::Set_Source_Settings:
+		return "control.action.Set_Source_Settings";
+	case Actions::Set_Sync_Offset:
+		return "control.action.Set_Sync_Offset";
+	case Actions::Set_Volume:
+		return "control.action.Set_Volume";
+	case Actions::Start_Recording:
+		return "control.action.Start_Recording";
+	case Actions::Start_Replay_Buffer:
+		return "control.action.Start_Replay_Buffer";
+	case Actions::Start_Streaming:
+		return "control.action.Start_Streaming";
+	case Actions::Stop_Media:
+		return "control.action.Stop_Media";
+	case Actions::Stop_Recording:
+		return "control.action.Stop_Recording";
+	case Actions::Stop_Replay_Buffer:
+		return "control.action.Stop_Replay_Buffer";
+	case Actions::Stop_Streaming:
+		return "control.action.Stop_Streaming";
+	case Actions::Studio_Mode:
+		return "control.action.Studio_Mode";
+	case Actions::Take_Source_Screenshot:
+		return "control.action.Take_Source_Screenshot";
+	case Actions::Toggle_Mute:
+		return "control.action.Toggle_Mute";
+	case Actions::Toggle_Source_Filter:
+		return "control.action.Toggle_Source_Filter";
+	case Actions::Toggle_Start_Stop_Streaming:
+		return "control.action.Toggle_Start_Stop_Streaming";
+	case Actions::Do_Transition:
+		return "control.action.Transition";
+	case Actions::Unpause_Recording:
+		return "control.action.Unpause_Recording";
 	}
 }
-
 
 Actions Utils::string_to_action(QString action)
 {
@@ -1463,13 +1462,10 @@ Actions Utils::string_to_action(QString action)
 	} else if (action == "control.action.Toggle_Source_Filter") {
 		return Actions::Toggle_Source_Filter;
 	} else if (action == "control.action.Toggle_Start_Stop_Streaming") {
-			return Actions::Toggle_Start_Stop_Streaming;
+		return Actions::Toggle_Start_Stop_Streaming;
 	} else if (action == "control.action.Transition") {
 		return Actions::Do_Transition;
 	} else if (action == "control.action.Unpause_Recording") {
-			return Actions::Unpause_Recording;
+		return Actions::Unpause_Recording;
 	}
-		
-		
-	
 }

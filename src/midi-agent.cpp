@@ -58,32 +58,27 @@ map<QString, function<void(MidiHook *hook, int midiVal)>> funcMap = {
 	 }},
 	{"Reset Scene Item",
 	 [](MidiHook *hook, int midiVal) {
-		 OBSController::ResetSceneItem(hook->scene,
-					       hook->item);
+		 OBSController::ResetSceneItem(hook->scene, hook->item);
 	 }},
 	{"TransitionToProgram",
 	 [](MidiHook *hook, int midiVal) {
 		 if (hook->transition.isEmpty()) {
 			 OBSController::TransitionToProgram();
-		 } else if (hook->duration!=-1) {
-			 OBSController::TransitionToProgram(
-				 hook->transition,
-				 hook->duration);
+		 } else if (hook->duration != -1) {
+			 OBSController::TransitionToProgram(hook->transition,
+							    hook->duration);
 		 } else {
-			 OBSController::TransitionToProgram(
-				 hook->transition);
+			 OBSController::TransitionToProgram(hook->transition);
 		 }
 	 }},
 	{"Set Current Transition",
 	 [](MidiHook *hook, int midiVal) {
-		 OBSController::SetCurrentTransition(
-			 hook->transition);
+		 OBSController::SetCurrentTransition(hook->transition);
 	 }},
 	{"SetTransitionDuration",
 	 [](MidiHook *hook, int midiVal) {
-		 if (hook->duration!=-1) {
-			 OBSController::SetTransitionDuration(
-				 hook->duration);
+		 if (hook->duration != -1) {
+			 OBSController::SetTransitionDuration(hook->duration);
 		 } else {
 			 OBSController::SetTransitionDuration(midiVal);
 		 }
@@ -94,7 +89,8 @@ map<QString, function<void(MidiHook *hook, int midiVal)>> funcMap = {
 	 }},
 	{"Set Mute",
 	 [](MidiHook *hook, int midiVal) {
-		 OBSController::SetMute(hook->audio_source, hook->bool_override);
+		 OBSController::SetMute(hook->audio_source,
+					hook->bool_override);
 	 }},
 	{"Start Stop Streaming",
 	 [](MidiHook *hook, int midiVal) {
@@ -134,8 +130,7 @@ map<QString, function<void(MidiHook *hook, int midiVal)>> funcMap = {
 	 }},
 	{"Set Current Profile",
 	 [](MidiHook *hook, int midiVal) {
-		 OBSController::SetCurrentProfile(
-			 hook->profile);
+		 OBSController::SetCurrentProfile(hook->profile);
 	 }},
 	{"Set Text GDIPlus Text",
 	 [](MidiHook *hook, int midiVal) {
@@ -151,8 +146,7 @@ map<QString, function<void(MidiHook *hook, int midiVal)>> funcMap = {
 	 }},
 	{"Take Source Screenshot",
 	 [](MidiHook *hook, int midiVal) {
-		 OBSController::TakeSourceScreenshot(
-			 hook->source);
+		 OBSController::TakeSourceScreenshot(hook->source);
 	 }},
 	{"Enable Source Filter",
 	 [](MidiHook *hook, int midiVal) {
@@ -174,9 +168,8 @@ map<QString, function<void(MidiHook *hook, int midiVal)>> funcMap = {
 	 }},
 	{"Set Sync Offset",
 	 [](MidiHook *hook, int midiVal) {
-		 OBSController::SetSyncOffset(
-			 hook->media_source,
-			 (int64_t)midiVal);
+		 OBSController::SetSyncOffset(hook->media_source,
+					      (int64_t)midiVal);
 	 }},
 	{"Set Source Position",
 	 [](MidiHook *hook, int midiVal) {
@@ -230,7 +223,8 @@ void MidiAgent::Load(obs_data_t *data)
 	for (size_t i = 0; i < hooksCount; i++) {
 		obs_data_t *hookData = obs_data_array_item(hooksData, i);
 		MidiHook *mh = new MidiHook();
-		mh->message_type = obs_data_get_string(hookData, "message_type");
+		mh->message_type =
+			obs_data_get_string(hookData, "message_type");
 		mh->norc = obs_data_get_int(hookData, "norc");
 		mh->channel = obs_data_get_int(hookData, "channel");
 		mh->action = obs_data_get_string(hookData, "action");
@@ -239,16 +233,18 @@ void MidiAgent::Load(obs_data_t *data)
 		mh->filter = obs_data_get_string(hookData, "filter");
 		mh->transition = obs_data_get_string(hookData, "transition");
 		mh->item = obs_data_get_string(hookData, "item");
-		mh->audio_source = obs_data_get_string(hookData, "audio_source");
-		mh->media_source = obs_data_get_string(hookData, "media_source");
+		mh->audio_source =
+			obs_data_get_string(hookData, "audio_source");
+		mh->media_source =
+			obs_data_get_string(hookData, "media_source");
 		mh->duration = obs_data_get_int(hookData, "duration");
 		mh->scene_collection =
 			obs_data_get_string(hookData, "scene_collection");
-		mh->profile =
-			obs_data_get_string(hookData, "profile");
+		mh->profile = obs_data_get_string(hookData, "profile");
 		mh->string_override =
 			obs_data_get_string(hookData, "string_override");
-		mh->bool_override = obs_data_get_bool(hookData, "bool_override");
+		mh->bool_override =
+			obs_data_get_bool(hookData, "bool_override");
 		mh->int_override = obs_data_get_int(hookData, "int_override");
 		AddMidiHook(mh);
 	}
@@ -272,7 +268,6 @@ void MidiAgent::OpenPort(int inport)
 		connected = true;
 		blog(LOG_INFO, "MIDI device connected In: [%d] %s", inport,
 		     name.toStdString().c_str());
-		     
 
 	} catch (const rtmidi::midi_exception &error) {
 
@@ -319,7 +314,8 @@ void MidiAgent::SetOutName(QString oname)
 {
 	if (outname != oname) {
 		midiout->close_port();
-		OpenOutPort(GetDeviceManager()->GetOutPortNumberByDeviceName(oname));
+		OpenOutPort(GetDeviceManager()->GetOutPortNumberByDeviceName(
+			oname));
 	}
 	outname = oname;
 }
@@ -374,8 +370,7 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 	int value = Utils::get_midi_value(message);
 	self->sending = true;
 	/***** Send Messages to emit function *****/
-	
-	
+
 	MidiMessage x;
 	x.device_name = self->name;
 	x.message_type = mType;
@@ -479,79 +474,85 @@ void MidiAgent::NewObsEvent(QString eventType, QString eventData)
 			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
 				if (self->midiHooks.at(i)->action ==
 					    "Set Volume" &&
-				    self->midiHooks.at(i)->audio_source == source) {
-					this->send(self->midiHooks.at(i)->message_type,
-						   self->midiHooks.at(i)->channel,
-						   self->midiHooks.at(i)->norc,
-						   newvol);
+				    self->midiHooks.at(i)->audio_source ==
+					    source) {
+					this->send(
+						self->midiHooks.at(i)
+							->message_type,
+						self->midiHooks.at(i)->channel,
+						self->midiHooks.at(i)->norc,
+						newvol);
 				}
 			}
 		} else if (eventType == QString("SwitchScenes")) {
-			QString source = QString::fromStdString(obs_data_get_string(data, "scene-name"));
+			QString source = QString::fromStdString(
+				obs_data_get_string(data, "scene-name"));
 			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
 				if (self->midiHooks.at(i)->action ==
 					    "Set Current Scene" &&
 				    self->midiHooks.at(i)->scene == source) {
-					this->send("note_off",
-						   self->midiHooks.at(i)->channel,
-						   lastscenebtn, 0);
+					this->send(
+						"note_off",
+						self->midiHooks.at(i)->channel,
+						lastscenebtn, 0);
 
-					this->send("note_on",
-						   self->midiHooks.at(i)->channel,
-						   self->midiHooks.at(i)->norc,
-						   1);
+					this->send(
+						"note_on",
+						self->midiHooks.at(i)->channel,
+						self->midiHooks.at(i)->norc, 1);
 					lastscenebtn =
 						self->midiHooks.at(i)->norc;
 				}
 			}
 
 		} else if (eventType == QString("TransitionBegin")) {
-			QString from =
-				obs_data_get_string(data, "from-scene");
+			QString from = obs_data_get_string(data, "from-scene");
 			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
 				if (self->midiHooks.at(i)->action ==
 					    "Set Current Scene" &&
 				    self->midiHooks.at(i)->scene == from) {
-					this->send("note_on",
-						   self->midiHooks.at(i)->channel,
-						   self->midiHooks.at(i)->norc,
-						   0);
-					this->send("note_off",
-						   self->midiHooks.at(i)->channel,
-						   self->midiHooks.at(i)->norc,
-						   0);
+					this->send(
+						"note_on",
+						self->midiHooks.at(i)->channel,
+						self->midiHooks.at(i)->norc, 0);
+					this->send(
+						"note_off",
+						self->midiHooks.at(i)->channel,
+						self->midiHooks.at(i)->norc, 0);
 				}
 			}
 
 		} else if (eventType == QString("SourceMuteStateChanged")) {
-			QString from =
-				obs_data_get_string(data, "sourceName");
+			QString from = obs_data_get_string(data, "sourceName");
 			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
 				if (self->midiHooks.at(i)->action ==
 					    "Toggle Mute" &&
-				    self->midiHooks.at(i)->audio_source == from) {
+				    self->midiHooks.at(i)->audio_source ==
+					    from) {
 					bool muted = obs_data_get_bool(data,
 								       "muted");
-					this->send("note_on",
-						   self->midiHooks.at(i)->channel,
-						   self->midiHooks.at(i)->norc,
-						   muted);
+					this->send(
+						"note_on",
+						self->midiHooks.at(i)->channel,
+						self->midiHooks.at(i)->norc,
+						muted);
 				}
 			}
 
 		} else if (eventType == QString("SourceMuteStateChanged")) {
-			QString from =
-				obs_data_get_string(data, "sourceName");
+			QString from = obs_data_get_string(data, "sourceName");
 			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
 				if (self->midiHooks.at(i)->action ==
 					    "Set Mute" &&
-				    self->midiHooks.at(i)->audio_source == from) {
+				    self->midiHooks.at(i)->audio_source ==
+					    from) {
 					bool muted = obs_data_get_bool(data,
 								       "muted");
-					this->send("note_on",
-						   self->midiHooks.at(i)->channel,
-						   self->midiHooks.at(i)->norc,
-						   muted);
+					this->send(
+						"note_on",
+						self->midiHooks.at(i)->channel,
+						self->midiHooks.at(i)->norc,
+						muted);
 				}
 			}
 		} else if (eventType == QString("SourceRenamed")) {
@@ -575,7 +576,8 @@ void MidiAgent::NewObsEvent(QString eventType, QString eventData)
 
 				for (unsigned i = 0; i < self->midiHooks.size();
 				     i++) {
-					if (self->midiHooks.at(i)->source == from) {
+					if (self->midiHooks.at(i)->source ==
+					    from) {
 						self->RemoveMidiHook(
 							self->midiHooks.at(i));
 						self->GetData();

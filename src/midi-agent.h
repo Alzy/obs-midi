@@ -36,12 +36,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "rpc/RpcEvent.h"
 #include "utils.h"
 
-
 class MidiHook {
 public:
-	int channel; //midi channel
+	int channel;          //midi channel
 	QString message_type; // Message Type
-	int norc; // Note or Control 
+	int norc;             // Note or Control
 	QString action;
 	QString scene;
 	QString source;
@@ -50,18 +49,19 @@ public:
 	QString item;
 	QString audio_source;
 	QString media_source;
-	int duration=-1;
+	int duration = -1;
 	QString scene_collection;
 	QString profile;
 	QString string_override;
 	bool bool_override;
 	int int_override;
-	
+
 	MidiHook(){};
-	
+
 	MidiHook(QString jsonString)
 	{
-		obs_data_t *data = obs_data_create_from_json(jsonString.toStdString().c_str());
+		obs_data_t *data = obs_data_create_from_json(
+			jsonString.toStdString().c_str());
 		channel = obs_data_get_int(data, "channel");
 		message_type = obs_data_get_string(data, "message_type");
 		norc = obs_data_get_int(data, "norc");
@@ -74,38 +74,36 @@ public:
 		audio_source = obs_data_get_string(data, "audio_source");
 		media_source = obs_data_get_string(data, "media_source");
 		duration = obs_data_get_int(data, "duration");
-		scene_collection = obs_data_get_string(data, "scene_collection");
+		scene_collection =
+			obs_data_get_string(data, "scene_collection");
 		profile = obs_data_get_string(data, "profile");
 		string_override = obs_data_get_string(data, "string_override");
 		bool_override = obs_data_get_bool(data, "bool_override");
-		int_override =	obs_data_get_int(data, "int_override");
-		
+		int_override = obs_data_get_int(data, "int_override");
 	}
 
 	obs_data_t *GetData()
 	{
 		obs_data_t *data = obs_data_create();
 		obs_data_set_int(data, "channel", channel);
-		obs_data_set_string(data, "message_type", message_type.toStdString().c_str());
+		obs_data_set_string(data, "message_type",
+				    message_type.toStdString().c_str());
 		obs_data_set_int(data, "norc", norc);
 		obs_data_set_string(data, "action",
 				    action.toStdString().c_str());
-		obs_data_set_string(data, "scene",
-				    scene.toStdString().c_str());
+		obs_data_set_string(data, "scene", scene.toStdString().c_str());
 		obs_data_set_string(data, "source",
 				    source.toStdString().c_str());
 		obs_data_set_string(data, "filter",
 				    filter.toStdString().c_str());
 		obs_data_set_string(data, "transition",
 				    transition.toStdString().c_str());
-		obs_data_set_string(data, "item",
-				    item.toStdString().c_str());
+		obs_data_set_string(data, "item", item.toStdString().c_str());
 		obs_data_set_string(data, "audio_source",
 				    audio_source.toStdString().c_str());
 		obs_data_set_string(data, "media_source",
 				    media_source.toStdString().c_str());
-		obs_data_set_int(data, "duration",
-				    duration);
+		obs_data_set_int(data, "duration", duration);
 		obs_data_set_string(data, "scene_collection",
 				    scene_collection.toStdString().c_str());
 		obs_data_set_string(data, "profile",

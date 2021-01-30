@@ -58,6 +58,7 @@ public slots:
 	void get_scenes();
 	void add_new_mapping();
 	void add_row_from_hook(MidiHook *hook);
+	void tab_changed(int i);
 	
 
 private:

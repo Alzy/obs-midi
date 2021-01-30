@@ -94,6 +94,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 	/**************Connections to mappper****************/
 	connect(ui->btn_add, SIGNAL(clicked()), this, SLOT(add_new_mapping()));
+	connect(ui->tabWidget, SIGNAL(currentChanged(int)), this,
+		SLOT(tab_changed(int)));
 	this->ui->cb_obs_output_action->addItems(TranslateActions());
 	loadingdevices = true;
 }
@@ -103,23 +105,7 @@ void PluginWindow::ToggleShowHide()
 
 	if (!isVisible()) {
 		setVisible(true);
-		ui->table_mapping->clear();
-		if (loadingdevices) {
-			auto devicemanager = GetDeviceManager();
-			auto device = devicemanager->GetMidiDeviceByName(
-				ui->mapping_lbl_device_name->text());
-			auto hooks = devicemanager->GetMidiHooksByDeviceName(
-				ui->mapping_lbl_device_name->text());
-			if (hooks.size() > 0) {
-
-				for (int i = 0; i < hooks.size(); i++) {
-
-					add_row_from_hook(hooks.at(i));
-				}
-			}
-			set_headers();
-
-		}
+		
 	}
 	else {
 		setVisible(false);
@@ -632,7 +618,7 @@ void PluginWindow::check_advanced_switch(bool state)
 void PluginWindow::obs_actions_filter_select(int selection)
 {
 	switching = true;
-
+	
 	switch (selection) {
 	case 0:
 		ShowAllActions();
@@ -884,4 +870,25 @@ void PluginWindow::add_row_from_hook(MidiHook * hook) {
 	ui->table_mapping->setItem(row, 8, itemitem);
 	ui->table_mapping->setItem(row, 9, audioitem);
 	ui->table_mapping->setItem(row, 10, mediaitem);
+}
+void PluginWindow::tab_changed(int i) {
+	ui->mapping_lbl_device_name->setText(
+		ui->list_midi_dev->currentItem()->text());
+	ui->table_mapping->clearContents();
+	set_headers();
+	ui->table_mapping->setRowCount(0);
+	auto devicemanager = GetDeviceManager();
+		auto device = devicemanager->GetMidiDeviceByName(
+			ui->mapping_lbl_device_name->text());
+		auto hooks = devicemanager->GetMidiHooksByDeviceName(
+			ui->mapping_lbl_device_name->text());
+		if (hooks.size() > 0) {
+
+			for (int i = 0; i < hooks.size(); i++) {
+
+				add_row_from_hook(hooks.at(i));
+			}
+		}
+	
+	
 }

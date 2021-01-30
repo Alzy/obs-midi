@@ -38,7 +38,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <property name="elideMode">
       <enum>Qt::ElideMiddle</enum>
@@ -1343,12 +1343,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>384</x>
-     <y>382</y>
+     <x>301</x>
+     <y>386</y>
     </hint>
     <hint type="destinationlabel">
-     <x>439</x>
-     <y>377</y>
+     <x>375</x>
+     <y>386</y>
     </hint>
    </hints>
   </connection>
@@ -1359,12 +1359,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>447</x>
-     <y>370</y>
+     <x>375</x>
+     <y>386</y>
     </hint>
     <hint type="destinationlabel">
-     <x>420</x>
-     <y>368</y>
+     <x>301</x>
+     <y>386</y>
     </hint>
    </hints>
   </connection>

@@ -321,12 +321,11 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 		if (eventType == QString("SourceVolumeChanged")) {
 			double vol = obs_data_get_double(data, "volume");
 			uint8_t newvol = Utils::mapper2(cbrt(vol));
-			QString source =
-				obs_data_get_string(data, "sourceName");
+			QString source = QString(obs_data_get_string(data, "sourceName"));
 			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
 				if (self->midiHooks.at(i)->action ==
-					    "Set Volume" &&
-				    self->midiHooks.at(i)->audio_source ==
+					    Utils::translate_action(ActionsClass::Actions::Set_Volume) &&
+				    self->midiHooks.at(i)->audio_source==
 					    source) {
 					this->send_message_to_midi_device(
 						self->midiHooks.at(i)
@@ -341,7 +340,7 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 				obs_data_get_string(data, "scene-name"));
 			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
 				if (self->midiHooks.at(i)->action ==
-					    "Set Current Scene" &&
+				     Utils::translate_action(ActionsClass::Actions::Set_Current_Scene) &&
 				    self->midiHooks.at(i)->scene == source) {
 					this->send_message_to_midi_device(
 						"note_off",
@@ -378,7 +377,7 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 			QString from = obs_data_get_string(data, "sourceName");
 			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
 				if (self->midiHooks.at(i)->action ==
-					    "Toggle Mute" &&
+				    Utils::translate_action(ActionsClass::Actions::Toggle_Mute) &&
 				    self->midiHooks.at(i)->audio_source ==
 					    from) {
 					bool muted = obs_data_get_bool(data,
@@ -451,14 +450,15 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 void MidiAgent::send_message_to_midi_device(QString type, int channel, int norc, int value)
 {
 	rtmidi::message *hello = new rtmidi::message();
-	if (type == "control_change") {
+	blog(0, "Midi Type is %s",type.toStdString().c_str());
+	if (type == "Control Change") {
 		this->midiout->send_message(
 			hello->control_change(channel, norc, value));
-	} else if (type == "note_on") {
+	} else if (type == "Note On") {
 		this->midiout->send_message(
 			hello->note_on(channel, norc, value));
 
-	} else if (type == "note_off") {
+	} else if (type == "Note Off") {
 		this->midiout->send_message(
 			hello->note_off(channel, norc, value));
 	}

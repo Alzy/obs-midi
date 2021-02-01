@@ -39,8 +39,8 @@ private Q_SLOTS:
 	void ToggleShowHide();
 
 public slots:
-	void selectOutput(QString item);
-	void domessage(MidiMessage mess);
+	void select_output_device(QString item);
+	void handle_midi_message(MidiMessage mess);
 
 	void obs_actions_select(QString action);
 	void check_advanced_switch(bool state);
@@ -68,8 +68,8 @@ private:
 	QMetaObject::Connection desconnect;
 	bool starting = true;
 	QString DeviceFilter;
-	void ShowPair(pairs pair);
-	void HidePair(pairs pair);
+	void ShowPair(Pairs pair);
+	void HidePair(Pairs pair);
 	void HideAllPairs();
 	void add_midi_device(QString Name);
 	void set_headers();
@@ -78,6 +78,7 @@ private:
 	void get_scene_names();
 
 	bool map_exists();
+	int map_location(MidiMessage message);
 
 private:
 	QGridLayout *layout;

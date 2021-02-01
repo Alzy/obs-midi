@@ -44,8 +44,9 @@ void DeviceManager::Load(obs_data_t *data)
 		MidiAgent *device = new MidiAgent();
 		device->Load(deviceData);
 		midiAgents.push_back(device);
+		
 		connect(this, SIGNAL(bcast(QString, QString)), device,
-			SLOT(NewObsEvent(QString, QString)));
+				SLOT(handle_obs_event(QString, QString)));
 		if (device->isEnabled()) {
 			int portNumber =
 				GetPortNumberByDeviceName(device->get_midi_input_name());

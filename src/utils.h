@@ -32,7 +32,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QSystemTrayIcon>
-
+#include <qmessagebox>
 #include <obs.hpp>
 #include <obs-module.h>
 #include <util/config-file.h>
@@ -48,7 +48,7 @@ typedef struct MidiMessage {
 	int value;
 } MidiMessage;
 Q_DECLARE_METATYPE(MidiMessage);
-enum pairs { Scene, Source, Item, Transition, Audio, Media, Filter };
+enum class Pairs { Scene, Source, Item, Transition, Audio, Media, Filter, String, Integer, Boolean };
 class ActionsClass : public QObject {
 	Q_OBJECT
 public:
@@ -112,9 +112,25 @@ public:
 		Set_Opacity
 	};
 	Q_ENUM(Actions)
+	enum class obs_event_type {
+		SourceVolumeChanged,
+		SwitchScenes,
+		TransitionBegin,
+		TransitionEnd,
+		SourceMuteStateChanged,
+		SourceRenamed,
+		Exiting,
+		SourceDestroyed,
+	};
+	Q_ENUM(obs_event_type)
+
 	static QString action_to_string(const Actions &enumval);
 	static Actions string_to_action(const QString &string);
+
+	static QString event_to_string(const obs_event_type &enumval);
+	static obs_event_type string_to_event(const QString &string);
 };
+
 
 typedef void (*PauseRecordingFunction)(bool);
 typedef bool (*RecordingPausedFunction)();
@@ -229,4 +245,6 @@ const QList<ActionsClass::Actions> AllActions_raw = {
 	ActionsClass::Actions::Toggle_Start_Stop_Streaming,
 	ActionsClass::Actions::Do_Transition,
 	ActionsClass::Actions::Unpause_Recording};
+void alert_popup(QString message);
+QString translate_action(ActionsClass::Actions action);
 };

@@ -29,7 +29,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "settings-dialog.h"
 #include <qdialogbuttonbox.h>
 #include <qcheckbox.h>
-#include <qmessagebox>
+
 #include "../version.h"
 PluginWindow::PluginWindow(QWidget *parent)
 	: QDialog(parent, Qt::Dialog), ui(new Ui::PluginWindow)
@@ -49,11 +49,12 @@ PluginWindow::PluginWindow(QWidget *parent)
 	Utils::TranslateActions();
 	//Connections for Device Tab
 	connect(ui->list_midi_dev, SIGNAL(currentTextChanged(QString)), this,
-		SLOT(on_item_select(QString)));
+		SLOT(on_device_select(QString)));
 	connect(ui->check_enabled, SIGNAL(stateChanged(bool)), this,
 		SLOT(on_check_enabled_state_changed(bool)));
 	connect(ui->bidirectional, SIGNAL(stateChanged(bool)), this,
 		SLOT(on_bid_enabled_state_changed(bool)));
+
 	//Connections for Configure Tab
 	connect(ui->cb_obs_action_filter, SIGNAL(currentIndexChanged(int)),
 		this, SLOT(obs_actions_filter_select(int)));
@@ -102,6 +103,8 @@ void PluginWindow::ToggleShowHide()
 
 	} else {
 		setVisible(false);
+		ui->btn_Listen_many->setChecked(false);
+		ui->btn_Listen_one->setChecked(false);
 	}
 }
 
@@ -156,7 +159,7 @@ void PluginWindow::SetAvailableDevices()
 		if (midiDevices.size() != 0) {
 			desconnect = connect(
 				ui->outbox, SIGNAL(currentTextChanged(QString)),
-				this, SLOT(selectOutput(QString)));
+				this, SLOT(select_output_device(QString)));
 		}
 		starting = false;
 	}
@@ -166,7 +169,7 @@ void PluginWindow::SetAvailableDevices()
 	on_device_select(ui->list_midi_dev->currentItem()->text());
 }
 
-void PluginWindow::selectOutput(QString selectedDeviceName)
+void PluginWindow::select_output_device(QString selectedDeviceName)
 {
 	if (!loadingdevices) {
 		auto selectedDevice =
@@ -240,11 +243,12 @@ void PluginWindow::on_device_select(QString curitem)
 	}
 
 	///HOOK up the Message Handler
-	connect(MAdevice, SIGNAL(SendNewUnknownMessage(MidiMessage)), this,
-		SLOT(domessage(MidiMessage))); /// name, mtype, norc, channel
+	 connect(
+		MAdevice, SIGNAL(broadcast_midi_message(MidiMessage)), this,
+		SLOT(handle_midi_message(MidiMessage))); /// name, mtype, norc, channel
 	ui->mapping_lbl_device_name->setText(curitem);
 }
-void PluginWindow::domessage(MidiMessage mess)
+void PluginWindow::handle_midi_message(MidiMessage mess)
 {
 	if (ui->tabWidget->currentIndex() == 1) {
 		if (ui->btn_Listen_one->isChecked() ||
@@ -260,6 +264,12 @@ void PluginWindow::domessage(MidiMessage mess)
 			ui->slider_value->setValue(mess.value);
 			ui->cb_mtype->setCurrentText(mess.message_type);
 			ui->btn_Listen_one->setChecked(false);
+		} else {
+			if (map_location(mess) != -1) {
+				ui->table_mapping->selectRow(
+					map_location(mess));
+			}
+			
 		}
 	}
 }
@@ -347,39 +357,39 @@ void PluginWindow::set_headers()
 	ui->table_mapping->horizontalHeaderItem(10)->setTextColor(actioncolor);
 }
 
-void PluginWindow::ShowPair(pairs Pair)
+void PluginWindow::ShowPair(Pairs Pair)
 {
 
 	switch (Pair) {
-	case pairs::Scene:
+	case Pairs::Scene:
 		ui->label_obs_output_scene->show();
 		ui->cb_obs_output_scene->show();
 		get_scenes();
 		ui->w_scene->show();
 		break;
-	case pairs::Source:
+	case Pairs::Source:
 		ui->label_obs_output_source->show();
 		ui->cb_obs_output_source->show();
 		get_sources(ui->cb_obs_output_scene->currentText());
 		ui->w_source->show();
 		break;
-	case pairs::Filter:
+	case Pairs::Filter:
 		ui->label_obs_output_filter->show();
 		ui->cb_obs_output_filter->show();
 
 		ui->w_filter->show();
 		break;
-	case pairs::Transition:
+	case Pairs::Transition:
 		ui->label_obs_output_transition->show();
 		ui->cb_obs_output_transition->show();
 		ui->w_transition->show();
 		break;
-	case pairs::Item:
+	case Pairs::Item:
 		ui->label_obs_output_item->show();
 		ui->cb_obs_output_item->show();
 		ui->w_item->show();
 		break;
-	case pairs::Audio:
+	case Pairs::Audio:
 		ui->cb_obs_output_audio_source->clear();
 		ui->cb_obs_output_audio_source->addItems(
 			Utils::GetAudioSourceNames());
@@ -387,7 +397,7 @@ void PluginWindow::ShowPair(pairs Pair)
 		ui->cb_obs_output_audio_source->show();
 		ui->w_audio->show();
 		break;
-	case pairs::Media:
+	case Pairs::Media:
 		ui->cb_obs_output_media_source->clear();
 		ui->cb_obs_output_media_source->addItems(
 			Utils::GetMediaSourceNames());
@@ -395,12 +405,18 @@ void PluginWindow::ShowPair(pairs Pair)
 		ui->cb_obs_output_media_source->show();
 		ui->w_media->show();
 		break;
+	case Pairs::String:
+		break;
+	case Pairs::Boolean:
+		break;
+	case Pairs::Integer:
+		break;
 	}
 }
-void PluginWindow::HidePair(pairs Pair)
+void PluginWindow::HidePair(Pairs Pair)
 {
 	switch (Pair) {
-	case pairs::Scene:
+	case Pairs::Scene:
 		ui->label_obs_output_scene->hide();
 		ui->cb_obs_output_scene->hide();
 		ui->cb_obs_output_scene->clear();
@@ -408,59 +424,68 @@ void PluginWindow::HidePair(pairs Pair)
 		ui->w_scene->hide();
 		blog(LOG_DEBUG, "Hide Scene");
 		break;
-	case pairs::Source:
+	case Pairs::Source:
 		ui->label_obs_output_source->hide();
 		ui->cb_obs_output_source->hide();
 		ui->cb_obs_output_source->clear();
 		ui->w_source->hide();
 		blog(LOG_DEBUG, "Hide Source");
 		break;
-	case pairs::Filter:
+	case Pairs::Filter:
 		ui->label_obs_output_filter->hide();
 		ui->cb_obs_output_filter->hide();
 		ui->cb_obs_output_filter->clear();
 		ui->w_filter->hide();
 		blog(LOG_DEBUG, "Hide Filter");
 		break;
-	case pairs::Transition:
+	case Pairs::Transition:
 		ui->label_obs_output_transition->hide();
 		ui->cb_obs_output_transition->hide();
 		ui->cb_obs_output_transition->clear();
 		ui->w_transition->hide();
 		blog(LOG_DEBUG, "Hide Transition");
 		break;
-	case pairs::Item:
+	case Pairs::Item:
 		ui->label_obs_output_item->hide();
 		ui->cb_obs_output_item->hide();
 		ui->cb_obs_output_item->clear();
 		ui->w_item->hide();
 		blog(LOG_DEBUG, "Hide Item");
 		break;
-	case pairs::Audio:
+	case Pairs::Audio:
 		ui->label_obs_output_audio_source->hide();
 		ui->cb_obs_output_audio_source->hide();
 		ui->cb_obs_output_audio_source->clear();
 		ui->w_audio->hide();
 		blog(LOG_DEBUG, "Hide Audio");
 		break;
-	case pairs::Media:
+	case Pairs::Media:
 		ui->label_obs_output_media_source->hide();
 		ui->cb_obs_output_media_source->hide();
 		ui->cb_obs_output_media_source->clear();
 		ui->w_media->hide();
 		blog(LOG_DEBUG, "Hide Media");
 		break;
+	case Pairs::String:
+		break;
+	case Pairs::Boolean:
+		break;
+	case Pairs::Integer:
+		break;
 	}
 }
 void PluginWindow::HideAllPairs()
 {
-	HidePair(pairs::Transition);
-	HidePair(pairs::Audio);
-	HidePair(pairs::Media);
-	HidePair(pairs::Filter);
-	HidePair(pairs::Scene);
-	HidePair(pairs::Source);
-	HidePair(pairs::Item);
+	HidePair(Pairs::Transition);
+	HidePair(Pairs::Audio);
+	HidePair(Pairs::Media);
+	HidePair(Pairs::Filter);
+	HidePair(Pairs::Scene);
+	HidePair(Pairs::Source);
+	HidePair(Pairs::Item);
+	HidePair(Pairs::String);
+	HidePair(Pairs::Integer);
+	HidePair(Pairs::Boolean);
 }
 
 void PluginWindow::ResetToDefaults()
@@ -653,95 +678,95 @@ void PluginWindow::obs_actions_select(QString action)
 
 		switch (ActionsClass::string_to_action(untranslate(action))) {
 		case ActionsClass::Actions::Set_Current_Scene:
-			ShowPair(pairs::Scene);
+			ShowPair(Pairs::Scene);
 			break;
 		case ActionsClass::Actions::Enable_Source_Filter:
-			ShowPair(pairs::Scene);
-			ShowPair(pairs::Source);
-			ShowPair(pairs::Filter);
+			ShowPair(Pairs::Scene);
+			ShowPair(Pairs::Source);
+			ShowPair(Pairs::Filter);
 			break;
 		case ActionsClass::Actions::Disable_Source_Filter:
-			ShowPair(pairs::Scene);
-			ShowPair(pairs::Source);
-			ShowPair(pairs::Filter);
+			ShowPair(Pairs::Scene);
+			ShowPair(Pairs::Source);
+			ShowPair(Pairs::Filter);
 			break;
 		case ActionsClass::Actions::Set_Gain_Filter:
-			ShowPair(pairs::Scene);
-			ShowPair(pairs::Source);
-			ShowPair(pairs::Filter);
+			ShowPair(Pairs::Scene);
+			ShowPair(Pairs::Source);
+			ShowPair(Pairs::Filter);
 			break;
 		case ActionsClass::Actions::Toggle_Source_Filter:
-			ShowPair(pairs::Scene);
-			ShowPair(pairs::Source);
-			ShowPair(pairs::Filter);
+			ShowPair(Pairs::Scene);
+			ShowPair(Pairs::Source);
+			ShowPair(Pairs::Filter);
 			break;
 		case ActionsClass::Actions::Reset_Scene_Item:
-			ShowPair(pairs::Scene);
-			ShowPair(pairs::Source);
-			ShowPair(pairs::Item);
+			ShowPair(Pairs::Scene);
+			ShowPair(Pairs::Source);
+			ShowPair(Pairs::Item);
 			break;
 		case ActionsClass::Actions::Set_Scene_Item_Render:
-			ShowPair(pairs::Scene);
-			ShowPair(pairs::Source);
-			ShowPair(pairs::Item);
+			ShowPair(Pairs::Scene);
+			ShowPair(Pairs::Source);
+			ShowPair(Pairs::Item);
 			break;
 		case ActionsClass::Actions::Set_Scene_Item_Position:
-			ShowPair(pairs::Scene);
-			ShowPair(pairs::Item);
+			ShowPair(Pairs::Scene);
+			ShowPair(Pairs::Item);
 			break;
 		case ActionsClass::Actions::Set_Scene_Item_Transform:
-			ShowPair(pairs::Scene);
-			ShowPair(pairs::Item);
+			ShowPair(Pairs::Scene);
+			ShowPair(Pairs::Item);
 			break;
 		case ActionsClass::Actions::Set_Scene_Item_Crop:
-			ShowPair(pairs::Scene);
-			ShowPair(pairs::Item);
+			ShowPair(Pairs::Scene);
+			ShowPair(Pairs::Item);
 			break;
 		case ActionsClass::Actions::Set_Scene_Transition_Override:
-			ShowPair(pairs::Scene);
-			ShowPair(pairs::Transition);
+			ShowPair(Pairs::Scene);
+			ShowPair(Pairs::Transition);
 			break;
 		case ActionsClass::Actions::Set_Current_Transition:
-			ShowPair(pairs::Transition);
+			ShowPair(Pairs::Transition);
 			break;
 		case ActionsClass::Actions::Set_Volume:
-			ShowPair(pairs::Audio);
+			ShowPair(Pairs::Audio);
 			break;
 		case ActionsClass::Actions::Set_Mute:
-			ShowPair(pairs::Audio);
+			ShowPair(Pairs::Audio);
 			break;
 		case ActionsClass::Actions::Toggle_Mute:
-			ShowPair(pairs::Audio);
+			ShowPair(Pairs::Audio);
 			break;
 		case ActionsClass::Actions::Set_Source_Filter_Visibility:
-			ShowPair(pairs::Scene);
-			ShowPair(pairs::Source);
-			ShowPair(pairs::Filter);
+			ShowPair(Pairs::Scene);
+			ShowPair(Pairs::Source);
+			ShowPair(Pairs::Filter);
 			break;
 		case ActionsClass::Actions::Take_Source_Screenshot:
-			ShowPair(pairs::Source);
-			ShowPair(pairs::Scene);
+			ShowPair(Pairs::Source);
+			ShowPair(Pairs::Scene);
 			break;
 		case ActionsClass::Actions::Play_Pause_Media:
-			ShowPair(pairs::Media);
+			ShowPair(Pairs::Media);
 			break;
 		case ActionsClass::Actions::Restart_Media:
-			ShowPair(pairs::Media);
+			ShowPair(Pairs::Media);
 			break;
 		case ActionsClass::Actions::Stop_Media:
-			ShowPair(pairs::Media);
+			ShowPair(Pairs::Media);
 			break;
 		case ActionsClass::Actions::Next_Media:
-			ShowPair(pairs::Media);
+			ShowPair(Pairs::Media);
 			break;
 		case ActionsClass::Actions::Previous_Media:
-			ShowPair(pairs::Media);
+			ShowPair(Pairs::Media);
 			break;
 		case ActionsClass::Actions::Set_Media_Time:
-			ShowPair(pairs::Media);
+			ShowPair(Pairs::Media);
 			break;
 		case ActionsClass::Actions::Scrub_Media:
-			ShowPair(pairs::Media);
+			ShowPair(Pairs::Media);
 			break;
 		default:
 			HideAllPairs();
@@ -769,7 +794,21 @@ bool PluginWindow::map_exists()
 	}
 	return false;
 }
-
+int PluginWindow::map_location(MidiMessage message)
+{
+	auto devicemanager = GetDeviceManager();
+	auto hooks = devicemanager->GetMidiHooksByDeviceName(
+		ui->mapping_lbl_device_name->text());
+	for (int i = 0; i < hooks.size(); i++) {
+		if ((hooks.at(i)->channel == message.channel) &&
+		    (hooks.at(i)->norc == message.NORC) &&
+		    (hooks.at(i)->message_type ==
+		     message.message_type)) {
+			return i;
+		}
+	}
+	return -1;
+}
 void PluginWindow::add_new_mapping()
 {
 	ui->btn_Listen_many->setChecked(false);
@@ -833,7 +872,6 @@ void PluginWindow::add_new_mapping()
 		conf->Save();
 	} else {
 		// TODO: Fix this, and create Utils::message_to_user(QString)
-		QMessageBox msgBox;
 		QString Mess;
 		Mess.append("Mapping already Exists for ");
 		Mess.append(ui->mapping_lbl_device_name->text());
@@ -843,8 +881,7 @@ void PluginWindow::add_new_mapping()
 		Mess.append(QString::number(ui->sb_norc->value()));
 		Mess.append(" and Message Type ");
 		Mess.append(ui->cb_mtype->currentText());
-		msgBox.setText(Mess);
-		msgBox.exec();
+		Utils::alert_popup(Mess);
 	}
 }
 
@@ -924,10 +961,9 @@ void PluginWindow::tab_changed(int i)
 }
 void PluginWindow::delete_mapping() {
 	auto devicemanager = GetDeviceManager();
-	auto hooks = devicemanager->GetMidiHooksByDeviceName(
-		ui->mapping_lbl_device_name->text());
 	auto dev = devicemanager->GetMidiDeviceByName(
 		ui->mapping_lbl_device_name->text());
+	auto hooks = dev->GetMidiHooks();
 	auto conf = GetConfig();
 	for (int i = 0; i < hooks.size(); i++) {
 		if ((hooks.at(i)->channel == ui->sb_channel->value()) &&

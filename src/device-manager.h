@@ -56,7 +56,7 @@ public:
 	void RegisterMidiDevice(int port, int outport);
 	void SendMidi(QString mtype, int channel, int norc, int value);
 	obs_data_t *GetData();
-	void broadcast(const RpcEvent &event);
+	void broadcast_obs_event(const RpcEvent &event);
 signals:
 	void bcast(QString updateType, QString eventData);
 

@@ -337,9 +337,9 @@ void OBSController::SetCurrentProfile(QString profileName)
 	obs_frontend_set_current_profile(profileName.toUtf8());
 }
 
-void OBSController::SetTextGDIPlusText() {}
+void OBSController::SetTextGDIPlusText(QString text) {}
 
-void OBSController::SetBrowserSourceURL() {}
+void OBSController::SetBrowserSourceURL(QString url) {}
 
 void OBSController::ReloadBrowserSource() {}
 

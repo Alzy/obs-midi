@@ -40,7 +40,7 @@ using namespace std;
 ///////////////////////
 /* MIDI HOOK ROUTES */
 //////////////////////
-void MidiAgent::executeAction(MidiHook *hook, int MidiVal, Actions action)
+void MidiAgent::do_obs_action(MidiHook *hook, int MidiVal, Actions action)
 {
 	switch (action) {
 	case Actions::Set_Current_Scene:
@@ -107,7 +107,9 @@ void MidiAgent::executeAction(MidiHook *hook, int MidiVal, Actions action)
 		OBSController::SetVolume(hook->audio_source,
 					 pow(Utils::mapper(MidiVal), 3.0));
 		break;
-	
+	case Actions::Take_Source_Screenshot:
+		OBSController::TakeSourceScreenshot(hook->source);
+		break;
 	};
 }
 // BUTTON ACTIONS
@@ -149,7 +151,7 @@ map<QString, function<void(MidiHook *hook, int midiVal)>> funcMap = {
 	 }},
 	{"Take Source Screenshot",
 	 [](MidiHook *hook, int midiVal) {
-		 OBSController::TakeSourceScreenshot(hook->source);
+		 
 	 }},
 	{"Enable Source Filter",
 	 [](MidiHook *hook, int midiVal) {
@@ -164,10 +166,7 @@ map<QString, function<void(MidiHook *hook, int midiVal)>> funcMap = {
 		 OBSController::ToggleSourceFilter();
 	 }},
 	// CC ACTIONS
-	{"Set Volume",
-	 [](MidiHook *hook, int midiVal) {
-		 
-	 }},
+	
 	{"Set Sync Offset",
 	 [](MidiHook *hook, int midiVal) {
 		 OBSController::SetSyncOffset(hook->media_source,
@@ -194,8 +193,8 @@ map<QString, function<void(MidiHook *hook, int midiVal)>> funcMap = {
 MidiAgent::MidiAgent()
 {
 
-	name = "Midi Device (uninit)";
-	outname = "Midi Out Device (uninit)";
+	midi_input_name = "Midi Device (uninit)";
+	midi_output_name = "Midi Out Device (uninit)";
 	midiin = new rtmidi::midi_in();
 	midiout = new rtmidi::midi_out();
 	midiin->set_callback(
@@ -204,8 +203,8 @@ MidiAgent::MidiAgent()
 
 MidiAgent::~MidiAgent()
 {
-	ClearMidiHooks();
-	ClosePort();
+	clear_MidiHooks();
+	close_midi_port();
 	delete midiin;
 	delete midiout;
 }
@@ -215,8 +214,8 @@ MidiAgent::~MidiAgent()
  */
 void MidiAgent::Load(obs_data_t *data)
 {
-	name = obs_data_get_string(data, "name");
-	outname = obs_data_get_string(data, "outname");
+	midi_input_name = obs_data_get_string(data, "name");
+	midi_output_name = obs_data_get_string(data, "outname");
 	enabled = obs_data_get_bool(data, "enabled");
 	bidirectional = obs_data_get_bool(data, "bidirectional");
 
@@ -248,7 +247,7 @@ void MidiAgent::Load(obs_data_t *data)
 		mh->bool_override =
 			obs_data_get_bool(hookData, "bool_override");
 		mh->int_override = obs_data_get_int(hookData, "int_override");
-		AddMidiHook(mh);
+		add_MidiHook(mh);
 	}
 }
 void MidiAgent::SendMessage(MidiMessage mess)
@@ -259,24 +258,24 @@ void MidiAgent::SendMessage(MidiMessage mess)
 
 /* Will open the port and enable this MidiAgent
 */
-void MidiAgent::OpenPort(int inport)
+void MidiAgent::open_midi_input_port(int inport)
 {
 	try {
 
 		midiin->open_port(inport);
 
-		name = QString::fromStdString(midiin->get_port_name(inport));
+		midi_input_name = QString::fromStdString(midiin->get_port_name(inport));
 		enabled = true;
 		connected = true;
 		blog(LOG_INFO, "MIDI device connected In: [%d] %s", inport,
-		     name.toStdString().c_str());
+		     midi_input_name.toStdString().c_str());
 
 	} catch (const rtmidi::midi_exception &error) {
 
 		blog(1, "unable to open port %i -- &s", inport, error.what());
 	}
 }
-void MidiAgent::OpenOutPort(int outport)
+void MidiAgent::open_midi_output_port(int outport)
 {
 
 	try {
@@ -286,17 +285,17 @@ void MidiAgent::OpenOutPort(int outport)
 		blog(1, " Opening out port -- %i -- exception -- %s ", outport,
 		     error.what());
 	}
-	outname = QString::fromStdString(midiout->get_port_name(outport));
+	midi_output_name = QString::fromStdString(midiout->get_port_name(outport));
 	enabled = true;
 	connected = true;
 
 	blog(LOG_INFO, "MIDI device connected Out: [%d] %s", outport,
-	     outname.toStdString().c_str());
+	     midi_output_name.toStdString().c_str());
 }
 
 /* Will close the port and disable this MidiAgent
 */
-void MidiAgent::ClosePort()
+void MidiAgent::close_midi_port()
 {
 	midiin->close_port();
 	midiout->close_port();
@@ -304,22 +303,22 @@ void MidiAgent::ClosePort()
 	connected = false;
 }
 
-QString MidiAgent::GetName()
+QString MidiAgent::get_midi_input_name()
 {
-	return name;
+	return midi_input_name;
 }
-QString MidiAgent::GetOutName()
+QString MidiAgent::get_midi_output_name()
 {
-	return outname;
+	return midi_output_name;
 }
-void MidiAgent::SetOutName(QString oname)
+void MidiAgent::set_midi_output_name(QString oname)
 {
-	if (outname != oname) {
+	if (midi_output_name != oname) {
 		midiout->close_port();
-		OpenOutPort(GetDeviceManager()->GetOutPortNumberByDeviceName(
+		open_midi_output_port(GetDeviceManager()->GetOutPortNumberByDeviceName(
 			oname));
 	}
-	outname = oname;
+	midi_output_name = oname;
 }
 bool MidiAgent::setBidirectional(bool state)
 {
@@ -331,8 +330,8 @@ bool MidiAgent::setBidirectional(bool state)
 		if (midiout->is_port_open()) {
 			midiout->close_port();
 		}
-		OpenOutPort(GetDeviceManager()->GetOutPortNumberByDeviceName(
-			outname));
+		open_midi_output_port(GetDeviceManager()->GetOutPortNumberByDeviceName(
+			midi_output_name));
 	}
 	return state;
 }
@@ -374,7 +373,7 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 	/***** Send Messages to emit function *****/
 
 	MidiMessage x;
-	x.device_name = self->name;
+	x.device_name = self->get_midi_input_name();
 	x.message_type = mType;
 	x.NORC = norc;
 	x.channel = channelnel;
@@ -397,7 +396,7 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 */
 void MidiAgent::TriggerInputAction(MidiHook *hook, int midiVal)
 {
-	executeAction(hook, midiVal, Utils::string_to_action(Utils::untranslate(hook->action)));
+	do_obs_action(hook, midiVal, Utils::string_to_action(Utils::untranslate(hook->action)));
 	//funcMap[hook->action](hook, midiVal);
 }
 
@@ -410,7 +409,7 @@ QVector<MidiHook *> MidiAgent::GetMidiHooks()
 
 /* Add a new MidiHook
 */
-void MidiAgent::AddMidiHook(MidiHook *hook)
+void MidiAgent::add_MidiHook(MidiHook *hook)
 {
 
 	//connect()
@@ -419,7 +418,7 @@ void MidiAgent::AddMidiHook(MidiHook *hook)
 
 /* Remove a MidiHook
 */
-void MidiAgent::RemoveMidiHook(MidiHook *hook)
+void MidiAgent::remove_MidiHook(MidiHook *hook)
 {
 	if (midiHooks.contains(hook)) {
 		midiHooks.removeOne(hook);
@@ -428,7 +427,7 @@ void MidiAgent::RemoveMidiHook(MidiHook *hook)
 
 /* Clears all the MidiHooks for this device.
 */
-void MidiAgent::ClearMidiHooks()
+void MidiAgent::clear_MidiHooks()
 {
 	midiHooks.clear();
 }
@@ -440,8 +439,8 @@ void MidiAgent::ClearMidiHooks()
 obs_data_t *MidiAgent::GetData()
 {
 	obs_data_t *data = obs_data_create();
-	obs_data_set_string(data, "name", name.toStdString().c_str());
-	obs_data_set_string(data, "outname", outname.toStdString().c_str());
+	obs_data_set_string(data, "name", midi_input_name.toStdString().c_str());
+	obs_data_set_string(data, "outname", midi_output_name.toStdString().c_str());
 
 	obs_data_set_bool(data, "enabled", enabled);
 	obs_data_set_bool(data, "bidirectional", bidirectional);
@@ -479,7 +478,7 @@ void MidiAgent::NewObsEvent(QString eventType, QString eventData)
 					    "Set Volume" &&
 				    self->midiHooks.at(i)->audio_source ==
 					    source) {
-					this->send(
+					this->send_message_to_midi_device(
 						self->midiHooks.at(i)
 							->message_type,
 						self->midiHooks.at(i)->channel,
@@ -494,12 +493,12 @@ void MidiAgent::NewObsEvent(QString eventType, QString eventData)
 				if (self->midiHooks.at(i)->action ==
 					    "Set Current Scene" &&
 				    self->midiHooks.at(i)->scene == source) {
-					this->send(
+					this->send_message_to_midi_device(
 						"note_off",
 						self->midiHooks.at(i)->channel,
 						lastscenebtn, 0);
 
-					this->send(
+					this->send_message_to_midi_device(
 						"note_on",
 						self->midiHooks.at(i)->channel,
 						self->midiHooks.at(i)->norc, 1);
@@ -514,11 +513,11 @@ void MidiAgent::NewObsEvent(QString eventType, QString eventData)
 				if (self->midiHooks.at(i)->action ==
 					    "Set Current Scene" &&
 				    self->midiHooks.at(i)->scene == from) {
-					this->send(
+					this->send_message_to_midi_device(
 						"note_on",
 						self->midiHooks.at(i)->channel,
 						self->midiHooks.at(i)->norc, 0);
-					this->send(
+					this->send_message_to_midi_device(
 						"note_off",
 						self->midiHooks.at(i)->channel,
 						self->midiHooks.at(i)->norc, 0);
@@ -534,7 +533,7 @@ void MidiAgent::NewObsEvent(QString eventType, QString eventData)
 					    from) {
 					bool muted = obs_data_get_bool(data,
 								       "muted");
-					this->send(
+					this->send_message_to_midi_device(
 						"note_on",
 						self->midiHooks.at(i)->channel,
 						self->midiHooks.at(i)->norc,
@@ -551,7 +550,7 @@ void MidiAgent::NewObsEvent(QString eventType, QString eventData)
 					    from) {
 					bool muted = obs_data_get_bool(data,
 								       "muted");
-					this->send(
+					this->send_message_to_midi_device(
 						"note_on",
 						self->midiHooks.at(i)->channel,
 						self->midiHooks.at(i)->norc,
@@ -581,7 +580,7 @@ void MidiAgent::NewObsEvent(QString eventType, QString eventData)
 				     i++) {
 					if (self->midiHooks.at(i)->source ==
 					    from) {
-						self->RemoveMidiHook(
+						self->remove_MidiHook(
 							self->midiHooks.at(i));
 						self->GetData();
 						i--;
@@ -599,7 +598,7 @@ void MidiAgent::NewObsEvent(QString eventType, QString eventData)
 		this->sending = false;
 	}
 }
-void MidiAgent::send(QString type, int channel, int norc, int value)
+void MidiAgent::send_message_to_midi_device(QString type, int channel, int norc, int value)
 {
 	rtmidi::message *hello = new rtmidi::message();
 	if (type == "control_change") {

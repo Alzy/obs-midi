@@ -127,13 +127,13 @@ public:
 	~MidiAgent();
 	void Load(obs_data_t *data);
 
-	void OpenPort(int inport);
-	void OpenOutPort(int outport);
-	void ClosePort();
-	void executeAction(MidiHook *hook, int MidiVal, Actions action);
-	QString GetName();
-	QString GetOutName();
-	void SetOutName(QString oname);
+	void open_midi_input_port(int inport);
+	void open_midi_output_port(int outport);
+	void close_midi_port();
+	void do_obs_action(MidiHook *hook, int MidiVal, Actions action);
+	QString get_midi_input_name();
+	QString get_midi_output_name();
+	void set_midi_output_name(QString oname);
 	int GetPort();
 	bool isEnabled();
 	bool isConnected();
@@ -143,9 +143,9 @@ public:
 	void TriggerInputAction(MidiHook *hook, int midiVal);
 	void SendMessage(MidiMessage mess);
 	QVector<MidiHook *> GetMidiHooks();
-	void AddMidiHook(MidiHook *hook);
-	void RemoveMidiHook(MidiHook *hook);
-	void ClearMidiHooks();
+	void add_MidiHook(MidiHook *hook);
+	void remove_MidiHook(MidiHook *hook);
+	void clear_MidiHooks();
 	obs_data_t *GetData();
 
 public slots:
@@ -154,11 +154,11 @@ signals:
 	void SendNewUnknownMessage(MidiMessage);
 
 private:
-	void send(QString type, int channel, int norc, int value = 0);
+	void send_message_to_midi_device(QString type, int channel, int norc, int value = 0);
 	rtmidi::midi_in *midiin;
 	rtmidi::midi_out *midiout;
-	QString name;
-	QString outname;
+	QString midi_input_name;
+	QString midi_output_name;
 	bool sending;
 	int port;
 	int lastscenebtn;

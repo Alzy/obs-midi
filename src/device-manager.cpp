@@ -48,15 +48,15 @@ void DeviceManager::Load(obs_data_t *data)
 			SLOT(NewObsEvent(QString, QString)));
 		if (device->isEnabled()) {
 			int portNumber =
-				GetPortNumberByDeviceName(device->GetName());
+				GetPortNumberByDeviceName(device->get_midi_input_name());
 			int outPort = GetOutPortNumberByDeviceName(
-				device->GetOutName());
+				device->get_midi_output_name());
 
 			if (portNumber != -1) {
-				device->OpenPort(portNumber);
+				device->open_midi_input_port(portNumber);
 			}
 			if (outPort != -1) {
-				device->OpenOutPort(outPort);
+				device->open_midi_output_port(outPort);
 			}
 		}
 	}
@@ -138,7 +138,7 @@ QVector<MidiAgent *> DeviceManager::GetActiveMidiDevices()
 MidiAgent *DeviceManager::GetMidiDeviceByName(QString deviceName)
 {
 	for (int i = 0; i < midiAgents.size(); i++) {
-		if (midiAgents.at(i)->GetName() == deviceName) {
+		if (midiAgents.at(i)->get_midi_input_name() == deviceName) {
 			return midiAgents.at(i);
 		}
 	}
@@ -163,8 +163,8 @@ QVector<MidiHook *> DeviceManager::GetMidiHooksByDeviceName(QString deviceName)
 void DeviceManager::RegisterMidiDevice(int port, int outport)
 {
 	MidiAgent *midiA = new MidiAgent();
-	midiA->OpenPort(port);
-	midiA->OpenOutPort(outport);
+	midiA->open_midi_input_port(port);
+	midiA->open_midi_output_port(outport);
 
 	midiAgents.push_back(midiA);
 }
@@ -194,7 +194,7 @@ void DeviceManager::SendMidi(QString mtype, int channel, int norc, int value)
 	//***Need to add message Deletion here***//
 }
 
-void DeviceManager::broadcast(const RpcEvent &event)
+void DeviceManager::broadcast_obs_event(const RpcEvent &event)
 {
 	OBSDataAutoRelease eventData = obs_data_create();
 

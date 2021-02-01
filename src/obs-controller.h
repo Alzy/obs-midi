@@ -56,8 +56,8 @@ void StopReplayBuffer();
 void SaveReplayBuffer();
 
 void SetCurrentProfile(QString profileName);
-void SetTextGDIPlusText();
-void SetBrowserSourceURL();
+void SetTextGDIPlusText(QString text);
+void SetBrowserSourceURL(QString url);
 void ReloadBrowserSource();
 void TakeSourceScreenshot(QString source);
 void EnableSourceFilter();

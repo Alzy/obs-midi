@@ -74,6 +74,7 @@ PluginWindow::PluginWindow(QWidget *parent)
 		SLOT(edit_mapping(int, int)));
 	/**************Connections to mappper****************/
 	connect(ui->btn_add, SIGNAL(clicked()), this, SLOT(add_new_mapping()));
+	connect(ui->btn_delete, SIGNAL(clicked()), this, SLOT(delete_mapping()));
 	connect(ui->tabWidget, SIGNAL(currentChanged(int)), this,
 		SLOT(tab_changed(int)));
 	this->ui->cb_obs_output_action->addItems(Utils::TranslateActions());
@@ -112,7 +113,7 @@ void PluginWindow::setCheck(bool x)
 void PluginWindow::SetAvailableDevices()
 {
 
-	auto midiOutDevices = GetDeviceManager()->GetOPL();
+	auto midiOutDevices = GetDeviceManager()->GetOutPortsList();
 
 	auto midiDevices = GetDeviceManager()->GetPortsList();
 
@@ -494,33 +495,33 @@ void PluginWindow::on_scene_change(QString scene)
 	ui->cb_obs_output_item->addItems(Utils::GetSceneItemsList(scene));
 }
 
-void PluginWindow::ShowOnly(QList<Actions> shows)
+void PluginWindow::ShowOnly(QList<ActionsClass::Actions> shows)
 {
 
 	ui->cb_obs_output_action->clear();
 	for (int i = 0; i < shows.size(); i++) {
 		ui->cb_obs_output_action->addItem(
-			obs_module_text(Utils::action_to_string(shows.at(i))
+			obs_module_text(ActionsClass::action_to_string(shows.at(i))
 						.toStdString()
 						.c_str()));
 	}
 }
 
-void PluginWindow::ShowEntry(Actions Entry)
+void PluginWindow::ShowEntry(ActionsClass::Actions Entry)
 {
 	if (ui->cb_obs_output_action->findText(
-		    Utils::action_to_string(Entry)) == -1) {
+		    ActionsClass::action_to_string(Entry)) == -1) {
 		ui->cb_obs_output_action->addItem(obs_module_text(
-			Utils::action_to_string(Entry).toStdString().c_str()));
+			ActionsClass::action_to_string(Entry).toStdString().c_str()));
 	}
 }
-void PluginWindow::HideEntry(Actions Entry)
+void PluginWindow::HideEntry(ActionsClass::Actions Entry)
 {
-	if (ui->cb_obs_output_action->findText(Utils::action_to_string(Entry)) >
-	    0) {
+	if (ui->cb_obs_output_action->findText(
+		    ActionsClass::action_to_string(Entry)) > 0) {
 		ui->cb_obs_output_action->removeItem(
 			ui->cb_obs_output_action->findText(
-				Utils::action_to_string(Entry)));
+				ActionsClass::action_to_string(Entry)));
 	}
 }
 void PluginWindow::ShowAllActions()
@@ -530,7 +531,7 @@ void PluginWindow::ShowAllActions()
 		ShowEntry(Utils::AllActions_raw.at(i));
 	}
 }
-void PluginWindow::HideEntries(QList<Actions> entrys)
+void PluginWindow::HideEntries(QList<ActionsClass::Actions> entrys)
 {
 	int count = ui->cb_obs_output_action->count();
 
@@ -541,7 +542,7 @@ void PluginWindow::HideEntries(QList<Actions> entrys)
 	}
 	listview->adjustSize();
 }
-void PluginWindow::ShowEntries(QList<Actions> entrys)
+void PluginWindow::ShowEntries(QList<ActionsClass::Actions> entrys)
 {
 	int count = ui->cb_obs_output_action->count();
 
@@ -650,96 +651,96 @@ void PluginWindow::obs_actions_select(QString action)
 	if (!switching) {
 		HideAllPairs();
 
-		switch (Utils::string_to_action(untranslate(action))) {
-		case Actions::Set_Current_Scene:
+		switch (ActionsClass::string_to_action(untranslate(action))) {
+		case ActionsClass::Actions::Set_Current_Scene:
 			ShowPair(pairs::Scene);
 			break;
-		case Actions::Enable_Source_Filter:
-			ShowPair(pairs::Scene);
-			ShowPair(pairs::Source);
-			ShowPair(pairs::Filter);
-			break;
-		case Actions::Disable_Source_Filter:
+		case ActionsClass::Actions::Enable_Source_Filter:
 			ShowPair(pairs::Scene);
 			ShowPair(pairs::Source);
 			ShowPair(pairs::Filter);
 			break;
-		case Actions::Set_Gain_Filter:
+		case ActionsClass::Actions::Disable_Source_Filter:
 			ShowPair(pairs::Scene);
 			ShowPair(pairs::Source);
 			ShowPair(pairs::Filter);
 			break;
-		case Actions::Toggle_Source_Filter:
+		case ActionsClass::Actions::Set_Gain_Filter:
 			ShowPair(pairs::Scene);
 			ShowPair(pairs::Source);
 			ShowPair(pairs::Filter);
 			break;
-		case Actions::Reset_Scene_Item:
+		case ActionsClass::Actions::Toggle_Source_Filter:
+			ShowPair(pairs::Scene);
+			ShowPair(pairs::Source);
+			ShowPair(pairs::Filter);
+			break;
+		case ActionsClass::Actions::Reset_Scene_Item:
 			ShowPair(pairs::Scene);
 			ShowPair(pairs::Source);
 			ShowPair(pairs::Item);
 			break;
-		case Actions::Set_Scene_Item_Render:
+		case ActionsClass::Actions::Set_Scene_Item_Render:
 			ShowPair(pairs::Scene);
 			ShowPair(pairs::Source);
 			ShowPair(pairs::Item);
 			break;
-		case Actions::Set_Scene_Item_Position:
+		case ActionsClass::Actions::Set_Scene_Item_Position:
 			ShowPair(pairs::Scene);
 			ShowPair(pairs::Item);
 			break;
-		case Actions::Set_Scene_Item_Transform:
+		case ActionsClass::Actions::Set_Scene_Item_Transform:
 			ShowPair(pairs::Scene);
 			ShowPair(pairs::Item);
 			break;
-		case Actions::Set_Scene_Item_Crop:
+		case ActionsClass::Actions::Set_Scene_Item_Crop:
 			ShowPair(pairs::Scene);
 			ShowPair(pairs::Item);
 			break;
-		case Actions::Set_Scene_Transition_Override:
+		case ActionsClass::Actions::Set_Scene_Transition_Override:
 			ShowPair(pairs::Scene);
 			ShowPair(pairs::Transition);
 			break;
-		case Actions::Set_Current_Transition:
+		case ActionsClass::Actions::Set_Current_Transition:
 			ShowPair(pairs::Transition);
 			break;
-		case Actions::Set_Volume:
+		case ActionsClass::Actions::Set_Volume:
 			ShowPair(pairs::Audio);
 			break;
-		case Actions::Set_Mute:
+		case ActionsClass::Actions::Set_Mute:
 			ShowPair(pairs::Audio);
 			break;
-		case Actions::Toggle_Mute:
+		case ActionsClass::Actions::Toggle_Mute:
 			ShowPair(pairs::Audio);
 			break;
-		case Actions::Set_Source_Filter_Visibility:
+		case ActionsClass::Actions::Set_Source_Filter_Visibility:
 			ShowPair(pairs::Scene);
 			ShowPair(pairs::Source);
 			ShowPair(pairs::Filter);
 			break;
-		case Actions::Take_Source_Screenshot:
+		case ActionsClass::Actions::Take_Source_Screenshot:
 			ShowPair(pairs::Source);
 			ShowPair(pairs::Scene);
 			break;
-		case Actions::Play_Pause_Media:
+		case ActionsClass::Actions::Play_Pause_Media:
 			ShowPair(pairs::Media);
 			break;
-		case Actions::Restart_Media:
+		case ActionsClass::Actions::Restart_Media:
 			ShowPair(pairs::Media);
 			break;
-		case Actions::Stop_Media:
+		case ActionsClass::Actions::Stop_Media:
 			ShowPair(pairs::Media);
 			break;
-		case Actions::Next_Media:
+		case ActionsClass::Actions::Next_Media:
 			ShowPair(pairs::Media);
 			break;
-		case Actions::Previous_Media:
+		case ActionsClass::Actions::Previous_Media:
 			ShowPair(pairs::Media);
 			break;
-		case Actions::Set_Media_Time:
+		case ActionsClass::Actions::Set_Media_Time:
 			ShowPair(pairs::Media);
 			break;
-		case Actions::Scrub_Media:
+		case ActionsClass::Actions::Scrub_Media:
 			ShowPair(pairs::Media);
 			break;
 		default:
@@ -750,7 +751,7 @@ void PluginWindow::obs_actions_select(QString action)
 }
 QString PluginWindow::untranslate(QString tstring)
 {
-	return Utils::action_to_string(Utils::AllActions_raw.at(
+	return ActionsClass::action_to_string(Utils::AllActions_raw.at(
 		Utils::TranslateActions().indexOf(tstring)));
 }
 bool PluginWindow::map_exists()
@@ -857,7 +858,7 @@ void PluginWindow::add_row_from_hook(MidiHook *hook)
 	actc.setRgb(170, 0, 255);
 	QTableWidgetItem *channelitem =
 		new QTableWidgetItem(QString::number(hook->channel));
-	
+
 	QTableWidgetItem *mtypeitem = new QTableWidgetItem(hook->message_type);
 	QTableWidgetItem *norcitem =
 		new QTableWidgetItem(QString::number(hook->norc));
@@ -871,7 +872,6 @@ void PluginWindow::add_row_from_hook(MidiHook *hook)
 	QTableWidgetItem *audioitem = new QTableWidgetItem(hook->audio_source);
 	QTableWidgetItem *mediaitem = new QTableWidgetItem(hook->media_source);
 
-
 	set_cell_colors(midic, channelitem);
 	set_cell_colors(midic, mtypeitem);
 	set_cell_colors(midic, norcitem);
@@ -883,7 +883,6 @@ void PluginWindow::add_row_from_hook(MidiHook *hook)
 	set_cell_colors(actc, itemitem);
 	set_cell_colors(actc, audioitem);
 	set_cell_colors(actc, mediaitem);
-
 
 	ui->table_mapping->setItem(row, 0, channelitem);
 	ui->table_mapping->setItem(row, 1, mtypeitem);
@@ -897,7 +896,8 @@ void PluginWindow::add_row_from_hook(MidiHook *hook)
 	ui->table_mapping->setItem(row, 9, audioitem);
 	ui->table_mapping->setItem(row, 10, mediaitem);
 }
-void PluginWindow::set_cell_colors(QColor color, QTableWidgetItem *item) {
+void PluginWindow::set_cell_colors(QColor color, QTableWidgetItem *item)
+{
 	QColor txcolor;
 	txcolor.black();
 	item->setBackgroundColor(txcolor);
@@ -922,7 +922,28 @@ void PluginWindow::tab_changed(int i)
 		}
 	}
 }
-void PluginWindow::delete_mapping() {}
+void PluginWindow::delete_mapping() {
+	auto devicemanager = GetDeviceManager();
+	auto hooks = devicemanager->GetMidiHooksByDeviceName(
+		ui->mapping_lbl_device_name->text());
+	auto dev = devicemanager->GetMidiDeviceByName(
+		ui->mapping_lbl_device_name->text());
+	auto conf = GetConfig();
+	for (int i = 0; i < hooks.size(); i++) {
+		if ((hooks.at(i)->channel == ui->sb_channel->value()) &&
+		    (hooks.at(i)->norc == ui->sb_norc->value()) &&
+		    (hooks.at(i)->message_type ==
+		     ui->cb_mtype->currentText())) {
+			dev->remove_MidiHook(hooks.at(i));
+			conf->Save();
+			ui->table_mapping->removeRow(
+				ui->table_mapping->selectedItems().at(0)->row());
+		}
+	}
+	
+	
+	
+}
 void PluginWindow::edit_mapping(int row, int col)
 {
 	auto sitems = ui->table_mapping->selectedItems();

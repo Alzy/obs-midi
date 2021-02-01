@@ -40,152 +40,7 @@ using namespace std;
 ///////////////////////
 /* MIDI HOOK ROUTES */
 //////////////////////
-void MidiAgent::do_obs_action(MidiHook *hook, int MidiVal, Actions action)
-{
-	switch (action) {
-	case Actions::Set_Current_Scene:
-		OBSController::SetCurrentScene(hook->scene);
-		break;
-	case Actions::Reset_Scene_Item:
-		OBSController::ResetSceneItem(hook->scene, hook->item);
-		break;
-	case Actions::Toggle_Mute:
-		OBSController::ToggleMute(hook->audio_source);
-		break;
-	case Actions::Do_Transition:
-		if (hook->transition.isEmpty()) {
-			OBSController::TransitionToProgram();
-		} else if (hook->duration != -1) {
-			OBSController::TransitionToProgram(hook->transition,
-							   hook->duration);
-		} else {
-			OBSController::TransitionToProgram(hook->transition);
-		}
-		break;
-	case Actions::Set_Current_Transition:
-		OBSController::SetCurrentTransition(hook->transition);
-		break;
-	case Actions::Set_Mute:
-		OBSController::SetMute(hook->audio_source, hook->bool_override);
-		break;
-	case Actions::Toggle_Start_Stop_Streaming:
-		OBSController::StartStopStreaming();
-		break;
-	case Actions::Set_Preview_Scene:
-		OBSController::SetPreviewScene(hook->scene);
-		break;
-	case Actions::Set_Current_Scene_Collection:
-		OBSController::SetCurrentSceneCollection(
-			hook->scene_collection);
-		break;
-	case Actions::Set_Transition_Duration:
-		if (hook->duration != -1) {
-			OBSController::SetTransitionDuration(hook->duration);
-		} else {
-			OBSController::SetTransitionDuration(MidiVal);
-		}
-		break;
-	case Actions::Start_Streaming:
-		OBSController::StartStreaming();
-		break;
-	case Actions::Stop_Streaming:
-		OBSController::StopStreaming();
-		break;
-	case Actions::Start_Recording:
-		OBSController::StartRecording();
-		break;
-	case Actions::Stop_Recording:
-		OBSController::StopRecording();
-		break;
-	case Actions::Start_Replay_Buffer:
-		OBSController::StartReplayBuffer();
-		break;
-	case Actions::Stop_Replay_Buffer:
-		OBSController::StopReplayBuffer();
-		break;
-	case Actions::Set_Volume:
-		OBSController::SetVolume(hook->audio_source,
-					 pow(Utils::mapper(MidiVal), 3.0));
-		break;
-	case Actions::Take_Source_Screenshot:
-		OBSController::TakeSourceScreenshot(hook->source);
-		break;
-	};
-}
-// BUTTON ACTIONS
-map<QString, function<void(MidiHook *hook, int midiVal)>> funcMap = {
 
-	{"Start Stop Recording",
-	 [](MidiHook *hook, int midiVal) {
-		 OBSController::StartStopRecording();
-	 }},
-
-	{"Pause Recording",
-	 [](MidiHook *hook, int midiVal) { OBSController::PauseRecording(); }},
-	{"Resume Recording",
-	 [](MidiHook *hook, int midiVal) { OBSController::ResumeRecording(); }},
-	{"Start Stop Replay Buffer",
-	 [](MidiHook *hook, int midiVal) {
-		 OBSController::StartStopReplayBuffer();
-	 }},
-
-	{"Save Replay Buffer",
-	 [](MidiHook *hook, int midiVal) {
-		 OBSController::SaveReplayBuffer();
-	 }},
-	{"Set Current Profile",
-	 [](MidiHook *hook, int midiVal) {
-		 OBSController::SetCurrentProfile(hook->profile);
-	 }},
-	{"Set Text GDIPlus Text",
-	 [](MidiHook *hook, int midiVal) {
-		 OBSController::SetTextGDIPlusText();
-	 }},
-	{"Set Browser Source URL",
-	 [](MidiHook *hook, int midiVal) {
-		 OBSController::SetBrowserSourceURL();
-	 }},
-	{"Reload Browser Source",
-	 [](MidiHook *hook, int midiVal) {
-		 OBSController::ReloadBrowserSource();
-	 }},
-	{"Take Source Screenshot",
-	 [](MidiHook *hook, int midiVal) {
-		 
-	 }},
-	{"Enable Source Filter",
-	 [](MidiHook *hook, int midiVal) {
-		 OBSController::EnableSourceFilter();
-	 }},
-	{"Disable Source Filter",
-	 [](MidiHook *hook, int midiVal) {
-		 OBSController::DisableSourceFilter();
-	 }},
-	{"Toggle Source Filter",
-	 [](MidiHook *hook, int midiVal) {
-		 OBSController::ToggleSourceFilter();
-	 }},
-	// CC ACTIONS
-	
-	{"Set Sync Offset",
-	 [](MidiHook *hook, int midiVal) {
-		 OBSController::SetSyncOffset(hook->media_source,
-					      (int64_t)midiVal);
-	 }},
-	{"Set Source Position",
-	 [](MidiHook *hook, int midiVal) {
-		 OBSController::SetSourcePosition();
-	 }},
-	{"Set Source Rotation",
-	 [](MidiHook *hook, int midiVal) {
-		 OBSController::SetSourceRotation();
-	 }},
-	{"Set Source Scale",
-	 [](MidiHook *hook, int midiVal) { OBSController::SetSourceScale(); }},
-	{"Set Gain Filter",
-	 [](MidiHook *hook, int midiVal) { OBSController::SetGainFilter(); }},
-	{"Set Opacity",
-	 [](MidiHook *hook, int midiVal) { OBSController::SetOpacity(); }}};
 
 ////////////////
 // MIDI AGENT //
@@ -250,11 +105,7 @@ void MidiAgent::Load(obs_data_t *data)
 		add_MidiHook(mh);
 	}
 }
-void MidiAgent::SendMessage(MidiMessage mess)
-{
 
-	emit this->SendNewUnknownMessage(mess);
-}
 
 /* Will open the port and enable this MidiAgent
 */
@@ -378,7 +229,8 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 	x.NORC = norc;
 	x.channel = channelnel;
 	x.value = value;
-	self->SendMessage(x);
+	//self->SendMessage(x);
+	emit self->broadcast_midi_message(x);
 
 	/** check if hook exists for this note or cc norc and launch it **/
 	//Eventually add channel to this check.
@@ -387,18 +239,16 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 		if (self->midiHooks.at(i)->message_type == mType &&
 		    self->midiHooks.at(i)->norc == norc &&
 		    self->midiHooks.at(i)->channel == channelnel) {
-			self->TriggerInputAction(self->midiHooks.at(i), value);
+			self->do_obs_action(
+				self->midiHooks.at(i), value,
+				ActionsClass::string_to_action(
+					Utils::untranslate(self->midiHooks.at(i)->action)));
+			
 		}
 	}
 }
 
-/* Triggers funcMap function. Called from HandleInput callback
-*/
-void MidiAgent::TriggerInputAction(MidiHook *hook, int midiVal)
-{
-	do_obs_action(hook, midiVal, Utils::string_to_action(Utils::untranslate(hook->action)));
-	//funcMap[hook->action](hook, midiVal);
-}
+
 
 /* Get the midi hooks for this device
 */
@@ -454,7 +304,7 @@ obs_data_t *MidiAgent::GetData()
 	return data;
 }
 /*Handle OBS events*/
-void MidiAgent::NewObsEvent(QString eventType, QString eventData)
+void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 {
 	if (!this->sending) {
 
@@ -612,4 +462,135 @@ void MidiAgent::send_message_to_midi_device(QString type, int channel, int norc,
 		this->midiout->send_message(
 			hello->note_off(channel, norc, value));
 	}
+}
+
+
+
+void MidiAgent::do_obs_action(MidiHook *hook, int MidiVal,
+			      ActionsClass::Actions action)
+{
+	switch (action) {
+	case ActionsClass::Actions::Set_Current_Scene:
+		OBSController::SetCurrentScene(hook->scene);
+		break;
+	case ActionsClass::Actions::Reset_Scene_Item:
+		OBSController::ResetSceneItem(hook->scene, hook->item);
+		break;
+	case ActionsClass::Actions::Toggle_Mute:
+		OBSController::ToggleMute(hook->audio_source);
+		break;
+	case ActionsClass::Actions::Do_Transition:
+		if (hook->transition.isEmpty()) {
+			OBSController::TransitionToProgram();
+		} else if (hook->duration != -1) {
+			OBSController::TransitionToProgram(hook->transition,
+							   hook->duration);
+		} else {
+			OBSController::TransitionToProgram(hook->transition);
+		}
+		break;
+	case ActionsClass::Actions::Set_Current_Transition:
+		OBSController::SetCurrentTransition(hook->transition);
+		break;
+	case  ActionsClass::Actions::Set_Mute:
+		OBSController::SetMute(hook->audio_source, hook->bool_override);
+		break;
+	case  ActionsClass::Actions::Toggle_Start_Stop_Streaming:
+		OBSController::StartStopStreaming();
+		break;
+	case  ActionsClass::Actions::Set_Preview_Scene:
+		OBSController::SetPreviewScene(hook->scene);
+		break;
+	case  ActionsClass::Actions::Set_Current_Scene_Collection:
+		OBSController::SetCurrentSceneCollection(
+			hook->scene_collection);
+		break;
+	case  ActionsClass::Actions::Set_Transition_Duration:
+		if (hook->duration != -1) {
+			OBSController::SetTransitionDuration(hook->duration);
+		} else {
+			OBSController::SetTransitionDuration(MidiVal);
+		}
+		break;
+	case  ActionsClass::Actions::Start_Streaming:
+		OBSController::StartStreaming();
+		break;
+	case  ActionsClass::Actions::Stop_Streaming:
+		OBSController::StopStreaming();
+		break;
+	case  ActionsClass::Actions::Start_Recording:
+		OBSController::StartRecording();
+		break;
+	case  ActionsClass::Actions::Stop_Recording:
+		OBSController::StopRecording();
+		break;
+	case  ActionsClass::Actions::Start_Replay_Buffer:
+		OBSController::StartReplayBuffer();
+		break;
+	case  ActionsClass::Actions::Stop_Replay_Buffer:
+		OBSController::StopReplayBuffer();
+		break;
+	case  ActionsClass::Actions::Set_Volume:
+		OBSController::SetVolume(hook->audio_source,
+					 pow(Utils::mapper(MidiVal), 3.0));
+		break;
+	case  ActionsClass::Actions::Take_Source_Screenshot:
+		OBSController::TakeSourceScreenshot(hook->source);
+		break;
+	case  ActionsClass::Actions::Pause_Recording:
+		OBSController::PauseRecording();
+		break;
+	case  ActionsClass::Actions::Enable_Source_Filter:
+		OBSController::EnableSourceFilter();
+		break;
+	case  ActionsClass::Actions::Disable_Source_Filter:
+		OBSController::DisableSourceFilter();
+		break;
+	case  ActionsClass::Actions::Toggle_Start_Stop_Recording:
+		OBSController::StartStopRecording();
+		break;
+	case  ActionsClass::Actions::Toggle_Start_Stop_Replay_Buffer:
+		OBSController::StartStopReplayBuffer();
+		break;
+	case  ActionsClass::Actions::Resume_Recording:
+		OBSController::ResumeRecording();
+		break;
+	case  ActionsClass::Actions::Save_Replay_Buffer:
+		OBSController::SaveReplayBuffer();
+		break;
+	case  ActionsClass::Actions::Set_Current_Profile:
+		OBSController::SetCurrentProfile(hook->profile);
+		break;
+	case  ActionsClass::Actions::Toggle_Source_Filter:
+		OBSController::ToggleSourceFilter();
+		break;
+	case  ActionsClass::Actions::Set_Text_GDIPlus_Text:
+		OBSController::SetTextGDIPlusText(hook->string_override);
+		break;
+	case  ActionsClass::Actions::Set_Browser_Source_URL:
+		OBSController::SetBrowserSourceURL(hook->string_override);
+		break;
+	case  ActionsClass::Actions::Reload_Browser_Source:
+		OBSController::ReloadBrowserSource();
+		break;
+	case  ActionsClass::Actions::Set_Sync_Offset:
+		OBSController::SetSyncOffset(hook->media_source,
+					     (int64_t)MidiVal);
+		break;
+	case  ActionsClass::Actions::Set_Source_Rotation:
+		OBSController::SetSourceRotation();
+		break;
+	case  ActionsClass::Actions::Set_Source_Position:
+		OBSController::SetSourcePosition();
+		break;
+	case  ActionsClass::Actions::Set_Gain_Filter:
+		OBSController::SetGainFilter();
+		break;
+	case  ActionsClass::Actions::Set_Opacity:
+		OBSController::SetOpacity();
+		break;
+	case  ActionsClass::Actions::Set_Source_Scale:
+		OBSController::SetSourceScale();
+		break;
+	};
 }

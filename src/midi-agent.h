@@ -130,7 +130,6 @@ public:
 	void open_midi_input_port(int inport);
 	void open_midi_output_port(int outport);
 	void close_midi_port();
-	void do_obs_action(MidiHook *hook, int MidiVal, Actions action);
 	QString get_midi_input_name();
 	QString get_midi_output_name();
 	void set_midi_output_name(QString oname);
@@ -140,8 +139,6 @@ public:
 	bool isBidirectional();
 	bool setBidirectional(bool state);
 	static void HandleInput(const rtmidi::message &message, void *userData);
-	void TriggerInputAction(MidiHook *hook, int midiVal);
-	void SendMessage(MidiMessage mess);
 	QVector<MidiHook *> GetMidiHooks();
 	void add_MidiHook(MidiHook *hook);
 	void remove_MidiHook(MidiHook *hook);
@@ -149,9 +146,9 @@ public:
 	obs_data_t *GetData();
 
 public slots:
-	void NewObsEvent(QString eventType, QString eventData);
+	void handle_obs_event(QString eventType, QString eventData);
 signals:
-	void SendNewUnknownMessage(MidiMessage);
+	void broadcast_midi_message(MidiMessage);
 
 private:
 	void send_message_to_midi_device(QString type, int channel, int norc, int value = 0);
@@ -167,4 +164,6 @@ private:
 	bool bidirectional;
 	bool closing = false;
 	QVector<MidiHook *> midiHooks;
+	void do_obs_action(MidiHook *hook, int MidiVal,
+			   ActionsClass::Actions action);
 };

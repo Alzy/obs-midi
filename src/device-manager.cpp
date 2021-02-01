@@ -96,10 +96,7 @@ QStringList DeviceManager::GetOutPortsList()
 	}
 	return outports;
 }
-QStringList DeviceManager::GetOPL()
-{
-	return opl;
-}
+
 
 /* Returns the port number of the specified device.
  * If the device isn't found (possibly due to being disconnected), returns -1

@@ -84,62 +84,66 @@ private:
 	QStringList *items;
 	QString sceneName;
 	bool switching = false;
-	void ShowOnly(QList<Actions> shows);
-	void ShowEntry(Actions Entry);
-	void HideEntry(Actions Entry);
+	void ShowOnly(QList<ActionsClass::Actions> shows);
+	void ShowEntry(ActionsClass::Actions Entry);
+	void HideEntry(ActionsClass::Actions Entry);
 	void ShowAllActions();
 	void HideAdvancedActions();
-	void HideEntries(QList<Actions> entrys);
-	void ShowEntries(QList<Actions> entrys);
+	void HideEntries(QList<ActionsClass::Actions> entrys);
+	void ShowEntries(QList<ActionsClass::Actions> entrys);
 	QString untranslate(QString translation);
 	QListView *listview;
-	QList<Actions> FrontendActions = {Actions::Start_Streaming,
-					  Actions::Stop_Streaming,
-					  Actions::Toggle_Start_Stop_Streaming,
-					  Actions::Start_Recording,
-					  Actions::Stop_Recording,
-					  Actions::Pause_Recording,
-					  Actions::Unpause_Recording,
-					  Actions::Start_Replay_Buffer,
-					  Actions::Stop_Replay_Buffer,
-					  Actions::Enable_Preview,
-					  Actions::Disable_Preview,
-					  Actions::Studio_Mode,
-					  Actions::Do_Transition,
-					  Actions::Reset_Stats};
+	QList<ActionsClass::Actions> FrontendActions = {
+		ActionsClass::Actions::Start_Streaming,
+		ActionsClass::Actions::Stop_Streaming,
+		ActionsClass::Actions::Toggle_Start_Stop_Streaming,
+		ActionsClass::Actions::Start_Recording,
+		ActionsClass::Actions::Stop_Recording,
+		ActionsClass::Actions::Pause_Recording,
+		ActionsClass::Actions::Unpause_Recording,
+		ActionsClass::Actions::Start_Replay_Buffer,
+		ActionsClass::Actions::Stop_Replay_Buffer,
+		ActionsClass::Actions::Enable_Preview,
+		ActionsClass::Actions::Disable_Preview,
+		ActionsClass::Actions::Studio_Mode,
+		ActionsClass::Actions::Do_Transition,
+		ActionsClass::Actions::Reset_Stats};
 
-	QList<Actions> filterActions = {Actions::Enable_Source_Filter,
-					Actions::Disable_Source_Filter,
-					Actions::Toggle_Source_Filter};
+	QList<ActionsClass::Actions> filterActions = {
+		ActionsClass::Actions::Enable_Source_Filter,
+		ActionsClass::Actions::Disable_Source_Filter,
+		ActionsClass::Actions::Toggle_Source_Filter};
 
-	QList<Actions> sceneActions = {Actions::Reset_Scene_Item,
-				       Actions::Set_Current_Scene,
-				       Actions::Set_Scene_Transition_Override,
-				       Actions::Set_Current_Transition};
+	QList<ActionsClass::Actions> sceneActions = {
+		ActionsClass::Actions::Reset_Scene_Item,
+		ActionsClass::Actions::Set_Current_Scene,
+		ActionsClass::Actions::Set_Scene_Transition_Override,
+		ActionsClass::Actions::Set_Current_Transition};
 
-	QList<Actions> sourceActions = {Actions::Toggle_Mute,
-					Actions::Take_Source_Screenshot};
+	QList<ActionsClass::Actions> sourceActions = {
+		ActionsClass::Actions::Toggle_Mute,
+		ActionsClass::Actions::Take_Source_Screenshot};
 
-	QList<Actions> mediaActions = {Actions::Play_Pause_Media,
-				       Actions::Restart_Media,
-				       Actions::Stop_Media, Actions::Next_Media,
-				       Actions::Previous_Media};
+	QList<ActionsClass::Actions> mediaActions = {
+		ActionsClass::Actions::Play_Pause_Media,
+		ActionsClass::Actions::Restart_Media, ActionsClass::Actions::Stop_Media,
+		ActionsClass::Actions::Next_Media, ActionsClass::Actions::Previous_Media};
 
-	
+	QList<ActionsClass::Actions> AdvancedSourceActions = {
+		ActionsClass::Actions::Set_Mute,
+		ActionsClass::Actions::Set_Source_Name,
+		ActionsClass::Actions::Set_Sync_Offset,
+		ActionsClass::Actions::Set_Source_Settings,
+		ActionsClass::Actions::Set_Source_Filter_Visibility,
+		ActionsClass::Actions::Set_Audio_Monitor_Type};
+	QList<ActionsClass::Actions> AdvancedMediaActions = {
+		ActionsClass::Actions::Scrub_Media};
 
-	QList<Actions> AdvancedSourceActions = {
-		Actions::Set_Mute,
-		Actions::Set_Source_Name,
-		Actions::Set_Sync_Offset,
-		Actions::Set_Source_Settings,
-		Actions::Set_Source_Filter_Visibility,
-		Actions::Set_Audio_Monitor_Type};
-	QList<Actions> AdvancedMediaActions = {Actions::Scrub_Media};
-
-	QList<Actions> AdvancedFilterActions = {Actions::Set_Gain_Filter};
-	QList<Actions> AdvancedSceneActions = {
-		Actions::Set_Scene_Item_Render,
-		Actions::Set_Scene_Item_Position,
-		Actions::Set_Scene_Item_Transform,
-		Actions::Set_Scene_Item_Crop};
+	QList<ActionsClass::Actions> AdvancedFilterActions = {
+		ActionsClass::Actions::Set_Gain_Filter};
+	QList<ActionsClass::Actions> AdvancedSceneActions = {
+		ActionsClass::Actions::Set_Scene_Item_Render,
+		ActionsClass::Actions::Set_Scene_Item_Position,
+		ActionsClass::Actions::Set_Scene_Item_Transform,
+		ActionsClass::Actions::Set_Scene_Item_Crop};
 };

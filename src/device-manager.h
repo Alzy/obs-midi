@@ -52,7 +52,6 @@ public:
 	QVector<MidiAgent *> GetActiveMidiDevices();
 	MidiAgent *GetMidiDeviceByName(QString deviceName);
 	QVector<MidiHook *> GetMidiHooksByDeviceName(QString deviceName);
-	QStringList GetOPL();
 	void RegisterMidiDevice(int port, int outport);
 	void SendMidi(QString mtype, int channel, int norc, int value);
 	obs_data_t *GetData();

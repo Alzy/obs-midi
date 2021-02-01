@@ -264,7 +264,7 @@ void events::broadcastUpdate(const char *updateType,
 
 	RpcEvent event(QString(updateType), streamTime, recordingTime,
 		       additionalFields);
-	_srv->broadcast(event);
+	_srv->broadcast_obs_event(event);
 	//emit obsEvent(event);
 }
 

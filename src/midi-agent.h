@@ -151,7 +151,7 @@ signals:
 	void broadcast_midi_message(MidiMessage);
 
 private:
-	void send_message_to_midi_device(QString type, int channel, int norc, int value = 0);
+	void send_message_to_midi_device(MidiMessage message);
 	rtmidi::midi_in *midiin;
 	rtmidi::midi_out *midiout;
 	QString midi_input_name;

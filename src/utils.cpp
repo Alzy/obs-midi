@@ -104,7 +104,7 @@ obs_data_array_t *Utils::StringListToArray(char **strings, const char *key)
 
 obs_data_array_t *Utils::GetSceneItems(obs_source_t *source)
 {
-	obs_data_array_t *items = obs_data_array_create();
+	obs_data_array_t* items = obs_data_array_create();
 	OBSScene scene = obs_scene_from_source(source);
 
 	if (!scene) {
@@ -124,7 +124,7 @@ obs_data_array_t *Utils::GetSceneItems(obs_source_t *source)
 			return true;
 		},
 		items);
-
+	
 	return items;
 }
 

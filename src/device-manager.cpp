@@ -66,10 +66,12 @@ void DeviceManager::Load(obs_data_t *data)
 void DeviceManager::Unload()
 {
 	blog(LOG_INFO, "UNLOADING DEVICE MANAGER");
+	midiAgents.clear();
 	for (auto agent : midiAgents) {
+		agent->clear_MidiHooks();
 		delete agent;
 	}
-	midiAgents.clear();
+	
 }
 
 /* Returns vector list of Port Names 

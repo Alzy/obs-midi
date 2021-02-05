@@ -38,7 +38,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <property name="elideMode">
       <enum>Qt::ElideMiddle</enum>
@@ -1151,7 +1151,7 @@
             </property>
            </spacer>
           </item>
-          <item>
+          <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
            <widget class="QFrame" name="frame_2">
             <property name="sizePolicy">
              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -1207,26 +1207,6 @@
                </property>
                <property name="text">
                 <string>Delete Mapping</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QSplitter" name="splitter_URL">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <widget class="QLabel" name="label_2">
-                <property name="text">
-                 <string>URL</string>
-                </property>
-               </widget>
-               <widget class="QLineEdit" name="extra_URL"/>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QCheckBox" name="extra_bool">
-               <property name="text">
-                <string>Boolean</string>
                </property>
               </widget>
              </item>

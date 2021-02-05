@@ -109,7 +109,8 @@ public:
 		Set_Source_Scale,
 		Set_Source_Rotation,
 		Set_Source_Position,
-		Set_Opacity
+		Set_Opacity,
+		Move_T_Bar
 	};
 	Q_ENUM(Actions)
 	enum class obs_event_type {
@@ -139,6 +140,8 @@ namespace Utils {
 class OBSActionsWidget;
 float mapper(int x);
 int mapper2(double x);
+int t_bar_mapper(int x);
+
 bool is_number(const QString &s);
 bool isJSon(QString val);
 
@@ -244,7 +247,8 @@ const QList<ActionsClass::Actions> AllActions_raw = {
 	ActionsClass::Actions::Toggle_Source_Filter,
 	ActionsClass::Actions::Toggle_Start_Stop_Streaming,
 	ActionsClass::Actions::Do_Transition,
-	ActionsClass::Actions::Unpause_Recording};
+	ActionsClass::Actions::Unpause_Recording,
+	ActionsClass::Actions::Move_T_Bar};
 void alert_popup(QString message);
 QString translate_action(ActionsClass::Actions action);
 };

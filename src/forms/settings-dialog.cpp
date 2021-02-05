@@ -56,8 +56,7 @@ PluginWindow::PluginWindow(QWidget *parent)
 		SLOT(on_bid_enabled_state_changed(bool)));
 
 	//Connections for Configure Tab
-	connect(ui->cb_obs_action_filter, SIGNAL(currentIndexChanged(int)),
-		this, SLOT(obs_actions_filter_select(int)));
+	
 	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
 		this, SLOT(get_sources(QString)));
 	connect(ui->cb_obs_output_action, SIGNAL(currentTextChanged(QString)),
@@ -491,7 +490,6 @@ void PluginWindow::HideAllPairs()
 void PluginWindow::ResetToDefaults()
 {
 	ui->cb_obs_output_action->setCurrentIndex(0);
-	ui->cb_obs_action_filter->setCurrentIndex(0);
 	ui->cb_obs_output_transition->setCurrentIndex(0);
 	ui->cb_obs_output_filter->setCurrentIndex(0);
 	ui->cb_obs_output_scene->setCurrentIndex(0);
@@ -579,13 +577,7 @@ void PluginWindow::ShowEntries(QList<ActionsClass::Actions> entrys)
 	listview->adjustSize();
 }
 
-void PluginWindow::HideAdvancedActions()
-{
-	HideEntries(AdvancedFilterActions);
-	HideEntries(AdvancedMediaActions);
-	HideEntries(AdvancedSceneActions);
-	HideEntries(AdvancedSourceActions);
-}
+
 void PluginWindow::get_sources(QString scene)
 {
 
@@ -632,44 +624,7 @@ void PluginWindow::check_advanced_switch(bool state)
 {
 	//obs_actions_filter_select(ui->cb_obs_action->currentIndex());
 }
-void PluginWindow::obs_actions_filter_select(int selection)
-{
-	switching = true;
 
-	switch (selection) {
-	case 0:
-		ShowAllActions();
-		//All filters
-
-	case 1:
-		// Frontend
-		ShowOnly(FrontendActions);
-
-		break;
-	case 2:
-		// Scenes
-		ShowOnly(sceneActions);
-
-		break;
-	case 3:
-		//Sources
-		ShowOnly(sourceActions);
-
-		break;
-	case 4:
-		//Filters
-		ShowOnly(filterActions);
-
-		break;
-	case 5:
-		//Media
-		ShowOnly(mediaActions);
-
-		break;
-	};
-	switching = false;
-	ui->cb_obs_output_action->setCurrentIndex(0);
-}
 
 void PluginWindow::obs_actions_select(QString action)
 {

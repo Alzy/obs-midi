@@ -635,7 +635,7 @@
              <number>3</number>
             </property>
             <layout class="QGridLayout" name="gridLayout_4">
-             <item row="3" column="0" colspan="2" alignment="Qt::AlignTop">
+             <item row="2" column="0" colspan="2" alignment="Qt::AlignTop">
               <widget class="QSplitter" name="splitter_2">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -1054,83 +1054,6 @@
               </widget>
              </item>
              <item row="0" column="0" alignment="Qt::AlignTop">
-              <widget class="QLabel" name="label_obs_action">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>25</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>25</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>Actions Filter</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1" alignment="Qt::AlignTop">
-              <widget class="QComboBox" name="cb_obs_action_filter">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>25</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>25</height>
-                </size>
-               </property>
-               <item>
-                <property name="text">
-                 <string>All Actions</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Frontend</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Scenes</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Sources</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Filters</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Media</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item row="1" column="0" alignment="Qt::AlignTop">
               <widget class="QLabel" name="label_obs_output_action">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -1155,7 +1078,7 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="1" alignment="Qt::AlignTop">
+             <item row="0" column="1" alignment="Qt::AlignTop">
               <widget class="QComboBox" name="cb_obs_output_action">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -1180,7 +1103,7 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="0" colspan="2">
+             <item row="1" column="0" colspan="2">
               <widget class="Line" name="line">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -1193,7 +1116,7 @@
                </property>
               </widget>
              </item>
-             <item row="4" column="0">
+             <item row="3" column="0">
               <spacer name="verticalSpacer">
                <property name="orientation">
                 <enum>Qt::Vertical</enum>

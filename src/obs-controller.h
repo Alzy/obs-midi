@@ -74,4 +74,5 @@ void SetSourceRotation();
 void SetSourceScale();
 void SetGainFilter();
 void SetOpacity();
+void move_t_bar(int move);
 };

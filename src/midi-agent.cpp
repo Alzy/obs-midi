@@ -582,5 +582,8 @@ void MidiAgent::do_obs_action(MidiHook *hook, int MidiVal,
 	case  ActionsClass::Actions::Set_Source_Scale:
 		OBSController::SetSourceScale();
 		break;
+	case ActionsClass::Actions::Move_T_Bar:
+		OBSController::move_t_bar(MidiVal);
+		break;
 	};
 }

@@ -41,15 +41,12 @@ private Q_SLOTS:
 public slots:
 	void select_output_device(QString item);
 	void handle_midi_message(MidiMessage mess);
-
 	void obs_actions_select(QString action);
 	void check_advanced_switch(bool state);
 	void ResetToDefaults();
-
 	void on_source_change(QString source);
 	void on_scene_change(QString source);
 	void get_sources(QString scene);
-	void obs_actions_filter_select(int);
 	void get_filters(QString Source);
 	void get_transitions();
 	void get_scenes();
@@ -89,62 +86,9 @@ private:
 	void ShowEntry(ActionsClass::Actions Entry);
 	void HideEntry(ActionsClass::Actions Entry);
 	void ShowAllActions();
-	void HideAdvancedActions();
 	void HideEntries(QList<ActionsClass::Actions> entrys);
 	void ShowEntries(QList<ActionsClass::Actions> entrys);
 	QString untranslate(QString translation);
 	QListView *listview;
-	QList<ActionsClass::Actions> FrontendActions = {
-		ActionsClass::Actions::Start_Streaming,
-		ActionsClass::Actions::Stop_Streaming,
-		ActionsClass::Actions::Toggle_Start_Stop_Streaming,
-		ActionsClass::Actions::Start_Recording,
-		ActionsClass::Actions::Stop_Recording,
-		ActionsClass::Actions::Pause_Recording,
-		ActionsClass::Actions::Unpause_Recording,
-		ActionsClass::Actions::Start_Replay_Buffer,
-		ActionsClass::Actions::Stop_Replay_Buffer,
-		ActionsClass::Actions::Enable_Preview,
-		ActionsClass::Actions::Disable_Preview,
-		ActionsClass::Actions::Studio_Mode,
-		ActionsClass::Actions::Do_Transition,
-		ActionsClass::Actions::Reset_Stats};
-
-	QList<ActionsClass::Actions> filterActions = {
-		ActionsClass::Actions::Enable_Source_Filter,
-		ActionsClass::Actions::Disable_Source_Filter,
-		ActionsClass::Actions::Toggle_Source_Filter};
-
-	QList<ActionsClass::Actions> sceneActions = {
-		ActionsClass::Actions::Reset_Scene_Item,
-		ActionsClass::Actions::Set_Current_Scene,
-		ActionsClass::Actions::Set_Scene_Transition_Override,
-		ActionsClass::Actions::Set_Current_Transition};
-
-	QList<ActionsClass::Actions> sourceActions = {
-		ActionsClass::Actions::Toggle_Mute,
-		ActionsClass::Actions::Take_Source_Screenshot};
-
-	QList<ActionsClass::Actions> mediaActions = {
-		ActionsClass::Actions::Play_Pause_Media,
-		ActionsClass::Actions::Restart_Media, ActionsClass::Actions::Stop_Media,
-		ActionsClass::Actions::Next_Media, ActionsClass::Actions::Previous_Media};
-
-	QList<ActionsClass::Actions> AdvancedSourceActions = {
-		ActionsClass::Actions::Set_Mute,
-		ActionsClass::Actions::Set_Source_Name,
-		ActionsClass::Actions::Set_Sync_Offset,
-		ActionsClass::Actions::Set_Source_Settings,
-		ActionsClass::Actions::Set_Source_Filter_Visibility,
-		ActionsClass::Actions::Set_Audio_Monitor_Type};
-	QList<ActionsClass::Actions> AdvancedMediaActions = {
-		ActionsClass::Actions::Scrub_Media};
-
-	QList<ActionsClass::Actions> AdvancedFilterActions = {
-		ActionsClass::Actions::Set_Gain_Filter};
-	QList<ActionsClass::Actions> AdvancedSceneActions = {
-		ActionsClass::Actions::Set_Scene_Item_Render,
-		ActionsClass::Actions::Set_Scene_Item_Position,
-		ActionsClass::Actions::Set_Scene_Item_Transform,
-		ActionsClass::Actions::Set_Scene_Item_Crop};
+	
 };

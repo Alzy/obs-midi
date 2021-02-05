@@ -470,14 +470,7 @@ void MidiAgent::do_obs_action(MidiHook *hook, int MidiVal,
 		OBSController::ToggleMute(hook->audio_source);
 		break;
 	case ActionsClass::Actions::Do_Transition:
-		if (hook->transition.isEmpty()) {
-			OBSController::TransitionToProgram();
-		} else if (hook->duration != -1) {
-			OBSController::TransitionToProgram(hook->transition,
-							   hook->duration);
-		} else {
-			OBSController::TransitionToProgram(hook->transition);
-		}
+		OBSController::TransitionToProgram();
 		break;
 	case ActionsClass::Actions::Set_Current_Transition:
 		OBSController::SetCurrentTransition(hook->transition);
@@ -589,5 +582,25 @@ void MidiAgent::do_obs_action(MidiHook *hook, int MidiVal,
 		break;
 	case ActionsClass::Actions::Play_Pause_Media:
 		OBSController::play_pause_media_source(hook->media_source);
+		break;
+	case ActionsClass::Actions::Studio_Mode:
+		OBSController::toggle_studio_mode();
+		break;
+	case ActionsClass::Actions::Reset_Stats:
+		OBSController::reset_stats();
+		break;
+	case ActionsClass::Actions::Restart_Media:
+		OBSController::restart_media(hook->media_source);
+		break;
+
+	case ActionsClass::Actions::Stop_Media:
+		OBSController::stop_media(hook->media_source);
+		break;
+	case ActionsClass::Actions::Previous_Media:
+		OBSController::prev_media(hook->media_source);
+		break;
+	case ActionsClass::Actions::Next_Media:
+		OBSController::next_media(hook->media_source);
+		break;
 	};
 }

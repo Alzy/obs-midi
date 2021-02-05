@@ -76,4 +76,12 @@ void SetGainFilter();
 void SetOpacity();
 void move_t_bar(int move);
 void play_pause_media_source(QString MediaSource);
+void toggle_studio_mode();
+void reset_stats();
+void restart_media(QString media_source);
+void stop_media(QString media_source);
+void play_media(QString media_source);
+void next_media(QString media_source);
+void prev_media(QString media_source);
+
 };

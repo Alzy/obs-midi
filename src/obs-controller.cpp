@@ -442,13 +442,55 @@ void OBSController::move_t_bar(int move) {
 void OBSController::play_pause_media_source(QString media_source) {
 	OBSSourceAutoRelease source =
 		obs_get_source_by_name(media_source.toStdString().c_str());
-	if (obs_source_media_get_state(source) ==
-	    obs_media_state::OBS_MEDIA_STATE_PAUSED) {
+	switch (obs_source_media_get_state(source)) {
+	case obs_media_state::OBS_MEDIA_STATE_PAUSED:
 		obs_source_media_play_pause(source, false);
-	} else if (obs_source_media_get_state(source) ==
-		   obs_media_state::OBS_MEDIA_STATE_PLAYING) {
+		break;
+	case obs_media_state::OBS_MEDIA_STATE_PLAYING:
 		obs_source_media_play_pause(source, true);
-	}
+		break;
+	case obs_media_state::OBS_MEDIA_STATE_ENDED:
+		obs_source_media_restart(source);
+		break;
 
+	}
+}
+
+// TODO:: Fix this 
+void OBSController::toggle_studio_mode() {
+	if (obs_frontend_preview_program_mode_active()) {
+		obs_frontend_set_preview_program_mode(false);
+
+	} else {
+		obs_frontend_set_preview_program_mode(true);
+	}
 	
+	
+}
+void OBSController::reset_stats() {
+}
+void OBSController::restart_media(QString media_source) {
+
+	obs_source_media_restart(obs_get_source_by_name(media_source.toStdString().c_str()));
+	
+
+}
+
+
+void OBSController::stop_media(QString media_source)
+{
+
+	obs_source_media_stop(
+		obs_get_source_by_name(media_source.toStdString().c_str()));
+}
+void OBSController::next_media(QString media_source)
+{
+
+	obs_source_media_next(
+		obs_get_source_by_name(media_source.toStdString().c_str()));
+}
+void OBSController::prev_media(QString media_source)
+{
+	obs_source_media_previous(
+		obs_get_source_by_name(media_source.toStdString().c_str()));
 }

@@ -216,10 +216,9 @@ const QList<ActionsClass::Actions> AllActions_raw = {
 	ActionsClass::Actions::Play_Pause_Media,
 	ActionsClass::Actions::Previous_Media,
 	ActionsClass::Actions::Reset_Scene_Item,
-	ActionsClass::Actions::Reset_Stats,
+	
 	ActionsClass::Actions::Restart_Media,
 	ActionsClass::Actions::Set_Current_Scene,
-	ActionsClass::Actions::Set_Current_Scene_Collection,
 	ActionsClass::Actions::Set_Current_Transition,
 	ActionsClass::Actions::Set_Preview_Scene,
 	ActionsClass::Actions::Set_Scene_Transition_Override,
@@ -231,7 +230,6 @@ const QList<ActionsClass::Actions> AllActions_raw = {
 	ActionsClass::Actions::Stop_Recording,
 	ActionsClass::Actions::Stop_Replay_Buffer,
 	ActionsClass::Actions::Stop_Streaming,
-	ActionsClass::Actions::Studio_Mode,
 	ActionsClass::Actions::Take_Source_Screenshot,
 	ActionsClass::Actions::Toggle_Mute,
 	ActionsClass::Actions::Toggle_Source_Filter,
@@ -245,6 +243,9 @@ const QList<ActionsClass::Actions> AllActions_raw = {
 	ActionsClass::Actions::Reload_Browser_Source,
 	ActionsClass::Actions::Move_T_Bar};
 const QList<ActionsClass::Actions> not_ready_actions{
+	ActionsClass::Actions::Studio_Mode,
+	ActionsClass::Actions::Set_Current_Scene_Collection,
+	ActionsClass::Actions::Reset_Stats,
 	ActionsClass::Actions::Set_Current_Profile,
 	ActionsClass::Actions::Set_Source_Scale,
 	ActionsClass::Actions::Set_Source_Rotation,

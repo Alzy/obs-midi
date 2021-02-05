@@ -531,10 +531,12 @@ void MidiAgent::do_obs_action(MidiHook *hook, int MidiVal,
 		OBSController::PauseRecording();
 		break;
 	case  ActionsClass::Actions::Enable_Source_Filter:
-		OBSController::EnableSourceFilter();
+		OBSController::EnableSourceFilter(obs_get_source_by_name(
+			hook->source.toStdString().c_str()));
 		break;
 	case  ActionsClass::Actions::Disable_Source_Filter:
-		OBSController::DisableSourceFilter();
+		OBSController::DisableSourceFilter(obs_get_source_by_name(
+			hook->source.toStdString().c_str()));
 		break;
 	case  ActionsClass::Actions::Toggle_Start_Stop_Recording:
 		OBSController::StartStopRecording();
@@ -552,16 +554,16 @@ void MidiAgent::do_obs_action(MidiHook *hook, int MidiVal,
 		OBSController::SetCurrentProfile(hook->profile);
 		break;
 	case  ActionsClass::Actions::Toggle_Source_Filter:
-		OBSController::ToggleSourceFilter();
+		OBSController::ToggleSourceFilter(obs_get_source_by_name(hook->source.toStdString().c_str()));
 		break;
 	case  ActionsClass::Actions::Set_Text_GDIPlus_Text:
 		OBSController::SetTextGDIPlusText(hook->string_override);
 		break;
 	case  ActionsClass::Actions::Set_Browser_Source_URL:
-		OBSController::SetBrowserSourceURL(hook->string_override);
+		OBSController::SetBrowserSourceURL(hook->source, hook->string_override);
 		break;
 	case  ActionsClass::Actions::Reload_Browser_Source:
-		OBSController::ReloadBrowserSource();
+		OBSController::ReloadBrowserSource(hook->source);
 		break;
 	case  ActionsClass::Actions::Set_Sync_Offset:
 		OBSController::SetSyncOffset(hook->media_source,
@@ -585,5 +587,7 @@ void MidiAgent::do_obs_action(MidiHook *hook, int MidiVal,
 	case ActionsClass::Actions::Move_T_Bar:
 		OBSController::move_t_bar(MidiVal);
 		break;
+	case ActionsClass::Actions::Play_Pause_Media:
+		OBSController::play_pause_media_source(hook->media_source);
 	};
 }

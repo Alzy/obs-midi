@@ -59,12 +59,12 @@ void SaveReplayBuffer();
 
 void SetCurrentProfile(QString profileName);
 void SetTextGDIPlusText(QString text);
-void SetBrowserSourceURL(QString url);
-void ReloadBrowserSource();
+void SetBrowserSourceURL(QString sourceName,QString url);
+void ReloadBrowserSource(QString sourceName);
 void TakeSourceScreenshot(QString source);
-void EnableSourceFilter();
-void DisableSourceFilter();
-void ToggleSourceFilter();
+void EnableSourceFilter(obs_source_t *source);
+void DisableSourceFilter(obs_source_t *source);
+void ToggleSourceFilter(obs_source_t *source);
 
 // CC ACTIONS
 void SetVolume(QString source, float volume);
@@ -75,4 +75,5 @@ void SetSourceScale();
 void SetGainFilter();
 void SetOpacity();
 void move_t_bar(int move);
+void play_pause_media_source(QString MediaSource);
 };

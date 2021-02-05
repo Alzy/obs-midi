@@ -290,7 +290,7 @@ void OBSController::StartStopReplayBuffer()
 void OBSController::StartReplayBuffer()
 {
 	if (!Utils::ReplayBufferEnabled()) {
-		throw("replay buffer disabled in settings");
+		Utils::alert_popup("replay buffer disabled in settings");
 	}
 
 	if (obs_frontend_replay_buffer_active() == false) {
@@ -340,17 +340,54 @@ void OBSController::SetCurrentProfile(QString profileName)
 
 void OBSController::SetTextGDIPlusText(QString text) {}
 
-void OBSController::SetBrowserSourceURL(QString url) {}
+void OBSController::SetBrowserSourceURL(QString sourceName, QString url) {
 
-void OBSController::ReloadBrowserSource() {}
+	OBSSourceAutoRelease source = obs_get_source_by_name(sourceName.toStdString().c_str());
+	QString sourceId = obs_source_get_id(source);
+	if (sourceId != "browser_source" && sourceId != "linuxbrowser-source") {
+		return Utils::alert_popup("Not a browser Source");
+	}
+
+	OBSDataAutoRelease settings = obs_source_get_settings(source);
+	obs_data_set_string(settings, "url",
+				    url.toStdString().c_str());
+	obs_source_update(source, settings);
+}
+
+void OBSController::ReloadBrowserSource(QString sourceName) {
+	OBSSourceAutoRelease source =
+		obs_get_source_by_name(sourceName.toUtf8());
+	obs_properties_t *sourceProperties = obs_source_properties(source);
+	obs_property_t *property =
+		obs_properties_get(sourceProperties, "refreshnocache");
+	obs_property_button_clicked(
+		property,
+		source); // This returns a boolean but we ignore it because the browser plugin always returns `false`.
+	obs_properties_destroy(sourceProperties);
+}
 
 void OBSController::TakeSourceScreenshot(QString source) {}
 
-void OBSController::EnableSourceFilter() {}
+void OBSController::EnableSourceFilter(obs_source_t *source)
+{
+	obs_source_set_enabled(source,true);
+	obs_source_release(source);
+}
 
-void OBSController::DisableSourceFilter() {}
+void OBSController::DisableSourceFilter(obs_source_t *source) {
+	obs_source_set_enabled(source, true);
+	obs_source_release(source);
+}
 
-void OBSController::ToggleSourceFilter() {}
+void OBSController::ToggleSourceFilter(obs_source_t *source)
+{
+	if (obs_source_enabled(source)) {
+		DisableSourceFilter(source);
+	} else {
+		EnableSourceFilter(source);
+	}
+
+}
 
 ////////////////
 // CC ACTIONS //
@@ -401,4 +438,17 @@ void OBSController::move_t_bar(int move) {
 		obs_frontend_set_tbar_position(Utils::t_bar_mapper(move));
 		obs_frontend_release_tbar();
 	}
+}
+void OBSController::play_pause_media_source(QString media_source) {
+	OBSSourceAutoRelease source =
+		obs_get_source_by_name(media_source.toStdString().c_str());
+	if (obs_source_media_get_state(source) ==
+	    obs_media_state::OBS_MEDIA_STATE_PAUSED) {
+		obs_source_media_play_pause(source, false);
+	} else if (obs_source_media_get_state(source) ==
+		   obs_media_state::OBS_MEDIA_STATE_PLAYING) {
+		obs_source_media_play_pause(source, true);
+	}
+
+	
 }

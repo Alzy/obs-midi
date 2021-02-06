@@ -124,7 +124,6 @@ void MidiAgent::open_midi_input_port(int inport)
 
 	} catch (const rtmidi::midi_exception &error) {
 
-		blog(1, "unable to open port %i -- &s", inport, error.what());
 	}
 }
 void MidiAgent::open_midi_output_port(int outport)
@@ -134,8 +133,8 @@ void MidiAgent::open_midi_output_port(int outport)
 		midiout->open_port(outport);
 	} catch (const rtmidi::midi_exception &error) {
 
-		blog(1, " Opening out port -- %i -- exception -- %s ", outport,
-		     error.what());
+
+
 	}
 	midi_output_name = QString::fromStdString(midiout->get_port_name(outport));
 	enabled = true;

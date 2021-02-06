@@ -61,9 +61,16 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_definitions(-DASIO_STANDALONE)
-include(external/FindLibObs.cmake)
-find_package(LibObs REQUIRED)
-
+if (${isAzure})
+	if (WIN32 OR APPLE)
+		include(external/FindLibObs.cmake)
+	endif()
+	find_package(LibObs REQUIRED)
+endif()
+if (APPLE)
+	include(external/FindLibObs.cmake)
+	find_package(LibObs REQUIRED)
+endif()
 
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
 

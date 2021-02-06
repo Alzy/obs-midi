@@ -138,8 +138,10 @@ public:
 	bool isConnected();
 	bool isBidirectional();
 	bool setBidirectional(bool state);
+	void set_enabled(bool enabled);
 	static void HandleInput(const rtmidi::message &message, void *userData);
 	QVector<MidiHook *> GetMidiHooks();
+	void set_midi_hooks(QVector<MidiHook *>);
 	void add_MidiHook(MidiHook *hook);
 	void remove_MidiHook(MidiHook *hook);
 	void clear_MidiHooks();

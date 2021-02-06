@@ -50,11 +50,11 @@ PluginWindow::PluginWindow(QWidget *parent)
 	//Connections for Device Tab
 	connect(ui->list_midi_dev, SIGNAL(currentTextChanged(QString)), this,
 		SLOT(on_device_select(QString)));
-	connect(ui->check_enabled, SIGNAL(stateChanged(bool)), this,
-		SLOT(on_check_enabled_state_changed(bool)));
-	connect(ui->bidirectional, SIGNAL(stateChanged(bool)), this,
-		SLOT(on_bid_enabled_state_changed(bool)));
-
+	connect(ui->check_enabled, SIGNAL(stateChanged(int)), this,
+		SLOT(on_check_enabled_state_changed(int)));
+	connect(ui->bidirectional, SIGNAL(stateChanged(int)), this,
+		SLOT(on_bid_enabled_state_changed(int)));
+	
 	//Connections for Configure Tab
 	
 	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
@@ -181,11 +181,10 @@ void PluginWindow::select_output_device(QString selectedDeviceName)
 	}
 }
 
-int PluginWindow::on_check_enabled_state_changed(bool state)
+int PluginWindow::on_check_enabled_state_changed(int state)
 {
 
-	if (state == true) {
-
+	if (state == Qt::CheckState::Checked) {
 		auto selectedDeviceName =
 			ui->list_midi_dev->currentItem()->text().toStdString();
 		auto selectedOutDeviceName =
@@ -205,18 +204,24 @@ int PluginWindow::on_check_enabled_state_changed(bool state)
 				selectedDeviceName.c_str());
 			device->open_midi_input_port(devicePort);
 			device->open_midi_output_port(deviceOutPort);
+
 		} else {
 
 			device->open_midi_input_port(devicePort);
 			device->open_midi_output_port(deviceOutPort);
 		}
+		device->set_enabled(true);
+		device->setBidirectional(true);
+		ui->bidirectional->setEnabled(true);
+		ui->bidirectional->setChecked(true);
+		ui->outbox->setEnabled(true);
+		
 	}
 
 	//ui->outbox->setCurrentText(QString::fromStdString(device->GetOutName()));
-	ui->bidirectional->setEnabled(state);
-	ui->bidirectional->setChecked(true);
-	ui->outbox->setEnabled(true);
+	
 	GetConfig()->Save();
+	on_device_select(ui->list_midi_dev->currentItem()->text());
 	return state;
 }
 
@@ -242,9 +247,10 @@ void PluginWindow::on_device_select(QString curitem)
 	}
 
 	///HOOK up the Message Handler
-	 connect(
-		MAdevice, SIGNAL(broadcast_midi_message(MidiMessage)), this,
-		SLOT(handle_midi_message(MidiMessage))); /// name, mtype, norc, channel
+	connect(MAdevice, SIGNAL(broadcast_midi_message(MidiMessage)), this,
+		SLOT(handle_midi_message(
+			MidiMessage))); /// name, mtype, norc, channel
+
 	ui->mapping_lbl_device_name->setText(curitem);
 }
 void PluginWindow::handle_midi_message(MidiMessage mess)
@@ -272,7 +278,7 @@ void PluginWindow::handle_midi_message(MidiMessage mess)
 		}
 	}
 }
-int PluginWindow::on_bid_enabled_state_changed(bool state)
+int PluginWindow::on_bid_enabled_state_changed(int state)
 {
 	auto device = GetDeviceManager()->GetMidiDeviceByName(
 		ui->list_midi_dev->currentItem()->text().toStdString().c_str());
@@ -904,15 +910,15 @@ void PluginWindow::tab_changed(int i)
 	set_headers();
 	ui->table_mapping->setRowCount(0);
 	auto devicemanager = GetDeviceManager();
-	auto device = devicemanager->GetMidiDeviceByName(
-		ui->mapping_lbl_device_name->text());
+	
 	auto hooks = devicemanager->GetMidiHooksByDeviceName(
 		ui->mapping_lbl_device_name->text());
-	if (hooks.size() > 0) {
+	if (hooks.count() > 0) {
 		for (int i = 0; i < hooks.size(); i++) {
 			add_row_from_hook(hooks.at(i));
 		}
 	}
+	
 }
 void PluginWindow::delete_mapping() {
 	auto devicemanager = GetDeviceManager();

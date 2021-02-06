@@ -152,8 +152,12 @@ QVector<MidiHook *> DeviceManager::GetMidiHooksByDeviceName(QString deviceName)
 		auto device = GetMidiDeviceByName(deviceName);
 		if (device != NULL) {
 			return device->GetMidiHooks();
+		} else {
+			QVector<MidiHook *> x;
+			//device->set_midi_hooks(x);
+			return x;
 		}
-		throw("no midi hooks for this device");
+		//Utils::alert_popup("no midi hooks for this device");
 	}
 }
 

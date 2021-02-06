@@ -54,6 +54,7 @@ MidiAgent::MidiAgent()
 	midiout = new rtmidi::midi_out();
 	midiin->set_callback(
 		[this](const auto &message) { HandleInput(message, this); });
+	
 }
 
 MidiAgent::~MidiAgent()
@@ -254,6 +255,7 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 */
 QVector<MidiHook *> MidiAgent::GetMidiHooks()
 {
+	
 	return midiHooks;
 }
 
@@ -265,9 +267,15 @@ void MidiAgent::add_MidiHook(MidiHook *hook)
 	//connect()
 	midiHooks.push_back(hook);
 }
-
-/* Remove a MidiHook
+void MidiAgent::set_enabled(bool state) {
+	this->enabled = state;
+}
+	/* Remove a MidiHook
 */
+void MidiAgent::set_midi_hooks(QVector<MidiHook *> mh)
+{
+	midiHooks = mh;
+}
 void MidiAgent::remove_MidiHook(MidiHook *hook)
 {
 	if (midiHooks.contains(hook)) {

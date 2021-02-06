@@ -29,9 +29,6 @@ public:
 	~PluginWindow();
 	void setCheck(bool check);
 	void SetAvailableDevices();
-	int on_check_enabled_state_changed(bool state);
-	void on_device_select(QString curitem);
-	int on_bid_enabled_state_changed(bool state);
 
 signals:
 	void changed(obs_data_t *change);
@@ -39,6 +36,10 @@ private Q_SLOTS:
 	void ToggleShowHide();
 
 public slots:
+	int on_check_enabled_state_changed(int state);
+	int on_bid_enabled_state_changed(int state);
+	void on_device_select(QString curitem);
+
 	void select_output_device(QString item);
 	void handle_midi_message(MidiMessage mess);
 	void obs_actions_select(QString action);
@@ -74,6 +75,7 @@ private:
 	bool listening = false;
 	void get_scene_names();
 
+	bool first_run;
 	bool map_exists();
 	int map_location(MidiMessage message);
 

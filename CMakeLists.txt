@@ -53,9 +53,9 @@ include_directories(src/RtMidi17)
 set(plugin_ui
 	src/forms/settings-dialog.ui
 )
-
+if (NOT ${isAzure})
 qt5_wrap_ui(plugin_ui_headers ${plugin_ui})
-
+endif()
 # OBS MIDI
 set(CMAKE_PREFIX_PATH "${QTDIR}")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)

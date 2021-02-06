@@ -32,7 +32,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QSystemTrayIcon>
-#include <qmessagebox>
+#include <QMessageBox>
 #include <obs.hpp>
 #include <obs-module.h>
 #include <util/config-file.h>

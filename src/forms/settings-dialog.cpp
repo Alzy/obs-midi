@@ -221,7 +221,7 @@ int PluginWindow::on_check_enabled_state_changed(int state)
 	//ui->outbox->setCurrentText(QString::fromStdString(device->GetOutName()));
 	
 	GetConfig()->Save();
-	on_device_select(ui->list_midi_dev->currentItem()->text());
+	//on_device_select(ui->list_midi_dev->currentItem()->text());
 	return state;
 }
 

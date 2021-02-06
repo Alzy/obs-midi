@@ -1,5 +1,5 @@
 /*
-obs-websocket
+obs-midi
 Copyright (C) 2016-2017	Stéphane Lepin <stephane.lepin@gmail.com>
 
 This program is free software; you can redistribute it and/or modify

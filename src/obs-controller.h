@@ -22,11 +22,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "utils.h"
 #include "midi-agent.h"
 #include "obs-midi.h"
+
 #if __has_include(<obs-frontend-api.h>)
 #include <obs-frontend-api.h>
 #else
 #include <obs-frontend-api/obs-frontend-api.h>
-#endifnamespace OBSController {
+#endif
+namespace OBSController {
 
 
 // BUTTON ACTIONS

@@ -407,32 +407,6 @@ jobs:
           install_name_tool -change /usr/local/opt/qt/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore ./build/obs-midi.so
           echo "Dependencies for obs-midi"
           otool -L ./build/obs-midi.so
-      - name: 'Install Apple Developer Certificate'
-        if: success()
-        uses: apple-actions/import-codesign-certs@253ddeeac23f2bdad1646faac5c8c2832e800071
-        with:
-          p12-file-base64: ${{ secrets.MACOS_CERT_CODESIGN }}
-          p12-password: ${{ secrets.MACOS_CERT_PASS }}
-      - name: 'Code signing'
-        if: success()
-        working-directory: ./obs-midi
-        shell: bash
-        run: |
-          set -e
-          codesign --sign "${{ secrets.MACOS_IDENT_CODESIGN }}" ./build/obs-midi.so
-          packagesbuild ./CI/macos/obs-midi.pkgproj
-          mv ./release/obs-midi.pkg ./release/${{ env.MAC_FILENAME_UNSIGNED }}
-          productsign --sign "${{ secrets.MACOS_IDENT_INSTALLER }}" ./release/${{ env.MAC_FILENAME_UNSIGNED }} ./release/${{ env.MAC_FILENAME }}
-          rm ./release/${{ env.MAC_FILENAME_UNSIGNED }}
-      - name: 'Notarization'
-        if: success()
-        working-directory: ./obs-midi
-        shell: bash
-        run: |
-          set -e
-          xcrun altool --store-password-in-keychain-item "AC_PASSWORD" -u "${{ secrets.MACOS_IDENT_USER }}" -p "${{ secrets.MACOS_IDENT_PASS }}"
-          xcnotary precheck ./release/${{ env.MAC_FILENAME }}
-          if [ "$?" -eq 0 ]; then xcnotary notarize ./release/${{ env.MAC_FILENAME }} --developer-account "${{ secrets.MACOS_IDENT_USER }}" --developer-password-keychain-item "AC_PASSWORD" --provider "${{ secrets.MACOS_IDENT_PROVIDER }}"; fi
       - name: 'Publish ${{ env.MAC_FILENAME }} artifact'
         if: success() && startsWith(github.ref, 'refs/tags')
         uses: actions/upload-artifact@v2-preview

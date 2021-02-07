@@ -129,11 +129,11 @@ jobs:
       - name: 'Build obs-midi 32-bit'
         working-directory: ${{ github.workspace }}/obs-midi
         run: msbuild /m /p:Configuration=RelWithDebInfo .\build32\obs-midi.sln
-      - name: 'Set PR artifact filename'
+            - name: 'Set release filename'
         shell: bash
         run: |
-          FILENAME="obs-midi-${{ env.GIT_HASH }}-Windows"
-          echo "::set-env name=FILENAME::$FILENAME"
+          FILENAME="obs-midi-${{ env.GIT_TAG }}-Windows"
+          echo "::set-env name=WIN_FILENAME::$FILENAME"
       - name: 'Package obs-midi'
         working-directory: ${{ github.workspace }}/obs-midi
         run: |
@@ -145,13 +145,13 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
-          name: '${{ env.GIT_HASH }}-Windows'
+          name: '${{ env.GIT_TAG }}-Windows'
           path: ${{ github.workspace }}/obs-midi/package/*.zip
       - name: 'Publish ${{ env.WIN_FILENAME }}-Installer.exe'
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
-          name: '${{ env.GIT_HASH }}-Windows-Installer'
+          name: '${{ env.GIT_TAG }}-Windows-Installer'
           path: ${{ github.workspace }}/obs-midi/package/*.exe
   ubuntu64:
     name: "Linux/Ubuntu 64-bit"
@@ -274,17 +274,17 @@ jobs:
           set -e
           cd ./build
           make -j4
-      - name: 'Set PR artifact filename'
+      - name: 'Set release filename'
         shell: bash
         run: |
-          FILENAME="obs-midi-1-${{ env.GIT_HASH }}-1_amd64.deb"
-          echo "::set-env name=FILENAME::$FILENAME"
-      - name: 'Package ${{ env.FILENAME }}'
+          FILENAME="obs-midi-${{ env.GIT_TAG }}-1_amd64.deb"
+          echo "::set-env name=LINUX_FILENAME::$FILENAME"
+      - name: 'Package ${{ env.LINUX_FILENAME }}'
         if: success()
         working-directory: ${{ github.workspace }}/obs-midi
         shell: bash
         run: |
-          VERSION="1-${{ env.GIT_HASH }}-git"
+          VERSION="${{ env.GIT_TAG }}"
           cd ./build
           sudo checkinstall -y --type=debian --fstrans=no -nodoc \
               --backup=no --deldoc=yes --install=no --pkgname=obs-midi --pkgversion=$VERSION \
@@ -294,11 +294,11 @@ jobs:
               --pakdir="../package"
           sudo chmod ao+r ../package/*
           cd -
-      - name: 'Publish ${{ env.FILENAME }}'
+      - name: 'Publish ${{ env.LINUX_FILENAME }}'
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
-          name: '${{ env.GIT_HASH }}-linux'
+          name: '${{ env.GIT_TAG }}-linux'
           path: '${{ github.workspace }}/obs-midi/package/*.deb'
   macos64:
     name: "macOS 64-bit"
@@ -389,11 +389,14 @@ jobs:
         run: |
           curl -L -O https://s3-us-west-2.amazonaws.com/obs-nightly/Packages.pkg
           sudo installer -pkg ${{ github.workspace }}/Packages.pkg -target /
-      - name: 'Set PR artifact filename'
+     - name: 'Set release filename'
+        if: success() && startsWith(github.ref, 'refs/tags')
         shell: bash
         run: |
-          FILENAME_UNSIGNED="obs-midi-${{ env.GIT_HASH }}-macOS-Unsigned.pkg"
-          echo "::set-env name=FILENAME_UNSIGNED::$FILENAME_UNSIGNED"
+          FILENAME_UNSIGNED="obs-midi-${{ env.GIT_TAG }}-macOS-Unsigned.pkg"
+          FILENAME="obs-midi-${{ env.GIT_TAG }}-macOS.pkg"
+          echo "::set-env name=MAC_FILENAME_UNSIGNED::$FILENAME_UNSIGNED"
+          echo "::set-env name=MAC_FILENAME::$FILENAME"
       - name: 'Fix linked dynamic library paths'
         if: success()
         working-directory: ${{ github.workspace }}/obs-midi
@@ -404,18 +407,37 @@ jobs:
           install_name_tool -change /usr/local/opt/qt/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore ./build/obs-midi.so
           echo "Dependencies for obs-midi"
           otool -L ./build/obs-midi.so
-      - name: 'Package ${{ env.FILENAME }}'
+      - name: 'Install Apple Developer Certificate'
+        if: success()
+        uses: apple-actions/import-codesign-certs@253ddeeac23f2bdad1646faac5c8c2832e800071
+        with:
+          p12-file-base64: ${{ secrets.MACOS_CERT_CODESIGN }}
+          p12-password: ${{ secrets.MACOS_CERT_PASS }}
+      - name: 'Code signing'
         if: success()
         working-directory: ./obs-midi
         shell: bash
         run: |
+          set -e
+          codesign --sign "${{ secrets.MACOS_IDENT_CODESIGN }}" ./build/obs-midi.so
           packagesbuild ./CI/macos/obs-midi.pkgproj
-          mv ./release/obs-midi.pkg ./release/${{ env.FILENAME_UNSIGNED }}
-      - name: 'Publish ${{ env.FILENAME_UNSIGNED }} artifact'
+          mv ./release/obs-midi.pkg ./release/${{ env.MAC_FILENAME_UNSIGNED }}
+          productsign --sign "${{ secrets.MACOS_IDENT_INSTALLER }}" ./release/${{ env.MAC_FILENAME_UNSIGNED }} ./release/${{ env.MAC_FILENAME }}
+          rm ./release/${{ env.MAC_FILENAME_UNSIGNED }}
+      - name: 'Notarization'
         if: success()
+        working-directory: ./obs-midi
+        shell: bash
+        run: |
+          set -e
+          xcrun altool --store-password-in-keychain-item "AC_PASSWORD" -u "${{ secrets.MACOS_IDENT_USER }}" -p "${{ secrets.MACOS_IDENT_PASS }}"
+          xcnotary precheck ./release/${{ env.MAC_FILENAME }}
+          if [ "$?" -eq 0 ]; then xcnotary notarize ./release/${{ env.MAC_FILENAME }} --developer-account "${{ secrets.MACOS_IDENT_USER }}" --developer-password-keychain-item "AC_PASSWORD" --provider "${{ secrets.MACOS_IDENT_PROVIDER }}"; fi
+      - name: 'Publish ${{ env.MAC_FILENAME }} artifact'
+        if: success() && startsWith(github.ref, 'refs/tags')
         uses: actions/upload-artifact@v2-preview
         with:
-          name: '${{ env.GIT_HASH }}-macOS'
+          name: '${{ env.GIT_TAG }}-macOS'
           path: ${{ github.workspace }}/obs-midi/release/*.pkg
 
   make-release:
@@ -472,7 +494,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ steps.crea  te_release.outputs.upload_url }}
           asset_path: ${{ github.workspace }}/${{ env.TAG_VERSION }}-macOS/obs-midi-${{ env.TAG_VERSION }}-macOS.pkg
           asset_name: obs-midi-${{ env.TAG_VERSION }}-macOS.pkg
           asset_content_type: application/octet-stream

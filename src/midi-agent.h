@@ -22,7 +22,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "rtmidi17/rtmidi17.hpp"
 #else
 #include <obs-frontend-api/obs-frontend-api.h>
-#include "RtMidi17/rtmidi17.hpp"
+#include "rtmidi17/rtmidi17.hpp"
 #endif
 #include <QtCore/QString>
 #include <QtCore/QSharedPointer>
@@ -33,66 +33,86 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <string>
 #include <iostream>
 #include "obs-controller.h"
-#include "obs-controller.h"
 #include "rpc/RpcEvent.h"
 #include "utils.h"
-using namespace std;
 
 class MidiHook {
 public:
-	string type;
-	int index;
-	bool bidirectional;
-	int mchan; //midi channel
-	string action;
-	string command;
-	string param1;
-	string param2;
-	string param3;
-	MidiHook(){};
-	MidiHook(string midiMessageType, int midiChannelIndex, int midiChannel,
-		 bool bidirectionals, string OBSCommand, string p1 = "",
-		 string p2 = "", string p3 = "", string actionType = "")
-		: type(midiMessageType),
-		  index(midiChannelIndex),
-		  mchan(midiChannel),
-		  bidirectional(bidirectionals),
-		  command(OBSCommand),
-		  param1(p1),
-		  param2(p2),
-		  param3(p3),
-		  action(actionType)
-	{
-		// if action not provided, default to button or fader depending on command
-		if (actionType.empty()) {
-			action = (command == "note_on" ? "button" : "fader");
-		}
-	}
+	int channel;          //midi channel
+	QString message_type; // Message Type
+	int norc;             // Note or Control
+	QString action;
+	QString scene;
+	QString source;
+	QString filter;
+	QString transition;
+	QString item;
+	QString audio_source;
+	QString media_source;
+	int duration = -1;
+	QString scene_collection;
+	QString profile;
+	QString string_override;
+	bool bool_override;
+	int int_override;
 
-	MidiHook(const char *jsonString)
+	MidiHook(){};
+
+	MidiHook(QString jsonString)
 	{
-		obs_data_t *data = obs_data_create_from_json(jsonString);
-		type = obs_data_get_string(data, "type");
-		index = obs_data_get_int(data, "index");
-		mchan = obs_data_get_int(data, "mchan");
+		obs_data_t *data = obs_data_create_from_json(
+			jsonString.toStdString().c_str());
+		channel = obs_data_get_int(data, "channel");
+		message_type = obs_data_get_string(data, "message_type");
+		norc = obs_data_get_int(data, "norc");
 		action = obs_data_get_string(data, "action");
-		command = obs_data_get_string(data, "command");
-		param1 = obs_data_get_string(data, "param1");
-		param2 = obs_data_get_string(data, "param2");
-		param3 = obs_data_get_string(data, "param3");
+		scene = obs_data_get_string(data, "scene");
+		source = obs_data_get_string(data, "source");
+		filter = obs_data_get_string(data, "filter");
+		transition = obs_data_get_string(data, "transition");
+		item = obs_data_get_string(data, "item");
+		audio_source = obs_data_get_string(data, "audio_source");
+		media_source = obs_data_get_string(data, "media_source");
+		duration = obs_data_get_int(data, "duration");
+		scene_collection =
+			obs_data_get_string(data, "scene_collection");
+		profile = obs_data_get_string(data, "profile");
+		string_override = obs_data_get_string(data, "string_override");
+		bool_override = obs_data_get_bool(data, "bool_override");
+		int_override = obs_data_get_int(data, "int_override");
 	}
 
 	obs_data_t *GetData()
 	{
 		obs_data_t *data = obs_data_create();
-		obs_data_set_string(data, "type", type.c_str());
-		obs_data_set_int(data, "index", index);
-		obs_data_set_int(data, "mchan", mchan);
-		obs_data_set_string(data, "action", action.c_str());
-		obs_data_set_string(data, "command", command.c_str());
-		obs_data_set_string(data, "param1", param1.c_str());
-		obs_data_set_string(data, "param2", param2.c_str());
-		obs_data_set_string(data, "param3", param3.c_str());
+		obs_data_set_int(data, "channel", channel);
+		obs_data_set_string(data, "message_type",
+				    message_type.toStdString().c_str());
+		obs_data_set_int(data, "norc", norc);
+		obs_data_set_string(data, "action",
+				    action.toStdString().c_str());
+		obs_data_set_string(data, "scene", scene.toStdString().c_str());
+		obs_data_set_string(data, "source",
+				    source.toStdString().c_str());
+		obs_data_set_string(data, "filter",
+				    filter.toStdString().c_str());
+		obs_data_set_string(data, "transition",
+				    transition.toStdString().c_str());
+		obs_data_set_string(data, "item", item.toStdString().c_str());
+		obs_data_set_string(data, "audio_source",
+				    audio_source.toStdString().c_str());
+		obs_data_set_string(data, "media_source",
+				    media_source.toStdString().c_str());
+		obs_data_set_int(data, "duration", duration);
+		obs_data_set_string(data, "scene_collection",
+				    scene_collection.toStdString().c_str());
+		obs_data_set_string(data, "profile",
+				    profile.toStdString().c_str());
+		obs_data_set_string(data, "string_override",
+				    string_override.toStdString().c_str());
+		obs_data_set_bool(data, "bool_override", bool_override);
+		obs_data_set_int(data, "int_override", int_override);
+
 		return data;
 	}
 
@@ -107,40 +127,37 @@ public:
 	~MidiAgent();
 	void Load(obs_data_t *data);
 
-	void OpenPort(int inport);
-	void OpenOutPort(int outport);
-	void ClosePort();
-
-	string GetName();
-	string GetOutName();
-	void SetOutName(string oname);
+	void open_midi_input_port(int inport);
+	void open_midi_output_port(int outport);
+	void close_midi_port();
+	QString get_midi_input_name();
+	QString get_midi_output_name();
+	void set_midi_output_name(QString oname);
 	int GetPort();
 	bool isEnabled();
 	bool isConnected();
 	bool isBidirectional();
 	bool setBidirectional(bool state);
+	void set_enabled(bool enabled);
 	static void HandleInput(const rtmidi::message &message, void *userData);
-	void TriggerInputCommand(MidiHook *hook, int midiVal);
-	void SendMessage(std::string names, std::string mType, int mIndex,
-			 int channel);
-	vector<MidiHook *> GetMidiHooks();
-	void AddMidiHook(MidiHook *hook);
-	void RemoveMidiHook(MidiHook *hook);
-	void ClearMidiHooks();
+	QVector<MidiHook *> GetMidiHooks();
+	void set_midi_hooks(QVector<MidiHook *>);
+	void add_MidiHook(MidiHook *hook);
+	void remove_MidiHook(MidiHook *hook);
+	void clear_MidiHooks();
 	obs_data_t *GetData();
 
 public slots:
-	void NewObsEvent(QString eventType, QString eventData);
+	void handle_obs_event(QString eventType, QString eventData);
 signals:
-	void SendNewUnknownMessage(QString names, QString mtype, int msgindex,
-				   int channel);
+	void broadcast_midi_message(MidiMessage);
 
 private:
-	void send(string type, int channel, int norc, int value = 0);
+	void send_message_to_midi_device(MidiMessage message);
 	rtmidi::midi_in *midiin;
 	rtmidi::midi_out *midiout;
-	string name;
-	string outname;
+	QString midi_input_name;
+	QString midi_output_name;
 	bool sending;
 	int port;
 	int lastscenebtn;
@@ -148,5 +165,7 @@ private:
 	bool connected;
 	bool bidirectional;
 	bool closing = false;
-	vector<MidiHook *> midiHooks;
+	QVector<MidiHook *> midiHooks;
+	void do_obs_action(MidiHook *hook, int MidiVal,
+			   ActionsClass::Actions action);
 };

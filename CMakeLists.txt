@@ -50,7 +50,12 @@ set(obs-midi_DEPS RtMidi17)
 include_directories(src/RtMidi17)
 
 
-
+set(plugin_ui
+	src/forms/settings-dialog.ui
+)
+if (NOT ${isAzure})
+qt5_wrap_ui(plugin_ui_headers ${plugin_ui})
+endif()
 # OBS MIDI
 set(CMAKE_PREFIX_PATH "${QTDIR}")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -75,10 +80,10 @@ endif()
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
 
 include_directories(
-				"${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api"
+	"${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api"
         SYSTEM
-				${Qt5Core_INCLUDES}
-				${Qt5Widgets_INCLUDES}
+	${Qt5Core_INCLUDES}
+	${Qt5Widgets_INCLUDES}
         "${CMAKE_SOURCE_DIR}/UI")
 
 set(obs-midi_SOURCES
@@ -87,30 +92,29 @@ set(obs-midi_SOURCES
 	src/midi-agent.cpp
 	src/device-manager.cpp
 	src/obs-controller.cpp
-  src/forms/settings-dialog.cpp
-	src/forms/configwindow.cpp
-  src/obs-midi.cpp
+	src/forms/settings-dialog.cpp
+	src/obs-midi.cpp
 	src/events.cpp
 	src/rpc/RpcEvent.cpp
 
 )
 
 list(APPEND obs-midi_HEADERS
-    src/utils.h
-		src/config.h
-	  src/midi-agent.h
-	  src/device-manager.h
-	  src/obs-controller.h
-    src/forms/settings-dialog.h
-	  src/forms/configwindow.h
-    src/obs-midi.h
-	  src/events.h
-	  src/rpc/RpcEvent.h
+	src/utils.h
+	src/config.h
+	src/midi-agent.h
+	src/device-manager.h
+	src/obs-controller.h
+	src/forms/settings-dialog.h
+	src/obs-midi.h
+	src/events.h
+	src/rpc/RpcEvent.h
 )
 
 add_library(obs-midi MODULE
         ${obs-midi_SOURCES}
-        ${obs-midi_HEADERS})
+        ${obs-midi_HEADERS}
+        ${plugin_ui_headers})
 
 if(WIN32 OR LINUX)
 	if (${isAzure})
@@ -139,7 +143,7 @@ else()
 endif()
 if (${isAzure})
 # --- Windows-specific build settings and tasks ---
-	message(WARNING "IS AZURE")
+	
 	if(WIN32)
 		if(NOT DEFINED OBS_FRONTEND_LIB)
 			set(OBS_FRONTEND_LIB "OBS_FRONTEND_LIB-NOTFOUND" CACHE FILEPATH "OBS frontend library")
@@ -279,3 +283,6 @@ if(WIN32)
 		install_obs_plugin_with_data(obs-midi data)
 	endif()
 endif()
+
+set_target_properties(obs-midi PROPERTIES FOLDER "plugins/obs-midi")
+set_target_properties(RtMidi17 PROPERTIES FOLDER "plugins/obs-midi")

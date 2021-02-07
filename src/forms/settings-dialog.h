@@ -18,35 +18,79 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <vector>
 #include <QtWidgets/QDialog>
 #include "ui_settings-dialog.h"
-#include "ui_configwindow.h"
-#include "configwindow.h"
 #include "../midi-agent.h"
 #include "../version.h"
 
-class SettingsDialog : public QDialog {
+class PluginWindow : public QDialog {
 	Q_OBJECT
 
 public:
-	SettingsDialog(QWidget *parent);
-	~SettingsDialog();
+	PluginWindow(QWidget *parent);
+	~PluginWindow();
 	void setCheck(bool check);
 	void SetAvailableDevices();
-	void on_btn_configure_clicked();
-	int on_check_enabled_stateChanged(bool state);
-	void on_item_select(QString curitem);
-	int on_bid_enabled_stateChanged(bool state);
+
+signals:
+	void changed(obs_data_t *change);
 private Q_SLOTS:
 	void ToggleShowHide();
 
 public slots:
-	void selectOutput(QString item);
+	int on_check_enabled_state_changed(int state);
+	int on_bid_enabled_state_changed(int state);
+	void on_device_select(QString curitem);
+
+	void select_output_device(QString item);
+	void handle_midi_message(MidiMessage mess);
+	void obs_actions_select(QString action);
+	void check_advanced_switch(bool state);
+	void ResetToDefaults();
+	void on_source_change(QString source);
+	void on_scene_change(QString source);
+	void get_sources(QString scene);
+	void get_filters(QString Source);
+	void get_transitions();
+	void get_scenes();
+	void add_new_mapping();
+	void add_row_from_hook(MidiHook *hook);
+	void tab_changed(int i);
+	void delete_mapping();
+	void edit_mapping(int row, int col);
+	void set_cell_colors(QColor color, QTableWidgetItem *item);
 
 private:
-	Ui::SettingsDialogDialog *ui;
+	Ui::PluginWindow *ui;
 
-	Ui::ConfigWindow *cwin;
 	bool hidedebugitems = true;
 	bool loadingdevices = false;
 	QMetaObject::Connection desconnect;
 	bool starting = true;
+	QString DeviceFilter;
+	void ShowPair(Pairs pair);
+	void HidePair(Pairs pair);
+	void HideAllPairs();
+	void add_midi_device(QString Name);
+	void set_headers();
+	QStringList SceneList;
+	bool listening = false;
+	void get_scene_names();
+
+	bool first_run;
+	bool map_exists();
+	int map_location(MidiMessage message);
+
+private:
+	QGridLayout *layout;
+	QStringList *items;
+	QString sceneName;
+	bool switching = false;
+	void ShowOnly(QList<ActionsClass::Actions> shows);
+	void ShowEntry(ActionsClass::Actions Entry);
+	void HideEntry(ActionsClass::Actions Entry);
+	void ShowAllActions();
+	void HideEntries(QList<ActionsClass::Actions> entrys);
+	void ShowEntries(QList<ActionsClass::Actions> entrys);
+	QString untranslate(QString translation);
+	QListView *listview;
+	
 };

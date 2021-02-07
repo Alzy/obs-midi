@@ -3,12 +3,10 @@ This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-
 You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>
 */
@@ -29,79 +27,120 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "../device-manager.h"
 #include "../config.h"
 #include "settings-dialog.h"
-#include "ui_configwindow.h"
-#include "configwindow.h"
 #include <qdialogbuttonbox.h>
 #include <qcheckbox.h>
+
 #include "../version.h"
-SettingsDialog::SettingsDialog(QWidget *parent)
-	: QDialog(parent, Qt::Dialog), ui(new Ui::SettingsDialogDialog)
+PluginWindow::PluginWindow(QWidget *parent)
+	: QDialog(parent, Qt::Dialog), ui(new Ui::PluginWindow)
 {
 	ui->setupUi(this);
-	connect(ui->list_midi_dev, &QListWidget::currentTextChanged, this,
-		&SettingsDialog::on_item_select);
-	connect(ui->check_enabled, &QCheckBox::stateChanged, this,
-		&SettingsDialog::on_check_enabled_stateChanged);
-	connect(ui->bidirectional, &QCheckBox::stateChanged, this,
-		&SettingsDialog::on_bid_enabled_stateChanged);
-	connect(ui->btn_configure, &QPushButton::clicked, this,
-		&SettingsDialog::on_btn_configure_clicked);
-	SetAvailableDevices();
-	//ui->SettingsDialog->
+
+	//Set Window Title
 	QString title;
 	title.append("OBS MIDI Settings -- Branch: ");
 	title.append(GIT_BRANCH);
 	title.append(" -- Commit: ");
 	title.append(GIT_COMMIT_HASH);
 	this->setWindowTitle(title);
+
+	HideAllPairs();
+
+	Utils::TranslateActions();
+	//Connections for Device Tab
+	connect(ui->list_midi_dev, SIGNAL(currentTextChanged(QString)), this,
+		SLOT(on_device_select(QString)));
+	connect(ui->check_enabled, SIGNAL(stateChanged(int)), this,
+		SLOT(on_check_enabled_state_changed(int)));
+	connect(ui->bidirectional, SIGNAL(stateChanged(int)), this,
+		SLOT(on_bid_enabled_state_changed(int)));
+	
+	//Connections for Configure Tab
+	
+	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
+		this, SLOT(get_sources(QString)));
+	connect(ui->cb_obs_output_action, SIGNAL(currentTextChanged(QString)),
+		this, SLOT(obs_actions_select(QString)));
+	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
+		this, SLOT(get_sources(QString)));
+	connect(ui->cb_obs_output_source, SIGNAL(currentTextChanged(QString)),
+		this, SLOT(get_filters(QString)));
+
+	connect(ui->cb_obs_output_source, SIGNAL(currentTextChanged(QString)),
+		this, SLOT(on_source_change(QString)));
+	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
+		this, SLOT(on_scene_change(QString)));
+	connect(ui->table_mapping, SIGNAL(cellClicked(int, int)), this,
+		SLOT(edit_mapping(int, int)));
+	/**************Connections to mappper****************/
+	connect(ui->btn_add, SIGNAL(clicked()), this, SLOT(add_new_mapping()));
+	connect(ui->btn_delete, SIGNAL(clicked()), this, SLOT(delete_mapping()));
+	connect(ui->tabWidget, SIGNAL(currentChanged(int)), this,
+		SLOT(tab_changed(int)));
+	this->ui->cb_obs_output_action->addItems(Utils::TranslateActions());
+	loadingdevices = true;
 }
 
-void SettingsDialog::ToggleShowHide()
+void PluginWindow::ToggleShowHide()
 {
 
 	if (!isVisible()) {
+		SetAvailableDevices();
+		ui->cb_obs_output_audio_source->clear();
+		ui->cb_obs_output_audio_source->addItems(
+			Utils::GetAudioSourceNames());
+		ui->cb_obs_output_media_source->clear();
+		ui->cb_obs_output_media_source->addItems(
+			Utils::GetMediaSourceNames());
+		ui->cb_obs_output_transition->clear();
+		ui->cb_obs_output_transition->addItems(
+			Utils::GetTransitionsList());
+
+		get_scene_names();
 
 		setVisible(true);
 
-	}
-
-	else {
-
+	} else {
 		setVisible(false);
+		ui->btn_Listen_many->setChecked(false);
+		ui->btn_Listen_one->setChecked(false);
 	}
 }
 
-void SettingsDialog::setCheck(bool x)
+void PluginWindow::setCheck(bool x)
 {
 	this->ui->check_enabled->setChecked(x);
-	this->ui->btn_configure->setEnabled(x);
 }
 
-void SettingsDialog::SetAvailableDevices()
+void PluginWindow::SetAvailableDevices()
 {
 
-	auto midiOutDevices = GetDeviceManager()->GetOPL();
-	loadingdevices = true;
-	this->ui->outbox->clear();
-	this->ui->outbox->insertItems(0, midiOutDevices);
-	loadingdevices = false;
+	auto midiOutDevices = GetDeviceManager()->GetOutPortsList();
+
 	auto midiDevices = GetDeviceManager()->GetPortsList();
 
 	this->ui->list_midi_dev->clear();
-	this->ui->check_enabled->setEnabled(false);
-	this->ui->btn_configure->setEnabled(false);
-	this->ui->outbox->setEnabled(false);
 
 	if (midiDevices.size() == 0) {
 		this->ui->list_midi_dev->addItem("No Devices Available");
-	} else if (midiDevices.size() > 0) {
-		this->ui->check_enabled->setEnabled(true);
-		this->ui->btn_configure->setEnabled(false);
+		ui->tab_configure->setEnabled(false);
+		ui->bidirectional->setEnabled(false);
+		ui->check_enabled->setEnabled(false);
 		this->ui->outbox->setEnabled(false);
-	}
-
-	for (int i = 0; i < midiDevices.size(); i++) {
-		this->ui->list_midi_dev->addItem(midiDevices.at(i).c_str());
+		ui->tabWidget->setEnabled(false);
+	} else if (midiDevices.size() > 0) {
+		for (int i = 0; i < midiDevices.size(); i++) {
+			this->ui->list_midi_dev->addItem(midiDevices.at(i));
+		}
+		ui->tab_configure->setEnabled(true);
+		ui->bidirectional->setEnabled(true);
+		ui->check_enabled->setEnabled(true);
+		this->ui->outbox->setEnabled(true);
+		ui->tabWidget->setEnabled(true);
+		loadingdevices = true;
+		this->ui->outbox->clear();
+		this->ui->outbox->insertItems(0, midiOutDevices);
+		loadingdevices = false;
 	}
 
 	if (starting) {
@@ -119,44 +158,33 @@ void SettingsDialog::SetAvailableDevices()
 		if (midiDevices.size() != 0) {
 			desconnect = connect(
 				ui->outbox, SIGNAL(currentTextChanged(QString)),
-				this, SLOT(selectOutput(QString)));
+				this, SLOT(select_output_device(QString)));
 		}
 		starting = false;
 	}
 
 	this->ui->list_midi_dev->setCurrentRow(-1);
 	this->ui->list_midi_dev->setCurrentRow(0);
+	on_device_select(ui->list_midi_dev->currentItem()->text());
 }
 
-void SettingsDialog::on_btn_configure_clicked()
-{
-
-	blog(LOG_INFO, "Configure button clicked");
-	ConfigWindow *cwin =
-		new ConfigWindow(ui->list_midi_dev->currentItem()->text());
-	blog(LOG_INFO, "new config window created");
-	cwin->exec();
-	blog(LOG_INFO, "execute config window");
-}
-
-void SettingsDialog::selectOutput(QString selectedDeviceName)
+void PluginWindow::select_output_device(QString selectedDeviceName)
 {
 	if (!loadingdevices) {
 		auto selectedDevice =
 			ui->list_midi_dev->currentItem()->text().toStdString();
 		auto device = GetDeviceManager()->GetMidiDeviceByName(
 			selectedDevice.c_str());
-		device->SetOutName(selectedDeviceName.toStdString());
+		device->set_midi_output_name(selectedDeviceName);
 
 		GetConfig()->Save();
 	}
 }
 
-int SettingsDialog::on_check_enabled_stateChanged(bool state)
+int PluginWindow::on_check_enabled_state_changed(int state)
 {
 
-	if (state == true) {
-
+	if (state == Qt::CheckState::Checked) {
 		auto selectedDeviceName =
 			ui->list_midi_dev->currentItem()->text().toStdString();
 		auto selectedOutDeviceName =
@@ -174,67 +202,757 @@ int SettingsDialog::on_check_enabled_stateChanged(bool state)
 							       deviceOutPort);
 			device = GetDeviceManager()->GetMidiDeviceByName(
 				selectedDeviceName.c_str());
-			device->OpenPort(devicePort);
-			device->OpenOutPort(deviceOutPort);
+			device->open_midi_input_port(devicePort);
+			device->open_midi_output_port(deviceOutPort);
+
 		} else {
 
-			device->OpenPort(devicePort);
-			device->OpenOutPort(deviceOutPort);
+			device->open_midi_input_port(devicePort);
+			device->open_midi_output_port(deviceOutPort);
 		}
+		device->set_enabled(true);
+		device->setBidirectional(true);
+		ui->bidirectional->setEnabled(true);
+		ui->bidirectional->setChecked(true);
+		ui->outbox->setEnabled(true);
+		
 	}
-
 	//ui->outbox->setCurrentText(QString::fromStdString(device->GetOutName()));
-	ui->btn_configure->setEnabled(state);
-	ui->bidirectional->setEnabled(state);
-	ui->bidirectional->setChecked(true);
-	ui->outbox->setEnabled(true);
+	
 	GetConfig()->Save();
+	//on_device_select(ui->list_midi_dev->currentItem()->text());
 	return state;
 }
 
-void SettingsDialog::on_item_select(QString curitem)
+void PluginWindow::on_device_select(QString curitem)
 {
-	auto texting = curitem.toStdString();
+	auto devicemanager = GetDeviceManager();
+	auto config = GetConfig();
+	MidiAgent *MAdevice = devicemanager->GetMidiDeviceByName(curitem);
+
+	ui->tabWidget->setTabText(1, QString("Configure - ").append(curitem));
 	// Pull info on if device is enabled, if so set true if not set false
-	auto device = GetDeviceManager()->GetMidiDeviceByName(
-		curitem.toStdString().c_str());
-	if (device != NULL && device->isEnabled()) {
+	if (MAdevice != NULL && MAdevice->isEnabled()) {
 		ui->check_enabled->setChecked(true);
-		ui->btn_configure->setEnabled(true);
 		ui->outbox->setEnabled(true);
 		ui->bidirectional->setEnabled(true);
-		ui->bidirectional->setChecked(device->isBidirectional());
-		auto on = device->GetOutName();
-		ui->outbox->setCurrentText(QString::fromStdString(on));
+		ui->bidirectional->setChecked(MAdevice->isBidirectional());
+		ui->outbox->setCurrentText(MAdevice->get_midi_output_name());
 
 	} else {
 		ui->check_enabled->setChecked(false);
-		ui->btn_configure->setEnabled(false);
 		ui->outbox->setEnabled(false);
 		ui->bidirectional->setEnabled(false);
 	}
+
+	///HOOK up the Message Handler
+	connect(MAdevice, SIGNAL(broadcast_midi_message(MidiMessage)), this,
+		SLOT(handle_midi_message(
+			MidiMessage))); /// name, mtype, norc, channel
+
+	ui->mapping_lbl_device_name->setText(curitem);
 }
-int SettingsDialog::on_bid_enabled_stateChanged(bool state)
+void PluginWindow::handle_midi_message(MidiMessage mess)
+{
+	if (ui->tabWidget->currentIndex() == 1) {
+		if (ui->btn_Listen_one->isChecked() ||
+		    ui->btn_Listen_many->isChecked()) {
+			blog(1,
+			     "got midi message via gui, \n Device = %s \nMType = %s \n NORC : %i \n Channel: %i \n Value: %i",
+			     mess.device_name.toStdString().c_str(),
+			     mess.message_type.toStdString().c_str(), mess.NORC,
+			     mess.channel, mess.value);
+			ui->mapping_lbl_device_name->setText(mess.device_name);
+			ui->sb_channel->setValue(mess.channel);
+			ui->sb_norc->setValue(mess.NORC);
+			ui->slider_value->setValue(mess.value);
+			ui->cb_mtype->setCurrentText(mess.message_type);
+			ui->btn_Listen_one->setChecked(false);
+		} else {
+			if (map_location(mess) != -1) {
+				ui->table_mapping->selectRow(
+					map_location(mess));
+			}
+			
+		}
+	}
+}
+int PluginWindow::on_bid_enabled_state_changed(int state)
 {
 	auto device = GetDeviceManager()->GetMidiDeviceByName(
 		ui->list_midi_dev->currentItem()->text().toStdString().c_str());
 	if (state) {
-		return 1;
 		device->setBidirectional(state);
+		return 1;
 
 	} else {
-		return 0;
 		device->setBidirectional(state);
+		return 0;
 	}
-	GetConfig()->Save();
-	GetConfig()->Load();
+	
 }
 
-SettingsDialog::~SettingsDialog()
+PluginWindow::~PluginWindow()
 {
 
 	loadingdevices = false;
 	starting = true;
 	disconnect(desconnect);
 	delete ui;
+}
+
+void PluginWindow::get_scene_names()
+{
+	obs_frontend_source_list sceneList = {};
+	obs_frontend_get_scenes(&sceneList);
+	SceneList.clear();
+	for (size_t i = 0; i < sceneList.sources.num; i++) {
+
+		SceneList.append(
+			obs_source_get_name(sceneList.sources.array[i]));
+	}
+	obs_frontend_source_list_free(&sceneList);
+}
+void PluginWindow::add_midi_device(QString name)
+{
+	blog(LOG_DEBUG, "Adding Midi Device %s", name.toStdString().c_str());
+	QTableWidgetItem *device_name = new QTableWidgetItem();
+	QTableWidgetItem *device_enabled = new QTableWidgetItem();
+	QTableWidgetItem *device_status = new QTableWidgetItem();
+	QTableWidgetItem *feedback_enabled = new QTableWidgetItem();
+	QTableWidgetItem *feedback_name = new QTableWidgetItem();
+	QTableWidgetItem *feedback_status = new QTableWidgetItem();
+	int rowcount = this->ui->table_mapping->rowCount();
+	this->ui->table_mapping->insertRow(rowcount);
+	device_name->setText(name);
+	device_enabled->setCheckState(Qt::Unchecked);
+	device_status->setText(QString("Disconnected"));
+	device_status->setTextColor("grey");
+	feedback_name->setText("");
+	feedback_enabled->setCheckState(Qt::Unchecked);
+	feedback_status->setText(QString("unset"));
+	this->ui->table_mapping->setItem(rowcount, 0, device_name);
+	this->ui->table_mapping->setItem(rowcount, 1, device_enabled);
+	this->ui->table_mapping->setItem(rowcount, 2, device_status);
+	this->ui->table_mapping->setItem(rowcount, 3, feedback_enabled);
+	this->ui->table_mapping->setItem(rowcount, 4, feedback_name);
+	this->ui->table_mapping->setItem(rowcount, 5, feedback_status);
+}
+void PluginWindow::set_headers()
+{
+	ui->table_mapping->setHorizontalHeaderLabels(
+		{"Channel", "Message Type", "Note or Control", "Action",
+		 "Scene", "Source", "Filter", "Transition", "Item",
+		 "Audio Source", "Media Source"});
+	QColor midicolor("#00aaff");
+
+	QColor actioncolor("#aa00ff");
+	ui->table_mapping->horizontalHeaderItem(0)->setTextColor(midicolor);
+	ui->table_mapping->horizontalHeaderItem(1)->setTextColor(midicolor);
+	ui->table_mapping->horizontalHeaderItem(2)->setTextColor(midicolor);
+	ui->table_mapping->horizontalHeaderItem(3)->setTextColor(actioncolor);
+	ui->table_mapping->horizontalHeaderItem(4)->setTextColor(actioncolor);
+	ui->table_mapping->horizontalHeaderItem(5)->setTextColor(actioncolor);
+	ui->table_mapping->horizontalHeaderItem(6)->setTextColor(actioncolor);
+	ui->table_mapping->horizontalHeaderItem(7)->setTextColor(actioncolor);
+	ui->table_mapping->horizontalHeaderItem(8)->setTextColor(actioncolor);
+	ui->table_mapping->horizontalHeaderItem(9)->setTextColor(actioncolor);
+	ui->table_mapping->horizontalHeaderItem(10)->setTextColor(actioncolor);
+}
+
+void PluginWindow::ShowPair(Pairs Pair)
+{
+
+	switch (Pair) {
+	case Pairs::Scene:
+		ui->label_obs_output_scene->show();
+		ui->cb_obs_output_scene->show();
+		get_scenes();
+		ui->w_scene->show();
+		break;
+	case Pairs::Source:
+		ui->label_obs_output_source->show();
+		ui->cb_obs_output_source->show();
+		get_sources(ui->cb_obs_output_scene->currentText());
+		ui->w_source->show();
+		break;
+	case Pairs::Filter:
+		ui->label_obs_output_filter->show();
+		ui->cb_obs_output_filter->show();
+
+		ui->w_filter->show();
+		break;
+	case Pairs::Transition:
+		ui->label_obs_output_transition->show();
+		ui->cb_obs_output_transition->show();
+		ui->w_transition->show();
+		break;
+	case Pairs::Item:
+		ui->label_obs_output_item->show();
+		ui->cb_obs_output_item->show();
+		ui->w_item->show();
+		break;
+	case Pairs::Audio:
+		ui->cb_obs_output_audio_source->clear();
+		ui->cb_obs_output_audio_source->addItems(
+			Utils::GetAudioSourceNames());
+		ui->label_obs_output_audio_source->show();
+		ui->cb_obs_output_audio_source->show();
+		ui->w_audio->show();
+		break;
+	case Pairs::Media:
+		ui->cb_obs_output_media_source->clear();
+		ui->cb_obs_output_media_source->addItems(
+			Utils::GetMediaSourceNames());
+		ui->label_obs_output_media_source->show();
+		ui->cb_obs_output_media_source->show();
+		ui->w_media->show();
+		break;
+	case Pairs::String:
+		break;
+	case Pairs::Boolean:
+		break;
+	case Pairs::Integer:
+		break;
+	}
+}
+void PluginWindow::HidePair(Pairs Pair)
+{
+	switch (Pair) {
+	case Pairs::Scene:
+		ui->label_obs_output_scene->hide();
+		ui->cb_obs_output_scene->hide();
+		ui->cb_obs_output_scene->clear();
+
+		ui->w_scene->hide();
+		blog(LOG_DEBUG, "Hide Scene");
+		break;
+	case Pairs::Source:
+		ui->label_obs_output_source->hide();
+		ui->cb_obs_output_source->hide();
+		ui->cb_obs_output_source->clear();
+		ui->w_source->hide();
+		blog(LOG_DEBUG, "Hide Source");
+		break;
+	case Pairs::Filter:
+		ui->label_obs_output_filter->hide();
+		ui->cb_obs_output_filter->hide();
+		ui->cb_obs_output_filter->clear();
+		ui->w_filter->hide();
+		blog(LOG_DEBUG, "Hide Filter");
+		break;
+	case Pairs::Transition:
+		ui->label_obs_output_transition->hide();
+		ui->cb_obs_output_transition->hide();
+		ui->cb_obs_output_transition->clear();
+		ui->w_transition->hide();
+		blog(LOG_DEBUG, "Hide Transition");
+		break;
+	case Pairs::Item:
+		ui->label_obs_output_item->hide();
+		ui->cb_obs_output_item->hide();
+		ui->cb_obs_output_item->clear();
+		ui->w_item->hide();
+		blog(LOG_DEBUG, "Hide Item");
+		break;
+	case Pairs::Audio:
+		ui->label_obs_output_audio_source->hide();
+		ui->cb_obs_output_audio_source->hide();
+		ui->cb_obs_output_audio_source->clear();
+		ui->w_audio->hide();
+		blog(LOG_DEBUG, "Hide Audio");
+		break;
+	case Pairs::Media:
+		ui->label_obs_output_media_source->hide();
+		ui->cb_obs_output_media_source->hide();
+		ui->cb_obs_output_media_source->clear();
+		ui->w_media->hide();
+		blog(LOG_DEBUG, "Hide Media");
+		break;
+	case Pairs::String:
+		break;
+	case Pairs::Boolean:
+		break;
+	case Pairs::Integer:
+		break;
+	}
+}
+void PluginWindow::HideAllPairs()
+{
+	HidePair(Pairs::Transition);
+	HidePair(Pairs::Audio);
+	HidePair(Pairs::Media);
+	HidePair(Pairs::Filter);
+	HidePair(Pairs::Scene);
+	HidePair(Pairs::Source);
+	HidePair(Pairs::Item);
+	HidePair(Pairs::String);
+	HidePair(Pairs::Integer);
+	HidePair(Pairs::Boolean);
+}
+
+void PluginWindow::ResetToDefaults()
+{
+	ui->cb_obs_output_action->setCurrentIndex(0);
+	ui->cb_obs_output_transition->setCurrentIndex(0);
+	ui->cb_obs_output_filter->setCurrentIndex(0);
+	ui->cb_obs_output_scene->setCurrentIndex(0);
+	ui->cb_obs_output_source->setCurrentIndex(0);
+	ui->cb_obs_output_audio_source->setCurrentIndex(0);
+	ui->cb_obs_output_media_source->setCurrentIndex(0);
+}
+void PluginWindow::get_transitions()
+{
+	ui->cb_obs_output_transition->clear();
+	ui->cb_obs_output_transition->addItems(Utils::GetTransitionsList());
+}
+
+void PluginWindow::on_source_change(QString source)
+{
+
+	get_filters(source);
+	ui->cb_obs_output_item->clear();
+	ui->cb_obs_output_item->addItems(Utils::GetSceneItemsList(source));
+}
+void PluginWindow::on_scene_change(QString scene)
+{
+
+	get_sources(scene);
+	ui->cb_obs_output_item->clear();
+	ui->cb_obs_output_item->addItems(Utils::GetSceneItemsList(scene));
+}
+
+void PluginWindow::ShowOnly(QList<ActionsClass::Actions> shows)
+{
+
+	ui->cb_obs_output_action->clear();
+	for (int i = 0; i < shows.size(); i++) {
+		ui->cb_obs_output_action->addItem(
+			obs_module_text(ActionsClass::action_to_string(shows.at(i))
+						.toStdString()
+						.c_str()));
+	}
+}
+
+void PluginWindow::ShowEntry(ActionsClass::Actions Entry)
+{
+	if (ui->cb_obs_output_action->findText(
+		    ActionsClass::action_to_string(Entry)) == -1) {
+		ui->cb_obs_output_action->addItem(obs_module_text(
+			ActionsClass::action_to_string(Entry).toStdString().c_str()));
+	}
+}
+void PluginWindow::HideEntry(ActionsClass::Actions Entry)
+{
+	if (ui->cb_obs_output_action->findText(
+		    ActionsClass::action_to_string(Entry)) > 0) {
+		ui->cb_obs_output_action->removeItem(
+			ui->cb_obs_output_action->findText(
+				ActionsClass::action_to_string(Entry)));
+	}
+}
+void PluginWindow::ShowAllActions()
+{
+	int count = Utils::AllActions_raw.count();
+	for (int i = 0; i < count; i++) {
+		ShowEntry(Utils::AllActions_raw.at(i));
+	}
+}
+void PluginWindow::HideEntries(QList<ActionsClass::Actions> entrys)
+{
+	int count = ui->cb_obs_output_action->count();
+
+	for (int i = 0; i < count; i++) {
+		if (entrys.contains(Utils::AllActions_raw.at(i))) {
+			HideEntry(Utils::AllActions_raw.at(i));
+		}
+	}
+	listview->adjustSize();
+}
+void PluginWindow::ShowEntries(QList<ActionsClass::Actions> entrys)
+{
+	int count = ui->cb_obs_output_action->count();
+
+	for (int i = 0; i < count; i++) {
+		if (entrys.contains(Utils::AllActions_raw.at(i))) {
+			ShowEntry(Utils::AllActions_raw.at(i));
+		}
+	}
+	listview->adjustSize();
+}
+
+
+void PluginWindow::get_sources(QString scene)
+{
+
+	ui->cb_obs_output_source->clear();
+	auto arrayref = Utils::GetSceneArray(scene);
+	int size = obs_data_array_count(arrayref);
+	for (int i = 0; i < size; i++) {
+		obs_data *item = obs_data_array_item(arrayref, i);
+
+		ui->cb_obs_output_source->addItem(
+			QString(obs_data_get_string(item, "name")));
+		obs_data_release(item);
+	}
+	obs_data_array_release(arrayref);
+}
+void PluginWindow::get_scenes()
+{
+	ui->cb_obs_output_scene->clear();
+	obs_data_array *x = Utils::GetScenes();
+	int cnt = obs_data_array_count(x);
+	for (int i = 0; i <= cnt; i++) {
+		auto it = obs_data_array_item(x, i);
+		ui->cb_obs_output_scene->addItem(
+			obs_data_get_string(it, "name"));
+		obs_data_release(it);
+	}
+
+	obs_data_array_release(x);
+}
+void PluginWindow::get_filters(QString source)
+{
+
+	ui->cb_obs_output_filter->clear();
+
+	auto x = obs_get_source_by_name(source.toStdString().c_str());
+	OBSDataArrayAutoRelease y = Utils::GetSourceFiltersList(x, false);
+	for (int i = 0; i < obs_data_array_count(y); i++) {
+		OBSDataAutoRelease z = obs_data_array_item(y, i);
+		ui->cb_obs_output_filter->addItem(
+			QString(obs_data_get_string(z, "name")));
+	}
+}
+void PluginWindow::check_advanced_switch(bool state)
+{
+	//obs_actions_filter_select(ui->cb_obs_action->currentIndex());
+}
+
+
+void PluginWindow::obs_actions_select(QString action)
+{
+	if (!switching) {
+		HideAllPairs();
+
+		switch (ActionsClass::string_to_action(untranslate(action))) {
+		case ActionsClass::Actions::Set_Current_Scene:
+			ShowPair(Pairs::Scene);
+			break;
+		case ActionsClass::Actions::Enable_Source_Filter:
+			ShowPair(Pairs::Scene);
+			ShowPair(Pairs::Source);
+			ShowPair(Pairs::Filter);
+			break;
+		case ActionsClass::Actions::Disable_Source_Filter:
+			ShowPair(Pairs::Scene);
+			ShowPair(Pairs::Source);
+			ShowPair(Pairs::Filter);
+			break;
+		case ActionsClass::Actions::Set_Gain_Filter:
+			ShowPair(Pairs::Scene);
+			ShowPair(Pairs::Source);
+			ShowPair(Pairs::Filter);
+			break;
+		case ActionsClass::Actions::Toggle_Source_Filter:
+			ShowPair(Pairs::Scene);
+			ShowPair(Pairs::Source);
+			ShowPair(Pairs::Filter);
+			break;
+		case ActionsClass::Actions::Reset_Scene_Item:
+			ShowPair(Pairs::Scene);
+			ShowPair(Pairs::Source);
+			ShowPair(Pairs::Item);
+			break;
+		case ActionsClass::Actions::Set_Scene_Item_Render:
+			ShowPair(Pairs::Scene);
+			ShowPair(Pairs::Source);
+			ShowPair(Pairs::Item);
+			break;
+		case ActionsClass::Actions::Set_Scene_Item_Position:
+			ShowPair(Pairs::Scene);
+			ShowPair(Pairs::Item);
+			break;
+		case ActionsClass::Actions::Set_Scene_Item_Transform:
+			ShowPair(Pairs::Scene);
+			ShowPair(Pairs::Item);
+			break;
+		case ActionsClass::Actions::Set_Scene_Item_Crop:
+			ShowPair(Pairs::Scene);
+			ShowPair(Pairs::Item);
+			break;
+		case ActionsClass::Actions::Set_Scene_Transition_Override:
+			ShowPair(Pairs::Scene);
+			ShowPair(Pairs::Transition);
+			break;
+		case ActionsClass::Actions::Set_Current_Transition:
+			ShowPair(Pairs::Transition);
+			break;
+		case ActionsClass::Actions::Set_Volume:
+			ShowPair(Pairs::Audio);
+			break;
+		case ActionsClass::Actions::Set_Mute:
+			ShowPair(Pairs::Audio);
+			break;
+		case ActionsClass::Actions::Toggle_Mute:
+			ShowPair(Pairs::Audio);
+			break;
+		case ActionsClass::Actions::Set_Source_Filter_Visibility:
+			ShowPair(Pairs::Scene);
+			ShowPair(Pairs::Source);
+			ShowPair(Pairs::Filter);
+			break;
+		case ActionsClass::Actions::Take_Source_Screenshot:
+			ShowPair(Pairs::Source);
+			ShowPair(Pairs::Scene);
+			break;
+		case ActionsClass::Actions::Play_Pause_Media:
+			ShowPair(Pairs::Media);
+			break;
+		case ActionsClass::Actions::Restart_Media:
+			ShowPair(Pairs::Media);
+			break;
+		case ActionsClass::Actions::Stop_Media:
+			ShowPair(Pairs::Media);
+			break;
+		case ActionsClass::Actions::Next_Media:
+			ShowPair(Pairs::Media);
+			break;
+		case ActionsClass::Actions::Previous_Media:
+			ShowPair(Pairs::Media);
+			break;
+		case ActionsClass::Actions::Set_Media_Time:
+			ShowPair(Pairs::Media);
+			break;
+		case ActionsClass::Actions::Scrub_Media:
+			ShowPair(Pairs::Media);
+			break;
+		default:
+			HideAllPairs();
+			break;
+		}
+	}
+}
+QString PluginWindow::untranslate(QString tstring)
+{
+	return ActionsClass::action_to_string(Utils::AllActions_raw.at(
+		Utils::TranslateActions().indexOf(tstring)));
+}
+bool PluginWindow::map_exists()
+{
+	auto devicemanager = GetDeviceManager();
+	auto hooks = devicemanager->GetMidiHooksByDeviceName(
+		ui->mapping_lbl_device_name->text());
+	for (int i = 0; i < hooks.size(); i++) {
+		if ((hooks.at(i)->channel == ui->sb_channel->value()) &&
+		    (hooks.at(i)->norc == ui->sb_norc->value()) &&
+		    (hooks.at(i)->message_type ==
+		     ui->cb_mtype->currentText())) {
+			return true;
+		}
+	}
+	return false;
+}
+int PluginWindow::map_location(MidiMessage message)
+{
+	auto devicemanager = GetDeviceManager();
+	auto hooks = devicemanager->GetMidiHooksByDeviceName(
+		ui->mapping_lbl_device_name->text());
+	for (int i = 0; i < hooks.size(); i++) {
+		if ((hooks.at(i)->channel == message.channel) &&
+		    (hooks.at(i)->norc == message.NORC) &&
+		    (hooks.at(i)->message_type ==
+		     message.message_type)) {
+			return i;
+		}
+	}
+	return -1;
+}
+void PluginWindow::add_new_mapping()
+{
+	ui->btn_Listen_many->setChecked(false);
+	ui->btn_Listen_one->setChecked(false);
+	if (!map_exists()) {
+
+		int row = ui->table_mapping->rowCount();
+		ui->table_mapping->insertRow(row);
+		QTableWidgetItem *channelitem = new QTableWidgetItem(
+			QString::number(ui->sb_channel->value()));
+		QTableWidgetItem *mtypeitem =
+			new QTableWidgetItem(ui->cb_mtype->currentText());
+		QTableWidgetItem *norcitem = new QTableWidgetItem(
+			QString::number(ui->sb_norc->value()));
+		QTableWidgetItem *actionitem = new QTableWidgetItem(
+			ui->cb_obs_output_action->currentText());
+		QTableWidgetItem *sceneitem = new QTableWidgetItem(
+			ui->cb_obs_output_scene->currentText());
+		QTableWidgetItem *sourceitem = new QTableWidgetItem(
+			ui->cb_obs_output_source->currentText());
+		QTableWidgetItem *filteritem = new QTableWidgetItem(
+			ui->cb_obs_output_filter->currentText());
+		QTableWidgetItem *transitionitem = new QTableWidgetItem(
+			ui->cb_obs_output_transition->currentText());
+		QTableWidgetItem *itemitem = new QTableWidgetItem(
+			ui->cb_obs_output_item->currentText());
+		QTableWidgetItem *audioitem = new QTableWidgetItem(
+			ui->cb_obs_output_audio_source->currentText());
+		QTableWidgetItem *mediaitem = new QTableWidgetItem(
+			ui->cb_obs_output_media_source->currentText());
+		ui->table_mapping->setItem(row, 0, channelitem);
+		ui->table_mapping->setItem(row, 1, mtypeitem);
+		ui->table_mapping->setItem(row, 2, norcitem);
+		ui->table_mapping->setItem(row, 3, actionitem);
+		ui->table_mapping->setItem(row, 4, sceneitem);
+		ui->table_mapping->setItem(row, 5, sourceitem);
+		ui->table_mapping->setItem(row, 6, filteritem);
+		ui->table_mapping->setItem(row, 7, transitionitem);
+		ui->table_mapping->setItem(row, 8, itemitem);
+		ui->table_mapping->setItem(row, 9, audioitem);
+		ui->table_mapping->setItem(row, 10, mediaitem);
+		MidiHook *newmh = new MidiHook();
+		newmh->channel = ui->sb_channel->value();
+		newmh->message_type = ui->cb_mtype->currentText();
+		newmh->norc = ui->sb_norc->value();
+		newmh->action = ui->cb_obs_output_action->currentText();
+		newmh->scene = ui->cb_obs_output_scene->currentText();
+		newmh->source = ui->cb_obs_output_source->currentText();
+		newmh->filter = ui->cb_obs_output_filter->currentText();
+		newmh->transition = ui->cb_obs_output_transition->currentText();
+		newmh->item = ui->cb_obs_output_item->currentText();
+		newmh->audio_source =
+			ui->cb_obs_output_audio_source->currentText();
+		newmh->media_source =
+			ui->cb_obs_output_media_source->currentText();
+		auto dm = GetDeviceManager();
+		auto dev = dm->GetMidiDeviceByName(
+			ui->mapping_lbl_device_name->text());
+		dev->add_MidiHook(newmh);
+		auto conf = GetConfig();
+		conf->Save();
+	} else {
+		// TODO: Fix this, and create Utils::message_to_user(QString)
+		QString Mess;
+		Mess.append("Mapping already Exists for ");
+		Mess.append(ui->mapping_lbl_device_name->text());
+		Mess.append(" , with channel # ");
+		Mess.append(QString::number(ui->sb_channel->value()));
+		Mess.append(" norc # ");
+		Mess.append(QString::number(ui->sb_norc->value()));
+		Mess.append(" and Message Type ");
+		Mess.append(ui->cb_mtype->currentText());
+		Utils::alert_popup(Mess);
+	}
+}
+
+void PluginWindow::add_row_from_hook(MidiHook *hook)
+{
+	int row = ui->table_mapping->rowCount();
+	ui->table_mapping->insertRow(row);
+	QColor midic;
+	midic.setRgb(0, 170, 255);
+	QColor actc;
+	actc.setRgb(170, 0, 255);
+	QTableWidgetItem *channelitem =
+		new QTableWidgetItem(QString::number(hook->channel));
+
+	QTableWidgetItem *mtypeitem = new QTableWidgetItem(hook->message_type);
+	QTableWidgetItem *norcitem =
+		new QTableWidgetItem(QString::number(hook->norc));
+	QTableWidgetItem *actionitem = new QTableWidgetItem(hook->action);
+	QTableWidgetItem *sceneitem = new QTableWidgetItem(hook->scene);
+	QTableWidgetItem *sourceitem = new QTableWidgetItem(hook->source);
+	QTableWidgetItem *filteritem = new QTableWidgetItem(hook->filter);
+	QTableWidgetItem *transitionitem =
+		new QTableWidgetItem(hook->transition);
+	QTableWidgetItem *itemitem = new QTableWidgetItem(hook->item);
+	QTableWidgetItem *audioitem = new QTableWidgetItem(hook->audio_source);
+	QTableWidgetItem *mediaitem = new QTableWidgetItem(hook->media_source);
+
+	set_cell_colors(midic, channelitem);
+	set_cell_colors(midic, mtypeitem);
+	set_cell_colors(midic, norcitem);
+	set_cell_colors(actc, actionitem);
+	set_cell_colors(actc, sceneitem);
+	set_cell_colors(actc, sourceitem);
+	set_cell_colors(actc, filteritem);
+	set_cell_colors(actc, transitionitem);
+	set_cell_colors(actc, itemitem);
+	set_cell_colors(actc, audioitem);
+	set_cell_colors(actc, mediaitem);
+
+	ui->table_mapping->setItem(row, 0, channelitem);
+	ui->table_mapping->setItem(row, 1, mtypeitem);
+	ui->table_mapping->setItem(row, 2, norcitem);
+	ui->table_mapping->setItem(row, 3, actionitem);
+	ui->table_mapping->setItem(row, 4, sceneitem);
+	ui->table_mapping->setItem(row, 5, sourceitem);
+	ui->table_mapping->setItem(row, 6, filteritem);
+	ui->table_mapping->setItem(row, 7, transitionitem);
+	ui->table_mapping->setItem(row, 8, itemitem);
+	ui->table_mapping->setItem(row, 9, audioitem);
+	ui->table_mapping->setItem(row, 10, mediaitem);
+}
+void PluginWindow::set_cell_colors(QColor color, QTableWidgetItem *item)
+{
+	QColor txcolor;
+	txcolor.black();
+	item->setBackgroundColor(txcolor);
+	item->setTextColor(color);
+}
+
+void PluginWindow::tab_changed(int i)
+{
+	ui->mapping_lbl_device_name->setText(
+		ui->list_midi_dev->currentItem()->text());
+	ui->table_mapping->clearContents();
+	set_headers();
+	ui->table_mapping->setRowCount(0);
+	auto devicemanager = GetDeviceManager();
+	
+	auto hooks = devicemanager->GetMidiHooksByDeviceName(
+		ui->mapping_lbl_device_name->text());
+	if (hooks.count() > 0) {
+		for (int i = 0; i < hooks.size(); i++) {
+			add_row_from_hook(hooks.at(i));
+		}
+	}
+	
+}
+void PluginWindow::delete_mapping() {
+	auto devicemanager = GetDeviceManager();
+	auto dev = devicemanager->GetMidiDeviceByName(
+		ui->mapping_lbl_device_name->text());
+	auto hooks = dev->GetMidiHooks();
+	auto conf = GetConfig();
+	for (int i = 0; i < hooks.size(); i++) {
+		if ((hooks.at(i)->channel == ui->sb_channel->value()) &&
+		    (hooks.at(i)->norc == ui->sb_norc->value()) &&
+		    (hooks.at(i)->message_type ==
+		     ui->cb_mtype->currentText())) {
+			dev->remove_MidiHook(hooks.at(i));
+			conf->Save();
+			ui->table_mapping->removeRow(
+				ui->table_mapping->selectedItems().at(0)->row());
+		}
+	}
+	
+	
+	
+}
+void PluginWindow::edit_mapping(int row, int col)
+{
+	auto sitems = ui->table_mapping->selectedItems();
+	//rebuild midi
+	ui->sb_channel->setValue(sitems.at(0)->text().toInt());
+	ui->cb_mtype->setCurrentText(sitems.at(1)->text());
+	ui->sb_norc->setValue(sitems.at(2)->text().toInt());
+	//rebuild actions
+	ui->cb_obs_output_action->setCurrentText(sitems.at(3)->text());
+	ui->cb_obs_output_scene->setCurrentText(sitems.at(4)->text());
+	ui->cb_obs_output_source->setCurrentText(sitems.at(5)->text());
+	ui->cb_obs_output_filter->setCurrentText(sitems.at(6)->text());
+	ui->cb_obs_output_transition->setCurrentText(sitems.at(7)->text());
+	ui->cb_obs_output_item->setCurrentText(sitems.at(8)->text());
+	ui->cb_obs_output_audio_source->setCurrentText(sitems.at(9)->text());
+	ui->cb_obs_output_media_source->setCurrentText(sitems.at(10)->text());
 }

@@ -23,12 +23,19 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "midi-agent.h"
 #include "obs-midi.h"
 
+#if __has_include(<obs-frontend-api.h>)
+#include <obs-frontend-api.h>
+#else
+#include <obs-frontend-api/obs-frontend-api.h>
+#endif
 namespace OBSController {
+
+
 // BUTTON ACTIONS
-void SetCurrentScene(const char *sceneName);
-void SetPreviewScene(const char *sceneName);
+void SetCurrentScene(QString sceneName);
+void SetPreviewScene(QString sceneName);
 void SetCurrentSceneCollection(QString sceneCollection);
-void ResetSceneItem(const char *sceneName, const char *itemName);
+void ResetSceneItem(QString sceneName, QString itemName);
 void TransitionToProgram();
 void TransitionToProgram(QString transitionName, int transitionDuration = 300);
 void SetCurrentTransition(QString name);
@@ -56,13 +63,13 @@ void StopReplayBuffer();
 void SaveReplayBuffer();
 
 void SetCurrentProfile(QString profileName);
-void SetTextGDIPlusText();
-void SetBrowserSourceURL();
-void ReloadBrowserSource();
+void SetTextGDIPlusText(QString text);
+void SetBrowserSourceURL(QString sourceName,QString url);
+void ReloadBrowserSource(QString sourceName);
 void TakeSourceScreenshot(QString source);
-void EnableSourceFilter();
-void DisableSourceFilter();
-void ToggleSourceFilter();
+void EnableSourceFilter(obs_source_t *source);
+void DisableSourceFilter(obs_source_t *source);
+void ToggleSourceFilter(obs_source_t *source);
 
 // CC ACTIONS
 void SetVolume(QString source, float volume);
@@ -72,4 +79,14 @@ void SetSourceRotation();
 void SetSourceScale();
 void SetGainFilter();
 void SetOpacity();
+void move_t_bar(int move);
+void play_pause_media_source(QString MediaSource);
+void toggle_studio_mode();
+void reset_stats();
+void restart_media(QString media_source);
+void stop_media(QString media_source);
+void play_media(QString media_source);
+void next_media(QString media_source);
+void prev_media(QString media_source);
+
 };

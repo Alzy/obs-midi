@@ -35,7 +35,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <vector>
 #include "midi-agent.h"
 #include "rpc/RpcEvent.h"
-using namespace std;
 
 class DeviceManager : public QObject {
 	Q_OBJECT
@@ -45,19 +44,18 @@ public:
 	void Load(obs_data_t *data);
 	void Unload();
 
-	vector<string> GetPortsList();
-	int GetPortNumberByDeviceName(const char *deviceName);
-	vector<string> GetOutPortsList();
-	int GetOutPortNumberByDeviceName(const char *deviceName);
+	QStringList GetPortsList();
+	int GetPortNumberByDeviceName(QString deviceName);
+	QStringList GetOutPortsList();
+	int GetOutPortNumberByDeviceName(QString deviceName);
 	QStringList opl;
-	vector<MidiAgent *> GetActiveMidiDevices();
-	MidiAgent *GetMidiDeviceByName(const char *deviceName);
-	vector<MidiHook *> GetMidiHooksByDeviceName(const char *deviceName);
-	QStringList GetOPL();
+	QVector<MidiAgent *> GetActiveMidiDevices();
+	MidiAgent *GetMidiDeviceByName(QString deviceName);
+	QVector<MidiHook *> GetMidiHooksByDeviceName(QString deviceName);
 	void RegisterMidiDevice(int port, int outport);
-	void SendMidi(QString mtype, int channel, int norc, int value);
+	
 	obs_data_t *GetData();
-	void broadcast(const RpcEvent &event);
+	void broadcast_obs_event(const RpcEvent &event);
 signals:
 	void bcast(QString updateType, QString eventData);
 
@@ -65,5 +63,5 @@ private:
 	rtmidi::midi_in *rtMidi;
 	rtmidi::midi_out *MO;
 
-	vector<MidiAgent *> midiAgents;
+	QVector<MidiAgent *> midiAgents;
 };

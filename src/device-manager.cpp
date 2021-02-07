@@ -35,8 +35,8 @@ DeviceManager::~DeviceManager()
  */
 void DeviceManager::Load(obs_data_t *data)
 {
-	vector<string> portsList = GetPortsList();
-	vector<string> outPortsList = GetOutPortsList();
+	QStringList portsList = GetPortsList();
+	QStringList outPortsList = GetOutPortsList();
 	obs_data_array_t *devicesData = obs_data_get_array(data, "devices");
 	size_t deviceCount = obs_data_array_count(devicesData);
 	for (size_t i = 0; i < deviceCount; i++) {
@@ -44,127 +44,122 @@ void DeviceManager::Load(obs_data_t *data)
 		MidiAgent *device = new MidiAgent();
 		device->Load(deviceData);
 		midiAgents.push_back(device);
+		
 		connect(this, SIGNAL(bcast(QString, QString)), device,
-			SLOT(NewObsEvent(QString, QString)));
+				SLOT(handle_obs_event(QString, QString)));
 		if (device->isEnabled()) {
-			int portNumber = GetPortNumberByDeviceName(
-				device->GetName().c_str());
+			int portNumber =
+				GetPortNumberByDeviceName(device->get_midi_input_name());
 			int outPort = GetOutPortNumberByDeviceName(
-				device->GetOutName().c_str());
+				device->get_midi_output_name());
 
 			if (portNumber != -1) {
-				device->OpenPort(portNumber);
+				device->open_midi_input_port(portNumber);
 			}
 			if (outPort != -1) {
-				device->OpenOutPort(outPort);
+				device->open_midi_output_port(outPort);
 			}
 		}
 	}
 }
 
-
 void DeviceManager::Unload()
 {
 	blog(LOG_INFO, "UNLOADING DEVICE MANAGER");
-	for (auto agent : midiAgents)
-	{
+	midiAgents.clear();
+	for (auto agent : midiAgents) {
+		agent->clear_MidiHooks();
 		delete agent;
 	}
-	midiAgents.clear();
+	
 }
-
 
 /* Returns vector list of Port Names 
  */
-vector<string> DeviceManager::GetPortsList()
+QStringList DeviceManager::GetPortsList()
 {
-	vector<string> ports;
+	QStringList ports;
 	int portCount = rtMidi->get_port_count();
 	for (int i = 0; i < portCount; i++) {
-		ports.push_back(rtMidi->get_port_name(i));
+		ports.append(QString::fromStdString(rtMidi->get_port_name(i)));
 	}
 	return ports;
 }
 
-
 /* Returns vector list of Port Names 
  */
-vector<string> DeviceManager::GetOutPortsList()
+QStringList DeviceManager::GetOutPortsList()
 {
 	opl.clear();
-	vector<string> outports;
+	QStringList outports;
 	int portCount = MO->get_port_count();
 	for (int i = 0; i < portCount; i++) {
-		outports.push_back(MO->get_port_name(i));
+		outports.append(QString::fromStdString(MO->get_port_name(i)));
 		opl.append(QString::fromStdString(MO->get_port_name(i)));
 	}
 	return outports;
 }
-QStringList DeviceManager::GetOPL()
-{
-	return opl;
-}
 
 
 /* Returns the port number of the specified device.
  * If the device isn't found (possibly due to being disconnected), returns -1
  */
-int DeviceManager::GetPortNumberByDeviceName(const char *deviceName)
+int DeviceManager::GetPortNumberByDeviceName(QString deviceName)
 {
-	vector<string> portsList = GetPortsList();
-	auto it = find(portsList.begin(), portsList.end(), deviceName);
-	if (it != portsList.end()) {
-		return distance(portsList.begin(), it);
+	QStringList portsList = GetPortsList();
+
+	if (portsList.contains(deviceName)) {
+		return portsList.indexOf(deviceName);
 	} else {
 		return -1;
 	}
 }
-
 
 /* Returns the port number of the specified device.
  * If the device isn't found (possibly due to being disconnected), returns -1
  */
-int DeviceManager::GetOutPortNumberByDeviceName(const char *deviceName)
+int DeviceManager::GetOutPortNumberByDeviceName(QString deviceName)
 {
 
-	vector<string> portsList = GetOutPortsList();
+	QStringList portsList = GetOutPortsList();
 
-	auto it = find(portsList.begin(), portsList.end(), deviceName);
-	if (it != portsList.end()) {
-		return distance(portsList.begin(), it);
+	if (portsList.contains(deviceName)) {
+		return portsList.indexOf(deviceName);
 	} else {
 		return -1;
 	}
 }
 
-
-vector<MidiAgent *> DeviceManager::GetActiveMidiDevices()
+QVector<MidiAgent *> DeviceManager::GetActiveMidiDevices()
 {
 	return midiAgents;
 }
 
-
-MidiAgent *DeviceManager::GetMidiDeviceByName(const char *deviceName)
+MidiAgent *DeviceManager::GetMidiDeviceByName(QString deviceName)
 {
 	for (int i = 0; i < midiAgents.size(); i++) {
-		if (midiAgents.at(i)->GetName() == deviceName) {
+		if (midiAgents.at(i)->get_midi_input_name() == deviceName) {
 			return midiAgents.at(i);
 		}
 	}
 	return NULL;
 }
 
-
-vector<MidiHook *>
-DeviceManager::GetMidiHooksByDeviceName(const char *deviceName)
+QVector<MidiHook *> DeviceManager::GetMidiHooksByDeviceName(QString deviceName)
 {
-	auto device = GetMidiDeviceByName(deviceName);
-	if (device != NULL) {
-		return device->GetMidiHooks();
-	}
-	throw("no midi hooks for this device");
-}
+	if (deviceName != QString("No Devices Available")) {
 
+		auto device = GetMidiDeviceByName(deviceName);
+		if (device != NULL) {
+			return device->GetMidiHooks();
+		} else {
+			QVector<MidiHook *> x;
+			//device->set_midi_hooks(x);
+			return x;
+		}
+		//Utils::alert_popup("no midi hooks for this device");
+	}
+}
 
 /* Registers a midi device.
  * Will create, store and enable a midi device.
@@ -172,12 +167,11 @@ DeviceManager::GetMidiHooksByDeviceName(const char *deviceName)
 void DeviceManager::RegisterMidiDevice(int port, int outport)
 {
 	MidiAgent *midiA = new MidiAgent();
-	midiA->OpenPort(port);
-	midiA->OpenOutPort(outport);
+	midiA->open_midi_input_port(port);
+	midiA->open_midi_output_port(outport);
 
 	midiAgents.push_back(midiA);
 }
-
 
 /* Get this Device Manager state as OBS Data. (includes devices and their midi hooks)
 * This is needed to Serialize the state in the config.
@@ -198,15 +192,8 @@ obs_data_t *DeviceManager::GetData()
 }
 
 
-void DeviceManager::SendMidi(QString mtype, int channel, int norc, int value)
 
-{
-
-	//***Need to add message Deletion here***//
-}
-
-
-void DeviceManager::broadcast(const RpcEvent &event)
+void DeviceManager::broadcast_obs_event(const RpcEvent &event)
 {
 	OBSDataAutoRelease eventData = obs_data_create();
 

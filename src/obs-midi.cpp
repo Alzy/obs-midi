@@ -6,7 +6,7 @@
 #include "rtmidi17/rtmidi17.hpp"
 #else
 #include <obs-frontend-api/obs-frontend-api.h>
-#include "RtMidi17/rtmidi17.hpp"
+#include "rtmidi17/rtmidi17.hpp"
 #endif
 #include <obs-data.h>
 #include <string>
@@ -46,24 +46,23 @@ eventsPtr _eventsSystem;
 bool obs_module_load(void)
 {
 	blog(LOG_INFO, "MIDI LOADED! :)");
-
+	qRegisterMetaType<MidiMessage>();
 	// Device Manager Setup
 	_deviceManager = DeviceManagerPtr(new DeviceManager());
 
 	// Config Setup
 	_config = ConfigPtr(new Config());
-	_config->Load();
 
 	// Signal Router Setup
 	_eventsSystem = eventsPtr(new events(_deviceManager));
-
+	_config->Load();
 	// UI SETUP
 	QMainWindow *mainWindow = (QMainWindow *)obs_frontend_get_main_window();
-	SettingsDialog *settingsDialog = new SettingsDialog(mainWindow);
+	PluginWindow *pluginWindow = new PluginWindow(mainWindow);
 	const char *menuActionText = obs_module_text("OBS MIDI Settings");
 	QAction *menuAction =
 		(QAction *)obs_frontend_add_tools_menu_qaction(menuActionText);
-	QObject::connect(menuAction, SIGNAL(triggered()), settingsDialog,
+	QObject::connect(menuAction, SIGNAL(triggered()), pluginWindow,
 			 SLOT(ToggleShowHide()));
 
 	// Setup event handler to start the server once OBS is ready

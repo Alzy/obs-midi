@@ -61,15 +61,25 @@ jobs:
           libx11-xcb-dev \
           libxcb1-dev \
           libxss-dev
-       run:  apt install libnss3-dev
-       run: wget https://cdn-fastly.obsproject.com/downloads/cef_binary_4280_linux64.tar.bz2
-       run: tar -xjf ./cef_binary_4280_linux64.tar.bz2
-       run: git clone --recursive https://github.com/obsproject/obs-studio.git
-       run: cd obs-studio
-       run: mkdir build && cd build
-       run: cmake -DUNIX_STRUCTURE=1 -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_BROWSER=ON -DCEF_ROOT_DIR="../../cef_binary_4280_linux64" ..
-       run: make -j4
-       run: sudo checkinstall --default --pkgname=obs-studio --fstrans=no --backup=no --pkgversion="$(date +%Y%m%d)-git" --deldoc=yes
+
+    - name: Create Build Environment
+      run:  apt install libnss3-dev
+    - name: Create Build Environment
+      run: wget https://cdn-fastly.obsproject.com/downloads/cef_binary_4280_linux64.tar.bz2
+    - name: Create Build Environment
+      run: tar -xjf ./cef_binary_4280_linux64.tar.bz2
+    - name: Create Build Environment
+      run: git clone --recursive https://github.com/obsproject/obs-studio.git
+    - name: Create Build Environment
+      run: cd obs-studio
+    - name: Create Build Environment
+      run: mkdir build && cd build
+    - name: Create Build Environment
+      run: cmake -DUNIX_STRUCTURE=1 -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_BROWSER=ON -DCEF_ROOT_DIR="../../cef_binary_4280_linux64" ..
+    - name: Create Build Environment
+      run: make -j4
+    - name: Create Build Environment
+      run: sudo checkinstall --default --pkgname=obs-studio --fstrans=no --backup=no --pkgversion="$(date +%Y%m%d)-git" --deldoc=yes
     - name: Create Build Environment
       # Some projects don't allow in-source building, so create a separate build directory
       # We'll use this as our working directory for all subsequent commands

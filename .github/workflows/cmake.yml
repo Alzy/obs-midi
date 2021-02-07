@@ -132,7 +132,7 @@ jobs:
       - name: 'Set release filename'
         shell: bash
         run: |
-          FILENAME="obs-midi-${{ env.GIT_TAG }}-Windows"
+          FILENAME="obs-midi-${{ env.GIT_HASH }}-Windows"
           echo "::set-env name=WIN_FILENAME::$FILENAME"
       - name: 'Package obs-midi'
         working-directory: ${{ github.workspace }}/obs-midi
@@ -145,13 +145,13 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
-          name: '${{ env.GIT_TAG }}-Windows'
+          name: '${{ env.GIT_HASH }}-Windows'
           path: ${{ github.workspace }}/obs-midi/package/*.zip
       - name: 'Publish ${{ env.WIN_FILENAME }}-Installer.exe'
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
-          name: '${{ env.GIT_TAG }}-Windows-Installer'
+          name: '${{ env.GIT_HASH }}-Windows-Installer'
           path: ${{ github.workspace }}/obs-midi/package/*.exe
   ubuntu64:
     name: "Linux/Ubuntu 64-bit"
@@ -277,7 +277,7 @@ jobs:
       - name: 'Set release filename'
         shell: bash
         run: |
-          FILENAME="obs-midi-${{ env.GIT_TAG }}-1_amd64.deb"
+          FILENAME="obs-midi-${{ env.GIT_HASH }}-1_amd64.deb"
           echo "::set-env name=LINUX_FILENAME::$FILENAME"
       - name: 'Package ${{ env.LINUX_FILENAME }}'
         if: success()
@@ -298,7 +298,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
-          name: '${{ env.GIT_TAG }}-linux'
+          name: '${{ env.GIT_HASH }}-linux'
           path: '${{ github.workspace }}/obs-midi/package/*.deb'
   macos64:
     name: "macOS 64-bit"
@@ -393,8 +393,8 @@ jobs:
         if: success()
         shell: bash
         run: |
-          FILENAME_UNSIGNED="obs-midi-${{ env.GIT_TAG }}-macOS-Unsigned.pkg"
-          FILENAME="obs-midi-${{ env.GIT_TAG }}-macOS.pkg"
+          FILENAME_UNSIGNED="obs-midi-${{ env.GIT_HASH }}-macOS-Unsigned.pkg"
+          FILENAME="obs-midi-${{ env.GIT_HASH }}-macOS.pkg"
           echo "::set-env name=MAC_FILENAME_UNSIGNED::$FILENAME_UNSIGNED"
           echo "::set-env name=MAC_FILENAME::$FILENAME"
       - name: 'Fix linked dynamic library paths'
@@ -411,7 +411,7 @@ jobs:
         if: success() 
         uses: actions/upload-artifact@v2-preview
         with:
-          name: '${{ env.GIT_TAG }}-macOS'
+          name: '${{ env.GIT_HASH }}-macOS'
           path: ${{ github.workspace }}/obs-midi/release/*.pkg
 
   make-release:
@@ -431,7 +431,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ env.TAG_VERSION }}
-          release_name: obs-midi ${{ env.GIT_TAG }}
+          release_name: obs-midi ${{ env.GIT_HASH }}
           draft: false
           prerelease: false
       - name: 'Download release artifacts'
@@ -443,7 +443,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ github.workspace }}obs-midi/release/*.zip
-          asset_name: obs-midi-${{env.GIT_TAG }}-Windows.zip
+          asset_name: obs-midi-${{ env.GIT_HASH }}-Windows.zip
           asset_content_type: application/zip
       - name: 'Upload Windows .exe artifact to release'
         uses: actions/upload-release-asset@v1
@@ -451,8 +451,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}obs-midi/release/obs-midi-${{env.GIT_TAG }}-Windows-Installer.exe
-          asset_name: obs-midi-${{ env.GIT_TAG }}-Windows-Installer.exe
+          asset_path: ${{ github.workspace }}obs-midi/release/obs-midi-${{ env.GIT_HASH }}-Windows-Installer.exe
+          asset_name: obs-midi-${{ env.GIT_HASH }}-Windows-Installer.exe
           asset_content_type: application/zip
       - name: 'Upload Linux artifact to release'
         uses: actions/upload-release-asset@v1
@@ -460,8 +460,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}obs-midi/release/obs-midi_${{ env.GIT_TAG }}-1_amd64.deb
-          asset_name: obs-midi-${{ env.GIT_TAG }}-1_amd64.deb
+          asset_path: ${{ github.workspace }}obs-midi/release/obs-midi_${{ env.GIT_HASH }}-1_amd64.deb
+          asset_name: obs-midi-${{ env.GIT_HASH }}-1_amd64.deb
           asset_content_type: application/octet-stream
       - name: 'Upload macOS artifact to release'
         uses: actions/upload-release-asset@v1
@@ -469,7 +469,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}obs-midi/release/obs-midi-${{ env.GIT_TAG }}-macOS.pkg
-          asset_name: obs-midi-${{ env.GIT_TAG }}-macOS.pkg
+          asset_path: ${{ github.workspace }}obs-midi/release/obs-midi-${{ env.GIT_HASH }}-macOS.pkg
+          asset_name: obs-midi-${{ env.GIT_HASH }}-macOS.pkg
           asset_content_type: application/octet-stream
   

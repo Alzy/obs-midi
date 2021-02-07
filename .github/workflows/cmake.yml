@@ -129,7 +129,7 @@ jobs:
       - name: 'Build obs-midi 32-bit'
         working-directory: ${{ github.workspace }}/obs-midi
         run: msbuild /m /p:Configuration=RelWithDebInfo .\build32\obs-midi.sln
-            - name: 'Set release filename'
+      - name: 'Set release filename'
         shell: bash
         run: |
           FILENAME="obs-midi-${{ env.GIT_TAG }}-Windows"
@@ -389,7 +389,7 @@ jobs:
         run: |
           curl -L -O https://s3-us-west-2.amazonaws.com/obs-nightly/Packages.pkg
           sudo installer -pkg ${{ github.workspace }}/Packages.pkg -target /
-     - name: 'Set release filename'
+      - name: 'Set release filename'
         if: success() && startsWith(github.ref, 'refs/tags')
         shell: bash
         run: |

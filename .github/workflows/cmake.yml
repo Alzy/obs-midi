@@ -430,10 +430,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.TAG_VERSION }}
-          release_name: obs-midi ${{ env.GIT_HASH }}
-          draft: false
-          prerelease: false
+          release_name: obs-midi ALPHA 2 ${{ env.GIT_HASH }}
+          draft: true
+          prerelease: true
       - name: 'Download release artifacts'
         uses: actions/download-artifact@v2-preview
       - name: 'Upload Windows .zip artifact to release'

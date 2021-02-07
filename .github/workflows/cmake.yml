@@ -22,6 +22,7 @@ env:
   TWITCH_HASH: ${{ secrets.TWITCH_HASH }}
   RESTREAM_CLIENTID: ${{ secrets.RESTREAM_CLIENTID }}
   RESTREAM_HASH: ${{ secrets.RESTREAM_HASH }}
+  isAzure: true 
 
 jobs:
   macos64:

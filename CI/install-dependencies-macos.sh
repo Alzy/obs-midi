@@ -35,8 +35,16 @@ done
 
 # qtwebsockets deps
 echo "[obs-websocket] Installing obs-websocket dependency 'QT 5.10.1'.."
-
+tap akeru-inc/tap
+brew install jack
+brew install speexdsp
+brew install cmake
+brew install freetype
+brew install fdk-aac
 brew install ./CI/macos/qt.rb
+brew install ./CI/macos/swig.rb
+brew install akeru-inc/tap/xcnotary
+
 
 # Pin this version of QT5 to avoid `brew upgrade`
 # upgrading it to incompatible version

@@ -346,9 +346,10 @@ jobs:
         run: |
           ./CI/install-dependencies-macos.sh
            echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> /Users/runner/.bash_profile
-           export LDFLAGS="-L/usr/local/opt/qt/lib"
-           export CPPFLAGS="-I/usr/local/opt/qt/include"
-           export PKG_CONFIG_PATH="/usr/local/opt/qt/lib/pkgconfig"
+           echo ::set-env name=LDFLAGS="-L/usr/local/opt/qt/lib"
+           echo ::set-env  name=CPPFLAGS="-I/usr/local/opt/qt/include"
+           echo ::set-env name=PKG_CONFIG_PATH="/usr/local/opt/qt/lib/pkgconfig"
+           echo ::set-env name=PATH="/usr/local/opt/qt/bin:$PATH"
       - name: 'Install prerequisite: Pre-built OBS dependencies'
         shell: bash
         run: |

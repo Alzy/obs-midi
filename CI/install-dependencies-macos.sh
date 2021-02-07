@@ -5,36 +5,36 @@
 OSTYPE=$(uname)
 
 if [ "${OSTYPE}" != "Darwin" ]; then
-    echo "[obs-midi - Error] macOS install dependencies script can be run on Darwin-type OS only."
+    echo "[obs-websocket - Error] macOS install dependencies script can be run on Darwin-type OS only."
     exit 1
 fi
 
 HAS_BREW=$(type brew 2>/dev/null)
 
 if [ "${HAS_BREW}" = "" ]; then
-    echo "[obs-midi - Error] Please install Homebrew (https://www.brew.sh/) to build obs-midi on macOS."
+    echo "[obs-websocket - Error] Please install Homebrew (https://www.brew.sh/) to build obs-websocket on macOS."
     exit 1
 fi
 
 # OBS Studio deps
-echo "[obs-midi] Updating Homebrew.."
+echo "[obs-websocket] Updating Homebrew.."
 brew update >/dev/null
-echo "[obs-midi] Checking installed Homebrew formulas.."
+echo "[obs-websocket] Checking installed Homebrew formulas.."
 BREW_PACKAGES=$(brew list)
-BREW_DEPENDENCIES="speexdsp ccache swig mbedtls"
+BREW_DEPENDENCIES="jack speexdsp ccache swig mbedtls"
 
 for DEPENDENCY in ${BREW_DEPENDENCIES}; do
     if echo "${BREW_PACKAGES}" | grep -q "^${DEPENDENCY}\$"; then
-        echo "[obs-midi] Upgrading OBS-Studio dependency '${DEPENDENCY}'.."
+        echo "[obs-websocket] Upgrading OBS-Studio dependency '${DEPENDENCY}'.."
         brew upgrade ${DEPENDENCY} 2>/dev/null
     else
-        echo "[obs-midi] Installing OBS-Studio dependency '${DEPENDENCY}'.."
+        echo "[obs-websocket] Installing OBS-Studio dependency '${DEPENDENCY}'.."
         brew install ${DEPENDENCY} 2>/dev/null
     fi
 done
 
-# qtmidis deps
-echo "[obs-midi] Installing obs-midi dependency 'QT 5.10.1'.."
+# qtwebsockets deps
+echo "[obs-websocket] Installing obs-websocket dependency 'QT 5.10.1'.."
 
 brew install ./CI/macos/qt.rb
 
@@ -50,7 +50,7 @@ brew pin qt
 HAS_PACKAGES=$(type packagesbuild 2>/dev/null)
 
 if [ "${HAS_PACKAGES}" = "" ]; then
-    echo "[obs-midi] Installing Packaging app (might require password due to 'sudo').."
+    echo "[obs-websocket] Installing Packaging app (might require password due to 'sudo').."
     curl -o './Packages.pkg' --retry-connrefused -s --retry-delay 1 'https://s3-us-west-2.amazonaws.com/obs-nightly/Packages.pkg'
     sudo installer -pkg ./Packages.pkg -target /
 fi

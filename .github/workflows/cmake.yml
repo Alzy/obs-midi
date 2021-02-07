@@ -345,6 +345,10 @@ jobs:
         working-directory: ${{ github.workspace }}/obs-midi
         run: |
           ./CI/install-dependencies-macos.sh
+           echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> /Users/runner/.bash_profile
+           export LDFLAGS="-L/usr/local/opt/qt/lib"
+           export CPPFLAGS="-I/usr/local/opt/qt/include"
+           export PKG_CONFIG_PATH="/usr/local/opt/qt/lib/pkgconfig"
       - name: 'Install prerequisite: Pre-built OBS dependencies'
         shell: bash
         run: |

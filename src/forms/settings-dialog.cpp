@@ -217,7 +217,6 @@ int PluginWindow::on_check_enabled_state_changed(int state)
 		ui->outbox->setEnabled(true);
 		
 	}
-
 	//ui->outbox->setCurrentText(QString::fromStdString(device->GetOutName()));
 	
 	GetConfig()->Save();
@@ -283,15 +282,14 @@ int PluginWindow::on_bid_enabled_state_changed(int state)
 	auto device = GetDeviceManager()->GetMidiDeviceByName(
 		ui->list_midi_dev->currentItem()->text().toStdString().c_str());
 	if (state) {
-		return 1;
 		device->setBidirectional(state);
+		return 1;
 
 	} else {
-		return 0;
 		device->setBidirectional(state);
+		return 0;
 	}
-	GetConfig()->Save();
-	GetConfig()->Load();
+	
 }
 
 PluginWindow::~PluginWindow()

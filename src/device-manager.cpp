@@ -191,12 +191,7 @@ obs_data_t *DeviceManager::GetData()
 	return data;
 }
 
-void DeviceManager::SendMidi(QString mtype, int channel, int norc, int value)
 
-{
-
-	//***Need to add message Deletion here***//
-}
 
 void DeviceManager::broadcast_obs_event(const RpcEvent &event)
 {

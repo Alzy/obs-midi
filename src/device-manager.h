@@ -53,7 +53,7 @@ public:
 	MidiAgent *GetMidiDeviceByName(QString deviceName);
 	QVector<MidiHook *> GetMidiHooksByDeviceName(QString deviceName);
 	void RegisterMidiDevice(int port, int outport);
-	void SendMidi(QString mtype, int channel, int norc, int value);
+	
 	obs_data_t *GetData();
 	void broadcast_obs_event(const RpcEvent &event);
 signals:

@@ -143,7 +143,7 @@ else()
 endif()
 if (${isAzure})
 # --- Windows-specific build settings and tasks ---
-	message(WARNING "IS AZURE")
+	
 	if(WIN32)
 		if(NOT DEFINED OBS_FRONTEND_LIB)
 			set(OBS_FRONTEND_LIB "OBS_FRONTEND_LIB-NOTFOUND" CACHE FILEPATH "OBS frontend library")

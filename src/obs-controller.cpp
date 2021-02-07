@@ -438,7 +438,7 @@ void OBSController::SetOpacity() {}
 void OBSController::move_t_bar(int move) {
 	
 	if (obs_frontend_preview_program_mode_active()) {
-		
+
 		obs_frontend_set_tbar_position(Utils::t_bar_mapper(move));
 		obs_frontend_release_tbar();
 	}

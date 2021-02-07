@@ -1,0 +1,99 @@
+name: CMake
+
+on: [push]
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    # The CMake configure and build commands are platform agnostic and should work equally
+    # well on Windows or Mac.  You can convert this to a matrix build if you need
+    # cross-platform coverage.
+    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: install deps
+      run: sudo apt-get install \
+          build-essential \
+          checkinstall \
+          cmake \
+          git \
+          libmbedtls-dev \
+          libasound2-dev \
+          libavcodec-dev \
+          libavdevice-dev \
+          libavfilter-dev \
+          libavformat-dev \
+          libavutil-dev \
+          libcurl4-openssl-dev \
+          libfdk-aac-dev \
+          libfontconfig-dev \
+          libfreetype6-dev \
+          libgl1-mesa-dev \
+          libjack-jackd2-dev \
+          libjansson-dev \
+          libluajit-5.1-dev \
+          libpulse-dev \
+          libqt5x11extras5-dev \
+          libspeexdsp-dev \
+          libswresample-dev \
+          libswscale-dev \
+          libudev-dev \
+          libv4l-dev \
+          libvlc-dev \
+          libx11-dev \
+          libx264-dev \
+          libxcb-shm0-dev \
+          libxcb-xinerama0-dev \
+          libxcomposite-dev \
+          libxinerama-dev \
+          pkg-config \
+          python3-dev \
+          qtbase5-dev \
+          libqt5svg5-dev \
+          swig \
+          libxcb-randr0-dev \
+          libxcb-xfixes0-dev \
+          libx11-xcb-dev \
+          libxcb1-dev \
+          libxss-dev
+       run:  apt install libnss3-dev
+       run: wget https://cdn-fastly.obsproject.com/downloads/cef_binary_4280_linux64.tar.bz2
+       run: tar -xjf ./cef_binary_4280_linux64.tar.bz2
+       run: git clone --recursive https://github.com/obsproject/obs-studio.git
+       run: cd obs-studio
+       run: mkdir build && cd build
+       run: cmake -DUNIX_STRUCTURE=1 -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_BROWSER=ON -DCEF_ROOT_DIR="../../cef_binary_4280_linux64" ..
+       run: make -j4
+       run: sudo checkinstall --default --pkgname=obs-studio --fstrans=no --backup=no --pkgversion="$(date +%Y%m%d)-git" --deldoc=yes
+    - name: Create Build Environment
+      # Some projects don't allow in-source building, so create a separate build directory
+      # We'll use this as our working directory for all subsequent commands
+      run: cmake -E make_directory ${{github.workspace}}/build
+
+    - name: Configure CMake
+      # Use a bash shell so we can use the same syntax for environment variable
+      # access regardless of the host operating system
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      # Note the current convention is to use the -S and -B options here to specify source 
+      # and build directories, but this is only available with CMake 3.13 and higher.  
+      # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
+      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+
+    - name: Build
+      working-directory: ${{github.workspace}}/build
+      shell: bash
+      # Execute the build.  You can specify a specific target with "--target <NAME>"
+      run: cmake --build . --config $BUILD_TYPE
+
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      shell: bash
+      # Execute tests defined by the CMake configuration.  
+      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+      run: ctest -C $BUILD_TYPE

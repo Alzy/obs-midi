@@ -1261,6 +1261,7 @@ QString Utils::mtype_to_string(rtmidi::message_type mess)
 		return "SYSTEM_RESET";
 	}
 	return "ERROR";
+
 }
 
 QString Utils::getMidiMessageType(int in)

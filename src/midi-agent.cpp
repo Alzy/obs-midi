@@ -20,7 +20,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "rtmidi17/rtmidi17.hpp"
 #else
 #include <obs-frontend-api/obs-frontend-api.h>
-#include "RtMidi17/rtmidi17.hpp"
+#include "rtmidi17/rtmidi17.hpp"
 #endif
 #include <QtCore/QTime>
 //#include <Python.h>
@@ -277,6 +277,7 @@ void MidiAgent::set_midi_hooks(QVector<MidiHook *> mh)
 }
 void MidiAgent::remove_MidiHook(MidiHook *hook)
 {
+
 	if (midiHooks.contains(hook)) {
 		midiHooks.removeOne(hook);
 	}
@@ -390,6 +391,7 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 			QString from = obs_data_get_string(data, "sourceName");
 			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
 				if (self->midiHooks.at(i)->action ==
+
 				    Utils::translate_action(ActionsClass::Actions::Toggle_Mute) &&
 				    self->midiHooks.at(i)->audio_source ==
 					    from) {

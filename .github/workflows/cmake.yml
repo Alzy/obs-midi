@@ -340,7 +340,11 @@ jobs:
           echo ::set-env name=GIT_BRANCH::${{ github.event.pull_request.head.ref }}
           echo ::set-env name=GIT_HASH::$(git rev-parse --short HEAD)
           echo ::set-env name=GIT_TAG::$(git describe --tags --abbrev=0)
-  
+      - name: 'Install Deps'
+        shell: bash
+        working-directory: ${{ github.workspace }}/obs-midi
+        run: |
+          ./CI/install-dependencies-macos.sh
       - name: 'Install prerequisite: Pre-built OBS dependencies'
         shell: bash
         run: |

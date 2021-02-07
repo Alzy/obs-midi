@@ -430,6 +430,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          tag_name: ${{ env.GIT_HASH }}
           release_name: obs-midi ALPHA 2 ${{ env.GIT_HASH }}
           draft: true
           prerelease: true
@@ -441,7 +442,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}obs-midi/release/*.zip
+          asset_path: ${{ github.workspace }}/obs-midi/release/*.zip
           asset_name: obs-midi-${{ env.GIT_HASH }}-Windows.zip
           asset_content_type: application/zip
       - name: 'Upload Windows .exe artifact to release'

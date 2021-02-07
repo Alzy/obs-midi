@@ -53,35 +53,6 @@ set(obs-midi_DEPS RtMidi17)
 include_directories(src/RtMidi17)
 
 
-set(plugin_ui
-	src/forms/settings-dialog.ui
-)
-if (NOT ${isAzure})
-qt5_wrap_ui(plugin_ui_headers ${plugin_ui})
-endif()
-# OBS MIDI
-set(CMAKE_PREFIX_PATH "${QTDIR}")
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-add_definitions(-DASIO_STANDALONE)
-if (${isAzure})
-	if (WIN32 OR APPLE)
-		include(external/FindLibObs.cmake)
-	endif()
-	find_package(LibObs REQUIRED)
-endif()
-if (APPLE)
-	include(external/FindLibObs.cmake)
-	find_package(LibObs REQUIRED)
-endif()
-
-find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
-
 include_directories(
 	"${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api"
         SYSTEM
@@ -90,7 +61,7 @@ include_directories(
         "${CMAKE_SOURCE_DIR}/UI")
 
 set(obs-midi_SOURCES
-  src/utils.cpp
+	src/utils.cpp
 	src/config.cpp
 	src/midi-agent.cpp
 	src/device-manager.cpp
@@ -98,9 +69,7 @@ set(obs-midi_SOURCES
 	src/forms/settings-dialog.cpp
 	src/obs-midi.cpp
 	src/events.cpp
-	src/rpc/RpcEvent.cpp
-
-)
+	src/rpc/RpcEvent.cpp)
 
 list(APPEND obs-midi_HEADERS
 	src/utils.h
@@ -111,8 +80,7 @@ list(APPEND obs-midi_HEADERS
 	src/forms/settings-dialog.h
 	src/obs-midi.h
 	src/events.h
-	src/rpc/RpcEvent.h
-)
+	src/rpc/RpcEvent.h)
 add_library(obs-midi MODULE
 	${obs-midi_SOURCES}
 	${obs-midi_HEADERS})
@@ -123,9 +91,11 @@ include_directories(
 	${Qt5Widgets_INCLUDES}
 	"${CMAKE_SOURCE_DIR}/deps/asio/asio/include")
 target_link_libraries(obs-midi
-	libobs
+	"${OBS_FRONTEND_LIB}"
+	${obs-midi_DEPS}
 	Qt5::Core
-	Qt5::Widgets)
+	Qt5::Widgets
+	libobs)
 # --- Windows-specific build settings and tasks ---
 if(WIN32)
 	if(NOT DEFINED OBS_FRONTEND_LIB)

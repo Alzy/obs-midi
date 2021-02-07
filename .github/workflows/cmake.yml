@@ -224,6 +224,8 @@ jobs:
            libvlc-dev \
            libx11-dev \
            libx264-dev \
+           libx11-xcb-dev \
+           libx11-xcb1 \
            libxcb-randr0-dev \
            libxcb-shm0-dev \
            libxcb-xinerama0-dev \

@@ -431,7 +431,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           release_name: obs-midi ALPHA 2 ${{ env.GIT_HASH }}
-          tag_name: Alpha ${{ env.GIT_HASH }} 
           draft: true
           prerelease: true
       - name: 'Download release artifacts'
@@ -451,7 +450,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}obs-midi/release/obs-midi-${{ env.GIT_HASH }}-Windows-Installer.exe
+          asset_path: ${{ github.workspace }}/obs-midi/release/obs-midi-${{ env.GIT_HASH }}-Windows-Installer.exe
           asset_name: obs-midi-${{ env.GIT_HASH }}-Windows-Installer.exe
           asset_content_type: application/zip
       - name: 'Upload Linux artifact to release'
@@ -460,7 +459,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}obs-midi/release/obs-midi_${{ env.GIT_HASH }}-1_amd64.deb
+          asset_path: ${{ github.workspace }}/obs-midi/release/obs-midi_${{ env.GIT_HASH }}-1_amd64.deb
           asset_name: obs-midi-${{ env.GIT_HASH }}-1_amd64.deb
           asset_content_type: application/octet-stream
       - name: 'Upload macOS artifact to release'
@@ -469,7 +468,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}obs-midi/release/obs-midi-${{ env.GIT_HASH }}-macOS.pkg
+          asset_path: ${{ github.workspace }}/obs-midi/release/obs-midi-${{ env.GIT_HASH }}-macOS.pkg
           asset_name: obs-midi-${{ env.GIT_HASH }}-macOS.pkg
           asset_content_type: application/octet-stream
   

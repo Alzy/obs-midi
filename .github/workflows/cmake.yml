@@ -417,3 +417,62 @@ jobs:
         with:
           name: '${{ env.GIT_HASH }}-macOS'
           path: ${{ github.workspace }}/obs-midi/release/*.pkg
+
+  make-release:
+    name: 'Create and upload release'
+    runs-on: [ubuntu-latest]
+    needs: [windows, ubuntu64, macos64]
+    steps:
+      - name: 'Get the version'
+        shell: bash
+        id: get_version
+        run: |
+          echo ::set-env name=TAG_VERSION::${GITHUB_REF/refs\/tags\//}
+      - name: 'Create Release'
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.TAG_VERSION }}
+          release_name: obs-midi ${{ env.TAG_VERSION }}
+          draft: false
+          prerelease: false
+      - name: 'Download release artifacts'
+        uses: actions/download-artifact@v2-preview
+      - name: 'Upload Windows .zip artifact to release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ github.workspace }}/${{ env.TAG_VERSION }}-Windows/obs-midi-${{ env.TAG_VERSION }}-Windows.zip
+          asset_name: obs-midi-${{ env.TAG_VERSION }}-Windows.zip
+          asset_content_type: application/zip
+      - name: 'Upload Windows .exe artifact to release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ github.workspace }}/${{ env.TAG_VERSION }}-Windows-Installer/obs-midi-${{ env.TAG_VERSION }}-Windows-Installer.exe
+          asset_name: obs-midi-${{ env.TAG_VERSION }}-Windows-Installer.exe
+          asset_content_type: application/zip
+      - name: 'Upload Linux artifact to release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ github.workspace }}/${{ env.TAG_VERSION }}-linux/obs-midi_${{ env.TAG_VERSION }}-1_amd64.deb
+          asset_name: obs-midi-${{ env.TAG_VERSION }}-1_amd64.deb
+          asset_content_type: application/octet-stream
+      - name: 'Upload macOS artifact to release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ github.workspace }}/${{ env.TAG_VERSION }}-macOS/obs-midi-${{ env.TAG_VERSION }}-macOS.pkg
+          asset_name: obs-midi-${{ env.TAG_VERSION }}-macOS.pkg
+          asset_content_type: application/octet-stream

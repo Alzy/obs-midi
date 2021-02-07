@@ -390,7 +390,7 @@ jobs:
           curl -L -O https://s3-us-west-2.amazonaws.com/obs-nightly/Packages.pkg
           sudo installer -pkg ${{ github.workspace }}/Packages.pkg -target /
       - name: 'Set release filename'
-        if: success() && startsWith(github.ref, 'refs/tags')
+        if: success()
         shell: bash
         run: |
           FILENAME_UNSIGNED="obs-midi-${{ env.GIT_TAG }}-macOS-Unsigned.pkg"
@@ -408,7 +408,7 @@ jobs:
           echo "Dependencies for obs-midi"
           otool -L ./build/obs-midi.so
       - name: 'Publish ${{ env.MAC_FILENAME }} artifact'
-        if: success() && startsWith(github.ref, 'refs/tags')
+        if: success() 
         uses: actions/upload-artifact@v2-preview
         with:
           name: '${{ env.GIT_TAG }}-macOS'

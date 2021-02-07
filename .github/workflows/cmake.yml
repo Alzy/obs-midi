@@ -16,6 +16,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: update repo
+      run: sudo apt-get update
     - name: install deps
       run: sudo apt-get install \
           build-essential \
@@ -63,7 +65,7 @@ jobs:
           libxss-dev
 
     - name: Create Build Environment
-      run:  apt install libnss3-dev
+      run:  sudo apt install libnss3-dev
     - name: Create Build Environment
       run: wget https://cdn-fastly.obsproject.com/downloads/cef_binary_4280_linux64.tar.bz2
     - name: Create Build Environment

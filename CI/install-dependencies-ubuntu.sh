@@ -3,7 +3,7 @@ set -ex
 
 sudo add-apt-repository -y ppa:obsproject/obs-studio
 sudo apt-get -qq update
-
+echo updated
 sudo apt-get -y build-dep obs-studio 
 
 sudo apt-get install -y \

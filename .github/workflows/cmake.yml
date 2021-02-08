@@ -475,7 +475,13 @@ jobs:
           asset_path: ${{ github.workspace }}/${{ env.GIT_HASH}}-Windows-Installer/obs-midi-${{ env.GIT_HASH }}-Windows-Installer.exe
           asset_name: obs-midi-${{ env.GIT_HASH }}-Windows-Installer.exe
           asset_content_type: application/zip
-
+      - name: 'check out directories'
+        shell: bash
+        working-directory: ${{ github.workspace }}/obs-midi
+        run: |
+          cd ${{ github.workspace }}
+          ls -la
+          
       - name: 'Upload macOS artifact to release'
         uses: actions/upload-release-asset@v1
         env:

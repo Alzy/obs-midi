@@ -397,6 +397,7 @@ jobs:
           FILENAME="obs-midi-${{ env.GIT_HASH }}-macOS.pkg"
           echo "::set-env name=MAC_FILENAME_UNSIGNED::$FILENAME_UNSIGNED"
           echo "::set-env name=MAC_FILENAME::$FILENAME"
+          
       - name: 'Fix linked dynamic library paths'
         if: success()
         working-directory: ${{ github.workspace }}/obs-midi
@@ -407,6 +408,14 @@ jobs:
           install_name_tool -change /usr/local/opt/qt/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore ./build/obs-midi.so
           echo "Dependencies for obs-midi"
           otool -L ./build/obs-midi.so
+      - name: 'package file'
+        if: success()
+        working-directory: ./obs-websocket
+        shell: bash
+        run: |
+          set -e
+          packagesbuild ./CI/macos/obs-websocket.pkgproj
+          mv ./release/obs-websocket.pkg ./release/${{ env.MAC_FILENAME_UNSIGNED }}
       - name: 'Publish ${{ env.MAC_FILENAME }} artifact'
         if: success() 
         uses: actions/upload-artifact@v2-preview
@@ -472,7 +481,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/${{ env.GIT_HASH }}-linux/obs-midi-${{ env.GIT_HASH }}-1_amd64.deb
+          asset_path: ${{ github.workspace }}/${{ env.GIT_HASH }}-linux/*.deb
           asset_name: obs-midi-${{ env.GIT_HASH }}-1_amd64.deb
           asset_content_type: application/octet-stream
       - name: 'Upload macOS artifact to release'

@@ -10,11 +10,9 @@ Use MIDI devices to trigger events in OBS and visa versa.
 # Installing
 
 
-1. Grab the zip from the [OBS-Midi Releases Page](https://github.com/Alzy/obs-midi/releases)
+1. Grab the zip from the [OBS-Midi Releases Page](https://github.com/cpyarger/obs-midi/releases)
 
-2. Copy the files in the zip to  your obs plugins directory.
-
-  * By Default this is C:\Program Files\obs-studio\obs-plugins\64bit
+2. Download and run the installer for your OS
 
 3. Launch OBS
 
@@ -24,9 +22,12 @@ Use MIDI devices to trigger events in OBS and visa versa.
 
 
 
-Currently runs on Windows and Linux, and is untested on MAC
+Currently runs on Windows and Linux, and is partly tested on MAC
 
  # Special thanks to the following projects
  * [RTMidi17](https://github.com/jcelerier/RtMidi17) An amazing modernized RTMIDI library
  * [OBSWebsocket](https://github.com/Palakis/obs-websocket/) from which much code was borrowed for interfacing with OBS
  * [Midi2OBS](https://github.com/lebaston100/MIDItoOBS) Where I got my start playing with this
+
+# Build Instructions
+[Build instructions can be found here](build.md)

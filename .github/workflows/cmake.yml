@@ -482,7 +482,10 @@ jobs:
         run: |
           cd ${{ github.workspace }}
           ls -la
-          
+          echo "linux"
+          ls -la ${{ github.workspace }}/${{ env.GIT_HASH }}-linux
+          echo "macos"
+          ls -la ${{ github.workspace }}/${{ env.GIT_HASH }}-macOS
       - name: 'Upload macOS artifact to release'
         uses: actions/upload-release-asset@v1
         env:

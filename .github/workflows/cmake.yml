@@ -472,7 +472,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/${{ env.GIT_HASH }}-linux/obs-midi_${{ env.GIT_HASH }}-1_amd64.deb
+          asset_path: ${{ github.workspace }}/${{ env.GIT_HASH }}-linux/obs-midi-${{ env.GIT_HASH }}-1_amd64.deb
           asset_name: obs-midi-${{ env.GIT_HASH }}-1_amd64.deb
           asset_content_type: application/octet-stream
       - name: 'Upload macOS artifact to release'

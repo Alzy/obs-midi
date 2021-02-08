@@ -284,7 +284,7 @@ jobs:
         working-directory: ${{ github.workspace }}/obs-midi
         shell: bash
         run: |
-          VERSION="${{ env.GIT_TAG }}"
+          VERSION="${{ env.GIT_HASH }}"
           cd ./build
           sudo checkinstall -y --type=debian --fstrans=no -nodoc \
               --backup=no --deldoc=yes --install=no --pkgname=obs-midi --pkgversion=$VERSION \

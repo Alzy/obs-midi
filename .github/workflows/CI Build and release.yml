@@ -454,7 +454,7 @@ jobs:
           tag_name: tag-${{ env.GIT_HASH }}
           body_path: ${{ github.workspace }}/obs-midi/docs/releasehead.md
           release_name: obs-midi ALPHA 2 ${{ env.GIT_HASH }}
-          draft: true
+          draft: false
           prerelease: true
       - name: 'Download release artifacts'
         uses: actions/download-artifact@v2-preview

@@ -33,7 +33,7 @@ In cmake-gui, you'll have to set the following variables :
 | **OBS_FRONTEND_LIB**           | (filepath) : location of the obs-frontend-api.lib file                                | C:/Users/User/Desktop/OBS/build/UI/obs-frontend-api/RelWithDebInfo/obs-frontend-api.lib|
 | **CMAKE_INSTALL_PREFIX**       | (path) : Same location as QTDIR                                                       | C:/Qt/5.15.2/msvc2019_64|
 
-
+![My CMake Gui Looks like ](https://github.com/cpyarger/obs-midi/blob/master/docs/obs-midi-cmake.PNG?raw=true)
 ## Linux
 
 On Debian/Ubuntu :

@@ -21,6 +21,8 @@ on:
     - cron: '23 11 * * 3'
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+  source_root: "./obs-midi"
+  source-root: "./obs-midi" 
 jobs:
   analyze:
     name: Analyze
@@ -154,9 +156,9 @@ jobs:
         cd ./build
         cmake -DLIBOBS_INCLUDE_DIR=${{ github.workspace }}/obs-studio/libobs -DCMAKE_INSTALL_PREFIX=/usr ..
 
-    - run: |
-        cd obs-midi
-        make -j4
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v1
+    
         
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1

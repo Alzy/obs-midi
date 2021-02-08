@@ -6,15 +6,33 @@ You'll need [Qt 5.15.2](https://download.qt.io/official_releases/qt/5.15/),
 [CMake](https://cmake.org/download/) and a working [OBS Studio development environment](https://obsproject.com/wiki/install-instructions) installed on your
 computer.
 
+For Cleanliness and sanity, Do not mix the obs-studio and obs-midi directories. 
+
+For Example My Directory structure looks like this
+
+
+|Directory | Reason|
+|-----------|----------|
+| Desktop\OBS\Build| (OBS-Studio Build Dir) |
+| Desktop\OBS\Deps | (OBS Dependencies from zip file on obs site) |
+| Desktop\OBS\midibuild | (Build Directory for obs-midi) |
+| Desktop\OBS\obs-studio | (obs studio source code) |
+| Desktop\OBS\obs-midi | (obs midi source code) |
+| C:\Qt\5.15.2\msvc2019_64 | (QTDIR) |
+
+
 ## Windows
 
 In cmake-gui, you'll have to set the following variables :
 
-- **QTDIR** (path) : location of the Qt environment suited for your compiler and architecture
-- **LIBOBS_INCLUDE_DIR** (path) : location of the libobs subfolder in the source code of OBS Studio
-- **LIBOBS_LIB** (filepath) : location of the obs.lib file
-- **OBS_FRONTEND_LIB** (filepath) : location of the obs-frontend-api.lib file
-- **CMAKE_INSTALL_PREFIX** (path) : Same location as QTDIR
+| Variable | info | Example Path |
+|----------|-------|-----------|
+| **QTDIR**                      | (path) : location of the Qt environment suited for your compiler and architecture     | C:/Qt/5.15.2/msvc2019_64|
+| **LIBOBS_INCLUDE_DIR**         | (path) : location of the libobs subfolder in the source code of OBS Studio            | C:/Users/User/Desktop/OBS/obs-studio/libobs |
+| **LIBOBS_LIB**                 | (filepath) : location of the obs.lib file                                             | C:/Users/User/Desktop/OBS/build/libobs/RelWithDebInfo/obs.lib|
+| **OBS_FRONTEND_LIB**           | (filepath) : location of the obs-frontend-api.lib file                                | C:/Users/User/Desktop/OBS/build/UI/obs-frontend-api/RelWithDebInfo/obs-frontend-api.lib|
+| **CMAKE_INSTALL_PREFIX**       | (path) : Same location as QTDIR                                                       | C:/Qt/5.15.2/msvc2019_64|
+
 
 ## Linux
 

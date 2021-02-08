@@ -410,12 +410,12 @@ jobs:
           otool -L ./build/obs-midi.so
       - name: 'package file'
         if: success()
-        working-directory: ./obs-websocket
+        working-directory: ./obs-midi
         shell: bash
         run: |
           set -e
-          packagesbuild ./CI/macos/obs-websocket.pkgproj
-          mv ./release/obs-websocket.pkg ./release/${{ env.MAC_FILENAME_UNSIGNED }}
+          packagesbuild ./CI/macos/obs-midi.pkgproj
+          mv ./release/obs-midi.pkg ./release/${{ env.MAC_FILENAME_UNSIGNED }}
       - name: 'Publish ${{ env.MAC_FILENAME }} artifact'
         if: success() 
         uses: actions/upload-artifact@v2-preview

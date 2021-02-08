@@ -419,6 +419,10 @@ jobs:
     runs-on: [ubuntu-latest]
     needs: [windows, ubuntu64, macos64]
     steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+        with:
+          path: ${{ github.workspace }}/obs-midi
       - name: 'Get obs-midi git info'
         shell: bash
         working-directory: ${{ github.workspace }}/obs-midi

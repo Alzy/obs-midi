@@ -452,6 +452,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: tag-${{ env.GIT_HASH }}
+          body_path: ${{ github.workspace }}/obs-midi/docs/releasehead.md
           release_name: obs-midi ALPHA 2 ${{ env.GIT_HASH }}
           draft: true
           prerelease: true

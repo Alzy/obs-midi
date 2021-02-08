@@ -5,8 +5,7 @@ Use MIDI devices to trigger events in OBS and visa versa.
 
 
 
-# Status -- WIP
-![CI Multiplatform Build](https://github.com/cpyarger/obs-midi/workflows/CI%20Multiplatform%20Build/badge.svg)
+# Status -- ![CI Multiplatform Build](https://github.com/cpyarger/obs-midi/workflows/CI%20Multiplatform%20Build/badge.svg)
 # Installing
 
 

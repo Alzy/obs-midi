@@ -82,4 +82,4 @@ This will result in a ready-to-use `obs-midi.pkg` installer in the `release` sub
 
 ## Automated Builds
 
-[![Build Status](https://dev.azure.com/Palakis/obs-midi/_apis/build/status/Palakis.obs-midi?branchName=4.x-current)](https://dev.azure.com/Palakis/obs-midi/_build/latest?definitionId=2&branchName=4.x-current)
+![CI Multiplatform Build](https://github.com/cpyarger/obs-midi/workflows/CI%20Multiplatform%20Build/badge.svg)

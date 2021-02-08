@@ -2,6 +2,8 @@ name: 'CI Multiplatform Build'
 
 on:
   push:
+    branches:
+      - release
     paths-ignore:
       - 'docs/**'
   pull_request:

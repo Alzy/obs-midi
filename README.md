@@ -10,7 +10,7 @@ Use MIDI devices to trigger events in OBS and visa versa.
 # Installing
 
 
-1. Grab the zip from the [OBS-Midi Releases Page](https://github.com/cpyarger/obs-midi/releases)
+1. Grab the installer from the [OBS-Midi Releases Page](https://github.com/cpyarger/obs-midi/releases)
 
 2. Download and run the installer for your OS
 

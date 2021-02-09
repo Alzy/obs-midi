@@ -2,6 +2,10 @@ name: 'CI MacOS Build'
 
 on:
   push:
+    branches:
+      - release
+      - master
+      - test2
     paths-ignore:
       - 'docs/**'
   pull_request:

@@ -121,13 +121,18 @@ jobs:
         with:
           p12-file-base64: ${{ secrets.MACOS_CERT_CODESIGN }}
           p12-password: ${{ secrets.MACOS_CERT_PASS }}
-      - name: 'Code signing'
-        if: success()
-        working-directory: ./obs-midi
-        shell: bash
+
+      - name: Codesign executable
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERT_CODESIGN }}
+          MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERT_PASS }}
         run: |
-          set -e
-          codesign --sign "${{ secrets.MACOS_IDENT_CODESIGN }}" ./build/obs-midi.so
+          echo $MACOS_CERTIFICATE | base64 —decode > certificate.p12
+          security create-keychain -p <your-password> build.keychain security default-keychain -s build.keychain
+          security unlock-keychain -p <your-password> build.keychain
+          security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k <your-password> build.keychain
+          /usr/bin/codesign --force -s <identity-id> ./build/obs-midi.so -v
           packagesbuild ./CI/macos/obs-midi.pkgproj
           mv ./release/obs-midi.pkg ./release/${{ env.MAC_FILENAME_UNSIGNED }}
           productsign --sign "${{ secrets.MACOS_IDENT_INSTALLER }}" ./release/${{ env.MAC_FILENAME_UNSIGNED }} ./release/${{ env.MAC_FILENAME }}

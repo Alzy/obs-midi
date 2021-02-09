@@ -174,4 +174,4 @@ jobs:
         uses: actions/upload-artifact@v2-preview
         with:
           name: '${{ env.GIT_HASH }}-linux'
-          path: '${{ github.workspace }}/obs-midi/*.tar.gz'
+          path: './build/*.tar.gz'

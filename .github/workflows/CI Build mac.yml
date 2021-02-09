@@ -18,7 +18,6 @@ jobs:
   macos64:
     name: "macOS 64-bit"
     runs-on: [macos-latest]
-    if: contains(github.event.head_commit.message, '[skip ci]') != true
     env:
       MACOS_DEPS_VERSION: '2020-04-18'
       QT_VERSION: '5.14.1'
@@ -55,16 +54,10 @@ jobs:
           echo ::set-env name=GIT_BRANCH::${{ github.event.pull_request.head.ref }}
           echo ::set-env name=GIT_HASH::$(git rev-parse --short HEAD)
           echo ::set-env name=GIT_TAG::$(git describe --tags --abbrev=0)
-      - name: 'Install Deps'
+      - name: 'Install prerequisites (Homebrew)'
         shell: bash
-        working-directory: ${{ github.workspace }}/obs-midi
         run: |
-          ./CI/install-dependencies-macos.sh
-           echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> /Users/runner/.bash_profile
-           echo ::set-env name=LDFLAGS="-L/usr/local/opt/qt/lib"
-           echo ::set-env  name=CPPFLAGS="-I/usr/local/opt/qt/include"
-           echo ::set-env name=PKG_CONFIG_PATH="/usr/local/opt/qt/lib/pkgconfig"
-           echo ::set-env name=PATH="/usr/local/opt/qt/bin:$PATH"
+          brew bundle --file ${{ github.workspace }}/obs-midi/CI/macos/Brewfile
       - name: 'Install prerequisite: Pre-built OBS dependencies'
         shell: bash
         run: |
@@ -105,14 +98,13 @@ jobs:
           curl -L -O https://s3-us-west-2.amazonaws.com/obs-nightly/Packages.pkg
           sudo installer -pkg ${{ github.workspace }}/Packages.pkg -target /
       - name: 'Set release filename'
-        if: success()
+        if: success() && startsWith(github.ref, 'refs/tags')
         shell: bash
         run: |
-          FILENAME_UNSIGNED="obs-midi-${{ env.GIT_HASH }}-macOS-Unsigned.pkg"
-          FILENAME="obs-midi-${{ env.GIT_HASH }}-macOS.pkg"
+          FILENAME_UNSIGNED="obs-midi-${{ env.GIT_TAG }}-macOS-Unsigned.pkg"
+          FILENAME="obs-midi-${{ env.GIT_TAG }}-macOS.pkg"
           echo "::set-env name=MAC_FILENAME_UNSIGNED::$FILENAME_UNSIGNED"
           echo "::set-env name=MAC_FILENAME::$FILENAME"
-
       - name: 'Fix linked dynamic library paths'
         if: success()
         working-directory: ${{ github.workspace }}/obs-midi
@@ -127,15 +119,15 @@ jobs:
         if: success()
         uses: apple-actions/import-codesign-certs@253ddeeac23f2bdad1646faac5c8c2832e800071
         with:
-          p12-file-base64: ${{ secrets.SIGNING_CERTIFICATE_P12_DATA }}
-          p12-password: ${{ secrets.SIGNING_CERTIFICATE_PASSWORD }}
+          p12-file-base64: ${{ secrets.MACOS_CERT_CODESIGN }}
+          p12-password: ${{ secrets.MACOS_CERT_PASS }}
       - name: 'Code signing'
         if: success()
         working-directory: ./obs-midi
         shell: bash
         run: |
           set -e
-          codesign --sign "${{ secrets.NOTARIZE_USERNAME  }}" ./build/obs-midi.so
+          codesign --sign "${{ secrets.MACOS_IDENT_CODESIGN }}" ./build/obs-midi.so
           packagesbuild ./CI/macos/obs-midi.pkgproj
           mv ./release/obs-midi.pkg ./release/${{ env.MAC_FILENAME_UNSIGNED }}
           productsign --sign "${{ secrets.MACOS_IDENT_INSTALLER }}" ./release/${{ env.MAC_FILENAME_UNSIGNED }} ./release/${{ env.MAC_FILENAME }}
@@ -146,11 +138,11 @@ jobs:
         shell: bash
         run: |
           set -e
-          xcrun altool --store-password-in-keychain-item "AC_PASSWORD" -u "${{ secrets.NOTARIZE_USERNAME }}" -p "${{ secrets.NOTARIZE_PASSWORD }}"
+          xcrun altool --store-password-in-keychain-item "AC_PASSWORD" -u "${{ secrets.MACOS_IDENT_USER }}" -p "${{ secrets.MACOS_IDENT_PASS }}"
           xcnotary precheck ./release/${{ env.MAC_FILENAME }}
-          if [ "$?" -eq 0 ]; then xcnotary notarize ./release/${{ env.MAC_FILENAME }} --developer-account "${{ secrets.NOTARIZE_USERNAME}}" --developer-password-keychain-item "AC_PASSWORD" --provider "${{ secrets.MACOS_IDENT_PROVIDER }}"; fi
+          if [ "$?" -eq 0 ]; then xcnotary notarize ./release/${{ env.MAC_FILENAME }} --developer-account "${{ secrets.MACOS_IDENT_USER }}" --developer-password-keychain-item "AC_PASSWORD" --provider "${{ secrets.MACOS_IDENT_PROVIDER }}"; fi
       - name: 'Publish ${{ env.MAC_FILENAME }} artifact'
-        if: success() && startsWith(github.ref, 'refs/tags')
+        if: success() && startsWith(github.ref,  'refs/tags')
         uses: actions/upload-artifact@v2-preview
         with:
           name: '${{ env.GIT_TAG }}-macOS'

@@ -152,16 +152,16 @@ jobs:
               --pakdir="../package"
           sudo chmod ao+r ../package/*
           cd -
-        - name: 'Tar ${{ env.LINUX_FILENAME }}'
-          if: success()
-          working-directory: ${{ github.workspace }}/obs-midi
-          shell: bash
-          run: |
-            VERSION="${{ env.GIT_HASH }}"
-            cd ./build
-            mkdir -p obs-studio/plugins/64bit/
-            cp ./obs-midi.so obs-studio/plugins/64bit/
-            tar -czvf obs-midi-Linux-${{ env.GIT_HASH }}-x64.tar.gz obs-studio
+      - name: 'Tar ${{ env.LINUX_FILENAME }}'
+        if: success()
+        working-directory: ${{ github.workspace }}/obs-midi
+        shell: bash
+        run: |
+          VERSION="${{ env.GIT_HASH }}"
+          cd ./build
+          mkdir -p obs-studio/plugins/64bit/
+          cp ./obs-midi.so obs-studio/plugins/64bit/
+          tar -czvf obs-midi-Linux-${{ env.GIT_HASH }}-x64.tar.gz obs-studio
 
       - name: 'Publish ${{ env.LINUX_FILENAME }}'
         if: success()

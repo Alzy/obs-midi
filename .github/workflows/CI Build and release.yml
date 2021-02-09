@@ -400,7 +400,7 @@ jobs:
           FILENAME="obs-midi-${{ env.GIT_HASH }}-macOS.pkg"
           echo "::set-env name=MAC_FILENAME_UNSIGNED::$FILENAME_UNSIGNED"
           echo "::set-env name=MAC_FILENAME::$FILENAME"
-          
+
       - name: 'Fix linked dynamic library paths'
         if: success()
         working-directory: ${{ github.workspace }}/obs-midi
@@ -423,7 +423,7 @@ jobs:
         shell: bash
         run: |
           set -e
-          codesign --sign "${{ secrets.SIGNING_CERTIFICATE_P12_DATA  }}" ./build/obs-midi.so
+          codesign --sign "${{ secrets.NOTARIZE_USERNAME  }}" ./build/obs-midi.so
           packagesbuild ./CI/macos/obs-midi.pkgproj
           mv ./release/obs-midi.pkg ./release/${{ env.MAC_FILENAME_UNSIGNED }}
           productsign --sign "${{ secrets.MACOS_IDENT_INSTALLER }}" ./release/${{ env.MAC_FILENAME_UNSIGNED }} ./release/${{ env.MAC_FILENAME }}

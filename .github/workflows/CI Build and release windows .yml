@@ -1,4 +1,4 @@
-name: 'CI Multiplatform Build'
+name: 'CI Windows Build'
 
 on:
   push:

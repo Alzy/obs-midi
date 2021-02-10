@@ -450,6 +450,7 @@ jobs:
           security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
           security import certificateInst.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k yourpassword build.keychain
+          security set-key-partition-list -S apple-tool:,apple:,productsign: -s -k yourpassword build.keychain
           security find-identity -v -p codesigning
       - name: Sign .so
         working-directory: ${{ github.workspace }}/obs-midi

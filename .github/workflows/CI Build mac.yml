@@ -141,10 +141,7 @@ jobs:
         working-directory: ${{ github.workspace }}/obs-midi
         run: |
             packagesbuild ./CI/macos/obs-midi.pkgproj
-      - name: Sign Package
-        working-directory: ${{ github.workspace }}/obs-midi
-        run: |
-          productsign --sign "Developer ID Installer" ./release/obs-midi.pkg ./release/obs-midi-signed.pkg
+      
       - name: 'Notarization'
         if: success()
         working-directory: ./obs-midi

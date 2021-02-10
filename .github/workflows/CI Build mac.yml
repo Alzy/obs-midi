@@ -97,14 +97,7 @@ jobs:
         run: |
           curl -L -O https://s3-us-west-2.amazonaws.com/obs-nightly/Packages.pkg
           sudo installer -pkg ${{ github.workspace }}/Packages.pkg -target /
-      - name: 'Set release filename'
-        if: success() && startsWith(github.ref, 'refs/tags')
-        shell: bash
-        run: |
-          FILENAME_UNSIGNED="obs-midi-${{ env.GIT_TAG }}-macOS-Unsigned.pkg"
-          FILENAME="obs-midi-${{ env.GIT_TAG }}-macOS.pkg"
-          echo "::set-env name=MAC_FILENAME_UNSIGNED::$FILENAME_UNSIGNED"
-          echo "::set-env name=MAC_FILENAME::$FILENAME"
+      
       - name: 'Fix linked dynamic library paths'
         if: success()
         working-directory: ${{ github.workspace }}/obs-midi
@@ -131,6 +124,10 @@ jobs:
           Name_unsigned: ${{ env.MAC_FILENAME_UNSIGNED }}
           Name_Signed: ${{ env.MAC_FILENAME }}
         run: |
+          FILENAME_UNSIGNED="obs-midi-${{ env.GIT_TAG }}-macOS-Unsigned.pkg"
+          FILENAME="obs-midi-${{ env.GIT_TAG }}-macOS.pkg"
+          echo "::set-env name=MAC_FILENAME_UNSIGNED::$FILENAME_UNSIGNED"
+          echo "::set-env name=MAC_FILENAME::$FILENAME"
           echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
           security create-keychain -p yourpassword build.keychain
           security default-keychain -s build.keychain

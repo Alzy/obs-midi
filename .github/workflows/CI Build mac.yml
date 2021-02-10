@@ -114,6 +114,12 @@ jobs:
         with:
           p12-file-base64: ${{ secrets.DEVAPPLICATIONCERT}}
           p12-password: ${{ secrets.MACOS_CERT_PASS }}
+      - name: 'Install Apple Developer Installer Certificate'
+        if: success()
+        uses: apple-actions/import-codesign-certs@253ddeeac23f2bdad1646faac5c8c2832e800071
+        with:
+          p12-file-base64: ${{ secrets.DEVINSTALLERCERT}}
+          p12-password: ${{ secrets.MACOS_CERT_PASS }}
 
       - name: Codesign executable
         working-directory: ${{ github.workspace }}/obs-midi
@@ -137,7 +143,7 @@ jobs:
           security find-identity -v -p codesigning
           /usr/bin/codesign --force -s "Developer ID" ./build/obs-midi.so -v
           packagesbuild ./CI/macos/obs-midi.pkgproj
-          productsign --sign "Developer ID" ./release/obs-midi.pkg ./release/obs-midi-signed.pkg
+          productsign --sign "Developer ID Installer" ./release/obs-midi.pkg ./release/obs-midi-signed.pkg
       - name: 'Notarization'
         if: success()
         working-directory: ./obs-midi

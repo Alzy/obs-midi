@@ -134,7 +134,7 @@ jobs:
           security unlock-keychain -p yourpassword build.keychain
           security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k yourpassword build.keychain
-          /usr/bin/codesign --force -s "Developer ID Installer: Chris Yarger (5CZ4DHWPQ9)" ./build/obs-midi.so -v
+          /usr/bin/codesign --force -s "Developer ID" ./build/obs-midi.so -v
           packagesbuild ./CI/macos/obs-midi.pkgproj
           mv ./release/obs-midi.pkg ./release/${{ env.MAC_FILENAME_UNSIGNED }}
           productsign --sign "${{ secrets.MACOS_IDENT_INSTALLER }}" ./release/${{ env.MAC_FILENAME_UNSIGNED }} ./release/${{ env.MAC_FILENAME }}

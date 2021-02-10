@@ -139,7 +139,7 @@ jobs:
       - name: package obs-midi
         working-directory: ${{ github.workspace }}/obs-midi
         run: |
-            packagesbuild --verbose --identity "Developer ID Installer" ./CI/macos/obs-midi.pkgproj
+            packagesbuild --verbose --identity "9ADCE51A63118ACE1AEEB3022748EE790F9D4ECF" ./CI/macos/obs-midi.pkgproj
       - name: 'Notarization'
         if: success()
         working-directory: ./obs-midi

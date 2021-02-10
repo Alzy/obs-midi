@@ -1,9 +1,6 @@
 name: 'CI Linux Build'
 
 on:
-
-  paths-ignore:
-    - 'docs/**'
   pull_request:
     paths-ignore:
       - '**.md'

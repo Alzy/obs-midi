@@ -127,10 +127,9 @@ jobs:
           MACOS_CERTIFICATE: ${{ secrets.MACOS_CERT_CODESIGN }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERT_PASS }}
         run: |
-          echo $MACOS_CERTIFICATE | base64 —decode > certificate.p12
           security create-keychain -p <your-password> build.keychain security default-keychain -s build.keychain
           security unlock-keychain -p <your-password> build.keychain
-          security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
+          security import $MACOS_CERTIFICATE -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k <your-password> build.keychain
           /usr/bin/codesign --force -s <identity-id> ./build/obs-midi.so -v
           packagesbuild ./CI/macos/obs-midi.pkgproj

@@ -97,7 +97,7 @@ jobs:
         run: |
           curl -L -O https://s3-us-west-2.amazonaws.com/obs-nightly/Packages.pkg
           sudo installer -pkg ${{ github.workspace }}/Packages.pkg -target /
-      
+
       - name: 'Fix linked dynamic library paths'
         if: success()
         working-directory: ${{ github.workspace }}/obs-midi
@@ -137,9 +137,9 @@ jobs:
           security find-identity -v -p codesigning
           /usr/bin/codesign --force -s "Developer ID" ./build/obs-midi.so -v
           packagesbuild ./CI/macos/obs-midi.pkgproj
-          mv ./release/obs-midi.pkg ./release/$Name_unsigned
-          productsign --sign "Developer ID" ./release/$Name_unsigned ./release/$Name_Signed
-          rm ./release/$Name_unsigned
+          mv ./release/obs-midi.pkg ./release/$MAC_FILENAME_UNSIGNED
+          productsign --sign "Developer ID" ./release/$MAC_FILENAME_UNSIGNED ./release/$MAC_FILENAME
+          rm ./release/$MAC_FILENAME_UNSIGNED
       - name: 'Notarization'
         if: success()
         working-directory: ./obs-midi

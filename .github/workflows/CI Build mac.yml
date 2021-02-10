@@ -123,6 +123,7 @@ jobs:
           p12-password: ${{ secrets.MACOS_CERT_PASS }}
 
       - name: Codesign executable
+        working-directory: ${{ github.workspace }}/obs-midi
         env:
           MACOS_CERTIFICATE: ${{ secrets.MACOS_CERT_CODESIGN }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERT_PASS }}

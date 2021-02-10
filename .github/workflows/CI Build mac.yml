@@ -141,17 +141,17 @@ jobs:
         working-directory: ${{ github.workspace }}/obs-midi
         run: |
             packagesbuild ./CI/macos/obs-midi.pkgproj
-      
+
       - name: 'Notarization'
         if: success()
         working-directory: ./obs-midi
         shell: bash
+        env:
+          MACOS_IDENTITY: ${{secrets.MACOS_IDENT_CODESIGN }}
+
         run: |
           set -e
           mv ./release/obs-midi.pkg ./release/${{ env.MAC_FILENAME }}
-          xcrun altool --store-password-in-keychain-item "AC_PASSWORD" -u "${{ secrets.MACOS_IDENT_USER }}" -p "${{ secrets.MACOS_IDENT_PASS }}"
-          xcnotary precheck ./release/${{ env.MAC_FILENAME }}
-          if [ "$?" -eq 0 ]; then xcnotary notarize ./release/${{ env.MAC_FILENAME }} --developer-account "${{ secrets.MACOS_IDENT_USER }}" --developer-password-keychain-item "AC_PASSWORD" --provider "${{ secrets.MACOS_IDENT_PROVIDER }}"; fi
 
       - name: 'Publish ${{ env.MAC_FILENAME }} artifact'
         if: success() && startsWith(github.ref,  'refs/tags')

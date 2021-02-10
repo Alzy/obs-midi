@@ -134,6 +134,7 @@ jobs:
           security unlock-keychain -p yourpassword build.keychain
           security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k yourpassword build.keychain
+          security find-identity -v -p codesigning
           /usr/bin/codesign --force -s "Developer ID" ./build/obs-midi.so -v
           packagesbuild ./CI/macos/obs-midi.pkgproj
           mv ./release/obs-midi.pkg ./release/${{ env.MAC_FILENAME_UNSIGNED }}

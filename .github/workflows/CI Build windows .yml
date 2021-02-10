@@ -1,10 +1,7 @@
 name: 'CI Windows Build'
 
 on:
-  push:
-    branches:
-      - release
-      - master
+
     paths-ignore:
       - 'docs/**'
   pull_request:

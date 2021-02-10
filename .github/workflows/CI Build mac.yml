@@ -3,8 +3,7 @@ name: 'CI MacOS Build'
 on:
   push:
     branches:
-      - release
-      - master
+
       - test2
     paths-ignore:
       - 'docs/**'
@@ -154,7 +153,7 @@ jobs:
           mv ./release/obs-midi.pkg ./release/${{ env.MAC_FILENAME }}
 
       - name: 'Publish ${{ env.MAC_FILENAME }} artifact'
-        if: success() 
+        if: success()
         uses: actions/upload-artifact@v2-preview
         with:
           name: '${{ env.GIT_TAG }}-macOS'

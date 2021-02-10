@@ -140,7 +140,7 @@ jobs:
         working-directory: ${{ github.workspace }}/obs-midi
         run: |
             packagesbuild ./CI/macos/obs-midi.pkgproj
-
+            productsign -s "Developer ID Installer"./release/obs-midi.pkg ./release/obs-midi-signed.pkg
       - name: 'Notarization'
         if: success()
         working-directory: ./obs-midi
@@ -150,7 +150,7 @@ jobs:
 
         run: |
           set -e
-          mv ./release/obs-midi.pkg ./release/${{ env.MAC_FILENAME }}
+          mv ./release/obs-midi-signed.pkg ./release/${{ env.MAC_FILENAME }}
 
       - name: 'Publish ${{ env.MAC_FILENAME }} artifact'
         if: success()

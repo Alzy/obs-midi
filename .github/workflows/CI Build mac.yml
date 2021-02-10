@@ -127,7 +127,8 @@ jobs:
           MACOS_CERTIFICATE: ${{ secrets.MACOS_CERT_CODESIGN }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERT_PASS }}
         run: |
-          security create-keychain -p yourpassword build.keychain security default-keychain -s build.keychain
+          security create-keychain -p yourpassword build.keychain
+          security default-keychain -s build.keychain
           security unlock-keychain -p yourpassword build.keychain
           security import $MACOS_CERTIFICATE -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k yourpassword build.keychain

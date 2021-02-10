@@ -123,11 +123,13 @@ jobs:
           p12-password: ${{ secrets.MACOS_CERT_PASS }}
 
       - name: Codesign executable
-        working-directory: ${{ github.workspace }}/obs-midi
+       working-directory: ${{ github.workspace }}/obs-midi
         env:
           MACOS_CERTIFICATE: ${{ secrets.MACOS_CERT_CODESIGN }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERT_PASS }}
           MACOS_IDENTITY: ${{secrets.MACOS_IDENT_CODESIGN }}
+          Name_unsigned : ${{ env.MAC_FILE  NAME_UNSIGNED }}
+          Name_Signed: ${{ env.MAC_FILENAME }}
         run: |
           echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
           security create-keychain -p yourpassword build.keychain
@@ -138,9 +140,9 @@ jobs:
           security find-identity -v -p codesigning
           /usr/bin/codesign --force -s "Developer ID" ./build/obs-midi.so -v
           packagesbuild ./CI/macos/obs-midi.pkgproj
-          mv ./release/obs-midi.pkg ./release/${{ env.MAC_FILENAME_UNSIGNED }}
-          productsign --sign "${{ secrets.MACOS_IDENT_INSTALLER }}" ./release/${{ env.MAC_FILENAME_UNSIGNED }} ./release/${{ env.MAC_FILENAME }}
-          rm ./release/${{ env.MAC_FILENAME_UNSIGNED }}
+          mv ./release/obs-midi.pkg ./release/$Name_unsigned
+          productsign --sign "Developer ID" ./release/$Name_unsigned ./release/$Name_Signed
+          rm ./release/$Name_unsigned
       - name: 'Notarization'
         if: success()
         working-directory: ./obs-midi

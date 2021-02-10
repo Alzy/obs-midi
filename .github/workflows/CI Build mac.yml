@@ -108,23 +108,12 @@ jobs:
           install_name_tool -change /usr/local/opt/qt/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore ./build/obs-midi.so
           echo "Dependencies for obs-midi"
           otool -L ./build/obs-midi.so
-      - name: 'Install Apple Developer Certificate'
-        if: success()
-        uses: apple-actions/import-codesign-certs@253ddeeac23f2bdad1646faac5c8c2832e800071
-        with:
-          p12-file-base64: ${{ secrets.DEVAPPLICATIONCERT}}
-          p12-password: ${{ secrets.MACOS_CERT_PASS }}
-      - name: 'Install Apple Developer Installer Certificate'
-        if: success()
-        uses: apple-actions/import-codesign-certs@253ddeeac23f2bdad1646faac5c8c2832e800071
-        with:
-          p12-file-base64: ${{ secrets.DEVINSTALLERCERT}}
-          p12-password: ${{ secrets.MACOS_CERT_PASS }}
 
       - name: Codesign executable
         working-directory: ${{ github.workspace }}/obs-midi
         env:
-          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERT_CODESIGN }}
+          MACOS_CERTIFICATE: ${{ secrets.DEVAPPLICATIONCERT }}
+          MACOS_CERTIFICATEINST: ${{ secrets.DEVINSTALLERCERT }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERT_PASS }}
           MACOS_IDENTITY: ${{secrets.MACOS_IDENT_CODESIGN }}
           Name_unsigned: ${{ env.MAC_FILENAME_UNSIGNED }}
@@ -135,10 +124,12 @@ jobs:
           echo "::set-env name=MAC_FILENAME_UNSIGNED::$FILENAME_UNSIGNED"
           echo "::set-env name=MAC_FILENAME::$FILENAME"
           echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
+          echo $MACOS_CERTIFICATEINST | base64 --decode > certificateInst.p12
           security create-keychain -p yourpassword build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p yourpassword build.keychain
           security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
+          security import certificateInst.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k yourpassword build.keychain
           security find-identity -v -p codesigning
           /usr/bin/codesign --force -s "Developer ID" ./build/obs-midi.so -v

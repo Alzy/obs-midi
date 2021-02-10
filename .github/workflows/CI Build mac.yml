@@ -154,7 +154,7 @@ jobs:
           mv ./release/obs-midi.pkg ./release/${{ env.MAC_FILENAME }}
 
       - name: 'Publish ${{ env.MAC_FILENAME }} artifact'
-        if: success() && startsWith(github.ref,  'refs/tags')
+        if: success() 
         uses: actions/upload-artifact@v2-preview
         with:
           name: '${{ env.GIT_TAG }}-macOS'

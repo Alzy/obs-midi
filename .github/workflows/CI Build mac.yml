@@ -119,7 +119,7 @@ jobs:
         if: success()
         uses: apple-actions/import-codesign-certs@253ddeeac23f2bdad1646faac5c8c2832e800071
         with:
-          p12-file-base64: ${{ secrets.MACOS_CERT_CODESIGN }}
+          p12-file-base64: ${{ secrets.DEVAPPLICATIONCERT}}
           p12-password: ${{ secrets.MACOS_CERT_PASS }}
 
       - name: Codesign executable

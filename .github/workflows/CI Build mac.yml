@@ -132,6 +132,7 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k yourpassword build.keychain
           security set-key-partition-list -S apple-tool:,apple:,productsign: -s -k yourpassword build.keychain
           security find-identity -v -p codesigning
+          security find-identity -v -p installer
       - name: Sign .so
         working-directory: ${{ github.workspace }}/obs-midi
         run: |
@@ -139,7 +140,7 @@ jobs:
       - name: package obs-midi
         working-directory: ${{ github.workspace }}/obs-midi
         run: |
-            packagesbuild --verbose --identity "9ADCE51A63118ACE1AEEB3022748EE790F9D4ECF" ./CI/macos/obs-midi.pkgproj
+            packagesbuild --verbose --identity "Developer ID Application: Chris Yarger (5CZ4DHWPQ9)" ./CI/macos/obs-midi.pkgproj
       - name: 'Notarization'
         if: success()
         working-directory: ./obs-midi

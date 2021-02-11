@@ -107,7 +107,12 @@ jobs:
           install_name_tool -change /usr/local/opt/qt/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore ./build/obs-midi.so
           echo "Dependencies for obs-midi"
           otool -L ./build/obs-midi.so
-
+      - name: 'Install Apple Developer Certificate'
+        if: success()
+        uses: apple-actions/import-codesign-certs@253ddeeac23f2bdad1646faac5c8c2832e800071
+        with:
+          p12-file-base64: ${{ secrets.MACOS_CERT_CODESIGN }}
+          p12-password: ${{ secrets.MACOS_CERT_PASS }}
      - name: 'Code signing'
         if: success()
         working-directory: ./obs-midi

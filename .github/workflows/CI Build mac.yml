@@ -113,7 +113,7 @@ jobs:
         with:
           p12-file-base64: ${{ secrets.MACOS_CERT_CODESIGN }}
           p12-password: ${{ secrets.MACOS_CERT_PASS }}
-     - name: 'Code signing'
+      - name: 'Code signing'
         if: success()
         working-directory: ./obs-midi
         shell: bash

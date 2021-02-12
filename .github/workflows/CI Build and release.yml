@@ -280,7 +280,7 @@ jobs:
       - name: 'Set release filename'
         shell: bash
         run: |
-          FILENAME="obs-midi-${{ env.GIT_HASH }}-1_amd64.deb"
+          FILENAME="obs-midi-0${{ env.GIT_HASH }}-1_amd64.deb"
           echo "::set-env name=LINUX_FILENAME::$FILENAME"
       - name: 'Package ${{ env.LINUX_FILENAME }}'
         if: success()
@@ -290,7 +290,7 @@ jobs:
           VERSION="${{ env.GIT_HASH }}"
           cd ./build
           sudo checkinstall -y --type=debian --fstrans=no -nodoc \
-              --backup=no --deldoc=yes --install=no --pkgname=obs-midi --pkgversion=$VERSION \
+              --backup=no --deldoc=yes --install=no --pkgname=obs-midi --pkgversion=0$VERSION \
               --pkglicense="GPLv2.0" --maintainer="${{ github.event.pusher.email }}" --pkggroup="video" \
               --pkgsource="${{ github.event.repository.html_url }}" \
               --requires="obs-studio,libqt5core5a,libqt5widgets5,qt5-image-formats-plugins" \
@@ -449,7 +449,7 @@ jobs:
           echo "store password"
           xcrun altool  --store-password-in-keychain-item "AC_PASSWORD" -u "${{ secrets.MACOS_IDENT_USER }}" -p "${{ secrets.MACOS_IDENT_PASS }}"
           echo "xcnotary precheck"
-          xcnotary precheck ./release/${{ env.MAC_FILENAME }} 
+          xcnotary precheck ./release/${{ env.MAC_FILENAME }}
           echo "xcnotary notarize"
           if [ "$?" -eq 0 ]; then xcnotary notarize ./release/${{ env.MAC_FILENAME }} -d "cpyarger@gmail.com" -k "AC_PASSWORD"; fi
 

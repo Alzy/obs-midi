@@ -21,4 +21,5 @@ fi
 # Discover clang-format
 
 
-find . -type d \( -o -path ./src -o -path ./src/forms \) -prune -type f -o -name '*.h' -or -name '*.hpp' -or -name '*.m' -or -name '*.mm' -or -name '*.c' -or -name '*.cpp' | xargs  clang-format-12 -i -style=file  -fallback-style=none -
+find . -type d \( -o -path ./src -o -path ./src/forms \) -prune -type f -o -name '*.h' -or -name '*.hpp' -or -name '*.m' -or -name '*.mm' -or -name '*.c' -or -name '*.cpp' >tmpfile
+while IFS= read -r line; do   clang-format-12 -i -style=file  -fallback-style=none  $line; done < tmpfile

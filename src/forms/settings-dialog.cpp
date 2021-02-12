@@ -29,7 +29,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "settings-dialog.h"
 #include <qdialogbuttonbox.h>
 #include <qcheckbox.h>
-
 #include "../version.h"
 PluginWindow::PluginWindow(QWidget *parent)
 	: QDialog(parent, Qt::Dialog), ui(new Ui::PluginWindow)
@@ -81,7 +80,6 @@ PluginWindow::PluginWindow(QWidget *parent)
 	this->ui->cb_obs_output_action->addItems(Utils::TranslateActions());
 	loadingdevices = true;
 }
-
 void PluginWindow::ToggleShowHide()
 {
 
@@ -107,12 +105,10 @@ void PluginWindow::ToggleShowHide()
 		ui->btn_Listen_one->setChecked(false);
 	}
 }
-
 void PluginWindow::setCheck(bool x)
 {
 	this->ui->check_enabled->setChecked(x);
 }
-
 void PluginWindow::SetAvailableDevices()
 {
 
@@ -168,7 +164,6 @@ void PluginWindow::SetAvailableDevices()
 	this->ui->list_midi_dev->setCurrentRow(0);
 	on_device_select(ui->list_midi_dev->currentItem()->text());
 }
-
 void PluginWindow::select_output_device(QString selectedDeviceName)
 {
 	if (!loadingdevices) {
@@ -181,7 +176,6 @@ void PluginWindow::select_output_device(QString selectedDeviceName)
 		GetConfig()->Save();
 	}
 }
-
 int PluginWindow::on_check_enabled_state_changed(int state)
 {
 
@@ -223,7 +217,6 @@ int PluginWindow::on_check_enabled_state_changed(int state)
 	//on_device_select(ui->list_midi_dev->currentItem()->text());
 	return state;
 }
-
 void PluginWindow::on_device_select(QString curitem)
 {
 	auto devicemanager = GetDeviceManager();
@@ -289,7 +282,6 @@ int PluginWindow::on_bid_enabled_state_changed(int state)
 		return 0;
 	}
 }
-
 PluginWindow::~PluginWindow()
 {
 
@@ -298,7 +290,6 @@ PluginWindow::~PluginWindow()
 	disconnect(desconnect);
 	delete ui;
 }
-
 void PluginWindow::get_scene_names()
 {
 	obs_frontend_source_list sceneList = {};
@@ -357,7 +348,6 @@ void PluginWindow::set_headers()
 	ui->table_mapping->horizontalHeaderItem(9)->setTextColor(actioncolor);
 	ui->table_mapping->horizontalHeaderItem(10)->setTextColor(actioncolor);
 }
-
 void PluginWindow::ShowPair(Pairs Pair)
 {
 
@@ -488,7 +478,6 @@ void PluginWindow::HideAllPairs()
 	HidePair(Pairs::Integer);
 	HidePair(Pairs::Boolean);
 }
-
 void PluginWindow::ResetToDefaults()
 {
 	ui->cb_obs_output_action->setCurrentIndex(0);
@@ -504,7 +493,6 @@ void PluginWindow::get_transitions()
 	ui->cb_obs_output_transition->clear();
 	ui->cb_obs_output_transition->addItems(Utils::GetTransitionsList());
 }
-
 void PluginWindow::on_source_change(QString source)
 {
 
@@ -519,7 +507,6 @@ void PluginWindow::on_scene_change(QString scene)
 	ui->cb_obs_output_item->clear();
 	ui->cb_obs_output_item->addItems(Utils::GetSceneItemsList(scene));
 }
-
 void PluginWindow::ShowOnly(QList<ActionsClass::Actions> shows)
 {
 
@@ -531,7 +518,6 @@ void PluginWindow::ShowOnly(QList<ActionsClass::Actions> shows)
 				.c_str()));
 	}
 }
-
 void PluginWindow::ShowEntry(ActionsClass::Actions Entry)
 {
 	if (ui->cb_obs_output_action->findText(
@@ -580,7 +566,6 @@ void PluginWindow::ShowEntries(QList<ActionsClass::Actions> entrys)
 	}
 	listview->adjustSize();
 }
-
 void PluginWindow::get_sources(QString scene)
 {
 
@@ -627,7 +612,6 @@ void PluginWindow::check_advanced_switch(bool state)
 {
 	//obs_actions_filter_select(ui->cb_obs_action->currentIndex());
 }
-
 void PluginWindow::obs_actions_select(QString action)
 {
 	if (!switching) {
@@ -833,7 +817,6 @@ void PluginWindow::add_new_mapping()
 		if (map_exists()) {
 			// TODO: Fix this, and create Utils::message_to_user(QString)
 			QString Mess;
-
 			Mess.append("Mapping already Exists for ");
 			Mess.append(ui->mapping_lbl_device_name->text());
 			Mess.append(" , with channel # ");
@@ -846,7 +829,6 @@ void PluginWindow::add_new_mapping()
 		}
 	}
 }
-
 void PluginWindow::add_row_from_hook(MidiHook *hook)
 {
 	int row = ui->table_mapping->rowCount();
@@ -902,7 +884,6 @@ void PluginWindow::set_cell_colors(QColor color, QTableWidgetItem *item)
 	item->setBackgroundColor(txcolor);
 	item->setTextColor(color);
 }
-
 void PluginWindow::tab_changed(int i)
 {
 	ui->mapping_lbl_device_name->setText(

@@ -457,7 +457,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
-          name: '${{ env.GIT_TAG }}-macOS'
+          name: '${{ env.GIT_HASH }}-macOS'
           path: ${{ github.workspace }}/obs-midi/release/*.pkg
 
   make-release:

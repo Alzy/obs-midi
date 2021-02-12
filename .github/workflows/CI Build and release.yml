@@ -1,9 +1,10 @@
-name: 'CI Multiplatform Build'
+name: 'CI Multiplatform Build and release'
 
 on:
   push:
     branches:
       - release
+      - master
     paths-ignore:
       - 'docs/**'
   pull_request:
@@ -296,16 +297,32 @@ jobs:
               --pakdir="../package"
           sudo chmod ao+r ../package/*
           cd -
+      - name: 'Tar ${{ env.LINUX_FILENAME }}'
+        if: success()
+        working-directory: ${{ github.workspace }}/obs-midi
+        shell: bash
+        run: |
+          VERSION="${{ env.GIT_HASH }}"
+          cd ./build
+          mkdir -p obs-studio/plugins/64bit/
+          cp ./obs-midi.so obs-studio/plugins/64bit/
+          tar -czvf obs-midi-Linux-${{ env.GIT_HASH }}-x64.tar.gz obs-studio
+
       - name: 'Publish ${{ env.LINUX_FILENAME }}'
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
           name: '${{ env.GIT_HASH }}-linux'
           path: '${{ github.workspace }}/obs-midi/package/*.deb'
+      - name: 'Publish ${{ env.LINUX_FILENAME }}'
+        if: success()
+        uses: actions/upload-artifact@v2-preview
+        with:
+          name: '${{ env.GIT_HASH }}-linux'
+          path: '${{ github.workspace }}/obs-midi/package/*.tar.gz'
   macos64:
     name: "macOS 64-bit"
     runs-on: [macos-latest]
-    if: contains(github.event.head_commit.message, '[skip ci]') != true
     env:
       MACOS_DEPS_VERSION: '2020-04-18'
       QT_VERSION: '5.14.1'
@@ -342,16 +359,10 @@ jobs:
           echo ::set-env name=GIT_BRANCH::${{ github.event.pull_request.head.ref }}
           echo ::set-env name=GIT_HASH::$(git rev-parse --short HEAD)
           echo ::set-env name=GIT_TAG::$(git describe --tags --abbrev=0)
-      - name: 'Install Deps'
+      - name: 'Install prerequisites (Homebrew)'
         shell: bash
-        working-directory: ${{ github.workspace }}/obs-midi
         run: |
-          ./CI/install-dependencies-macos.sh
-           echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> /Users/runner/.bash_profile
-           echo ::set-env name=LDFLAGS="-L/usr/local/opt/qt/lib"
-           echo ::set-env  name=CPPFLAGS="-I/usr/local/opt/qt/include"
-           echo ::set-env name=PKG_CONFIG_PATH="/usr/local/opt/qt/lib/pkgconfig"
-           echo ::set-env name=PATH="/usr/local/opt/qt/bin:$PATH"
+          brew bundle --file ${{ github.workspace }}/obs-midi/CI/macos/Brewfile
       - name: 'Install prerequisite: Pre-built OBS dependencies'
         shell: bash
         run: |
@@ -395,11 +406,10 @@ jobs:
         if: success()
         shell: bash
         run: |
-          FILENAME_UNSIGNED="obs-midi-${{ env.GIT_HASH }}-macOS-Unsigned.pkg"
-          FILENAME="obs-midi-${{ env.GIT_HASH }}-macOS.pkg"
+          FILENAME_UNSIGNED="obs-midi-${{ env.GIT_TAG }}-macOS-Unsigned.pkg"
+          FILENAME="obs-midi-${{ env.GIT_TAG }}-macOS.pkg"
           echo "::set-env name=MAC_FILENAME_UNSIGNED::$FILENAME_UNSIGNED"
           echo "::set-env name=MAC_FILENAME::$FILENAME"
-          
       - name: 'Fix linked dynamic library paths'
         if: success()
         working-directory: ${{ github.workspace }}/obs-midi
@@ -410,19 +420,43 @@ jobs:
           install_name_tool -change /usr/local/opt/qt/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore ./build/obs-midi.so
           echo "Dependencies for obs-midi"
           otool -L ./build/obs-midi.so
-      - name: 'package file'
+      - name: 'Install Apple Developer Certificate'
+        if: success()
+        uses: apple-actions/import-codesign-certs@253ddeeac23f2bdad1646faac5c8c2832e800071
+        with:
+          p12-file-base64: ${{ secrets.MACOS_CERT_CODESIGN }}
+          p12-password: ${{ secrets.MACOS_CERT_PASS }}
+      - name: 'Code signing'
         if: success()
         working-directory: ./obs-midi
         shell: bash
         run: |
           set -e
+          security find-identity -v -p codesigning
+          codesign --sign "${{ secrets.MACOS_IDENT_CODESIGN }}" ./build/obs-midi.so
           packagesbuild ./CI/macos/obs-midi.pkgproj
           mv ./release/obs-midi.pkg ./release/${{ env.MAC_FILENAME_UNSIGNED }}
+          productsign --sign "${{ secrets.MACOS_IDENT_INSTALLER }}" ./release/${{ env.MAC_FILENAME_UNSIGNED }} ./release/${{ env.MAC_FILENAME }}
+          rm ./release/${{ env.MAC_FILENAME_UNSIGNED }}
+
+      - name: 'Notarization'
+        if: success()
+        working-directory: ./obs-midi
+        shell: bash
+        run: |
+          set -e
+          echo "store password"
+          xcrun altool  --store-password-in-keychain-item "AC_PASSWORD" -u "${{ secrets.MACOS_IDENT_USER }}" -p "${{ secrets.MACOS_IDENT_PASS }}"
+          echo "xcnotary precheck"
+          xcnotary precheck ./release/${{ env.MAC_FILENAME }} -d "cpyarger@gmail.com" -k "AC_PASSWORD"
+          echo "xcnotary notarize"
+          if [ "$?" -eq 0 ]; then xcnotary notarize ./release/${{ env.MAC_FILENAME }} -d "cpyarger@gmail.com" -k "AC_PASSWORD"; fi
+
       - name: 'Publish ${{ env.MAC_FILENAME }} artifact'
-        if: success() 
+        if: success()
         uses: actions/upload-artifact@v2-preview
         with:
-          name: '${{ env.GIT_HASH }}-macOS'
+          name: '${{ env.GIT_TAG }}-macOS'
           path: ${{ github.workspace }}/obs-midi/release/*.pkg
 
   make-release:

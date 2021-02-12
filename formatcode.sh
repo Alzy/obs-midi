@@ -19,12 +19,6 @@ if [[ $OS = "Linux" || $OS = "Darwin" ]] ; then
 fi
 
 # Discover clang-format
-if type clang-format-12 2> /dev/null ; then
-    CLANG_FORMAT=clang-format-12
-else
-    CLANG_FORMAT=clang-format
-fi
 
-find . -type d \( -o -path ./src \
--o -path ./src/forms \) -prune -type f -o -name '*.h' -or -name '*.hpp' -or -name '*.m' -or -name '*.mm' -or -name '*.c' -or -name '*.cpp' \
-| xargs -L100 -P${NPROC} ${CLANG_FORMAT} -i -style=file  -fallback-style=none -
+
+find . -type d \( -o -path ./src -o -path ./src/forms \) -prune -type f -o -name '*.h' -or -name '*.hpp' -or -name '*.m' -or -name '*.mm' -or -name '*.c' -or -name '*.cpp' | xargs  clang-format-12 -i -style=file  -fallback-style=none -

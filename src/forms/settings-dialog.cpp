@@ -34,7 +34,6 @@ PluginWindow::PluginWindow(QWidget *parent)
 	: QDialog(parent, Qt::Dialog), ui(new Ui::PluginWindow)
 {
 	ui->setupUi(this);
-
 	//Set Window Title
 	QString title;
 	title.append("OBS MIDI Settings -- Branch: ");
@@ -42,9 +41,7 @@ PluginWindow::PluginWindow(QWidget *parent)
 	title.append(" -- Commit: ");
 	title.append(GIT_COMMIT_HASH);
 	this->setWindowTitle(title);
-
 	HideAllPairs();
-
 	Utils::TranslateActions();
 	//Connections for Device Tab
 	connect(ui->list_midi_dev, SIGNAL(currentTextChanged(QString)), this,
@@ -53,9 +50,7 @@ PluginWindow::PluginWindow(QWidget *parent)
 		SLOT(on_check_enabled_state_changed(int)));
 	connect(ui->bidirectional, SIGNAL(stateChanged(int)), this,
 		SLOT(on_bid_enabled_state_changed(int)));
-
 	//Connections for Configure Tab
-
 	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
 		this, SLOT(get_sources(QString)));
 	connect(ui->cb_obs_output_action, SIGNAL(currentTextChanged(QString)),
@@ -64,7 +59,6 @@ PluginWindow::PluginWindow(QWidget *parent)
 		this, SLOT(get_sources(QString)));
 	connect(ui->cb_obs_output_source, SIGNAL(currentTextChanged(QString)),
 		this, SLOT(get_filters(QString)));
-
 	connect(ui->cb_obs_output_source, SIGNAL(currentTextChanged(QString)),
 		this, SLOT(on_source_change(QString)));
 	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
@@ -93,11 +87,8 @@ void PluginWindow::ToggleShowHide()
 		ui->cb_obs_output_transition->clear();
 		ui->cb_obs_output_transition->addItems(
 			Utils::GetTransitionsList());
-
 		get_scene_names();
-
 		setVisible(true);
-
 	} else {
 		setVisible(false);
 		ui->btn_Listen_many->setChecked(false);
@@ -134,9 +125,7 @@ void PluginWindow::SetAvailableDevices()
 		this->ui->outbox->insertItems(0, midiOutDevices);
 		loadingdevices = false;
 	}
-
 	if (starting) {
-
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
 		//define something for Windows (32-bit and 64-bit, this part is common)
 		this->ui->outbox->setCurrentIndex(1);
@@ -154,7 +143,6 @@ void PluginWindow::SetAvailableDevices()
 		}
 		starting = false;
 	}
-
 	this->ui->list_midi_dev->setCurrentRow(-1);
 	this->ui->list_midi_dev->setCurrentRow(0);
 	on_device_select(ui->list_midi_dev->currentItem()->text());
@@ -167,7 +155,6 @@ void PluginWindow::select_output_device(QString selectedDeviceName)
 		auto device = GetDeviceManager()->GetMidiDeviceByName(
 			selectedDevice.c_str());
 		device->set_midi_output_name(selectedDeviceName);
-
 		GetConfig()->Save();
 	}
 }

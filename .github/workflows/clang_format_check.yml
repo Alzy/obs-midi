@@ -13,18 +13,11 @@ jobs:
 
       - name: Install clang format
         run: |
-          # gets us newer clang
-          sudo bash -c "cat >> /etc/apt/sources.list" << LLVMAPT
-          # 3.8
-          deb https://apt.llvm.org/focal/ llvm-toolchain-12 main
-          deb-src http://apt.llvm.org/focal/ llvm-toolchain-12 main
-          LLVMAPT
+          bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
 
-          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
-
-          sudo apt-get -qq update
-
-          sudo apt-get install -y clang-format-12
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh 12
 
       - name: Check the Formatting
         run: |

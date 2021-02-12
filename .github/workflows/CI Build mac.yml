@@ -96,7 +96,14 @@ jobs:
         run: |
           curl -L -O https://s3-us-west-2.amazonaws.com/obs-nightly/Packages.pkg
           sudo installer -pkg ${{ github.workspace }}/Packages.pkg -target /
-
+      - name: 'Set release filename'
+        if: success() && startsWith(github.ref, 'refs/tags')
+        shell: bash
+        run: |
+          FILENAME_UNSIGNED="obs-midi-${{ env.GIT_TAG }}-macOS-Unsigned.pkg"
+          FILENAME="obs-midi-${{ env.GIT_TAG }}-macOS.pkg"
+          echo "::set-env name=MAC_FILENAME_UNSIGNED::$FILENAME_UNSIGNED"
+          echo "::set-env name=MAC_FILENAME::$FILENAME"
       - name: 'Fix linked dynamic library paths'
         if: success()
         working-directory: ${{ github.workspace }}/obs-midi

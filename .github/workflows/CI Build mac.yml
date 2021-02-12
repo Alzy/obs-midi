@@ -97,7 +97,7 @@ jobs:
           curl -L -O https://s3-us-west-2.amazonaws.com/obs-nightly/Packages.pkg
           sudo installer -pkg ${{ github.workspace }}/Packages.pkg -target /
       - name: 'Set release filename'
-        if: success() && startsWith(github.ref, 'refs/tags')
+        if: success()
         shell: bash
         run: |
           FILENAME_UNSIGNED="obs-midi-${{ env.GIT_TAG }}-macOS-Unsigned.pkg"

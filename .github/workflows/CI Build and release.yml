@@ -307,7 +307,7 @@ jobs:
           mkdir -p obs-studio/plugins/64bit/
           cp ./obs-midi.so obs-studio/plugins/64bit/
           tar -czvf obs-midi-Linux-${{ env.GIT_HASH }}-x64.tar.gz obs-studio
-          mv obs-midi-*.tar.gz ${{ github.workspace }}/obs-midi/package/
+          pwd
 
       - name: 'Publish ${{ env.LINUX_FILENAME }}'
         if: success()
@@ -320,7 +320,7 @@ jobs:
         uses: actions/upload-artifact@v2-preview
         with:
           name: '${{ env.GIT_HASH }}-linux'
-          path: '${{ github.workspace }}/obs-midi/package/*.tar.gz'
+          path: '${{ github.workspace }}/obs-midi/build/*.tar.gz'
   macos64:
     name: "macOS 64-bit"
     runs-on: [macos-latest]

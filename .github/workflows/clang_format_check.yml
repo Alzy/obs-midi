@@ -29,5 +29,6 @@ jobs:
       - name: Check the Formatting
         run: |
           chmod +x ./formatcode.sh
+          chmod +x ./CI/check-format.sh
           ./formatcode.sh
           ./CI/check-format.sh

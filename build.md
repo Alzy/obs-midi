@@ -6,7 +6,7 @@ You'll need [Qt 5.15.2](https://download.qt.io/official_releases/qt/5.15/),
 [CMake](https://cmake.org/download/) and a working [OBS Studio development environment](https://obsproject.com/wiki/install-instructions) installed on your
 computer.
 
-For Cleanliness and sanity, Do not mix the obs-studio and obs-midi directories. 
+For Cleanliness and sanity, Do not mix the obs-studio and obs-midi directories.
 
 For Example My Directory structure looks like this
 
@@ -34,6 +34,14 @@ In cmake-gui, you'll have to set the following variables :
 | **CMAKE_INSTALL_PREFIX**       | (path) : Same location as QTDIR                                                       | C:/Qt/5.15.2/msvc2019_64|
 
 ![My CMake Gui Looks like ](https://github.com/cpyarger/obs-midi/blob/master/docs/obs-midi-cmake.PNG?raw=true)
+
+In Visual Studio, Set OBS-Midi as the startup project,
+
+![set obs-midi as startup project ](https://github.com/cpyarger/obs-midi/blob/master/docs/obs-midi-set-as-startup-project.PNG?raw=true)
+Change Output Directory to OBS-Studio projects plugin's folder on the general page
+![My CMake Gui Looks like ](https://github.com/cpyarger/obs-midi/blob/master/docs/obs-midi-general-page.PNG?raw=true)
+Change Debug to obs-studio's exe and exe dir in the debug page
+![My CMake Gui Looks like ](https://github.com/cpyarger/obs-midi/blob/master/docs/obs-midi-debug-page.PNG?raw=true)
 ## Linux
 
 On Debian/Ubuntu :

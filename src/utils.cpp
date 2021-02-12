@@ -113,7 +113,7 @@ obs_data_array_t *Utils::StringListToArray(char **strings, const char *key)
 
 obs_data_array_t *Utils::GetSceneItems(obs_source_t *source)
 {
-	obs_data_array_t* items = obs_data_array_create();
+	obs_data_array_t *items = obs_data_array_create();
 	OBSScene scene = obs_scene_from_source(source);
 
 	if (!scene) {
@@ -133,7 +133,7 @@ obs_data_array_t *Utils::GetSceneItems(obs_source_t *source)
 			return true;
 		},
 		items);
-	
+
 	return items;
 }
 
@@ -1088,7 +1088,6 @@ QStringList Utils::GetSceneItemsList(QString scenename)
 
 		OBSDataAutoRelease sceneItemData = obs_data_create();
 
-
 		OBSSource source = obs_sceneitem_get_source(item);
 
 		obs_data_set_string(sceneItemData, "sourceName",
@@ -1261,7 +1260,6 @@ QString Utils::mtype_to_string(rtmidi::message_type mess)
 		return "SYSTEM_RESET";
 	}
 	return "ERROR";
-
 }
 
 QString Utils::getMidiMessageType(int in)
@@ -1313,12 +1311,14 @@ ActionsClass::Actions ActionsClass::string_to_action(const QString &action)
 {
 	return QVariant(action).value<ActionsClass::Actions>();
 }
-QString ActionsClass::event_to_string(const ActionsClass::obs_event_type &enumval)
+QString
+ActionsClass::event_to_string(const ActionsClass::obs_event_type &enumval)
 {
 	return QVariant::fromValue(enumval).toString();
 }
 
-ActionsClass::obs_event_type ActionsClass::string_to_event(const QString &action)
+ActionsClass::obs_event_type
+ActionsClass::string_to_event(const QString &action)
 {
 	return QVariant(action).value<ActionsClass::obs_event_type>();
 }
@@ -1333,15 +1333,18 @@ QStringList Utils::TranslateActions()
 	}
 	return temp;
 }
-QString Utils::translate_action(ActionsClass::Actions action) {
-	return QString(obs_module_text(ActionsClass::action_to_string(action).toStdString().c_str()));
+QString Utils::translate_action(ActionsClass::Actions action)
+{
+	return QString(obs_module_text(
+		ActionsClass::action_to_string(action).toStdString().c_str()));
 }
 QString Utils::untranslate(QString tstring)
 {
 	return ActionsClass::action_to_string(
 		AllActions_raw.at(TranslateActions().indexOf(tstring)));
 }
-void Utils::alert_popup(QString message) {
+void Utils::alert_popup(QString message)
+{
 	QMessageBox msgBox;
 	msgBox.setText(message);
 	msgBox.exec();

@@ -19,14 +19,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "RpcResponse.h"
 #include "RpcRequest.h"
 
-RpcResponse::RpcResponse(
-	Status status, const QString& messageId,
-	const QString& methodName, obs_data_t* additionalFields
-) :
-	_status(status),
-	_messageId(messageId),
-	_methodName(methodName),
-	_additionalFields(nullptr)
+RpcResponse::RpcResponse(Status status, const QString &messageId,
+			 const QString &methodName,
+			 obs_data_t *additionalFields)
+	: _status(status),
+	  _messageId(messageId),
+	  _methodName(methodName),
+	  _additionalFields(nullptr)
 {
 	if (additionalFields) {
 		_additionalFields = obs_data_create();
@@ -34,15 +33,20 @@ RpcResponse::RpcResponse(
 	}
 }
 
-const RpcResponse RpcResponse::ok(const RpcRequest& request, obs_data_t* additionalFields)
+const RpcResponse RpcResponse::ok(const RpcRequest &request,
+				  obs_data_t *additionalFields)
 {
-	RpcResponse response(Status::Ok, request.messageId(), request.methodName(), additionalFields);
+	RpcResponse response(Status::Ok, request.messageId(),
+			     request.methodName(), additionalFields);
 	return response;
-} 
+}
 
-const RpcResponse RpcResponse::fail(const RpcRequest& request, const QString& errorMessage, obs_data_t* additionalFields)
+const RpcResponse RpcResponse::fail(const RpcRequest &request,
+				    const QString &errorMessage,
+				    obs_data_t *additionalFields)
 {
-	RpcResponse response(Status::Error, request.messageId(), request.methodName(), additionalFields);
+	RpcResponse response(Status::Error, request.messageId(),
+			     request.methodName(), additionalFields);
 	response._errorMessage = errorMessage;
 	return response;
 }

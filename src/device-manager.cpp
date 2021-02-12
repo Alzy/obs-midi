@@ -44,12 +44,12 @@ void DeviceManager::Load(obs_data_t *data)
 		MidiAgent *device = new MidiAgent();
 		device->Load(deviceData);
 		midiAgents.push_back(device);
-		
+
 		connect(this, SIGNAL(bcast(QString, QString)), device,
-				SLOT(handle_obs_event(QString, QString)));
+			SLOT(handle_obs_event(QString, QString)));
 		if (device->isEnabled()) {
-			int portNumber =
-				GetPortNumberByDeviceName(device->get_midi_input_name());
+			int portNumber = GetPortNumberByDeviceName(
+				device->get_midi_input_name());
 			int outPort = GetOutPortNumberByDeviceName(
 				device->get_midi_output_name());
 
@@ -71,7 +71,6 @@ void DeviceManager::Unload()
 		agent->clear_MidiHooks();
 		delete agent;
 	}
-	
 }
 
 /* Returns vector list of Port Names 
@@ -99,7 +98,6 @@ QStringList DeviceManager::GetOutPortsList()
 	}
 	return outports;
 }
-
 
 /* Returns the port number of the specified device.
  * If the device isn't found (possibly due to being disconnected), returns -1
@@ -190,8 +188,6 @@ obs_data_t *DeviceManager::GetData()
 	obs_data_set_array(data, "devices", deviceData);
 	return data;
 }
-
-
 
 void DeviceManager::broadcast_obs_event(const RpcEvent &event)
 {

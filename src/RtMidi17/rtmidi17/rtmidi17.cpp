@@ -90,10 +90,12 @@ auto for_all_backends(F&& f)
 template <typename F>
 auto for_backend(rtmidi::API api, F&& f)
 {
-  for_all_backends([&](auto b) {
-    if (b.API == api)
-      f(b);
-  });
+  for_all_backends(
+      [&](auto b)
+      {
+        if (b.API == api)
+          f(b);
+      });
 }
 
 RTMIDI17_INLINE midi_exception::~midi_exception() = default;
@@ -121,9 +123,9 @@ open_midi_observer(rtmidi::API api, observer::callbacks&& cb)
 {
   std::unique_ptr<observer_api> ptr;
 
-  for_backend(api, [&](auto b) {
-    ptr = std::make_unique<typename decltype(b)::midi_observer>(std::move(cb));
-  });
+  for_backend(
+      api,
+      [&](auto b) { ptr = std::make_unique<typename decltype(b)::midi_observer>(std::move(cb)); });
 
   return ptr;
 }
@@ -133,9 +135,9 @@ open_midi_in(rtmidi::API api, std::string_view clientName, unsigned int queueSiz
 {
   std::unique_ptr<midi_in_api> ptr;
 
-  for_backend(api, [&](auto b) {
-    ptr = std::make_unique<typename decltype(b)::midi_in>(clientName, queueSizeLimit);
-  });
+  for_backend(
+      api, [&](auto b)
+      { ptr = std::make_unique<typename decltype(b)::midi_in>(clientName, queueSizeLimit); });
 
   return ptr;
 }

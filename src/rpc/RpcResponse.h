@@ -24,44 +24,34 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 class RpcRequest;
 
-class RpcResponse
-{
+class RpcResponse {
 public:
 	enum Status { Unknown, Ok, Error };
 
-	static RpcResponse ofRequest(const RpcRequest& request);
-	static const RpcResponse ok(const RpcRequest& request, obs_data_t* additionalFields = nullptr);
-	static const RpcResponse fail(
-		const RpcRequest& request, const QString& errorMessage,
-		obs_data_t* additionalFields = nullptr
-	);
+	static RpcResponse ofRequest(const RpcRequest &request);
+	static const RpcResponse ok(const RpcRequest &request,
+				    obs_data_t *additionalFields = nullptr);
+	static const RpcResponse fail(const RpcRequest &request,
+				      const QString &errorMessage,
+				      obs_data_t *additionalFields = nullptr);
 
-	Status status() {
-		return _status;
-	}
+	Status status() { return _status; }
 
-	const QString& messageId() const {
-		return _messageId;
-	}
-	
-	const QString& methodName() const {
-		return _methodName;
-	}
+	const QString &messageId() const { return _messageId; }
 
-	const QString& errorMessage() const {
-		return _errorMessage;
-	}
-	
-	const OBSData additionalFields() const {
+	const QString &methodName() const { return _methodName; }
+
+	const QString &errorMessage() const { return _errorMessage; }
+
+	const OBSData additionalFields() const
+	{
 		return OBSData(_additionalFields);
 	}
 
 private:
-	explicit RpcResponse(
-		Status status,
-		const QString& messageId, const QString& methodName,
-		obs_data_t* additionalFields = nullptr
-	);
+	explicit RpcResponse(Status status, const QString &messageId,
+			     const QString &methodName,
+			     obs_data_t *additionalFields = nullptr);
 	const Status _status;
 	const QString _messageId;
 	const QString _methodName;

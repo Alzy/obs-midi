@@ -134,13 +134,15 @@ try
   if (chooseMidiPort(midiout) == false)
     return 0;
 
-  midiin.set_callback([](const rtmidi::message& message) {
-    auto nBytes = message.size();
-    for (auto i = 0U; i < nBytes; i++)
-      std::cout << "Byte " << i << " = " << (int)message[i] << ", ";
-    if (nBytes > 0)
-      std::cout << "stamp = " << message.timestamp << std::endl;
-  });
+  midiin.set_callback(
+      [](const rtmidi::message& message)
+      {
+        auto nBytes = message.size();
+        for (auto i = 0U; i < nBytes; i++)
+          std::cout << "Byte " << i << " = " << (int)message[i] << ", ";
+        if (nBytes > 0)
+          std::cout << "stamp = " << message.timestamp << std::endl;
+      });
 
   std::vector<unsigned char> message;
   message.push_back(0xF6);

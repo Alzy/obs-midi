@@ -41,7 +41,6 @@ using namespace std;
 /* MIDI HOOK ROUTES */
 //////////////////////
 
-
 ////////////////
 // MIDI AGENT //
 ////////////////
@@ -54,7 +53,6 @@ MidiAgent::MidiAgent()
 	midiout = new rtmidi::midi_out();
 	midiin->set_callback(
 		[this](const auto &message) { HandleInput(message, this); });
-	
 }
 
 MidiAgent::~MidiAgent()
@@ -107,7 +105,6 @@ void MidiAgent::Load(obs_data_t *data)
 	}
 }
 
-
 /* Will open the port and enable this MidiAgent
 */
 void MidiAgent::open_midi_input_port(int inport)
@@ -116,14 +113,14 @@ void MidiAgent::open_midi_input_port(int inport)
 
 		midiin->open_port(inport);
 
-		midi_input_name = QString::fromStdString(midiin->get_port_name(inport));
+		midi_input_name =
+			QString::fromStdString(midiin->get_port_name(inport));
 		enabled = true;
 		connected = true;
 		blog(LOG_INFO, "MIDI device connected In: [%d] %s", inport,
 		     midi_input_name.toStdString().c_str());
 
 	} catch (const rtmidi::midi_exception &error) {
-
 	}
 }
 void MidiAgent::open_midi_output_port(int outport)
@@ -132,11 +129,9 @@ void MidiAgent::open_midi_output_port(int outport)
 	try {
 		midiout->open_port(outport);
 	} catch (const rtmidi::midi_exception &error) {
-
-
-
 	}
-	midi_output_name = QString::fromStdString(midiout->get_port_name(outport));
+	midi_output_name =
+		QString::fromStdString(midiout->get_port_name(outport));
 	enabled = true;
 	connected = true;
 
@@ -166,8 +161,9 @@ void MidiAgent::set_midi_output_name(QString oname)
 {
 	if (midi_output_name != oname) {
 		midiout->close_port();
-		open_midi_output_port(GetDeviceManager()->GetOutPortNumberByDeviceName(
-			oname));
+		open_midi_output_port(
+			GetDeviceManager()->GetOutPortNumberByDeviceName(
+				oname));
 	}
 	midi_output_name = oname;
 }
@@ -181,8 +177,9 @@ bool MidiAgent::setBidirectional(bool state)
 		if (midiout->is_port_open()) {
 			midiout->close_port();
 		}
-		open_midi_output_port(GetDeviceManager()->GetOutPortNumberByDeviceName(
-			midi_output_name));
+		open_midi_output_port(
+			GetDeviceManager()->GetOutPortNumberByDeviceName(
+				midi_output_name));
 	}
 	return state;
 }
@@ -242,19 +239,17 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 			self->do_obs_action(
 				self->midiHooks.at(i), value,
 				ActionsClass::string_to_action(
-					Utils::untranslate(self->midiHooks.at(i)->action)));
-			
+					Utils::untranslate(
+						self->midiHooks.at(i)->action)));
 		}
 	}
 }
-
-
 
 /* Get the midi hooks for this device
 */
 QVector<MidiHook *> MidiAgent::GetMidiHooks()
 {
-	
+
 	return midiHooks;
 }
 
@@ -266,10 +261,11 @@ void MidiAgent::add_MidiHook(MidiHook *hook)
 	//connect()
 	midiHooks.push_back(hook);
 }
-void MidiAgent::set_enabled(bool state) {
+void MidiAgent::set_enabled(bool state)
+{
 	this->enabled = state;
 }
-	/* Remove a MidiHook
+/* Remove a MidiHook
 */
 void MidiAgent::set_midi_hooks(QVector<MidiHook *> mh)
 {
@@ -297,8 +293,10 @@ void MidiAgent::clear_MidiHooks()
 obs_data_t *MidiAgent::GetData()
 {
 	obs_data_t *data = obs_data_create();
-	obs_data_set_string(data, "name", midi_input_name.toStdString().c_str());
-	obs_data_set_string(data, "outname", midi_output_name.toStdString().c_str());
+	obs_data_set_string(data, "name",
+			    midi_input_name.toStdString().c_str());
+	obs_data_set_string(data, "outname",
+			    midi_output_name.toStdString().c_str());
 
 	obs_data_set_bool(data, "enabled", enabled);
 	obs_data_set_bool(data, "bidirectional", bidirectional);
@@ -329,11 +327,14 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 		if (eventType == QString("SourceVolumeChanged")) {
 			double vol = obs_data_get_double(data, "volume");
 			uint8_t newvol = Utils::mapper2(cbrt(vol));
-			QString source = QString(obs_data_get_string(data, "sourceName"));
+			QString source = QString(
+				obs_data_get_string(data, "sourceName"));
 			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
 				if (self->midiHooks.at(i)->action ==
-					    Utils::translate_action(ActionsClass::Actions::Set_Volume) &&
-				    self->midiHooks.at(i)->audio_source==
+					    Utils::translate_action(
+						    ActionsClass::Actions::
+							    Set_Volume) &&
+				    self->midiHooks.at(i)->audio_source ==
 					    source) {
 					message.message_type =
 						self->midiHooks.at(i)
@@ -343,7 +344,8 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 					message.NORC =
 						self->midiHooks.at(i)->norc;
 					message.value = newvol;
-					this->send_message_to_midi_device(message);
+					this->send_message_to_midi_device(
+						message);
 				}
 			}
 		} else if (eventType == QString("SwitchScenes")) {
@@ -351,18 +353,23 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 				obs_data_get_string(data, "scene-name"));
 			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
 				if (self->midiHooks.at(i)->action ==
-				     Utils::translate_action(ActionsClass::Actions::Set_Current_Scene) &&
+					    Utils::translate_action(
+						    ActionsClass::Actions::
+							    Set_Current_Scene) &&
 				    self->midiHooks.at(i)->scene == source) {
 					message.message_type = "Note Off";
 					message.channel =
 						self->midiHooks.at(i)->channel;
 					message.NORC = lastscenebtn;
 					message.value = 0;
-					this->send_message_to_midi_device(message);
+					this->send_message_to_midi_device(
+						message);
 					message.message_type = "Note On";
 					message.value = 1;
-					this->send_message_to_midi_device(message);
-					lastscenebtn = self->midiHooks.at(i)->norc;
+					this->send_message_to_midi_device(
+						message);
+					lastscenebtn =
+						self->midiHooks.at(i)->norc;
 				}
 			}
 
@@ -380,10 +387,11 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 					message.NORC =
 						self->midiHooks.at(i)->norc;
 					message.value = 0;
-					this->send_message_to_midi_device(message);
+					this->send_message_to_midi_device(
+						message);
 					message.message_type = "Note Off";
-					this->send_message_to_midi_device(message);
-					
+					this->send_message_to_midi_device(
+						message);
 				}
 			}
 
@@ -392,7 +400,9 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
 				if (self->midiHooks.at(i)->action ==
 
-				    Utils::translate_action(ActionsClass::Actions::Toggle_Mute) &&
+					    Utils::translate_action(
+						    ActionsClass::Actions::
+							    Toggle_Mute) &&
 				    self->midiHooks.at(i)->audio_source ==
 					    from) {
 					bool muted = obs_data_get_bool(data,
@@ -403,7 +413,8 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 					message.NORC =
 						self->midiHooks.at(i)->norc;
 					message.value = muted;
-					this->send_message_to_midi_device(message);
+					this->send_message_to_midi_device(
+						message);
 				}
 			}
 		} else if (eventType == QString("SourceRenamed")) {
@@ -451,8 +462,8 @@ void MidiAgent::send_message_to_midi_device(MidiMessage message)
 {
 	rtmidi::message *hello = new rtmidi::message();
 	if (message.message_type == "Control Change") {
-		this->midiout->send_message(
-			hello->control_change(message.channel, message.NORC, message.value));
+		this->midiout->send_message(hello->control_change(
+			message.channel, message.NORC, message.value));
 	} else if (message.message_type == "Note On") {
 		this->midiout->send_message(hello->note_on(
 			message.channel, message.NORC, message.value));
@@ -462,8 +473,6 @@ void MidiAgent::send_message_to_midi_device(MidiMessage message)
 			message.channel, message.NORC, message.value));
 	}
 }
-
-
 
 void MidiAgent::do_obs_action(MidiHook *hook, int MidiVal,
 			      ActionsClass::Actions action)
@@ -484,106 +493,108 @@ void MidiAgent::do_obs_action(MidiHook *hook, int MidiVal,
 	case ActionsClass::Actions::Set_Current_Transition:
 		OBSController::SetCurrentTransition(hook->transition);
 		break;
-	case  ActionsClass::Actions::Set_Mute:
+	case ActionsClass::Actions::Set_Mute:
 		OBSController::SetMute(hook->audio_source, hook->bool_override);
 		break;
-	case  ActionsClass::Actions::Toggle_Start_Stop_Streaming:
+	case ActionsClass::Actions::Toggle_Start_Stop_Streaming:
 		OBSController::StartStopStreaming();
 		break;
-	case  ActionsClass::Actions::Set_Preview_Scene:
+	case ActionsClass::Actions::Set_Preview_Scene:
 		OBSController::SetPreviewScene(hook->scene);
 		break;
-	case  ActionsClass::Actions::Set_Current_Scene_Collection:
+	case ActionsClass::Actions::Set_Current_Scene_Collection:
 		OBSController::SetCurrentSceneCollection(
 			hook->scene_collection);
 		break;
-	case  ActionsClass::Actions::Set_Transition_Duration:
+	case ActionsClass::Actions::Set_Transition_Duration:
 		if (hook->duration != -1) {
 			OBSController::SetTransitionDuration(hook->duration);
 		} else {
 			OBSController::SetTransitionDuration(MidiVal);
 		}
 		break;
-	case  ActionsClass::Actions::Start_Streaming:
+	case ActionsClass::Actions::Start_Streaming:
 		OBSController::StartStreaming();
 		break;
-	case  ActionsClass::Actions::Stop_Streaming:
+	case ActionsClass::Actions::Stop_Streaming:
 		OBSController::StopStreaming();
 		break;
-	case  ActionsClass::Actions::Start_Recording:
+	case ActionsClass::Actions::Start_Recording:
 		OBSController::StartRecording();
 		break;
-	case  ActionsClass::Actions::Stop_Recording:
+	case ActionsClass::Actions::Stop_Recording:
 		OBSController::StopRecording();
 		break;
-	case  ActionsClass::Actions::Start_Replay_Buffer:
+	case ActionsClass::Actions::Start_Replay_Buffer:
 		OBSController::StartReplayBuffer();
 		break;
-	case  ActionsClass::Actions::Stop_Replay_Buffer:
+	case ActionsClass::Actions::Stop_Replay_Buffer:
 		OBSController::StopReplayBuffer();
 		break;
-	case  ActionsClass::Actions::Set_Volume:
+	case ActionsClass::Actions::Set_Volume:
 		OBSController::SetVolume(hook->audio_source,
 					 pow(Utils::mapper(MidiVal), 3.0));
 		break;
-	case  ActionsClass::Actions::Take_Source_Screenshot:
+	case ActionsClass::Actions::Take_Source_Screenshot:
 		OBSController::TakeSourceScreenshot(hook->source);
 		break;
-	case  ActionsClass::Actions::Pause_Recording:
+	case ActionsClass::Actions::Pause_Recording:
 		OBSController::PauseRecording();
 		break;
-	case  ActionsClass::Actions::Enable_Source_Filter:
+	case ActionsClass::Actions::Enable_Source_Filter:
 		OBSController::EnableSourceFilter(obs_get_source_by_name(
 			hook->source.toStdString().c_str()));
 		break;
-	case  ActionsClass::Actions::Disable_Source_Filter:
+	case ActionsClass::Actions::Disable_Source_Filter:
 		OBSController::DisableSourceFilter(obs_get_source_by_name(
 			hook->source.toStdString().c_str()));
 		break;
-	case  ActionsClass::Actions::Toggle_Start_Stop_Recording:
+	case ActionsClass::Actions::Toggle_Start_Stop_Recording:
 		OBSController::StartStopRecording();
 		break;
-	case  ActionsClass::Actions::Toggle_Start_Stop_Replay_Buffer:
+	case ActionsClass::Actions::Toggle_Start_Stop_Replay_Buffer:
 		OBSController::StartStopReplayBuffer();
 		break;
-	case  ActionsClass::Actions::Resume_Recording:
+	case ActionsClass::Actions::Resume_Recording:
 		OBSController::ResumeRecording();
 		break;
-	case  ActionsClass::Actions::Save_Replay_Buffer:
+	case ActionsClass::Actions::Save_Replay_Buffer:
 		OBSController::SaveReplayBuffer();
 		break;
-	case  ActionsClass::Actions::Set_Current_Profile:
+	case ActionsClass::Actions::Set_Current_Profile:
 		OBSController::SetCurrentProfile(hook->profile);
 		break;
-	case  ActionsClass::Actions::Toggle_Source_Filter:
-		OBSController::ToggleSourceFilter(obs_get_source_by_name(hook->source.toStdString().c_str()));
+	case ActionsClass::Actions::Toggle_Source_Filter:
+		OBSController::ToggleSourceFilter(obs_get_source_by_name(
+			hook->source.toStdString().c_str()));
 		break;
-	case  ActionsClass::Actions::Set_Text_GDIPlus_Text:
+	case ActionsClass::Actions::Set_Text_GDIPlus_Text:
 		OBSController::SetTextGDIPlusText(hook->string_override);
 		break;
-	case  ActionsClass::Actions::Set_Browser_Source_URL:
-		OBSController::SetBrowserSourceURL(hook->source, hook->string_override);
+	case ActionsClass::Actions::Set_Browser_Source_URL:
+		OBSController::SetBrowserSourceURL(hook->source,
+						   hook->string_override);
 		break;
-	case  ActionsClass::Actions::Reload_Browser_Source:
+	case ActionsClass::Actions::Reload_Browser_Source:
 		OBSController::ReloadBrowserSource(hook->source);
 		break;
-	case  ActionsClass::Actions::Set_Sync_Offset:
+	case ActionsClass::Actions::Set_Sync_Offset:
 		OBSController::SetSyncOffset(hook->media_source,
 					     (int64_t)MidiVal);
 		break;
-	case  ActionsClass::Actions::Set_Source_Rotation:
+	case ActionsClass::Actions::Set_Source_Rotation:
 		OBSController::SetSourceRotation();
 		break;
-	case  ActionsClass::Actions::Set_Source_Position:
+	case ActionsClass::Actions::Set_Source_Position:
 		OBSController::SetSourcePosition();
 		break;
-	case  ActionsClass::Actions::Set_Gain_Filter:
+	case ActionsClass::Actions::Set_Gain_Filter:
 		OBSController::SetGainFilter();
 		break;
-	case  ActionsClass::Actions::Set_Opacity:
+	case ActionsClass::Actions::Set_Opacity:
 		OBSController::SetOpacity();
 		break;
-	case  ActionsClass::Actions::Set_Source_Scale:
+	case ActionsClass::Actions::Set_Source_Scale:
 		OBSController::SetSourceScale();
 		break;
 	case ActionsClass::Actions::Move_T_Bar:

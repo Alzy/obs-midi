@@ -44,14 +44,16 @@ auto get(T const& async)
     slim_condition_variable cv;
     bool completed = false;
 
-    async.Completed([&](auto&&, auto&&) {
-      {
-        slim_lock_guard const guard(m);
-        completed = true;
-      }
+    async.Completed(
+        [&](auto&&, auto&&)
+        {
+          {
+            slim_lock_guard const guard(m);
+            completed = true;
+          }
 
-      cv.notify_one();
-    });
+          cv.notify_one();
+        });
 
     slim_lock_guard guard(m);
     cv.wait(m, [&] { return completed; });
@@ -322,26 +324,28 @@ public:
       port_ = get(MidiInPort::FromIdAsync(id));
       if (port_)
       {
-        port_.MessageReceived([=](auto&, auto args) {
-          const auto& msg = args.Message();
+        port_.MessageReceived(
+            [=](auto&, auto args)
+            {
+              const auto& msg = args.Message();
 
-          auto reader = DataReader::FromBuffer(msg.RawData());
-          array_view<uint8_t> bs;
-          reader.ReadBytes(bs);
+              auto reader = DataReader::FromBuffer(msg.RawData());
+              array_view<uint8_t> bs;
+              reader.ReadBytes(bs);
 
-          double t = static_cast<double>(msg.Timestamp().count());
+              double t = static_cast<double>(msg.Timestamp().count());
 
-          rtmidi::message m{{bs.begin(), bs.end()}, t};
-          if (inputData_.userCallback)
-          {
-            inputData_.userCallback(m);
-          }
-          else
-          {
-            if (!inputData_.queue.push(m))
-              std::cerr << "\nmidi_in_winuwp: message queue limit reached!!\n\n";
-          }
-        });
+              rtmidi::message m{{bs.begin(), bs.end()}, t};
+              if (inputData_.userCallback)
+              {
+                inputData_.userCallback(m);
+              }
+              else
+              {
+                if (!inputData_.queue.push(m))
+                  std::cerr << "\nmidi_in_winuwp: message queue limit reached!!\n\n";
+              }
+            });
       }
     }
   }

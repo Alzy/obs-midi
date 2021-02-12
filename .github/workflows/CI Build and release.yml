@@ -531,7 +531,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ github.workspace }}/${{ env.GIT_HASH }}-macOS/obs-midi-${{ env.GIT_HASH }}-macOS.pkg
-          asset_name: obs-midi-${{ env.GIT_HASH }}-macOS-Unsigned.pkg
+          asset_name: obs-midi-${{ env.GIT_HASH }}-macOS.pkg
           asset_content_type: application/octet-stream
       - name: 'Upload Linux artifact to release'
         uses: actions/upload-release-asset@v1

@@ -78,7 +78,7 @@ private:
 	bool first_run;
 	bool map_exists();
 	int map_location(MidiMessage message);
-
+	bool verify_mapping();
 private:
 	QGridLayout *layout;
 	QStringList *items;

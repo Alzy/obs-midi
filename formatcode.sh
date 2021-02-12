@@ -27,4 +27,4 @@ fi
 
 find . -type d \( -o -path ./src \
 -o -path ./src/forms \) -prune -type f -o -name '*.h' -or -name '*.hpp' -or -name '*.m' -or -name '*.mm' -or -name '*.c' -or -name '*.cpp' \
-| xargs -L100 -P${NPROC} ${CLANG_FORMAT}  -style=file  -fallback-style=none
+| xargs -L100 -P${NPROC} ${CLANG_FORMAT} -i -style=file  -fallback-style=none -

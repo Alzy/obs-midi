@@ -141,7 +141,7 @@ jobs:
           set -e
           xcrun altool  --store-password-in-keychain-item "AC_PASSWORD" -u "${{ secrets.MACOS_IDENT_USER }}" -p "${{ secrets.MACOS_IDENT_PASS }}"
           xcnotary precheck ./release/${{ env.MAC_FILENAME }}
-          if [ "$?" -eq 0 ]; then xcnotary notarize ./release/${{ env.MAC_FILENAME }} --developer-account "${{ secrets.MACOS_IDENT_USER }}" --developer-password-keychain-item "AC_PASSWORD" ; fi
+          if [ "$?" -eq 0 ]; then xcnotary notarize ./release/${{ env.MAC_FILENAME }} --developer-account "${{ secrets.MACOS_IDENT_USER }}" --developer-password-keychain-item "AC_PASSWORD" --provider "${{ secrets.MACOS_IDENT_PROVIDER }}"; fi
 
       - name: 'Publish ${{ env.MAC_FILENAME }} artifact'
         if: success()

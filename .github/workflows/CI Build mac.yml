@@ -124,6 +124,7 @@ jobs:
           mv ./release/obs-midi.pkg ./release/${{ env.MAC_FILENAME_UNSIGNED }}
           productsign --sign "${{ secrets.MACOS_IDENT_INSTALLER }}" ./release/${{ env.MAC_FILENAME_UNSIGNED }} ./release/${{ env.MAC_FILENAME }}
           rm ./release/${{ env.MAC_FILENAME_UNSIGNED }}
+          
       - name: 'Notarization'
         if: success()
         working-directory: ./obs-midi

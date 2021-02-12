@@ -82,7 +82,6 @@ PluginWindow::PluginWindow(QWidget *parent)
 }
 void PluginWindow::ToggleShowHide()
 {
-
 	if (!isVisible()) {
 		SetAvailableDevices();
 		ui->cb_obs_output_audio_source->clear();
@@ -111,13 +110,9 @@ void PluginWindow::setCheck(bool x)
 }
 void PluginWindow::SetAvailableDevices()
 {
-
 	auto midiOutDevices = GetDeviceManager()->GetOutPortsList();
-
 	auto midiDevices = GetDeviceManager()->GetPortsList();
-
 	this->ui->list_midi_dev->clear();
-
 	if (midiDevices.size() == 0) {
 		this->ui->list_midi_dev->addItem("No Devices Available");
 		ui->tab_configure->setEnabled(false);
@@ -178,7 +173,6 @@ void PluginWindow::select_output_device(QString selectedDeviceName)
 }
 int PluginWindow::on_check_enabled_state_changed(int state)
 {
-
 	if (state == Qt::CheckState::Checked) {
 		auto selectedDeviceName =
 			ui->list_midi_dev->currentItem()->text().toStdString();
@@ -284,7 +278,6 @@ int PluginWindow::on_bid_enabled_state_changed(int state)
 }
 PluginWindow::~PluginWindow()
 {
-
 	loadingdevices = false;
 	starting = true;
 	disconnect(desconnect);
@@ -350,7 +343,6 @@ void PluginWindow::set_headers()
 }
 void PluginWindow::ShowPair(Pairs Pair)
 {
-
 	switch (Pair) {
 	case Pairs::Scene:
 		ui->label_obs_output_scene->show();
@@ -495,21 +487,18 @@ void PluginWindow::get_transitions()
 }
 void PluginWindow::on_source_change(QString source)
 {
-
 	get_filters(source);
 	ui->cb_obs_output_item->clear();
 	ui->cb_obs_output_item->addItems(Utils::GetSceneItemsList(source));
 }
 void PluginWindow::on_scene_change(QString scene)
 {
-
 	get_sources(scene);
 	ui->cb_obs_output_item->clear();
 	ui->cb_obs_output_item->addItems(Utils::GetSceneItemsList(scene));
 }
 void PluginWindow::ShowOnly(QList<ActionsClass::Actions> shows)
 {
-
 	ui->cb_obs_output_action->clear();
 	for (int i = 0; i < shows.size(); i++) {
 		ui->cb_obs_output_action->addItem(obs_module_text(
@@ -568,7 +557,6 @@ void PluginWindow::ShowEntries(QList<ActionsClass::Actions> entrys)
 }
 void PluginWindow::get_sources(QString scene)
 {
-
 	ui->cb_obs_output_source->clear();
 	auto arrayref = Utils::GetSceneArray(scene);
 	int size = obs_data_array_count(arrayref);
@@ -597,9 +585,7 @@ void PluginWindow::get_scenes()
 }
 void PluginWindow::get_filters(QString source)
 {
-
 	ui->cb_obs_output_filter->clear();
-
 	auto x = obs_get_source_by_name(source.toStdString().c_str());
 	OBSDataArrayAutoRelease y = Utils::GetSourceFiltersList(x, false);
 	for (int i = 0; i < obs_data_array_count(y); i++) {
@@ -616,7 +602,6 @@ void PluginWindow::obs_actions_select(QString action)
 {
 	if (!switching) {
 		HideAllPairs();
-
 		switch (ActionsClass::string_to_action(untranslate(action))) {
 		case ActionsClass::Actions::Set_Current_Scene:
 			ShowPair(Pairs::Scene);

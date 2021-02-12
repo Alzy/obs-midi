@@ -407,8 +407,8 @@ jobs:
         if: success()
         shell: bash
         run: |
-          FILENAME_UNSIGNED="obs-midi-${{ env.GIT_TAG }}-macOS-Unsigned.pkg"
-          FILENAME="obs-midi-${{ env.GIT_TAG }}-macOS.pkg"
+          FILENAME_UNSIGNED="obs-midi-${{ env.GIT_HASH }}-macOS-Unsigned.pkg"
+          FILENAME="obs-midi-${{ env.GIT_HASH }}-macOS.pkg"
           echo "::set-env name=MAC_FILENAME_UNSIGNED::$FILENAME_UNSIGNED"
           echo "::set-env name=MAC_FILENAME::$FILENAME"
       - name: 'Fix linked dynamic library paths'

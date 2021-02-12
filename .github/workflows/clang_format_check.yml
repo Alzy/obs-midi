@@ -28,7 +28,6 @@ jobs:
 
       - name: Check the Formatting
         run: |
-          ls -al
-          pwd
+          chmod +x ./formatcode.sh
           ./formatcode.sh
           ./CI/check-format.sh

@@ -193,9 +193,7 @@ int PluginWindow::on_check_enabled_state_changed(int state)
 				selectedDeviceName.c_str());
 			device->open_midi_input_port(devicePort);
 			device->open_midi_output_port(deviceOutPort);
-
 		} else {
-
 			device->open_midi_input_port(devicePort);
 			device->open_midi_output_port(deviceOutPort);
 		}
@@ -206,7 +204,6 @@ int PluginWindow::on_check_enabled_state_changed(int state)
 		ui->outbox->setEnabled(true);
 	}
 	//ui->outbox->setCurrentText(QString::fromStdString(device->GetOutName()));
-
 	GetConfig()->Save();
 	//on_device_select(ui->list_midi_dev->currentItem()->text());
 	return state;
@@ -216,7 +213,6 @@ void PluginWindow::on_device_select(QString curitem)
 	auto devicemanager = GetDeviceManager();
 	auto config = GetConfig();
 	MidiAgent *MAdevice = devicemanager->GetMidiDeviceByName(curitem);
-
 	ui->tabWidget->setTabText(1, QString("Configure - ").append(curitem));
 	// Pull info on if device is enabled, if so set true if not set false
 	if (MAdevice != NULL && MAdevice->isEnabled()) {
@@ -225,18 +221,15 @@ void PluginWindow::on_device_select(QString curitem)
 		ui->bidirectional->setEnabled(true);
 		ui->bidirectional->setChecked(MAdevice->isBidirectional());
 		ui->outbox->setCurrentText(MAdevice->get_midi_output_name());
-
 	} else {
 		ui->check_enabled->setChecked(false);
 		ui->outbox->setEnabled(false);
 		ui->bidirectional->setEnabled(false);
 	}
-
 	///HOOK up the Message Handler
 	connect(MAdevice, SIGNAL(broadcast_midi_message(MidiMessage)), this,
 		SLOT(handle_midi_message(
 			MidiMessage))); /// name, mtype, norc, channel
-
 	ui->mapping_lbl_device_name->setText(curitem);
 }
 void PluginWindow::handle_midi_message(MidiMessage mess)
@@ -289,7 +282,6 @@ void PluginWindow::get_scene_names()
 	obs_frontend_get_scenes(&sceneList);
 	SceneList.clear();
 	for (size_t i = 0; i < sceneList.sources.num; i++) {
-
 		SceneList.append(
 			obs_source_get_name(sceneList.sources.array[i]));
 	}
@@ -739,7 +731,6 @@ void PluginWindow::add_new_mapping()
 	ui->btn_Listen_many->setChecked(false);
 	ui->btn_Listen_one->setChecked(false);
 	if (!map_exists() && verify_mapping()) {
-
 		int row = ui->table_mapping->rowCount();
 		ui->table_mapping->insertRow(row);
 		QTableWidgetItem *channelitem = new QTableWidgetItem(

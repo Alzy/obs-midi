@@ -90,12 +90,23 @@ include_directories(
 	${Qt5Core_INCLUDES}
 	${Qt5Widgets_INCLUDES}
 	"${CMAKE_SOURCE_DIR}/deps/asio/asio/include")
-target_link_libraries(obs-midi
-	"${OBS_FRONTEND_LIB}"
-	${obs-midi_DEPS}
-	Qt5::Core
-	Qt5::Widgets
-	libobs)
+if(LINUX)
+	include_directories(/usr/include/obs)
+	target_link_libraries(obs-midi
+		"${OBS_FRONTEND_LIB}"
+		${obs-midi_DEPS}
+		Qt5::Core
+		Qt5::Widgets
+		libobs.so)
+	
+else()
+	target_link_libraries(obs-midi
+		"${OBS_FRONTEND_LIB}"
+		${obs-midi_DEPS}
+		Qt5::Core
+		Qt5::Widgets
+		libobs)
+endif()
 # --- Windows-specific build settings and tasks ---
 if(WIN32)
 	if(NOT DEFINED OBS_FRONTEND_LIB)

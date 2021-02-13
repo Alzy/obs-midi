@@ -5,6 +5,7 @@ on:
     branches:
       - release
       - master
+      - macCItest
     paths-ignore:
       - 'docs/**'
   pull_request:
@@ -447,11 +448,12 @@ jobs:
         run: |
           set -e
           echo "store password"
-          xcrun altool  --store-password-in-keychain-item "AC_PASSWORD" -u "${{ secrets.MACOS_IDENT_USER }}" -p "${{ secrets.MACOS_IDENT_PASS }}"
+          
+          xcrun altool  --store-password-in-keychain-item "AC_PASSWORD" -u "${{ secrets.MACOS_IDENT_USER }}" -p "${{ secrets.MACOS_AC_PASS  }}"
           echo "xcnotary precheck"
           xcnotary precheck ./release/${{ env.MAC_FILENAME }}
-          echo "xcnotary notarize Currently Disabled"
-          #if [ "$?" -eq 0 ]; then xcnotary notarize ./release/${{ env.MAC_FILENAME }} -d "cpyarger@gmail.com" -k "AC_PASSWORD"; fi
+          echo "xcnotary notarize Currently enabled"
+          if [ "$?" -eq 0 ]; then xcnotary notarize ./release/${{ env.MAC_FILENAME }} -d "cpyarger@gmail.com" -k "AC_PASSWORD"; fi
 
       - name: 'Publish ${{ env.MAC_FILENAME }} artifact'
         if: success()

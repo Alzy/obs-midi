@@ -448,7 +448,9 @@ jobs:
         run: |
           set -e
           echo "store password"
+          
           xcrun altool  --store-password-in-keychain-item "AC_PASSWORD" -u "${{ secrets.MACOS_IDENT_USER }}" -p "${{ secrets.MACOS_IDENT_PASS }}"
+          xcrun altool -u "${{ secrets.MACOS_IDENT_USER }}"  -p "AC_PASSWORD" --notarize-app --file  ./release/${{ env.MAC_FILENAME }} --output-format xml
           echo "xcnotary precheck"
           xcnotary precheck ./release/${{ env.MAC_FILENAME }}
           echo "xcnotary notarize Currently enabled"

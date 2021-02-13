@@ -450,7 +450,6 @@ jobs:
           echo "store password"
           
           xcrun altool  --store-password-in-keychain-item "AC_PASSWORD" -u "${{ secrets.MACOS_IDENT_USER }}" -p "${{ secrets.MACOS_AC_PASS  }}"
-          xcrun altool -u "${{ secrets.MACOS_IDENT_USER }}"  -p "${{ secrets.MACOS_AC_PASS  }}" --notarize-app --file  ./release/${{ env.MAC_FILENAME }} --output-format xml
           echo "xcnotary precheck"
           xcnotary precheck ./release/${{ env.MAC_FILENAME }}
           echo "xcnotary notarize Currently enabled"

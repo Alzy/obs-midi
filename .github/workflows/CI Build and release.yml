@@ -448,7 +448,7 @@ jobs:
         run: |
           set -e
           echo "store password"
-          
+
           xcrun altool  --store-password-in-keychain-item "AC_PASSWORD" -u "${{ secrets.MACOS_IDENT_USER }}" -p "${{ secrets.MACOS_AC_PASS  }}"
           echo "xcnotary precheck"
           xcnotary precheck ./release/${{ env.MAC_FILENAME }}
@@ -543,4 +543,13 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ github.workspace }}/${{ env.GIT_HASH }}-linux/obs-midi-${{ env.GIT_HASH }}-1_amd64.deb
           asset_name: obs-midi-${{ env.GIT_HASH }}-1_amd64.deb
+          asset_content_type: application/octet-stream
+      - name: 'Upload Linux tar artifact to release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ github.workspace }}/${{ env.GIT_HASH }}-linux/obs-midi-${{ env.GIT_HASH }}-x64.tar.gz
+          asset_name: obs-midi-${{ env.GIT_HASH }}-x64.tar.gz
           asset_content_type: application/octet-stream

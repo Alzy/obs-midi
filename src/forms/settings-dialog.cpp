@@ -333,7 +333,7 @@ void PluginWindow::add_midi_device(QString name)
 	device_name->setText(name);
 	device_enabled->setCheckState(Qt::Unchecked);
 	device_status->setText(QString("Disconnected"));
-	device_status->setTextColor("grey");
+	//device_status->setForeground("grey");
 	feedback_name->setText("");
 	feedback_enabled->setCheckState(Qt::Unchecked);
 	feedback_status->setText(QString("unset"));
@@ -353,17 +353,17 @@ void PluginWindow::set_headers()
 	QColor midicolor("#00aaff");
 
 	QColor actioncolor("#aa00ff");
-	ui->table_mapping->horizontalHeaderItem(0)->setTextColor(midicolor);
-	ui->table_mapping->horizontalHeaderItem(1)->setTextColor(midicolor);
-	ui->table_mapping->horizontalHeaderItem(2)->setTextColor(midicolor);
-	ui->table_mapping->horizontalHeaderItem(3)->setTextColor(actioncolor);
-	ui->table_mapping->horizontalHeaderItem(4)->setTextColor(actioncolor);
-	ui->table_mapping->horizontalHeaderItem(5)->setTextColor(actioncolor);
-	ui->table_mapping->horizontalHeaderItem(6)->setTextColor(actioncolor);
-	ui->table_mapping->horizontalHeaderItem(7)->setTextColor(actioncolor);
-	ui->table_mapping->horizontalHeaderItem(8)->setTextColor(actioncolor);
-	ui->table_mapping->horizontalHeaderItem(9)->setTextColor(actioncolor);
-	ui->table_mapping->horizontalHeaderItem(10)->setTextColor(actioncolor);
+	ui->table_mapping->horizontalHeaderItem(0)->setForeground(midicolor);
+	ui->table_mapping->horizontalHeaderItem(1)->setForeground(midicolor);
+	ui->table_mapping->horizontalHeaderItem(2)->setForeground(midicolor);
+	ui->table_mapping->horizontalHeaderItem(3)->setForeground(actioncolor);
+	ui->table_mapping->horizontalHeaderItem(4)->setForeground(actioncolor);
+	ui->table_mapping->horizontalHeaderItem(5)->setForeground(actioncolor);
+	ui->table_mapping->horizontalHeaderItem(6)->setForeground(actioncolor);
+	ui->table_mapping->horizontalHeaderItem(7)->setForeground(actioncolor);
+	ui->table_mapping->horizontalHeaderItem(8)->setForeground(actioncolor);
+	ui->table_mapping->horizontalHeaderItem(9)->setForeground(actioncolor);
+	ui->table_mapping->horizontalHeaderItem(10)->setForeground(actioncolor);
 }
 
 void PluginWindow::ShowPair(Pairs Pair)
@@ -910,7 +910,7 @@ void PluginWindow::set_cell_colors(QColor color, QTableWidgetItem* item)
 	QColor txcolor;
 	txcolor.black();
 	item->setBackgroundColor(txcolor);
-	item->setTextColor(color);
+	item->setForeground(color);
 }
 
 void PluginWindow::tab_changed(int i)

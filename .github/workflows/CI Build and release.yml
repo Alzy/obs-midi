@@ -521,9 +521,9 @@ jobs:
         run: |
           cd ${{ github.workspace }}
           ls -la
-          echo "linux"
+          echo ${{ github.workspace }}/${{ env.GIT_HASH }}-linux
           ls -la ${{ github.workspace }}/${{ env.GIT_HASH }}-linux
-          echo "macos"
+          echo ${{ github.workspace }}/${{ env.GIT_HASH }}-macOS
           ls -la ${{ github.workspace }}/${{ env.GIT_HASH }}-macOS
           mv ${{ github.workspace }}/${{ env.GIT_HASH }}-linux/*.deb ${{ github.workspace }}/${{ env.GIT_HASH }}-linux/obs-midi-${{ env.GIT_HASH }}-1_amd64.deb
       - name: 'Upload macOS artifact to release'
@@ -550,6 +550,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/${{ env.GIT_HASH }}-linux/obs-midi-${{ env.GIT_HASH }}-x64.tar.gz
-          asset_name: obs-midi-${{ env.GIT_HASH }}-x64.tar.gz
+          asset_path: ${{ github.workspace }}/${{ env.GIT_HASH }}-linux/obs-midi-Linux-${{ env.GIT_HASH }}-x64.tar.gz
+          asset_name: obs-midi-Linux-${{ env.GIT_HASH }}-x64.tar.gz
           asset_content_type: application/octet-stream

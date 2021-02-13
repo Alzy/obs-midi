@@ -310,13 +310,13 @@ jobs:
           tar -czvf obs-midi-Linux-${{ env.GIT_HASH }}-x64.tar.gz obs-studio
           pwd
 
-      - name: 'Publish ${{ env.LINUX_FILENAME }}'
+      - name: 'Publish Deb'
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
           name: '${{ env.GIT_HASH }}-linux'
           path: '${{ github.workspace }}/obs-midi/package/*.deb'
-      - name: 'Publish ${{ env.LINUX_FILENAME }}'
+      - name: 'Publish Tar'
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:

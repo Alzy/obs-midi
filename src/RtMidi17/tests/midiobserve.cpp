@@ -24,18 +24,14 @@ try
   for (auto api : rtmidi::available_apis())
   {
     rtmidi::observer::callbacks cbs;
-    cbs.input_added = [=](int i, std::string n) {
-      std::cerr << apiMap[api] << " : input added " << i << " => " << n << "\n";
-    };
-    cbs.input_removed = [=](int i, std::string n) {
-      std::cerr << apiMap[api] << " : input removed " << i << " => " << n << "\n";
-    };
-    cbs.output_added = [=](int i, std::string n) {
-      std::cerr << apiMap[api] << " : output added " << i << " => " << n << "\n";
-    };
-    cbs.output_removed = [=](int i, std::string n) {
-      std::cerr << apiMap[api] << " : output removed " << i << " => " << n << "\n";
-    };
+    cbs.input_added = [=](int i, std::string n)
+    { std::cerr << apiMap[api] << " : input added " << i << " => " << n << "\n"; };
+    cbs.input_removed = [=](int i, std::string n)
+    { std::cerr << apiMap[api] << " : input removed " << i << " => " << n << "\n"; };
+    cbs.output_added = [=](int i, std::string n)
+    { std::cerr << apiMap[api] << " : output added " << i << " => " << n << "\n"; };
+    cbs.output_removed = [=](int i, std::string n)
+    { std::cerr << apiMap[api] << " : output removed " << i << " => " << n << "\n"; };
     std::cout << "  " << apiMap[api] << std::endl;
     observers.push_back(std::make_unique<rtmidi::observer>(api, cbs));
   }

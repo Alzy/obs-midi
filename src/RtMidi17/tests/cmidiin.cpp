@@ -84,13 +84,15 @@ try
   // Set our callback function.  This should be done immediately after
   // opening the port to avoid having incoming messages written to the
   // queue instead of sent to the callback function.
-  midiin.set_callback([](const rtmidi::message& message) {
-    auto nBytes = message.size();
-    for (auto i = 0U; i < nBytes; i++)
-      std::cout << "Byte " << i << " = " << (int)message[i] << ", ";
-    if (nBytes > 0)
-      std::cout << "stamp = " << message.timestamp << std::endl;
-  });
+  midiin.set_callback(
+      [](const rtmidi::message& message)
+      {
+        auto nBytes = message.size();
+        for (auto i = 0U; i < nBytes; i++)
+          std::cout << "Byte " << i << " = " << (int)message[i] << ", ";
+        if (nBytes > 0)
+          std::cout << "stamp = " << message.timestamp << std::endl;
+      });
 
   // Don't ignore sysex, timing, or active sensing messages.
   midiin.ignore_types(false, false, false);

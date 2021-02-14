@@ -19,6 +19,10 @@ Use MIDI devices to trigger events in OBS and visa versa.
 
   * Select your controller, hit configure, Toggle a button and fader, remap it to an action and hit save!
 
+# Installing Extra Steps - MAC
+- If you are unable to see obs-midi in the tools you will need to install jack
+- https://jackaudio.org/downloads/
+
 
 
 Currently runs on Windows and Linux, and is partly tested on MAC

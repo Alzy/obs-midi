@@ -19,10 +19,9 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "RpcRequest.h"
 #include "RpcResponse.h"
 
-RpcRequest::RpcRequest(const QString& messageId, const QString& methodName, obs_data_t* params) :
-	_messageId(messageId),
-	_methodName(methodName),
-	_parameters(nullptr)
+RpcRequest::RpcRequest(const QString &messageId, const QString &methodName,
+		       obs_data_t *params)
+	: _messageId(messageId), _methodName(methodName), _parameters(nullptr)
 {
 	if (params) {
 		_parameters = obs_data_create();
@@ -30,23 +29,26 @@ RpcRequest::RpcRequest(const QString& messageId, const QString& methodName, obs_
 	}
 }
 
-const RpcResponse RpcRequest::success(obs_data_t* additionalFields) const
+const RpcResponse RpcRequest::success(obs_data_t *additionalFields) const
 {
 	return RpcResponse::ok(*this, additionalFields);
 }
 
-const RpcResponse RpcRequest::failed(const QString& errorMessage, obs_data_t* additionalFields) const
+const RpcResponse RpcRequest::failed(const QString &errorMessage,
+				     obs_data_t *additionalFields) const
 {
 	return RpcResponse::fail(*this, errorMessage, additionalFields);
 }
 
-const bool RpcRequest::hasField(QString name, obs_data_type expectedFieldType, obs_data_number_type expectedNumberType) const
+const bool RpcRequest::hasField(QString name, obs_data_type expectedFieldType,
+				obs_data_number_type expectedNumberType) const
 {
 	if (!_parameters || name.isEmpty() || name.isNull()) {
 		return false;
 	}
 
-	OBSDataItemAutoRelease dataItem = obs_data_item_byname(_parameters, name.toUtf8());
+	OBSDataItemAutoRelease dataItem =
+		obs_data_item_byname(_parameters, name.toUtf8());
 	if (!dataItem) {
 		return false;
 	}
@@ -57,8 +59,10 @@ const bool RpcRequest::hasField(QString name, obs_data_type expectedFieldType, o
 			return false;
 		}
 
-		if (fieldType == OBS_DATA_NUMBER && expectedNumberType != OBS_DATA_NUM_INVALID) {
-			obs_data_number_type numberType = obs_data_item_numtype(dataItem);
+		if (fieldType == OBS_DATA_NUMBER &&
+		    expectedNumberType != OBS_DATA_NUM_INVALID) {
+			obs_data_number_type numberType =
+				obs_data_item_numtype(dataItem);
 			if (numberType != expectedNumberType) {
 				return false;
 			}
@@ -78,7 +82,8 @@ const bool RpcRequest::hasString(QString fieldName) const
 	return this->hasField(fieldName, OBS_DATA_STRING);
 }
 
-const bool RpcRequest::hasNumber(QString fieldName, obs_data_number_type expectedNumberType) const
+const bool RpcRequest::hasNumber(QString fieldName,
+				 obs_data_number_type expectedNumberType) const
 {
 	return this->hasField(fieldName, OBS_DATA_NUMBER, expectedNumberType);
 }

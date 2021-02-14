@@ -79,6 +79,7 @@ private:
 	bool map_exists();
 	int map_location(MidiMessage message);
 	bool verify_mapping();
+
 private:
 	QGridLayout *layout;
 	QStringList *items;
@@ -92,5 +93,4 @@ private:
 	void ShowEntries(QList<ActionsClass::Actions> entrys);
 	QString untranslate(QString translation);
 	QListView *listview;
-	
 };

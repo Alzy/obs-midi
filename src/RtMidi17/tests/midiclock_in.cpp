@@ -69,30 +69,32 @@ try
   // opening the port to avoid having incoming messages written to the
   // queue instead of sent to the callback function.
   unsigned int clock_count = 0;
-  midiin.set_callback([&](const rtmidi::message& message) {
-    // Ignore longer messages
-    if (message.size() != 1)
-      return;
-
-    unsigned int msg = message[0];
-    if (msg == 0xFA)
-      std::cout << "START received" << std::endl;
-    if (msg == 0xFB)
-      std::cout << "CONTINUE received" << std::endl;
-    if (msg == 0xFC)
-      std::cout << "STOP received" << std::endl;
-    if (msg == 0xF8)
-    {
-      if (++clock_count == 24)
+  midiin.set_callback(
+      [&](const rtmidi::message& message)
       {
-        double bpm = 60.0 / 24.0 / message.timestamp;
-        std::cout << "One beat, estimated BPM = " << bpm << std::endl;
-        clock_count = 0;
-      }
-    }
-    else
-      clock_count = 0;
-  });
+        // Ignore longer messages
+        if (message.size() != 1)
+          return;
+
+        unsigned int msg = message[0];
+        if (msg == 0xFA)
+          std::cout << "START received" << std::endl;
+        if (msg == 0xFB)
+          std::cout << "CONTINUE received" << std::endl;
+        if (msg == 0xFC)
+          std::cout << "STOP received" << std::endl;
+        if (msg == 0xF8)
+        {
+          if (++clock_count == 24)
+          {
+            double bpm = 60.0 / 24.0 / message.timestamp;
+            std::cout << "One beat, estimated BPM = " << bpm << std::endl;
+            clock_count = 0;
+          }
+        }
+        else
+          clock_count = 0;
+      });
 
   // Don't ignore sysex, timing, or active sensing messages.
   midiin.ignore_types(false, false, false);

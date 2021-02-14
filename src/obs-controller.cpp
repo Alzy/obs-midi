@@ -27,7 +27,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #endif
 using namespace std;
 
-
 ////////////////////
 // BUTTON ACTIONS //
 ////////////////////
@@ -343,21 +342,23 @@ void OBSController::SetCurrentProfile(QString profileName)
 
 void OBSController::SetTextGDIPlusText(QString text) {}
 
-void OBSController::SetBrowserSourceURL(QString sourceName, QString url) {
+void OBSController::SetBrowserSourceURL(QString sourceName, QString url)
+{
 
-	OBSSourceAutoRelease source = obs_get_source_by_name(sourceName.toStdString().c_str());
+	OBSSourceAutoRelease source =
+		obs_get_source_by_name(sourceName.toStdString().c_str());
 	QString sourceId = obs_source_get_id(source);
 	if (sourceId != "browser_source" && sourceId != "linuxbrowser-source") {
 		return Utils::alert_popup("Not a browser Source");
 	}
 
 	OBSDataAutoRelease settings = obs_source_get_settings(source);
-	obs_data_set_string(settings, "url",
-				    url.toStdString().c_str());
+	obs_data_set_string(settings, "url", url.toStdString().c_str());
 	obs_source_update(source, settings);
 }
 
-void OBSController::ReloadBrowserSource(QString sourceName) {
+void OBSController::ReloadBrowserSource(QString sourceName)
+{
 	OBSSourceAutoRelease source =
 		obs_get_source_by_name(sourceName.toUtf8());
 	obs_properties_t *sourceProperties = obs_source_properties(source);
@@ -373,11 +374,12 @@ void OBSController::TakeSourceScreenshot(QString source) {}
 
 void OBSController::EnableSourceFilter(obs_source_t *source)
 {
-	obs_source_set_enabled(source,true);
+	obs_source_set_enabled(source, true);
 	obs_source_release(source);
 }
 
-void OBSController::DisableSourceFilter(obs_source_t *source) {
+void OBSController::DisableSourceFilter(obs_source_t *source)
+{
 	obs_source_set_enabled(source, true);
 	obs_source_release(source);
 }
@@ -389,7 +391,6 @@ void OBSController::ToggleSourceFilter(obs_source_t *source)
 	} else {
 		EnableSourceFilter(source);
 	}
-
 }
 
 ////////////////
@@ -434,15 +435,17 @@ void OBSController::SetSourceScale() {}
 void OBSController::SetGainFilter() {}
 
 void OBSController::SetOpacity() {}
-void OBSController::move_t_bar(int move) {
-	
+void OBSController::move_t_bar(int move)
+{
+
 	if (obs_frontend_preview_program_mode_active()) {
 
 		obs_frontend_set_tbar_position(Utils::t_bar_mapper(move));
 		obs_frontend_release_tbar();
 	}
 }
-void OBSController::play_pause_media_source(QString media_source) {
+void OBSController::play_pause_media_source(QString media_source)
+{
 	OBSSourceAutoRelease source =
 		obs_get_source_by_name(media_source.toStdString().c_str());
 	switch (obs_source_media_get_state(source)) {
@@ -455,30 +458,26 @@ void OBSController::play_pause_media_source(QString media_source) {
 	case obs_media_state::OBS_MEDIA_STATE_ENDED:
 		obs_source_media_restart(source);
 		break;
-
 	}
 }
 
-// TODO:: Fix this 
-void OBSController::toggle_studio_mode() {
+// TODO:: Fix this
+void OBSController::toggle_studio_mode()
+{
 	if (obs_frontend_preview_program_mode_active()) {
 		obs_frontend_set_preview_program_mode(false);
 
 	} else {
 		obs_frontend_set_preview_program_mode(true);
 	}
-	
-	
 }
-void OBSController::reset_stats() {
+void OBSController::reset_stats() {}
+void OBSController::restart_media(QString media_source)
+{
+
+	obs_source_media_restart(
+		obs_get_source_by_name(media_source.toStdString().c_str()));
 }
-void OBSController::restart_media(QString media_source) {
-
-	obs_source_media_restart(obs_get_source_by_name(media_source.toStdString().c_str()));
-	
-
-}
-
 
 void OBSController::stop_media(QString media_source)
 {

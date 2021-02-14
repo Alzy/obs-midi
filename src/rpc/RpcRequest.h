@@ -25,34 +25,30 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 // forward declarations
 class RpcResponse;
 
-class RpcRequest
-{
+class RpcRequest {
 public:
-	explicit RpcRequest(const QString& messageId, const QString& methodName, obs_data_t* params);
-	
-	const QString& messageId() const
-	{
-		return _messageId;
-	}
-		
-	const QString& methodName() const
-	{
-		return _methodName;
-	}
+	explicit RpcRequest(const QString &messageId, const QString &methodName,
+			    obs_data_t *params);
 
-	const OBSData parameters() const
-	{
-		return OBSData(_parameters);
-	}
+	const QString &messageId() const { return _messageId; }
 
-	const RpcResponse success(obs_data_t* additionalFields = nullptr) const;
-	const RpcResponse failed(const QString& errorMessage, obs_data_t* additionalFields = nullptr) const;
+	const QString &methodName() const { return _methodName; }
 
-	const bool hasField(QString fieldName, obs_data_type expectedFieldType = OBS_DATA_NULL,
-					obs_data_number_type expectedNumberType = OBS_DATA_NUM_INVALID) const;
+	const OBSData parameters() const { return OBSData(_parameters); }
+
+	const RpcResponse success(obs_data_t *additionalFields = nullptr) const;
+	const RpcResponse failed(const QString &errorMessage,
+				 obs_data_t *additionalFields = nullptr) const;
+
+	const bool hasField(QString fieldName,
+			    obs_data_type expectedFieldType = OBS_DATA_NULL,
+			    obs_data_number_type expectedNumberType =
+				    OBS_DATA_NUM_INVALID) const;
 	const bool hasBool(QString fieldName) const;
 	const bool hasString(QString fieldName) const;
-	const bool hasNumber(QString fieldName, obs_data_number_type expectedNumberType = OBS_DATA_NUM_INVALID) const;
+	const bool hasNumber(QString fieldName,
+			     obs_data_number_type expectedNumberType =
+				     OBS_DATA_NUM_INVALID) const;
 	const bool hasInteger(QString fieldName) const;
 	const bool hasDouble(QString fieldName) const;
 	const bool hasArray(QString fieldName) const;

@@ -48,7 +48,18 @@ typedef struct MidiMessage {
 	int value;
 } MidiMessage;
 Q_DECLARE_METATYPE(MidiMessage);
-enum class Pairs { Scene, Source, Item, Transition, Audio, Media, Filter, String, Integer, Boolean };
+enum class Pairs {
+	Scene,
+	Source,
+	Item,
+	Transition,
+	Audio,
+	Media,
+	Filter,
+	String,
+	Integer,
+	Boolean
+};
 class ActionsClass : public QObject {
 	Q_OBJECT
 public:
@@ -133,7 +144,6 @@ public:
 	static obs_event_type string_to_event(const QString &string);
 };
 
-
 typedef void (*PauseRecordingFunction)(bool);
 typedef bool (*RecordingPausedFunction)();
 namespace Utils {
@@ -217,7 +227,7 @@ const QList<ActionsClass::Actions> AllActions_raw = {
 	ActionsClass::Actions::Play_Pause_Media,
 	ActionsClass::Actions::Previous_Media,
 	ActionsClass::Actions::Reset_Scene_Item,
-	
+
 	ActionsClass::Actions::Restart_Media,
 	ActionsClass::Actions::Set_Current_Scene,
 	ActionsClass::Actions::Set_Current_Transition,
@@ -257,8 +267,7 @@ const QList<ActionsClass::Actions> not_ready_actions{
 	ActionsClass::Actions::Set_Gain_Filter,
 	ActionsClass::Actions::Set_Media_Time,
 	ActionsClass::Actions::Set_Source_Settings,
-	ActionsClass::Actions::Set_Sync_Offset,
-	ActionsClass::Actions::Set_Mute,
+	ActionsClass::Actions::Set_Sync_Offset, ActionsClass::Actions::Set_Mute,
 	ActionsClass::Actions::Scrub_Media,
 	ActionsClass::Actions::Set_Audio_Monitor_Type,
 	ActionsClass::Actions::Set_Scene_Item_Crop,
@@ -270,7 +279,6 @@ const QList<ActionsClass::Actions> not_ready_actions{
 	ActionsClass::Actions::Set_Browser_Source_URL,
 	ActionsClass::Actions::Toggle_Source_Visibility };
 
-
 void alert_popup(QString message);
-		QString translate_action(ActionsClass::Actions action);
+QString translate_action(ActionsClass::Actions action);
 };

@@ -5,7 +5,7 @@ Use MIDI devices to trigger events in OBS and visa versa.
 
 
 
-# Status -- ![CI Multiplatform Build](https://github.com/cpyarger/obs-midi/workflows/CI%20Multiplatform%20Build/badge.svg)
+# Status -- ![CI Multiplatform Build and release](https://github.com/cpyarger/obs-midi/workflows/CI%20Multiplatform%20Build%20and%20release/badge.svg?branch=release)
 # Installing
 
 
@@ -18,6 +18,10 @@ Use MIDI devices to trigger events in OBS and visa versa.
   * The Configuration is under Tools-> OBS Midi Settings
 
   * Select your controller, hit configure, Toggle a button and fader, remap it to an action and hit save!
+
+# Installing Extra Steps - MAC
+- If you are unable to see obs-midi in the tools you will need to install jack
+- https://jackaudio.org/downloads/
 
 
 

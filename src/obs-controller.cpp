@@ -38,8 +38,7 @@ void OBSController::SetCurrentScene(QString sceneName)
 {
 	OBSSourceAutoRelease source =
 		obs_get_source_by_name(sceneName.toStdString().c_str());
-		obs_frontend_set_current_scene(source);
-	
+	obs_frontend_set_current_scene(source);
 }
 
 /**
@@ -92,7 +91,6 @@ void OBSController::ResetSceneItem(QString sceneName, QString itemName)
 
 	OBSDataAutoRelease settings = obs_source_get_settings(sceneItemSource);
 	obs_source_update(sceneItemSource, settings);
-	
 }
 
 /**
@@ -142,15 +140,20 @@ void OBSController::SetTransitionDuration(int duration)
 	obs_frontend_set_transition_duration(duration);
 }
 
-void OBSController::SetSourceVisibility(QString scene,QString item,bool set) {
-	obs_sceneitem_set_visible(Utils::GetSceneItemFromName(Utils::GetSceneFromNameOrCurrent(scene),item), set);
+void OBSController::SetSourceVisibility(QString scene, QString item, bool set)
+{
+	obs_sceneitem_set_visible(
+		Utils::GetSceneItemFromName(
+			Utils::GetSceneFromNameOrCurrent(scene), item),
+		set);
 } //DOESNT EXIST
 
-void OBSController::ToggleSourceVisibility(QString scene, QString item) {
-	if (obs_sceneitem_visible(Utils::GetSceneItemFromName(Utils::GetSceneFromNameOrCurrent(scene), item))) {
+void OBSController::ToggleSourceVisibility(QString scene, QString item)
+{
+	if (obs_sceneitem_visible(Utils::GetSceneItemFromName(
+		    Utils::GetSceneFromNameOrCurrent(scene), item))) {
 		SetSourceVisibility(scene, item, false);
-	}
-	else {
+	} else {
 		SetSourceVisibility(scene, item, true);
 	}
 } //DOESNT EXIST

@@ -73,7 +73,7 @@ void MidiAgent::Load(obs_data_t *data)
 	enabled = obs_data_get_bool(data, "enabled");
 	bidirectional = obs_data_get_bool(data, "bidirectional");
 
-	obs_data_array_t * hooksData = obs_data_get_array(data, "hooks");
+	obs_data_array_t *hooksData = obs_data_get_array(data, "hooks");
 	size_t hooksCount = obs_data_array_count(hooksData);
 	for (size_t i = 0; i < hooksCount; i++) {
 		obs_data_t *hookData = obs_data_array_item(hooksData, i);
@@ -121,7 +121,6 @@ void MidiAgent::open_midi_input_port(int inport)
 
 	} catch (const rtmidi::midi_exception &error) {
 		Utils::alert_popup(QString("Midi Error ").append(error.what()));
-
 	}
 }
 void MidiAgent::open_midi_output_port(int outport)
@@ -391,7 +390,9 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 			QString from = obs_data_get_string(data, "sourceName");
 			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
 				if (self->midiHooks.at(i)->action ==
-				    Utils::translate_action(ActionsClass::Actions::Toggle_Mute) &&
+					    Utils::translate_action(
+						    ActionsClass::Actions::
+							    Toggle_Mute) &&
 				    self->midiHooks.at(i)->audio_source ==
 					    from) {
 					bool muted = obs_data_get_bool(data,
@@ -444,7 +445,8 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 }
 void MidiAgent::send_message_to_midi_device(MidiMessage message)
 {
-	std::unique_ptr<rtmidi::message> hello = std::make_unique<rtmidi::message>();
+	std::unique_ptr<rtmidi::message> hello =
+		std::make_unique<rtmidi::message>();
 	if (message.message_type == "Control Change") {
 		this->midiout->send_message(hello->control_change(
 			message.channel, message.NORC, message.value));

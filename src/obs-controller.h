@@ -40,7 +40,8 @@ void TransitionToProgram(QString transitionName, int transitionDuration = 300);
 void SetCurrentTransition(QString name);
 void SetTransitionDuration(int duration); // can also be used with cc
 
-void SetSourceVisibility(QString scene, QString source, bool set);    // doesn't exist??
+void SetSourceVisibility(QString scene, QString source,
+			 bool set);                         // doesn't exist??
 void ToggleSourceVisibility(QString scene, QString source); //doesn't exist?
 
 void ToggleMute(QString sourceName);

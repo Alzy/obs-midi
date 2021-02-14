@@ -72,7 +72,6 @@ events::events(DeviceManagerPtr srv)
 	cpuUsageInfo = os_cpu_usage_info_start();
 	obs_frontend_add_event_callback(events::FrontendEventHandler, this);
 
-
 	connect(&streamStatusTimer, SIGNAL(timeout()), this,
 		SLOT(StreamStatus()));
 	connect(&heartbeatTimer, SIGNAL(timeout()), this, SLOT(Heartbeat()));

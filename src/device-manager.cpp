@@ -161,7 +161,7 @@ QVector<MidiHook *> DeviceManager::GetMidiHooksByDeviceName(QString deviceName)
 */
 void DeviceManager::RegisterMidiDevice(int port, int outport)
 {
-	std::unique_ptr<MidiAgent>midiA = std::make_unique<MidiAgent>();
+	std::unique_ptr<MidiAgent> midiA = std::make_unique<MidiAgent>();
 	midiA->open_midi_input_port(port);
 	midiA->open_midi_output_port(outport);
 

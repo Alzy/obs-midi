@@ -277,7 +277,7 @@ const QList<ActionsClass::Actions> not_ready_actions{
 	ActionsClass::Actions::Set_Text_GDIPlus_Text,
 	//ActionsClass::Actions::Set_Opacity,
 	ActionsClass::Actions::Set_Browser_Source_URL,
-	ActionsClass::Actions::Toggle_Source_Visibility };
+	ActionsClass::Actions::Toggle_Source_Visibility};
 
 void alert_popup(QString message);
 QString translate_action(ActionsClass::Actions action);

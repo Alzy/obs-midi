@@ -2,8 +2,6 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMainWindow>
 
-
-
 #include <iostream>
 #include <obs-module.h>
 #if __has_include(<obs-frontend-api.h>)

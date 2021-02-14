@@ -1,4 +1,9 @@
 
+#include <QtWidgets/QAction>
+#include <QtWidgets/QMainWindow>
+
+
+
 #include <iostream>
 #include <obs-module.h>
 #if __has_include(<obs-frontend-api.h>)
@@ -13,11 +18,10 @@
 #include <map>
 #include <iostream>
 #include <utility>
+
 #include "obs-midi.h"
 
 #include "forms/settings-dialog.h"
-#include <QtWidgets/QAction>
-#include <QtWidgets/QMainWindow>
 #include "config.h"
 #include "device-manager.h"
 #include "utils.h"

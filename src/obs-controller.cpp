@@ -39,12 +39,8 @@ void OBSController::SetCurrentScene(QString sceneName)
 {
 	OBSSourceAutoRelease source =
 		obs_get_source_by_name(sceneName.toStdString().c_str());
-
-	if (source) {
 		obs_frontend_set_current_scene(source);
-	} else {
-		throw("requested scene does not exist");
-	}
+	
 }
 
 /**
@@ -53,11 +49,11 @@ void OBSController::SetCurrentScene(QString sceneName)
 void OBSController::SetPreviewScene(QString sceneName)
 {
 	if (!obs_frontend_preview_program_mode_active()) {
-		throw("studio mode not enabled");
+		Utils::alert_popup("studio mode not enabled");
 	}
 	OBSScene scene = Utils::GetSceneFromNameOrCurrent(sceneName);
 	if (!scene) {
-		throw("specified scene doesn't exist");
+		Utils::alert_popup("specified scene doesn't exist");
 	}
 
 	obs_frontend_set_current_preview_scene(obs_scene_get_source(scene));
@@ -68,10 +64,6 @@ void OBSController::SetPreviewScene(QString sceneName)
  */
 void OBSController::SetCurrentSceneCollection(QString sceneCollection)
 {
-	if (sceneCollection.isEmpty()) {
-		throw("Scene Collection name is empty");
-	}
-
 	// TODO : Check if specified profile exists and if changing is allowed
 	obs_frontend_set_current_scene_collection(sceneCollection.toUtf8());
 }
@@ -86,7 +78,7 @@ void OBSController::ResetSceneItem(QString sceneName, QString itemName)
 		throw("requested scene doesn't exist");
 	}
 
-	obs_data_t *params = obs_data_create();
+	OBSDataAutoRelease params = obs_data_create();
 	obs_data_set_string(params, "scene-name",
 			    sceneName.toStdString().c_str());
 	OBSDataItemAutoRelease itemField = obs_data_item_byname(params, "item");
@@ -101,6 +93,7 @@ void OBSController::ResetSceneItem(QString sceneName, QString itemName)
 
 	OBSDataAutoRelease settings = obs_source_get_settings(sceneItemSource);
 	obs_source_update(sceneItemSource, settings);
+	
 }
 
 /**
@@ -119,15 +112,15 @@ void OBSController::TransitionToProgram(QString transitionName,
 					int transitionDuration)
 {
 	if (!obs_frontend_preview_program_mode_active()) {
-		throw("studio mode not enabled");
+		Utils::alert_popup("studio mode not enabled");
 	}
 
 	if (transitionName.isEmpty()) {
-		throw("transition name can not be empty");
+		Utils::alert_popup("transition name can not be empty");
 	}
 	bool success = Utils::SetTransitionByName(transitionName);
 	if (!success) {
-		throw("specified transition doesn't exist");
+		Utils::alert_popup("specified transition doesn't exist");
 	}
 	obs_frontend_set_transition_duration(transitionDuration);
 
@@ -139,10 +132,7 @@ void OBSController::TransitionToProgram(QString transitionName,
  */
 void OBSController::SetCurrentTransition(QString name)
 {
-	bool success = Utils::SetTransitionByName(name);
-	if (!success) {
-		throw("requested transition does not exist");
-	}
+	Utils::SetTransitionByName(name);
 }
 
 /**
@@ -153,9 +143,18 @@ void OBSController::SetTransitionDuration(int duration)
 	obs_frontend_set_transition_duration(duration);
 }
 
-void OBSController::SetSourceVisibility() {} //DOESNT EXIST
+void OBSController::SetSourceVisibility(QString scene,QString item,bool set) {
+	obs_sceneitem_set_visible(Utils::GetSceneItemFromName(Utils::GetSceneFromNameOrCurrent(scene),item), set);
+} //DOESNT EXIST
 
-void OBSController::ToggleSourceVisibility() {} //DOESNT EXIST
+void OBSController::ToggleSourceVisibility(QString scene, QString item) {
+	if (obs_sceneitem_visible(Utils::GetSceneItemFromName(Utils::GetSceneFromNameOrCurrent(scene), item))) {
+		SetSourceVisibility(scene, item, false);
+	}
+	else {
+		SetSourceVisibility(scene, item, true);
+	}
+} //DOESNT EXIST
 
 /**
 * Inverts the mute status of a specified source.

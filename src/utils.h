@@ -110,7 +110,8 @@ public:
 		Set_Source_Rotation,
 		Set_Source_Position,
 		Set_Opacity,
-		Move_T_Bar
+		Move_T_Bar,
+		Toggle_Source_Visibility
 	};
 	Q_ENUM(Actions)
 	enum class obs_event_type {
@@ -266,7 +267,8 @@ const QList<ActionsClass::Actions> not_ready_actions{
 	ActionsClass::Actions::Set_Scene_Item_Transform,
 	ActionsClass::Actions::Set_Text_GDIPlus_Text,
 	//ActionsClass::Actions::Set_Opacity,
-	ActionsClass::Actions::Set_Browser_Source_URL};
+	ActionsClass::Actions::Set_Browser_Source_URL,
+	ActionsClass::Actions::Toggle_Source_Visibility };
 
 
 void alert_popup(QString message);

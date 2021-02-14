@@ -1024,7 +1024,6 @@ QStringList Utils::GetMediaSourceNames()
 			if (isMedia) {
 				sn->append(obs_source_get_name(source));
 			}
-
 			return true;
 		},
 		static_cast<void *>(&sourceNames));
@@ -1075,7 +1074,7 @@ QStringList Utils::GetSceneItemsList(QString scenename)
 
 	QStringList SceneItemsList;
 
-	const char *sceneName = scenename.toStdString().c_str();
+	auto sceneName = scenename.toStdString().c_str();
 	OBSSourceAutoRelease sceneSource = obs_get_source_by_name(sceneName);
 	OBSScene scene = obs_scene_from_source(sceneSource);
 

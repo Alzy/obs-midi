@@ -72,9 +72,6 @@ events::events(DeviceManagerPtr srv)
 	cpuUsageInfo = os_cpu_usage_info_start();
 	obs_frontend_add_event_callback(events::FrontendEventHandler, this);
 
-	QSpinBox *durationControl = Utils::GetTransitionDurationControl();
-	connect(durationControl, SIGNAL(valueChanged(int)), this,
-		SLOT(TransitionDurationChanged(int)));
 
 	connect(&streamStatusTimer, SIGNAL(timeout()), this,
 		SLOT(StreamStatus()));

@@ -148,16 +148,13 @@ MidiAgent *DeviceManager::GetMidiDeviceByName(QString deviceName)
 QVector<MidiHook *> DeviceManager::GetMidiHooksByDeviceName(QString deviceName)
 {
 	if (deviceName != QString("No Devices Available")) {
-
 		auto device = GetMidiDeviceByName(deviceName);
 		if (device != NULL) {
 			return device->GetMidiHooks();
 		} else {
 			QVector<MidiHook *> x;
-			//device->set_midi_hooks(x);
 			return x;
 		}
-		//Utils::alert_popup("no midi hooks for this device");
 	}
 }
 
@@ -166,11 +163,11 @@ QVector<MidiHook *> DeviceManager::GetMidiHooksByDeviceName(QString deviceName)
 */
 void DeviceManager::RegisterMidiDevice(int port, int outport)
 {
-	MidiAgent *midiA = new MidiAgent();
+	std::unique_ptr<MidiAgent>midiA = std::make_unique<MidiAgent>();
 	midiA->open_midi_input_port(port);
 	midiA->open_midi_output_port(outport);
 
-	midiAgents.push_back(midiA);
+	midiAgents.push_back(midiA.get());
 }
 
 /* Get this Device Manager state as OBS Data. (includes devices and their midi hooks)

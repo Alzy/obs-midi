@@ -310,13 +310,13 @@ jobs:
           tar -czvf obs-midi-Linux-${{ env.GIT_HASH }}-x64.tar.gz obs-studio
           pwd
 
-      - name: 'Publish ${{ env.LINUX_FILENAME }}'
+      - name: 'Publish Deb'
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
           name: '${{ env.GIT_HASH }}-linux'
           path: '${{ github.workspace }}/obs-midi/package/*.deb'
-      - name: 'Publish ${{ env.LINUX_FILENAME }}'
+      - name: 'Publish Tar'
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
@@ -442,13 +442,13 @@ jobs:
           rm ./release/${{ env.MAC_FILENAME_UNSIGNED }}
 
       - name: 'Notarization'
-        if: success()
+        if: success() &&  github.ref == 'refs/heads/release'
         working-directory: ./obs-midi
         shell: bash
         run: |
           set -e
           echo "store password"
-          
+
           xcrun altool  --store-password-in-keychain-item "AC_PASSWORD" -u "${{ secrets.MACOS_IDENT_USER }}" -p "${{ secrets.MACOS_AC_PASS  }}"
           echo "xcnotary precheck"
           xcnotary precheck ./release/${{ env.MAC_FILENAME }}
@@ -521,9 +521,9 @@ jobs:
         run: |
           cd ${{ github.workspace }}
           ls -la
-          echo "linux"
+          echo ${{ github.workspace }}/${{ env.GIT_HASH }}-linux
           ls -la ${{ github.workspace }}/${{ env.GIT_HASH }}-linux
-          echo "macos"
+          echo ${{ github.workspace }}/${{ env.GIT_HASH }}-macOS
           ls -la ${{ github.workspace }}/${{ env.GIT_HASH }}-macOS
           mv ${{ github.workspace }}/${{ env.GIT_HASH }}-linux/*.deb ${{ github.workspace }}/${{ env.GIT_HASH }}-linux/obs-midi-${{ env.GIT_HASH }}-1_amd64.deb
       - name: 'Upload macOS artifact to release'
@@ -543,4 +543,13 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ github.workspace }}/${{ env.GIT_HASH }}-linux/obs-midi-${{ env.GIT_HASH }}-1_amd64.deb
           asset_name: obs-midi-${{ env.GIT_HASH }}-1_amd64.deb
+          asset_content_type: application/octet-stream
+      - name: 'Upload Linux tar artifact to release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ github.workspace }}/${{ env.GIT_HASH }}-linux/obs-midi-Linux-${{ env.GIT_HASH }}-x64.tar.gz
+          asset_name: obs-midi-Linux-${{ env.GIT_HASH }}-x64.tar.gz
           asset_content_type: application/octet-stream

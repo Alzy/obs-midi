@@ -27,7 +27,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #endif
 using namespace std;
 
-
 ////////////////////
 // BUTTON ACTIONS //
 ////////////////////
@@ -39,12 +38,7 @@ void OBSController::SetCurrentScene(QString sceneName)
 {
 	OBSSourceAutoRelease source =
 		obs_get_source_by_name(sceneName.toStdString().c_str());
-
-	if (source) {
-		obs_frontend_set_current_scene(source);
-	} else {
-		throw("requested scene does not exist");
-	}
+	obs_frontend_set_current_scene(source);
 }
 
 /**
@@ -53,11 +47,11 @@ void OBSController::SetCurrentScene(QString sceneName)
 void OBSController::SetPreviewScene(QString sceneName)
 {
 	if (!obs_frontend_preview_program_mode_active()) {
-		throw("studio mode not enabled");
+		Utils::alert_popup("studio mode not enabled");
 	}
 	OBSScene scene = Utils::GetSceneFromNameOrCurrent(sceneName);
 	if (!scene) {
-		throw("specified scene doesn't exist");
+		Utils::alert_popup("specified scene doesn't exist");
 	}
 
 	obs_frontend_set_current_preview_scene(obs_scene_get_source(scene));
@@ -68,10 +62,6 @@ void OBSController::SetPreviewScene(QString sceneName)
  */
 void OBSController::SetCurrentSceneCollection(QString sceneCollection)
 {
-	if (sceneCollection.isEmpty()) {
-		throw("Scene Collection name is empty");
-	}
-
 	// TODO : Check if specified profile exists and if changing is allowed
 	obs_frontend_set_current_scene_collection(sceneCollection.toUtf8());
 }
@@ -86,7 +76,7 @@ void OBSController::ResetSceneItem(QString sceneName, QString itemName)
 		throw("requested scene doesn't exist");
 	}
 
-	obs_data_t *params = obs_data_create();
+	OBSDataAutoRelease params = obs_data_create();
 	obs_data_set_string(params, "scene-name",
 			    sceneName.toStdString().c_str());
 	OBSDataItemAutoRelease itemField = obs_data_item_byname(params, "item");
@@ -119,15 +109,15 @@ void OBSController::TransitionToProgram(QString transitionName,
 					int transitionDuration)
 {
 	if (!obs_frontend_preview_program_mode_active()) {
-		throw("studio mode not enabled");
+		Utils::alert_popup("studio mode not enabled");
 	}
 
 	if (transitionName.isEmpty()) {
-		throw("transition name can not be empty");
+		Utils::alert_popup("transition name can not be empty");
 	}
 	bool success = Utils::SetTransitionByName(transitionName);
 	if (!success) {
-		throw("specified transition doesn't exist");
+		Utils::alert_popup("specified transition doesn't exist");
 	}
 	obs_frontend_set_transition_duration(transitionDuration);
 
@@ -139,10 +129,7 @@ void OBSController::TransitionToProgram(QString transitionName,
  */
 void OBSController::SetCurrentTransition(QString name)
 {
-	bool success = Utils::SetTransitionByName(name);
-	if (!success) {
-		throw("requested transition does not exist");
-	}
+	Utils::SetTransitionByName(name);
 }
 
 /**
@@ -153,9 +140,23 @@ void OBSController::SetTransitionDuration(int duration)
 	obs_frontend_set_transition_duration(duration);
 }
 
-void OBSController::SetSourceVisibility() {} //DOESNT EXIST
+void OBSController::SetSourceVisibility(QString scene, QString item, bool set)
+{
+	obs_sceneitem_set_visible(
+		Utils::GetSceneItemFromName(
+			Utils::GetSceneFromNameOrCurrent(scene), item),
+		set);
+} //DOESNT EXIST
 
-void OBSController::ToggleSourceVisibility() {} //DOESNT EXIST
+void OBSController::ToggleSourceVisibility(QString scene, QString item)
+{
+	if (obs_sceneitem_visible(Utils::GetSceneItemFromName(
+		    Utils::GetSceneFromNameOrCurrent(scene), item))) {
+		SetSourceVisibility(scene, item, false);
+	} else {
+		SetSourceVisibility(scene, item, true);
+	}
+} //DOESNT EXIST
 
 /**
 * Inverts the mute status of a specified source.
@@ -344,21 +345,23 @@ void OBSController::SetCurrentProfile(QString profileName)
 
 void OBSController::SetTextGDIPlusText(QString text) {}
 
-void OBSController::SetBrowserSourceURL(QString sourceName, QString url) {
+void OBSController::SetBrowserSourceURL(QString sourceName, QString url)
+{
 
-	OBSSourceAutoRelease source = obs_get_source_by_name(sourceName.toStdString().c_str());
+	OBSSourceAutoRelease source =
+		obs_get_source_by_name(sourceName.toStdString().c_str());
 	QString sourceId = obs_source_get_id(source);
 	if (sourceId != "browser_source" && sourceId != "linuxbrowser-source") {
 		return Utils::alert_popup("Not a browser Source");
 	}
 
 	OBSDataAutoRelease settings = obs_source_get_settings(source);
-	obs_data_set_string(settings, "url",
-				    url.toStdString().c_str());
+	obs_data_set_string(settings, "url", url.toStdString().c_str());
 	obs_source_update(source, settings);
 }
 
-void OBSController::ReloadBrowserSource(QString sourceName) {
+void OBSController::ReloadBrowserSource(QString sourceName)
+{
 	OBSSourceAutoRelease source =
 		obs_get_source_by_name(sourceName.toUtf8());
 	obs_properties_t *sourceProperties = obs_source_properties(source);
@@ -374,11 +377,12 @@ void OBSController::TakeSourceScreenshot(QString source) {}
 
 void OBSController::EnableSourceFilter(obs_source_t *source)
 {
-	obs_source_set_enabled(source,true);
+	obs_source_set_enabled(source, true);
 	obs_source_release(source);
 }
 
-void OBSController::DisableSourceFilter(obs_source_t *source) {
+void OBSController::DisableSourceFilter(obs_source_t *source)
+{
 	obs_source_set_enabled(source, true);
 	obs_source_release(source);
 }
@@ -390,7 +394,6 @@ void OBSController::ToggleSourceFilter(obs_source_t *source)
 	} else {
 		EnableSourceFilter(source);
 	}
-
 }
 
 ////////////////
@@ -435,15 +438,17 @@ void OBSController::SetSourceScale() {}
 void OBSController::SetGainFilter() {}
 
 void OBSController::SetOpacity() {}
-void OBSController::move_t_bar(int move) {
-	
+void OBSController::move_t_bar(int move)
+{
+
 	if (obs_frontend_preview_program_mode_active()) {
 
 		obs_frontend_set_tbar_position(Utils::t_bar_mapper(move));
 		obs_frontend_release_tbar();
 	}
 }
-void OBSController::play_pause_media_source(QString media_source) {
+void OBSController::play_pause_media_source(QString media_source)
+{
 	OBSSourceAutoRelease source =
 		obs_get_source_by_name(media_source.toStdString().c_str());
 	switch (obs_source_media_get_state(source)) {
@@ -456,30 +461,26 @@ void OBSController::play_pause_media_source(QString media_source) {
 	case obs_media_state::OBS_MEDIA_STATE_ENDED:
 		obs_source_media_restart(source);
 		break;
-
 	}
 }
 
-// TODO:: Fix this 
-void OBSController::toggle_studio_mode() {
+// TODO:: Fix this
+void OBSController::toggle_studio_mode()
+{
 	if (obs_frontend_preview_program_mode_active()) {
 		obs_frontend_set_preview_program_mode(false);
 
 	} else {
 		obs_frontend_set_preview_program_mode(true);
 	}
-	
-	
 }
-void OBSController::reset_stats() {
+void OBSController::reset_stats() {}
+void OBSController::restart_media(QString media_source)
+{
+
+	obs_source_media_restart(
+		obs_get_source_by_name(media_source.toStdString().c_str()));
 }
-void OBSController::restart_media(QString media_source) {
-
-	obs_source_media_restart(obs_get_source_by_name(media_source.toStdString().c_str()));
-	
-
-}
-
 
 void OBSController::stop_media(QString media_source)
 {

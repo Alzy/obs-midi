@@ -129,21 +129,22 @@ public:
     }
 
     running = true;
-    poll_ = std::thread{[this] {
-      while (this->running)
-      {
-        int err = poll(descriptors_.data(), descriptors_.size(), -1);
-        if (err > 0)
-        {
-          snd_seq_event_t* ev;
-          while (snd_seq_event_input(seq_, &ev) >= 0)
-          {
-            handle_event(ev);
-          }
-        }
-        std::this_thread::sleep_for(1s);
-      }
-    }};
+    poll_ = std::thread{[this]
+                        {
+                          while (this->running)
+                          {
+                            int err = poll(descriptors_.data(), descriptors_.size(), -1);
+                            if (err > 0)
+                            {
+                              snd_seq_event_t* ev;
+                              while (snd_seq_event_input(seq_, &ev) >= 0)
+                              {
+                                handle_event(ev);
+                              }
+                            }
+                            std::this_thread::sleep_for(1s);
+                          }
+                        }};
   }
 
   struct port_info

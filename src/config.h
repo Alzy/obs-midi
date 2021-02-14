@@ -45,5 +45,5 @@ public:
 	bool SettingsLoaded;
 
 private:
-	static void OnFrontendEvent(enum obs_frontend_event event, void *param);
+	static void on_frontend_event(obs_frontend_event event, void *param);
 };

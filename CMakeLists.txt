@@ -6,7 +6,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_definitions(-DASIO_STANDALONE)
@@ -90,12 +90,23 @@ include_directories(
 	${Qt5Core_INCLUDES}
 	${Qt5Widgets_INCLUDES}
 	"${CMAKE_SOURCE_DIR}/deps/asio/asio/include")
-target_link_libraries(obs-midi
-	"${OBS_FRONTEND_LIB}"
-	${obs-midi_DEPS}
-	Qt5::Core
-	Qt5::Widgets
-	libobs)
+if(LINUX)
+	include_directories(/usr/include/obs)
+	target_link_libraries(obs-midi
+		"${OBS_FRONTEND_LIB}"
+		${obs-midi_DEPS}
+		Qt5::Core
+		Qt5::Widgets
+		libobs.so)
+	
+else()
+	target_link_libraries(obs-midi
+		"${OBS_FRONTEND_LIB}"
+		${obs-midi_DEPS}
+		Qt5::Core
+		Qt5::Widgets
+		libobs)
+endif()
 # --- Windows-specific build settings and tasks ---
 if(WIN32)
 	if(NOT DEFINED OBS_FRONTEND_LIB)
@@ -176,21 +187,18 @@ if(WIN32)
 		COMMAND if $<CONFIG:Debug>==1 (
 			"${CMAKE_COMMAND}" -E copy
 				"$<TARGET_FILE:obs-midi>"
-				"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/rundir/$<CONFIG>/obs-plugins/${ARCH_NAME}")
+				"${LibObs_DIR}/../rundir/$<CONFIG>/obs-plugins/${ARCH_NAME}")
 
 		COMMAND if $<CONFIG:Debug>==1 (
 			"${CMAKE_COMMAND}" -E copy
 				"$<TARGET_PDB_FILE:obs-midi>"
-				"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/rundir/$<CONFIG>/obs-plugins/${ARCH_NAME}")
+				"${LibObs_DIR}/../rundir/$<CONFIG>/obs-plugins/${ARCH_NAME}")
 
-		COMMAND if $<CONFIG:Debug>==1 (
-			"${CMAKE_COMMAND}" -E make_directory
-				"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/rundir/$<CONFIG>/data/obs-plugins/obs-midi")
 
 		COMMAND if $<CONFIG:Debug>==1 (
 			"${CMAKE_COMMAND}" -E copy_directory
 				"${PROJECT_SOURCE_DIR}/data"
-				"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/rundir/$<CONFIG>/data/obs-plugins/obs-midi")
+				"${LibObs_DIR}/../rundir/$<CONFIG>/data/obs-plugins/${ARCH_NAME}")
 	)
 	# --- End of sub-section ---
 

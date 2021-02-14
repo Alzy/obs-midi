@@ -30,7 +30,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #endif
 namespace OBSController {
 
-
 // BUTTON ACTIONS
 void SetCurrentScene(QString sceneName);
 void SetPreviewScene(QString sceneName);
@@ -41,8 +40,9 @@ void TransitionToProgram(QString transitionName, int transitionDuration = 300);
 void SetCurrentTransition(QString name);
 void SetTransitionDuration(int duration); // can also be used with cc
 
-void SetSourceVisibility();    // doesn't exist??
-void ToggleSourceVisibility(); //doesn't exist?
+void SetSourceVisibility(QString scene, QString source,
+			 bool set);                         // doesn't exist??
+void ToggleSourceVisibility(QString scene, QString source); //doesn't exist?
 
 void ToggleMute(QString sourceName);
 void SetMute(QString sourceName, bool mute);
@@ -64,7 +64,7 @@ void SaveReplayBuffer();
 
 void SetCurrentProfile(QString profileName);
 void SetTextGDIPlusText(QString text);
-void SetBrowserSourceURL(QString sourceName,QString url);
+void SetBrowserSourceURL(QString sourceName, QString url);
 void ReloadBrowserSource(QString sourceName);
 void TakeSourceScreenshot(QString source);
 void EnableSourceFilter(obs_source_t *source);

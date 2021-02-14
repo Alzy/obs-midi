@@ -44,12 +44,12 @@ void DeviceManager::Load(obs_data_t *data)
 		MidiAgent *device = new MidiAgent();
 		device->Load(deviceData);
 		midiAgents.push_back(device);
-		
+
 		connect(this, SIGNAL(bcast(QString, QString)), device,
-				SLOT(handle_obs_event(QString, QString)));
+			SLOT(handle_obs_event(QString, QString)));
 		if (device->isEnabled()) {
-			int portNumber =
-				GetPortNumberByDeviceName(device->get_midi_input_name());
+			int portNumber = GetPortNumberByDeviceName(
+				device->get_midi_input_name());
 			int outPort = GetOutPortNumberByDeviceName(
 				device->get_midi_output_name());
 
@@ -71,7 +71,6 @@ void DeviceManager::Unload()
 		agent->clear_MidiHooks();
 		delete agent;
 	}
-	
 }
 
 /* Returns vector list of Port Names 
@@ -99,7 +98,6 @@ QStringList DeviceManager::GetOutPortsList()
 	}
 	return outports;
 }
-
 
 /* Returns the port number of the specified device.
  * If the device isn't found (possibly due to being disconnected), returns -1
@@ -148,16 +146,13 @@ MidiAgent *DeviceManager::GetMidiDeviceByName(QString deviceName)
 QVector<MidiHook *> DeviceManager::GetMidiHooksByDeviceName(QString deviceName)
 {
 	if (deviceName != QString("No Devices Available")) {
-
 		auto device = GetMidiDeviceByName(deviceName);
 		if (device != NULL) {
 			return device->GetMidiHooks();
 		} else {
 			QVector<MidiHook *> x;
-			//device->set_midi_hooks(x);
 			return x;
 		}
-		//Utils::alert_popup("no midi hooks for this device");
 	}
 }
 
@@ -166,11 +161,11 @@ QVector<MidiHook *> DeviceManager::GetMidiHooksByDeviceName(QString deviceName)
 */
 void DeviceManager::RegisterMidiDevice(int port, int outport)
 {
-	MidiAgent *midiA = new MidiAgent();
+	std::unique_ptr<MidiAgent> midiA = std::make_unique<MidiAgent>();
 	midiA->open_midi_input_port(port);
 	midiA->open_midi_output_port(outport);
 
-	midiAgents.push_back(midiA);
+	midiAgents.push_back(midiA.get());
 }
 
 /* Get this Device Manager state as OBS Data. (includes devices and their midi hooks)
@@ -190,8 +185,6 @@ obs_data_t *DeviceManager::GetData()
 	obs_data_set_array(data, "devices", deviceData);
 	return data;
 }
-
-
 
 void DeviceManager::broadcast_obs_event(const RpcEvent &event)
 {

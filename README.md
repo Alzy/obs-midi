@@ -6,6 +6,7 @@ Use MIDI devices to trigger events in OBS and visa versa.
 
 
 # Status -- ![CI Multiplatform Build and release](https://github.com/cpyarger/obs-midi/workflows/CI%20Multiplatform%20Build%20and%20release/badge.svg?branch=release)
+[![Open Source Helpers](https://www.codetriage.com/cpyarger/obs-midi/badges/users.svg)](https://www.codetriage.com/cpyarger/obs-midi)
 # Installing
 
 
@@ -35,14 +36,13 @@ Currently runs on Windows and Linux, and is partly tested on MAC
 # Build Instructions
 [Build instructions can be found here](build.md)
 
+# Contributing
 
-# Contributing 
-
-Anyone who wants to help out the project 
+Anyone who wants to help out the project
 
 - Drop any ideas or suggestions or bugs in the issues
-- Leave an honest review on the [obs forum](https://obsproject.com/forum/resources/obs-midi.1023/) 
+- Leave an honest review on the [obs forum](https://obsproject.com/forum/resources/obs-midi.1023/)
 - If you know anyone who would be willing to help with the programming let them know about the project
-- If you or anyone you know makes youtube videos, we are always looking for reviews, and tutorial videos í¸¸ 
+- If you or anyone you know makes youtube videos, we are always looking for reviews, and tutorial videos ï¿½
 - Contribute to translations on [crowdin](https://crowdin.com/project/obs-midi)
-- If you know C++ we can always use help with cleaning up the code base and especially hunting and fixing memory leaks. 
+- If you know C++ we can always use help with cleaning up the code base and especially hunting and fixing memory leaks.

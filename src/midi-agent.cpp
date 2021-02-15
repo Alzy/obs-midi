@@ -213,17 +213,36 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 
 	/*************Get Message parts***********/
 	self->sending = true;
-	/***** Send Messages to emit function *****/
-
 	MidiMessage x;
-	x.device_name = self->get_midi_input_name();
-	x.message_type = Utils::mtype_to_string(message.get_message_type());
-	x.NORC = Utils::get_midi_note_or_control(message);
-	x.channel = message.get_channel();
-	x.value = Utils::get_midi_value(message);
+	/***** Send Messages to emit function *****/
+	if (message.get_message_type() ==
+		    rtmidi::message_type::CONTROL_CHANGE ||
+	    message.get_message_type() == rtmidi::message_type::NOTE_ON ||
+	    message.get_message_type() == rtmidi::message_type::NOTE_OFF) {
+
+		x.device_name = self->get_midi_input_name();
+
+		x.message_type =
+			Utils::mtype_to_string(message.get_message_type());
+		x.NORC = Utils::get_midi_note_or_control(message);
+		x.channel = message.get_channel();
+		x.value = Utils::get_midi_value(message);
+
+	} else if (message.get_message_type() ==
+			   rtmidi::message_type::PITCH_BEND ||
+		   message.get_message_type() ==
+			   rtmidi::message_type::PROGRAM_CHANGE) {
+	
+	
+		x.device_name = self->get_midi_input_name();
+
+		x.message_type =
+			Utils::mtype_to_string(message.get_message_type());
+		x.value = Utils::get_midi_value(message);
+	}
 	//self->SendMessage(x);
 	emit self->broadcast_midi_message(x);
-
+	
 	/** check if hook exists for this note or cc norc and launch it **/
 	//Eventually add channel to this check.
 
@@ -238,6 +257,7 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 						self->midiHooks.at(i)->action)));
 		}
 	}
+	
 }
 
 /* Get the midi hooks for this device
@@ -388,7 +408,7 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 			}
 		} else if (eventType == QString("SourceMuteStateChanged")) {
 			QString from = obs_data_get_string(data, "sourceName");
-			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
+			for (int i = 0; i < self->midiHooks.size(); i++) {
 				if (self->midiHooks.at(i)->action ==
 					    Utils::translate_action(
 						    ActionsClass::Actions::

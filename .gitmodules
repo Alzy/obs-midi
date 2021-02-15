@@ -1,3 +1,3 @@
-[submodule "RtMidi17"]
-	path = RtMidi17
-	url = https://github.com/jcelerier/RtMidi17.git
+[submodule "src/RtMidi17"]
+	path = src/RtMidi17
+	url = https://github.com/cpyarger/RtMidi17.git

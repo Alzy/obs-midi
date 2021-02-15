@@ -34,6 +34,10 @@ PluginWindow::PluginWindow(QWidget *parent)
 	: QDialog(parent, Qt::Dialog), ui(new Ui::PluginWindow)
 {
 	ui->setupUi(this);
+	ui->table_mapping->setSelectionBehavior(
+		QAbstractItemView::SelectionBehavior::SelectRows);
+	ui->table_mapping->setSelectionMode(
+		QAbstractItemView::SelectionMode::SingleSelection);
 	//Set Window Title
 	QString title;
 	title.append("OBS MIDI Settings -- Branch: ");
@@ -63,8 +67,9 @@ PluginWindow::PluginWindow(QWidget *parent)
 		this, SLOT(on_source_change(QString)));
 	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
 		this, SLOT(on_scene_change(QString)));
-	connect(ui->table_mapping, SIGNAL(cellClicked(int, int)), this,
-		SLOT(edit_mapping(int, int)));
+	connect(ui->table_mapping, SIGNAL(cellClicked(int,int)), this,
+		SLOT(edit_mapping()));
+	
 	/**************Connections to mappper****************/
 	connect(ui->btn_add, SIGNAL(clicked()), this, SLOT(add_new_mapping()));
 	connect(ui->btn_delete, SIGNAL(clicked()), this,
@@ -736,7 +741,8 @@ void PluginWindow::add_new_mapping()
 {
 	ui->btn_Listen_many->setChecked(false);
 	ui->btn_Listen_one->setChecked(false);
-	if (!map_exists() && verify_mapping()) {
+	if (!map_exists() && verify_mapping() && ui->sb_channel->value() != 0 &&
+		    ui->sb_norc->value() != 0) {
 		int row = ui->table_mapping->rowCount();
 		ui->table_mapping->insertRow(row);
 		QTableWidgetItem *channelitem = new QTableWidgetItem(
@@ -793,6 +799,9 @@ void PluginWindow::add_new_mapping()
 		auto conf = GetConfig();
 		conf->Save();
 	} else {
+		if (ui->sb_channel->value() == 0&&ui->sb_norc->value()==0) {
+			Utils::alert_popup("Can Not Map Channel and norc 0. \nPlease Click Listen One or Listen Many to listen for MIDI Event to map");
+		}
 		if (!verify_mapping()) {
 			Utils::alert_popup("Mapping Missing required variable");
 		}
@@ -885,39 +894,48 @@ void PluginWindow::tab_changed(int i)
 }
 void PluginWindow::delete_mapping()
 {
-	auto devicemanager = GetDeviceManager();
-	auto dev = devicemanager->GetMidiDeviceByName(
-		ui->mapping_lbl_device_name->text());
-	auto hooks = dev->GetMidiHooks();
-	auto conf = GetConfig();
-	for (int i = 0; i < hooks.size(); i++) {
-		if ((hooks.at(i)->channel == ui->sb_channel->value()) &&
-		    (hooks.at(i)->norc == ui->sb_norc->value()) &&
-		    (hooks.at(i)->message_type ==
-		     ui->cb_mtype->currentText())) {
-			dev->remove_MidiHook(hooks.at(i));
-			conf->Save();
-			ui->table_mapping->removeRow(
-				ui->table_mapping->selectedItems().at(0)->row());
+	if (ui->table_mapping->rowCount() > 0) {
+		int row = ui->table_mapping->selectedItems().at(0)->row();
+		auto devicemanager = GetDeviceManager();
+		auto dev = devicemanager->GetMidiDeviceByName(
+			ui->mapping_lbl_device_name->text());
+		auto hooks = dev->GetMidiHooks();
+		auto conf = GetConfig();
+		for (int i = 0; i < hooks.size(); i++) {
+			if ((hooks.at(i)->channel == ui->sb_channel->value()) &&
+			    (hooks.at(i)->norc == ui->sb_norc->value()) &&
+			    (hooks.at(i)->message_type ==
+			     ui->cb_mtype->currentText())) {
+				dev->remove_MidiHook(hooks.at(i));
+				conf->Save();
+				ui->table_mapping->removeRow(row);
+				ui->table_mapping->clearSelection();
+			}
 		}
 	}
 }
-void PluginWindow::edit_mapping(int row, int col)
+void PluginWindow::edit_mapping()
 {
-	auto sitems = ui->table_mapping->selectedItems();
-	//rebuild midi
-	ui->sb_channel->setValue(sitems.at(0)->text().toInt());
-	ui->cb_mtype->setCurrentText(sitems.at(1)->text());
-	ui->sb_norc->setValue(sitems.at(2)->text().toInt());
-	//rebuild actions
-	ui->cb_obs_output_action->setCurrentText(sitems.at(3)->text());
-	ui->cb_obs_output_scene->setCurrentText(sitems.at(4)->text());
-	ui->cb_obs_output_source->setCurrentText(sitems.at(5)->text());
-	ui->cb_obs_output_filter->setCurrentText(sitems.at(6)->text());
-	ui->cb_obs_output_transition->setCurrentText(sitems.at(7)->text());
-	ui->cb_obs_output_item->setCurrentText(sitems.at(8)->text());
-	ui->cb_obs_output_audio_source->setCurrentText(sitems.at(9)->text());
-	ui->cb_obs_output_media_source->setCurrentText(sitems.at(10)->text());
+	if (ui->table_mapping->rowCount() != 0) {
+
+		auto sitems = ui->table_mapping->selectedItems();
+		//rebuild midi
+		ui->sb_channel->setValue(sitems.at(0)->text().toInt());
+		ui->cb_mtype->setCurrentText(sitems.at(1)->text());
+		ui->sb_norc->setValue(sitems.at(2)->text().toInt());
+		//rebuild actions
+		ui->cb_obs_output_action->setCurrentText(sitems.at(3)->text());
+		ui->cb_obs_output_scene->setCurrentText(sitems.at(4)->text());
+		ui->cb_obs_output_source->setCurrentText(sitems.at(5)->text());
+		ui->cb_obs_output_filter->setCurrentText(sitems.at(6)->text());
+		ui->cb_obs_output_transition->setCurrentText(
+			sitems.at(7)->text());
+		ui->cb_obs_output_item->setCurrentText(sitems.at(8)->text());
+		ui->cb_obs_output_audio_source->setCurrentText(
+			sitems.at(9)->text());
+		ui->cb_obs_output_media_source->setCurrentText(
+			sitems.at(10)->text());
+	}
 }
 bool PluginWindow::verify_mapping()
 {

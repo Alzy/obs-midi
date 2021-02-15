@@ -55,7 +55,7 @@ public slots:
 	void add_row_from_hook(MidiHook *hook);
 	void tab_changed(int i);
 	void delete_mapping();
-	void edit_mapping(int row, int col);
+	void edit_mapping();
 	void set_cell_colors(QColor color, QTableWidgetItem *item);
 
 private:

@@ -1103,13 +1103,14 @@ int Utils::get_midi_note_or_control(rtmidi::message mess)
 }
 int Utils::get_midi_value(rtmidi::message mess)
 {
+
 	int bytetopullfrom = -1;
 	switch (mess.get_message_type()) {
 	case rtmidi::message_type::INVALID:
 		break;
 
 	case rtmidi::message_type::PITCH_BEND:
-		bytetopullfrom = 1;
+		bytetopullfrom = 2;
 		break;
 	case rtmidi::message_type::CONTROL_CHANGE:
 		bytetopullfrom = 2;
@@ -1121,6 +1122,10 @@ int Utils::get_midi_value(rtmidi::message mess)
 	case rtmidi::message_type::NOTE_ON:
 		bytetopullfrom = 2;
 		break;
+	case rtmidi::message_type::PROGRAM_CHANGE:
+		bytetopullfrom = 1;
+		break;
+
 
 		/*****************Messages to work on ***************
 		// Standard Message
@@ -1152,6 +1157,7 @@ int Utils::get_midi_value(rtmidi::message mess)
 }
 QString Utils::mtype_to_string(rtmidi::message_type mess)
 {
+	
 	switch (mess) {
 	case rtmidi::message_type::INVALID:
 		return "INVALID";
@@ -1165,11 +1171,11 @@ QString Utils::mtype_to_string(rtmidi::message_type mess)
 	case rtmidi::message_type::CONTROL_CHANGE:
 		return "Control Change";
 	case rtmidi::message_type::PROGRAM_CHANGE:
-		return "PROGRAM_CHANGE";
+		return "Program Change";
 	case rtmidi::message_type::AFTERTOUCH:
 		return "AFTERTOUCH";
 	case rtmidi::message_type::PITCH_BEND:
-		return "PITCH_BEND";
+		return "Pitch Bend";
 
 	// System Common Messages
 	case rtmidi::message_type::SYSTEM_EXCLUSIVE:
@@ -1219,9 +1225,10 @@ QString Utils::getMidiMessageType(int in)
 	} else if (inrange(176, 191, in)) {
 		return "Control Change";
 	} else if (inrange(192, 207, in)) {
-		return "Program_Change";
-	} else
-		return "";
+		return "Program Change";
+	} else if (inrange(224, 239, in)) {
+		return "Pitch Bend";
+	}
 
 	/* Future Message types to be worked on
 	if (inrange(128, 143, in)) {

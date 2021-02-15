@@ -120,7 +120,7 @@ void MidiAgent::open_midi_input_port(int inport)
 		     midi_input_name.toStdString().c_str());
 
 	} catch (const rtmidi::midi_exception &error) {
-		Utils::alert_popup(QString("Midi Error ").append(error.what()));
+		blog(LOG_DEBUG, "Midi Error %s", error.what());
 	}
 }
 void MidiAgent::open_midi_output_port(int outport)
@@ -130,7 +130,7 @@ void MidiAgent::open_midi_output_port(int outport)
 		midiout->open_port(outport);
 	} catch (const rtmidi::midi_exception &error) {
 
-		Utils::alert_popup(QString("Midi Error ").append(error.what()));
+		blog(LOG_DEBUG, "Midi Error %s", error.what());
 	}
 	midi_output_name =
 		QString::fromStdString(midiout->get_port_name(outport));

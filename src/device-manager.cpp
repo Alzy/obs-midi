@@ -159,13 +159,14 @@ QVector<MidiHook *> DeviceManager::GetMidiHooksByDeviceName(QString deviceName)
 /* Registers a midi device.
  * Will create, store and enable a midi device.
 */
-void DeviceManager::RegisterMidiDevice(int port, int outport)
+MidiAgent * DeviceManager::RegisterMidiDevice(int port, int outport)
 {
-	std::unique_ptr<MidiAgent> midiA = std::make_unique<MidiAgent>();
+	MidiAgent * midiA = new MidiAgent();
 	midiA->open_midi_input_port(port);
 	midiA->open_midi_output_port(outport);
 
-	midiAgents.push_back(midiA.get());
+	midiAgents.push_back(midiA);
+	return midiA;
 }
 
 /* Get this Device Manager state as OBS Data. (includes devices and their midi hooks)

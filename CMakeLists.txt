@@ -19,7 +19,7 @@ if (WIN32 OR APPLE)
 	include(external/FindLibObs.cmake)
 endif()
 
-find_package(LibObs REQUIRED)
+find_package(LibObs)
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
 # Version bits
 execute_process(
@@ -232,3 +232,6 @@ if(APPLE)
 	target_link_libraries(obs-midi "${OBS_FRONTEND_LIB}")
 endif()
 # -- End of section --
+if (DEFINED $ENV{isCI})
+install_obs_plugin_with_data(obs-midi data)
+endif()

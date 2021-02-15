@@ -179,10 +179,9 @@ int PluginWindow::on_check_enabled_state_changed(int state)
 			GetDeviceManager()->GetOutPortNumberByDeviceName(
 				selectedOutDeviceName.c_str());
 		if (device == NULL) {
-			GetDeviceManager()->RegisterMidiDevice(devicePort,
+			device=GetDeviceManager()->RegisterMidiDevice(devicePort,
 							       deviceOutPort);
-			device = GetDeviceManager()->GetMidiDeviceByName(
-				selectedDeviceName.c_str());
+			
 			device->open_midi_input_port(devicePort);
 			device->open_midi_output_port(deviceOutPort);
 		} else {

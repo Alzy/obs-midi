@@ -24,6 +24,8 @@ Use MIDI devices to trigger events in OBS and visa versa.
 - If you are unable to see obs-midi in the tools you will need to install jack
 - https://jackaudio.org/downloads/
 
+# Ubuntu specifics - SNAP Release
+Due to specific ALSA permissions not being set on the ubuntu snap craft package, OBS-MIDI will not work on the snap version of obs-studio
 
 
 Currently runs on Windows and Linux, and is partly tested on MAC

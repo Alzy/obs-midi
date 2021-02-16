@@ -597,6 +597,9 @@ void PluginWindow::obs_actions_select(QString action)
 		case ActionsClass::Actions::Set_Current_Scene:
 			ShowPair(Pairs::Scene);
 			break;
+		case ActionsClass::Actions::Set_Preview_Scene:
+			ShowPair(Pairs::Scene);
+			break;
 		case ActionsClass::Actions::Enable_Source_Filter:
 			ShowPair(Pairs::Scene);
 			ShowPair(Pairs::Source);

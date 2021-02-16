@@ -145,6 +145,7 @@ public:
 	void add_MidiHook(MidiHook *hook);
 	void remove_MidiHook(MidiHook *hook);
 	void clear_MidiHooks();
+	int find_hook(ActionsClass::Actions action, QString query);
 	obs_data_t *GetData();
 
 public slots:

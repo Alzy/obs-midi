@@ -106,7 +106,7 @@ obs_data_array_t *Utils::GetSceneItems(obs_source_t *source)
 {
 	obs_data_array_t *items = obs_data_array_create();
 	OBSScene scene = obs_scene_from_source(source);
-
+	
 	if (!scene) {
 		return nullptr;
 	}

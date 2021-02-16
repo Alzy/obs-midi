@@ -232,8 +232,7 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 			   rtmidi::message_type::PITCH_BEND ||
 		   message.get_message_type() ==
 			   rtmidi::message_type::PROGRAM_CHANGE) {
-	
-	
+
 		x.device_name = self->get_midi_input_name();
 
 		x.message_type =
@@ -242,7 +241,7 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 	}
 	//self->SendMessage(x);
 	emit self->broadcast_midi_message(x);
-	
+
 	/** check if hook exists for this note or cc norc and launch it **/
 	//Eventually add channel to this check.
 
@@ -257,7 +256,6 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 						self->midiHooks.at(i)->action)));
 		}
 	}
-	
 }
 
 /* Get the midi hooks for this device
@@ -341,94 +339,65 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 			uint8_t newvol = Utils::mapper2(cbrt(vol));
 			QString source = QString(
 				obs_data_get_string(data, "sourceName"));
-			for (int i = 0; i < self->midiHooks.size(); i++) {
-				if (self->midiHooks.at(i)->action ==
-					    Utils::translate_action(
-						    ActionsClass::Actions::
-							    Set_Volume) &&
-				    self->midiHooks.at(i)->audio_source ==
-					    source) {
-					message.message_type =
-						self->midiHooks.at(i)
-							->message_type;
-					message.channel =
-						self->midiHooks.at(i)->channel;
-					message.NORC =
-						self->midiHooks.at(i)->norc;
-					message.value = newvol;
-					this->send_message_to_midi_device(
-						message);
-				}
+			int i = self->find_hook(
+				ActionsClass::Actions::Set_Volume, source);
+			if (i !=-1) {
+				message.message_type =
+					self->midiHooks.at(i)->message_type;
+				message.channel =
+					self->midiHooks.at(i)->channel;
+				message.NORC = self->midiHooks.at(i)->norc;
+				message.value = newvol;
+				this->send_message_to_midi_device(message);
 			}
 		} else if (eventType == QString("SwitchScenes")) {
 			QString source = QString::fromStdString(
 				obs_data_get_string(data, "scene-name"));
-			for (int i = 0; i < self->midiHooks.size(); i++) {
-				if (self->midiHooks.at(i)->action ==
-					    Utils::translate_action(
-						    ActionsClass::Actions::
-							    Set_Current_Scene) &&
-				    self->midiHooks.at(i)->scene == source) {
-					message.message_type = "Note Off";
-					message.channel =
-						self->midiHooks.at(i)->channel;
-					message.NORC = lastscenebtn;
-					message.value = 0;
-					this->send_message_to_midi_device(
-						message);
-					message.NORC =
-						self->midiHooks.at(i)->norc;
-					message.message_type = "Note On";
-					message.value = 1;
-					this->send_message_to_midi_device(
-						message);
-					lastscenebtn =
-						self->midiHooks.at(i)->norc;
-				}
+			int i = self->find_hook(
+				ActionsClass::Actions::Set_Current_Scene,
+				source);
+			if (i != -1) {
+				message.message_type = "Note Off";
+				message.channel =
+					self->midiHooks.at(i)->channel;
+				message.NORC = lastscenebtn;
+				message.value = 0;
+				this->send_message_to_midi_device(message);
+				message.NORC = self->midiHooks.at(i)->norc;
+				message.message_type = "Note On";
+				message.value = 1;
+				this->send_message_to_midi_device(message);
+				lastscenebtn = self->midiHooks.at(i)->norc;
 			}
 
 		} else if (eventType == QString("TransitionBegin")) {
 			QString from = obs_data_get_string(data, "from-scene");
-			for (int i = 0; i < self->midiHooks.size(); i++) {
-				if (self->midiHooks.at(i)->action ==
-					    Utils::translate_action(
-						    ActionsClass::Actions::
-							    Set_Current_Scene) &&
-				    self->midiHooks.at(i)->scene == from) {
-					message.channel =
-						self->midiHooks.at(i)->channel;
-					message.message_type = "Note On";
-					message.NORC =
-						self->midiHooks.at(i)->norc;
-					message.value = 0;
-					this->send_message_to_midi_device(
-						message);
-					message.message_type = "Note Off";
-					this->send_message_to_midi_device(
-						message);
-				}
+			int i = self->find_hook(
+				ActionsClass::Actions::Set_Current_Scene, from);
+			if (i != -1) {
+				message.channel =
+					self->midiHooks.at(i)->channel;
+				message.message_type = "Note On";
+				message.NORC = self->midiHooks.at(i)->norc;
+				message.value = 0;
+				this->send_message_to_midi_device(message);
+				message.message_type = "Note Off";
+				this->send_message_to_midi_device(message);
 			}
 		} else if (eventType == QString("SourceMuteStateChanged")) {
 			QString from = obs_data_get_string(data, "sourceName");
-			for (int i = 0; i < self->midiHooks.size(); i++) {
-				if (self->midiHooks.at(i)->action ==
-					    Utils::translate_action(
-						    ActionsClass::Actions::
-							    Toggle_Mute) &&
-				    self->midiHooks.at(i)->audio_source ==
-					    from) {
-					bool muted = obs_data_get_bool(data,
-								       "muted");
-					message.message_type = "Note On";
-					message.channel =
-						self->midiHooks.at(i)->channel;
-					message.NORC =
-						self->midiHooks.at(i)->norc;
-					message.value = muted;
-					this->send_message_to_midi_device(
-						message);
-				}
+			int i = self->find_hook(
+				ActionsClass::Actions::Toggle_Mute, from);
+			if (i != -1) {
+				bool muted = obs_data_get_bool(data, "muted");
+				message.message_type = "Note On";
+				message.channel =
+					self->midiHooks.at(i)->channel;
+				message.NORC = self->midiHooks.at(i)->norc;
+				message.value = muted;
+				this->send_message_to_midi_device(message);
 			}
+
 		} else if (eventType == QString("SourceRenamed")) {
 			QString from =
 				obs_data_get_string(data, "previousName");
@@ -465,6 +434,27 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 		this->sending = false;
 	}
 }
+int MidiAgent::find_hook(ActionsClass::Actions action, QString query)
+{
+	MidiAgent *self = static_cast<MidiAgent *>(this);
+	QString check;
+	for (int i = 0; i < self->midiHooks.size(); i++) {
+		switch (action) {
+		case ActionsClass::Actions::Set_Volume:
+		case ActionsClass::Actions::Toggle_Mute:
+			check = self->midiHooks.at(i)->source;
+			break;
+		case ActionsClass::Actions::Set_Current_Scene:
+			check = self->midiHooks.at(i)->scene;
+			break;
+		}
+		if (check == query) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 void MidiAgent::send_message_to_midi_device(MidiMessage message)
 {
 	std::unique_ptr<rtmidi::message> hello =

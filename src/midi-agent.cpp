@@ -246,7 +246,7 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 	/** check if hook exists for this note or cc norc and launch it **/
 	//Eventually add channel to this check.
 
-	for (unsigned i = 0; i < self->midiHooks.size(); i++) {
+	for (int i = 0; i < self->midiHooks.size(); i++) {
 		if (self->midiHooks.at(i)->message_type == x.message_type &&
 		    self->midiHooks.at(i)->norc == x.NORC &&
 		    self->midiHooks.at(i)->channel == x.channel) {
@@ -341,7 +341,7 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 			uint8_t newvol = Utils::mapper2(cbrt(vol));
 			QString source = QString(
 				obs_data_get_string(data, "sourceName"));
-			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
+			for (int i = 0; i < self->midiHooks.size(); i++) {
 				if (self->midiHooks.at(i)->action ==
 					    Utils::translate_action(
 						    ActionsClass::Actions::
@@ -363,7 +363,7 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 		} else if (eventType == QString("SwitchScenes")) {
 			QString source = QString::fromStdString(
 				obs_data_get_string(data, "scene-name"));
-			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
+			for (int i = 0; i < self->midiHooks.size(); i++) {
 				if (self->midiHooks.at(i)->action ==
 					    Utils::translate_action(
 						    ActionsClass::Actions::
@@ -376,6 +376,8 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 					message.value = 0;
 					this->send_message_to_midi_device(
 						message);
+					message.NORC =
+						self->midiHooks.at(i)->norc;
 					message.message_type = "Note On";
 					message.value = 1;
 					this->send_message_to_midi_device(
@@ -387,7 +389,7 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 
 		} else if (eventType == QString("TransitionBegin")) {
 			QString from = obs_data_get_string(data, "from-scene");
-			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
+			for (int i = 0; i < self->midiHooks.size(); i++) {
 				if (self->midiHooks.at(i)->action ==
 					    Utils::translate_action(
 						    ActionsClass::Actions::
@@ -430,7 +432,7 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 		} else if (eventType == QString("SourceRenamed")) {
 			QString from =
 				obs_data_get_string(data, "previousName");
-			for (unsigned i = 0; i < self->midiHooks.size(); i++) {
+			for (int i = 0; i < self->midiHooks.size(); i++) {
 				if (self->midiHooks.at(i)->source == from) {
 					self->midiHooks.at(i)->source =
 						obs_data_get_string(data,
@@ -446,7 +448,7 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 				QString from =
 					obs_data_get_string(data, "sourceName");
 
-				for (unsigned i = 0; i < self->midiHooks.size();
+				for (int i = 0; i < self->midiHooks.size();
 				     i++) {
 					if (self->midiHooks.at(i)->source ==
 					    from) {

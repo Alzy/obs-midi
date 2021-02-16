@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_definitions(-DASIO_STANDALONE)
 
-if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm") 
+if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
     set(CMAKE_CXX_FLAGS "-mfpu=neon")
 endif()
 
@@ -98,7 +98,7 @@ if(LINUX)
 		Qt5::Core
 		Qt5::Widgets
 		libobs.so)
-	
+
 else()
 	target_link_libraries(obs-midi
 		"${OBS_FRONTEND_LIB}"

@@ -47,11 +47,11 @@ void OBSController::SetCurrentScene(QString sceneName)
 void OBSController::SetPreviewScene(QString sceneName)
 {
 	if (!obs_frontend_preview_program_mode_active()) {
-		Utils::alert_popup("studio mode not enabled");
+		blog(LOG_DEBUG,"studio mode not enabled");
 	}
 	OBSScene scene = Utils::GetSceneFromNameOrCurrent(sceneName);
 	if (!scene) {
-		Utils::alert_popup("specified scene doesn't exist");
+		blog(LOG_DEBUG, "specified scene doesn't exist");
 	}
 
 	obs_frontend_set_current_preview_scene(obs_scene_get_source(scene));
@@ -109,15 +109,15 @@ void OBSController::TransitionToProgram(QString transitionName,
 					int transitionDuration)
 {
 	if (!obs_frontend_preview_program_mode_active()) {
-		Utils::alert_popup("studio mode not enabled");
+		blog(LOG_DEBUG,"studio mode not enabled");
 	}
 
 	if (transitionName.isEmpty()) {
-		Utils::alert_popup("transition name can not be empty");
+		blog(LOG_DEBUG,"transition name can not be empty");
 	}
 	bool success = Utils::SetTransitionByName(transitionName);
 	if (!success) {
-		Utils::alert_popup("specified transition doesn't exist");
+		blog(LOG_DEBUG,"specified transition doesn't exist");
 	}
 	obs_frontend_set_transition_duration(transitionDuration);
 
@@ -295,7 +295,7 @@ void OBSController::StartStopReplayBuffer()
 void OBSController::StartReplayBuffer()
 {
 	if (!Utils::ReplayBufferEnabled()) {
-		Utils::alert_popup("replay buffer disabled in settings");
+		blog(LOG_DEBUG,"replay buffer disabled in settings");
 	}
 
 	if (obs_frontend_replay_buffer_active() == false) {
@@ -352,7 +352,7 @@ void OBSController::SetBrowserSourceURL(QString sourceName, QString url)
 		obs_get_source_by_name(sourceName.toStdString().c_str());
 	QString sourceId = obs_source_get_id(source);
 	if (sourceId != "browser_source" && sourceId != "linuxbrowser-source") {
-		return Utils::alert_popup("Not a browser Source");
+		return blog(LOG_DEBUG,"Not a browser Source");
 	}
 
 	OBSDataAutoRelease settings = obs_source_get_settings(source);

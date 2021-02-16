@@ -310,8 +310,8 @@ jobs:
         run: |
           VERSION="${{ env.GIT_HASH }}"
           cd ./build
-          mkdir -p obs-studio/plugins/64bit/
-          cp ./obs-midi.so obs-studio/plugins/64bit/
+          mkdir -p obs-studio/plugins/obs-midi/bin/64bit/
+          cp ./obs-midi.so obs-studio/plugins/obs-midi/bin/64bit/
           tar -czvf obs-midi-Linux-${{ env.GIT_HASH }}-x64.tar.gz obs-studio
           pwd
 

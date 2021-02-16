@@ -167,6 +167,5 @@ private:
 	bool bidirectional;
 	bool closing = false;
 	QVector<MidiHook *> midiHooks;
-	void do_obs_action(MidiHook *hook, int MidiVal,
-			   ActionsClass::Actions action);
+	void do_obs_action(MidiHook *hook, int MidiVal);
 };

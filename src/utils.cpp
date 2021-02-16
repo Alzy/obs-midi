@@ -1250,40 +1250,21 @@ QString Utils::mtype_to_string(rtmidi::message_type mess)
 	}
 	return "ERROR";
 }
-QString Utils::getMidiMessageType(int in)
+QString Utils::get_midi_message_type(rtmidi::message message)
 {
-	//currently sets from a few  non breaking returns, will need to have message format structs to return here instead
-	if (inrange(128, 143, in)) {
-		return "Note Off";
-	} else if (inrange(144, 159, in)) {
-		return "Note On";
-	} else if (inrange(176, 191, in)) {
+	switch (message.get_message_type()) {
+	case rtmidi::message_type::CONTROL_CHANGE:
 		return "Control Change";
-	} else if (inrange(192, 207, in)) {
+	case rtmidi::message_type::NOTE_OFF:
+		return "Note Off";
+	case rtmidi::message_type::NOTE_ON:
+		return "Note On";
+	case rtmidi::message_type::PROGRAM_CHANGE:
 		return "Program Change";
-	} else if (inrange(224, 239, in)) {
+	case rtmidi::message_type::PITCH_BEND:
 		return "Pitch Bend";
 	}
 
-	/* Future Message types to be worked on
-	if (inrange(128, 143, in)) {
-		return "note_off";
-	} else if (inrange(144, 159, in)) {
-		return "note_on";
-	} else if (inrange(160, 175, in)) {
-		return "poly_aftertouch";
-	} else if (inrange(176, 191, in)) {
-		return "control_change";
-	} else 	if (inrange(192, 207, in)) {
-		return "program_change";
-	} else 	if (inrange(208, 223, in)) {
-		return "chan_aftertouch";
-	} else 	if (inrange(224, 239, in)) {
-		return "pitch_bend";
-	} else if (inrange(240, 255, in)) {
-		return "system";
-	} else
-		return "";*/
 }
 QSpinBox *Utils::GetTransitionDurationControl()
 {

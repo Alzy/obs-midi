@@ -684,13 +684,7 @@ void PluginWindow::obs_actions_select(QString action)
 			break;
 		case ActionsClass::Actions::Toggle_Source_Visibility:{
 			ShowPair(Pairs::Scene);
-			obs_source_t *source = obs_get_source_by_name(
-				ui->cb_obs_output_scene->currentText().toStdString().c_str());
-			QStringList items = Utils::GetSceneItemsBySource(source);
-			obs_source_release(source);
-			ui->cb_obs_output_item->clear();
-			ui->cb_obs_output_item->addItems(items);
-			ShowPair(Pairs::Item);
+			ShowPair(Pairs::Source);
 		} break;
 		default:
 			HideAllPairs();

@@ -213,48 +213,19 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 
 	/*************Get Message parts***********/
 	self->sending = true;
-	MidiMessage x;
+	MidiMessage x(message);
 	/***** Send Messages to emit function *****/
-	if (message.get_message_type() ==
-		    rtmidi::message_type::CONTROL_CHANGE ||
-	    message.get_message_type() == rtmidi::message_type::NOTE_ON ||
-	    message.get_message_type() == rtmidi::message_type::NOTE_OFF) {
-
-		x.device_name = self->get_midi_input_name();
-
-		x.message_type =
-			Utils::mtype_to_string(message.get_message_type());
-		x.NORC = Utils::get_midi_note_or_control(message);
-		x.channel = message.get_channel();
-		x.value = Utils::get_midi_value(message);
-
-	} else if (message.get_message_type() ==
-			   rtmidi::message_type::PITCH_BEND ||
-		   message.get_message_type() ==
-			   rtmidi::message_type::PROGRAM_CHANGE) {
-	
-	
-		x.device_name = self->get_midi_input_name();
-
-		x.message_type =
-			Utils::mtype_to_string(message.get_message_type());
-		x.value = Utils::get_midi_value(message);
-	}
-	//self->SendMessage(x);
+	x.device_name = self->get_midi_input_name();
 	emit self->broadcast_midi_message(x);
 	
 	/** check if hook exists for this note or cc norc and launch it **/
-	//Eventually add channel to this check.
 
 	for (int i = 0; i < self->midiHooks.size(); i++) {
 		if (self->midiHooks.at(i)->message_type == x.message_type &&
 		    self->midiHooks.at(i)->norc == x.NORC &&
 		    self->midiHooks.at(i)->channel == x.channel) {
 			self->do_obs_action(
-				self->midiHooks.at(i), x.value,
-				ActionsClass::string_to_action(
-					Utils::untranslate(
-						self->midiHooks.at(i)->action)));
+				self->midiHooks.at(i), x.value);
 		}
 	}
 	
@@ -510,10 +481,9 @@ void MidiAgent::send_message_to_midi_device(MidiMessage message)
 	}
 }
 
-void MidiAgent::do_obs_action(MidiHook *hook, int MidiVal,
-			      ActionsClass::Actions action)
+void MidiAgent::do_obs_action(MidiHook *hook, int MidiVal)
 {
-	switch (action) {
+	switch (ActionsClass::string_to_action(Utils::untranslate(hook->action))) {
 	case ActionsClass::Actions::Set_Current_Scene:
 		OBSController::SetCurrentScene(hook->scene);
 		break;
@@ -659,7 +629,7 @@ void MidiAgent::do_obs_action(MidiHook *hook, int MidiVal,
 		OBSController::next_media(hook->media_source);
 		break;
 	case ActionsClass::Actions::Toggle_Source_Visibility:
-		OBSController::ToggleSourceVisibility(hook->scene, hook->item);
+		OBSController::ToggleSourceVisibility(hook->scene, hook->source);
 		break;
 	};
 }

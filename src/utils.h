@@ -40,14 +40,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 typedef void (*PauseRecordingFunction)(bool);
 typedef bool (*RecordingPausedFunction)();
-typedef struct MidiMessage {
-	QString device_name;
-	QString message_type;
-	int channel;
-	int NORC;
-	int value;
-} MidiMessage;
-Q_DECLARE_METATYPE(MidiMessage);
+
 enum class Pairs {
 	Scene,
 	Source,
@@ -156,7 +149,7 @@ int t_bar_mapper(int x);
 bool is_number(const QString &s);
 bool isJSon(QString val);
 
-QString getMidiMessageType(int in);
+QString get_midi_message_type(rtmidi::message message);
 QStringList GetMediaSourceNames();
 QStringList GetAudioSourceNames();
 
@@ -228,7 +221,7 @@ const QList<ActionsClass::Actions> AllActions_raw = {
 	ActionsClass::Actions::Play_Pause_Media,
 	ActionsClass::Actions::Previous_Media,
 	ActionsClass::Actions::Reset_Scene_Item,
-
+	ActionsClass::Actions::Toggle_Source_Visibility,
 	ActionsClass::Actions::Restart_Media,
 	ActionsClass::Actions::Set_Current_Scene,
 	ActionsClass::Actions::Set_Current_Transition,
@@ -278,8 +271,25 @@ const QList<ActionsClass::Actions> not_ready_actions{
 	ActionsClass::Actions::Set_Text_GDIPlus_Text,
 	//ActionsClass::Actions::Set_Opacity,
 	ActionsClass::Actions::Set_Browser_Source_URL,
-	ActionsClass::Actions::Toggle_Source_Visibility};
+	};
 
 void alert_popup(QString message);
 QString translate_action(ActionsClass::Actions action);
 };
+
+typedef struct MidiMessage {
+	MidiMessage(){};
+	MidiMessage(rtmidi::message message)
+	{
+		this->channel = message.get_channel();
+		this->message_type = Utils::get_midi_message_type(message);
+		this->NORC = Utils::get_midi_note_or_control(message);
+		this->value = Utils::get_midi_value(message);
+	}
+	QString device_name;
+	QString message_type;
+	int channel=0;
+	int NORC=0;
+	int value=0;
+} MidiMessage;
+Q_DECLARE_METATYPE(MidiMessage);

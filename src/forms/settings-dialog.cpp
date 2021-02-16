@@ -93,6 +93,7 @@ void PluginWindow::ToggleShowHide()
 		ui->cb_obs_output_transition->addItems(
 			Utils::GetTransitionsList());
 		get_scene_names();
+		ui->tabWidget->setCurrentIndex(0);
 		setVisible(true);
 	} else {
 		setVisible(false);

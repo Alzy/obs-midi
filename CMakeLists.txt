@@ -208,8 +208,12 @@ if(UNIX AND NOT APPLE)
 
         set(CMAKE_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
 		OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+	find_program(LSB_RELEASE_EXEC lsb_release)
+	execute_process(COMMAND ${LSB_RELEASE_EXEC} -is
+	OUTPUT_VARIABLE LSB_RELEASE_ID_SHORT
+	OUTPUT_STRIP_TRAILING_WHITESPACE
 
-	if(${USE_UBUNTU_FIX})
+	if(${LSB_RELEASE_ID_SHORT} == "Ubuntu")
 		install(TARGETS obs-midi LIBRARY
 			DESTINATION "/usr/lib/obs-plugins"
 			PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
@@ -233,5 +237,7 @@ if(APPLE)
 endif()
 # -- End of section --
 if (DEFINED $ENV{isCI})
+set_target_properties(obs-midi PROPERTIES PREFIX "plugins/obs-midi")
+
 install_obs_plugin_with_data(obs-midi data)
 endif()

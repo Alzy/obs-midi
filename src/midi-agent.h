@@ -130,6 +130,7 @@ class MidiAgent : public QObject {
 
 public:
 	MidiAgent();
+	MidiAgent(obs_data_t* data);
 	~MidiAgent();
 	void Load(obs_data_t *data);
 

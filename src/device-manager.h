@@ -60,8 +60,8 @@ signals:
 	void bcast(QString updateType, QString eventData);
 
 private:
-	rtmidi::midi_in *rtMidi;
-	rtmidi::midi_out *MO;
+	rtmidi::midi_in rtMidi;
+	rtmidi::midi_out MO;
 
 	QVector<MidiAgent *> midiAgents;
 };

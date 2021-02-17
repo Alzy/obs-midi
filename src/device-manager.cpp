@@ -19,15 +19,14 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 DeviceManager::DeviceManager()
 {
-	rtMidi = new rtmidi::midi_in();
-	MO = new rtmidi::midi_out();
+	
 }
 
 DeviceManager::~DeviceManager()
 {
 	Unload();
-	delete rtMidi;
-	delete MO;
+	this->deleteLater();
+	
 }
 
 /* Load the Device Manager from saved Config Store data.
@@ -41,8 +40,7 @@ void DeviceManager::Load(obs_data_t *data)
 	size_t deviceCount = obs_data_array_count(devicesData);
 	for (size_t i = 0; i < deviceCount; i++) {
 		obs_data_t *deviceData = obs_data_array_item(devicesData, i);
-		MidiAgent *device = new MidiAgent();
-		device->Load(deviceData);
+		MidiAgent *device = new MidiAgent(deviceData);
 		obs_data_release(deviceData);
 		midiAgents.push_back(device);
 
@@ -60,10 +58,10 @@ void DeviceManager::Load(obs_data_t *data)
 			if (outPort != -1) {
 				device->open_midi_output_port(outPort);
 			}
+			
 		}
 	}
 
-	obs_data_array_release(devicesData);
 }
 
 void DeviceManager::Unload()
@@ -71,7 +69,9 @@ void DeviceManager::Unload()
 	blog(LOG_INFO, "UNLOADING DEVICE MANAGER");
 	midiAgents.clear();
 	for (auto agent : midiAgents) {
+		blog(LOG_DEBUG, "Unloading Midi Device %s",agent->get_midi_input_name().toStdString().c_str());
 		agent->clear_MidiHooks();
+		agent->~MidiAgent();
 		delete agent;
 	}
 }
@@ -81,9 +81,9 @@ void DeviceManager::Unload()
 QStringList DeviceManager::GetPortsList()
 {
 	QStringList ports;
-	int portCount = rtMidi->get_port_count();
+	int portCount = rtMidi.get_port_count();
 	for (int i = 0; i < portCount; i++) {
-		ports.append(QString::fromStdString(rtMidi->get_port_name(i)));
+		ports.append(QString::fromStdString(rtMidi.get_port_name(i)));
 	}
 	return ports;
 }
@@ -94,10 +94,10 @@ QStringList DeviceManager::GetOutPortsList()
 {
 	opl.clear();
 	QStringList outports;
-	int portCount = MO->get_port_count();
+	int portCount = MO.get_port_count();
 	for (int i = 0; i < portCount; i++) {
-		outports.append(QString::fromStdString(MO->get_port_name(i)));
-		opl.append(QString::fromStdString(MO->get_port_name(i)));
+		outports.append(QString::fromStdString(MO.get_port_name(i)));
+		opl.append(QString::fromStdString(MO.get_port_name(i)));
 	}
 	return outports;
 }
@@ -177,9 +177,9 @@ MidiAgent * DeviceManager::RegisterMidiDevice(int port, int outport)
 */
 obs_data_t *DeviceManager::GetData()
 {
-	obs_data_t *data = obs_data_create();
+	obs_data_t* data = obs_data_create();
 
-	obs_data_array_t *deviceData = obs_data_array_create();
+	obs_data_array_t* deviceData = obs_data_array_create();
 	for (int i = 0; i < midiAgents.size(); i++) {
 		obs_data_array_push_back(deviceData,
 					 midiAgents.at(i)->GetData());

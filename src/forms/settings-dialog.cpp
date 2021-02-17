@@ -171,15 +171,11 @@ int PluginWindow::on_check_enabled_state_changed(int state)
 			GetDeviceManager()->GetOutPortNumberByDeviceName(
 				selectedOutDeviceName.c_str());
 		if (device == NULL) {
-			device=GetDeviceManager()->RegisterMidiDevice(devicePort,
-							       deviceOutPort);
-			
-			device->open_midi_input_port(devicePort);
-			device->open_midi_output_port(deviceOutPort);
-		} else {
-			device->open_midi_input_port(devicePort);
-			device->open_midi_output_port(deviceOutPort);
+			device = GetDeviceManager()->RegisterMidiDevice(
+				devicePort, deviceOutPort);
 		}
+		device->open_midi_input_port(devicePort);
+		device->open_midi_output_port(deviceOutPort);
 		device->set_enabled(true);
 		device->setBidirectional(true);
 		ui->bidirectional->setEnabled(true);

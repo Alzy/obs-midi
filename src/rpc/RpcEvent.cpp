@@ -31,5 +31,4 @@ RpcEvent::RpcEvent(const QString &updateType,
 		_additionalFields = obs_data_create();
 		obs_data_apply(_additionalFields, additionalFields);
 	}
-	obs_data_release(additionalFields);
 }

@@ -229,7 +229,7 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 				self->midiHooks.at(i), x->value);
 		}
 	}
-	free(x);
+	delete(x);
 }
 
 /* Get the midi hooks for this device
@@ -297,7 +297,7 @@ obs_data_t *MidiAgent::GetData()
 void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 {
 	if (!this->sending) {
-		MidiMessage message;
+		MidiMessage *message = new MidiMessage();
 		OBSDataAutoRelease data = obs_data_create_from_json(
 			eventData.toStdString().c_str());
 
@@ -320,16 +320,16 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 							    Set_Volume) &&
 				    self->midiHooks.at(i)->audio_source ==
 					    source) {
-					message.message_type =
+					message->message_type =
 						self->midiHooks.at(i)
 							->message_type;
-					message.channel =
+					message->channel =
 						self->midiHooks.at(i)->channel;
-					message.NORC =
+					message->NORC =
 						self->midiHooks.at(i)->norc;
-					message.value = newvol;
+					message->value = newvol;
 					this->send_message_to_midi_device(
-						message);
+						message->get());
 				}
 			}
 		} else if (eventType == QString("SwitchScenes")) {
@@ -341,19 +341,19 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 						    ActionsClass::Actions::
 							    Set_Current_Scene) &&
 				    self->midiHooks.at(i)->scene == source) {
-					message.message_type = "Note Off";
-					message.channel =
+					message->message_type = "Note Off";
+					message->channel =
 						self->midiHooks.at(i)->channel;
-					message.NORC = lastscenebtn;
-					message.value = 0;
+					message->NORC = lastscenebtn;
+					message->value = 0;
 					this->send_message_to_midi_device(
-						message);
-					message.NORC =
+						message->get());
+					message->NORC =
 						self->midiHooks.at(i)->norc;
-					message.message_type = "Note On";
-					message.value = 1;
+					message->message_type = "Note On";
+					message->value = 1;
 					this->send_message_to_midi_device(
-						message);
+						message->get());
 					lastscenebtn =
 						self->midiHooks.at(i)->norc;
 				}
@@ -368,19 +368,19 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 						    ActionsClass::Actions::
 							    Set_Preview_Scene) &&
 				    self->midiHooks.at(i)->scene == source) {
-					message.message_type = "Note Off";
-					message.channel =
+					message->message_type = "Note Off";
+					message->channel =
 						self->midiHooks.at(i)->channel;
-					message.NORC = last_preview_scene_norc;
-					message.value = 0;
+					message->NORC = last_preview_scene_norc;
+					message->value = 0;
 					this->send_message_to_midi_device(
-						message);
-					message.NORC =
+						message->get());
+					message->NORC =
 						self->midiHooks.at(i)->norc;
-					message.message_type = "Note On";
-					message.value = 1;
+					message->message_type = "Note On";
+					message->value = 1;
 					this->send_message_to_midi_device(
-						message);
+						message->get());
 					last_preview_scene_norc =
 						self->midiHooks.at(i)->norc;
 				}
@@ -395,17 +395,17 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 						    ActionsClass::Actions::
 							    Set_Current_Scene) &&
 				    self->midiHooks.at(i)->scene == from) {
-					message.channel =
+					message->channel =
 						self->midiHooks.at(i)->channel;
-					message.message_type = "Note On";
-					message.NORC =
+					message->message_type = "Note On";
+					message->NORC =
 						self->midiHooks.at(i)->norc;
-					message.value = 0;
+					message->value = 0;
 					this->send_message_to_midi_device(
-						message);
-					message.message_type = "Note Off";
+						message->get());
+					message->message_type = "Note Off";
 					this->send_message_to_midi_device(
-						message);
+						message->get());
 				}
 			}
 		} else if (eventType == QString("SourceMuteStateChanged")) {
@@ -419,14 +419,14 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 					    from) {
 					bool muted = obs_data_get_bool(data,
 								       "muted");
-					message.message_type = "Note On";
-					message.channel =
+					message->message_type = "Note On";
+					message->channel =
 						self->midiHooks.at(i)->channel;
-					message.NORC =
+					message->NORC =
 						self->midiHooks.at(i)->norc;
-					message.value = muted;
+					message->value = muted;
 					this->send_message_to_midi_device(
-						message);
+						message->get());
 				}
 			}
 		} else if (eventType == QString("SourceRenamed")) {
@@ -461,9 +461,12 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 				GetConfig()->Save();
 			}
 		}
+		delete(message);
+		obs_data_release(data);
 	} else {
 		this->sending = false;
 	}
+	
 }
 void MidiAgent::send_message_to_midi_device(MidiMessage message)
 {

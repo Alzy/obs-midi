@@ -1052,6 +1052,7 @@ QStringList Utils::GetTransitionsList()
 		OBSSource transition = transitionList.sources.array[i];
 
 		names.append(obs_source_get_name(transition));
+		
 	}
 	obs_frontend_source_list_free(&transitionList);
 	return names;
@@ -1087,6 +1088,7 @@ QStringList Utils::GetSceneItemsList(QString scenename)
 		SceneItemsList.append(obs_data_get_string(
 			obs_data_array_item(sceneItemArray, i), "sourceName"));
 	}
+	obs_data_array_release(sceneItemArray);
 	return SceneItemsList;
 }
 int Utils::get_midi_note_or_control(rtmidi::message mess)
@@ -1108,30 +1110,7 @@ int Utils::get_midi_note_or_control(rtmidi::message mess)
 	case rtmidi::message_type::CONTROL_CHANGE:
 		bytetopullfrom = 1;
 		break;
-		/*****************Messages to work on ***************
-	// Standard Message
-	case rtmidi::message_type:: POLY_PRESSURE : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: PROGRAM_CHANGE : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: AFTERTOUCH : bytetopullfrom = 0;break;
-	// System Common Messages
-	case rtmidi::message_type:: SYSTEM_EXCLUSIVE : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: TIME_CODE : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: SONG_POS_POINTER : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: SONG_SELECT : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: RESERVED1 : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: RESERVED2 : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: TUNE_REQUEST : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: EOX : bytetopullfrom = 0;break;
-	// System Realtime Messages
-	case rtmidi::message_type:: TIME_CLOCK : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: RESERVED3 : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: START : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: CONTINUE : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: STOP : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: RESERVED4 : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: ACTIVE_SENSING : bytetopullfrom = 0;break;
-	case rtmidi::message_type:: SYSTEM_RESET : bytetopullfrom = 0;break;
-	****************************************************/
+	
 	}
 
 	return mess[bytetopullfrom];
@@ -1160,32 +1139,6 @@ int Utils::get_midi_value(rtmidi::message mess)
 	case rtmidi::message_type::PROGRAM_CHANGE:
 		bytetopullfrom = 1;
 		break;
-
-
-		/*****************Messages to work on ***************
-		// Standard Message
-		case rtmidi::message_type:: POLY_PRESSURE : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: PROGRAM_CHANGE : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: AFTERTOUCH : bytetopullfrom = 0;break;
-		// System Common Messages
-		case rtmidi::message_type:: SYSTEM_EXCLUSIVE : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: TIME_CODE : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: SONG_POS_POINTER : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: SONG_SELECT : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: RESERVED1 : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: RESERVED2 : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: TUNE_REQUEST : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: EOX : bytetopullfrom = 0;break;
-		// System Realtime Messages
-		case rtmidi::message_type:: TIME_CLOCK : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: RESERVED3 : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: START : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: CONTINUE : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: STOP : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: RESERVED4 : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: ACTIVE_SENSING : bytetopullfrom = 0;break;
-		case rtmidi::message_type:: SYSTEM_RESET : bytetopullfrom = 0;break;
-  			*/
 	}
 
 	return mess[bytetopullfrom];

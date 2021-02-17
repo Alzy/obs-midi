@@ -103,6 +103,7 @@ void MidiAgent::Load(obs_data_t *data)
 		mh->int_override = obs_data_get_int(hookData, "int_override");
 		add_MidiHook(mh);
 	}
+	obs_data_array_release(hooksData);
 }
 /* Will open the port and enable this MidiAgent
 */

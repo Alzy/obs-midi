@@ -83,15 +83,8 @@ void PluginWindow::ToggleShowHide()
 {
 	if (!isVisible()) {
 		SetAvailableDevices();
-		ui->cb_obs_output_audio_source->clear();
-		ui->cb_obs_output_audio_source->addItems(
-			Utils::GetAudioSourceNames());
-		ui->cb_obs_output_media_source->clear();
-		ui->cb_obs_output_media_source->addItems(
-			Utils::GetMediaSourceNames());
-		ui->cb_obs_output_transition->clear();
-		ui->cb_obs_output_transition->addItems(
-			Utils::GetTransitionsList());
+		
+
 		get_scene_names();
 		ui->tabWidget->setCurrentIndex(0);
 		setVisible(true);
@@ -350,6 +343,8 @@ void PluginWindow::ShowPair(Pairs Pair)
 		ui->label_obs_output_transition->show();
 		ui->cb_obs_output_transition->show();
 		ui->w_transition->show();
+		ui->cb_obs_output_transition->addItems(
+			Utils::GetTransitionsList());
 		break;
 	case Pairs::Item:
 		ui->label_obs_output_item->show();
@@ -570,13 +565,16 @@ void PluginWindow::get_scenes()
 void PluginWindow::get_filters(QString source)
 {
 	ui->cb_obs_output_filter->clear();
-	auto x = obs_get_source_by_name(source.toStdString().c_str());
+	obs_source* x = obs_get_source_by_name(source.toStdString().c_str());
 	OBSDataArrayAutoRelease y = Utils::GetSourceFiltersList(x, false);
 	for (int i = 0; i < obs_data_array_count(y); i++) {
-		OBSDataAutoRelease z = obs_data_array_item(y, i);
+		obs_data_t* z = obs_data_array_item(y, i);
 		ui->cb_obs_output_filter->addItem(
 			QString(obs_data_get_string(z, "name")));
+		obs_data_release(z);
 	}
+	obs_data_array_release(y);
+	obs_source_release(x);
 }
 void PluginWindow::check_advanced_switch(bool state)
 {

@@ -53,8 +53,9 @@ void OBSController::SetPreviewScene(QString sceneName)
 	if (!scene) {
 		blog(LOG_DEBUG, "specified scene doesn't exist");
 	}
+	OBSSourceAutoRelease source = obs_scene_get_source(scene);
 
-	obs_frontend_set_current_preview_scene(obs_scene_get_source(scene));
+	obs_frontend_set_current_preview_scene(source);
 }
 
 /**
@@ -87,7 +88,8 @@ void OBSController::ResetSceneItem(QString sceneName, QString itemName)
 		throw("specified scene item doesn't exist");
 	}
 
-	OBSSource sceneItemSource = obs_sceneitem_get_source(sceneItem);
+	OBSSourceAutoRelease sceneItemSource =
+		obs_sceneitem_get_source(sceneItem);
 
 	OBSDataAutoRelease settings = obs_source_get_settings(sceneItemSource);
 	obs_source_update(sceneItemSource, settings);
@@ -477,25 +479,27 @@ void OBSController::toggle_studio_mode()
 void OBSController::reset_stats() {}
 void OBSController::restart_media(QString media_source)
 {
-
-	obs_source_media_restart(
-		obs_get_source_by_name(media_source.toStdString().c_str()));
+	OBSSourceAutoRelease source =
+		obs_get_source_by_name(media_source.toStdString().c_str());
+	obs_source_media_restart(source);
 }
 
 void OBSController::stop_media(QString media_source)
 {
-
-	obs_source_media_stop(
-		obs_get_source_by_name(media_source.toStdString().c_str()));
+	OBSSourceAutoRelease source =
+		obs_get_source_by_name(media_source.toStdString().c_str());
+	obs_source_media_stop(source);
 }
 void OBSController::next_media(QString media_source)
 {
+	OBSSourceAutoRelease source =
+		obs_get_source_by_name(media_source.toStdString().c_str());
 
-	obs_source_media_next(
-		obs_get_source_by_name(media_source.toStdString().c_str()));
+	obs_source_media_next(source);
 }
 void OBSController::prev_media(QString media_source)
 {
-	obs_source_media_previous(
-		obs_get_source_by_name(media_source.toStdString().c_str()));
+	OBSSourceAutoRelease source =
+		obs_get_source_by_name(media_source.toStdString().c_str());
+	obs_source_media_previous(source);
 }

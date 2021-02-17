@@ -214,22 +214,22 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 
 	/*************Get Message parts***********/
 	self->sending = true;
-	MidiMessage x(message);
+	MidiMessage *x= new MidiMessage();
+	x->set_message(message);
 	/***** Send Messages to emit function *****/
-	x.device_name = self->get_midi_input_name();
-	emit self->broadcast_midi_message(x);
-	
+	x->device_name = self->get_midi_input_name();
+	emit self->broadcast_midi_message(x->get());
 	/** check if hook exists for this note or cc norc and launch it **/
 
 	for (int i = 0; i < self->midiHooks.size(); i++) {
-		if (self->midiHooks.at(i)->message_type == x.message_type &&
-		    self->midiHooks.at(i)->norc == x.NORC &&
-		    self->midiHooks.at(i)->channel == x.channel) {
+		if (self->midiHooks.at(i)->message_type == x->message_type &&
+		    self->midiHooks.at(i)->norc == x->NORC &&
+		    self->midiHooks.at(i)->channel == x->channel) {
 			self->do_obs_action(
-				self->midiHooks.at(i), x.value);
+				self->midiHooks.at(i), x->value);
 		}
 	}
-	
+	free(x);
 }
 
 /* Get the midi hooks for this device

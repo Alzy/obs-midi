@@ -72,11 +72,7 @@ events::events(DeviceManagerPtr srv)
 	cpuUsageInfo = os_cpu_usage_info_start();
 	obs_frontend_add_event_callback(events::FrontendEventHandler, this);
 
-	connect(&streamStatusTimer, SIGNAL(timeout()), this,
-		SLOT(StreamStatus()));
-	connect(&heartbeatTimer, SIGNAL(timeout()), this, SLOT(Heartbeat()));
-
-	heartbeatTimer.start(STATUS_INTERVAL);
+	
 
 	// Connect to signals of all existing sources
 	obs_enum_sources(
@@ -1844,7 +1840,7 @@ void events::OnBroadcastCustomMessage(QString realm, obs_data_t *data)
  */
 obs_data_t *events::GetStats()
 {
-	obs_data_t *stats = obs_data_create();
+	OBSDataAutoRelease stats = obs_data_create();
 
 	double cpuUsage = os_cpu_usage_info_query(cpuUsageInfo);
 	double memoryUsage =

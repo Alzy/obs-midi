@@ -167,7 +167,6 @@ MidiAgent * DeviceManager::RegisterMidiDevice(int port, int outport)
 	MidiAgent * midiA = new MidiAgent();
 	midiA->open_midi_input_port(port);
 	midiA->open_midi_output_port(outport);
-
 	midiAgents.push_back(midiA);
 	return midiA;
 }
@@ -198,21 +197,7 @@ void DeviceManager::broadcast_obs_event(const RpcEvent &event)
 	obs_data_set_string(eventData, "update-type",
 			    updateType.toUtf8().constData());
 
-	std::optional<uint64_t> streamTime = event.streamTime();
-	if (streamTime.has_value()) {
-		QString streamingTimecode =
-			Utils::nsToTimestamp(streamTime.value());
-		obs_data_set_string(eventData, "stream-timecode",
-				    streamingTimecode.toUtf8().constData());
-	}
-
-	std::optional<uint64_t> recordingTime = event.recordingTime();
-	if (recordingTime.has_value()) {
-		QString recordingTimecode =
-			Utils::nsToTimestamp(recordingTime.value());
-		obs_data_set_string(eventData, "rec-timecode",
-				    recordingTimecode.toUtf8().constData());
-	}
+	
 
 	OBSData additionalFields = event.additionalFields();
 	if (additionalFields) {
@@ -222,4 +207,5 @@ void DeviceManager::broadcast_obs_event(const RpcEvent &event)
 	blog(1, "OBS EVENT %s -- %s", event.updateType().toStdString().c_str(),obs_data_get_json(eventData));
 	emit bcast(event.updateType(),
 		   QString::fromStdString(obs_data_get_json(eventData)));
+	obs_data_release(additionalFields);
 };

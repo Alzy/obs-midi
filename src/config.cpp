@@ -74,6 +74,7 @@ void Config::Load()
 	deviceManager->Load(deviceManagerData);
 	obs_data_release(deviceManagerData);
 	SettingsLoaded = true;
+	
 }
 
 /* Save the configuration to the OBS Config Store
@@ -86,9 +87,10 @@ void Config::Save()
 	config_set_bool(obsConfig, SECTION_NAME, PARAM_ALERT, AlertsEnabled);
 
 	auto deviceManager = GetDeviceManager();
+	auto data= deviceManager->GetData();
 	config_set_string(obsConfig, SECTION_NAME, PARAM_DEVICES,
-			  obs_data_get_json(deviceManager->GetData()));
-
+			  obs_data_get_json(data));
+	obs_data_release(data);
 	config_save(obsConfig);
 }
 

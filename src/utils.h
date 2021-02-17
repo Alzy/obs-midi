@@ -279,7 +279,7 @@ QString translate_action(ActionsClass::Actions action);
 
 typedef struct MidiMessage {
 	MidiMessage(){};
-	MidiMessage(rtmidi::message message)
+	void set_message(rtmidi::message message)
 	{
 		this->channel = message.get_channel();
 		this->message_type = Utils::get_midi_message_type(message);
@@ -291,5 +291,6 @@ typedef struct MidiMessage {
 	int channel=0;
 	int NORC=0;
 	int value=0;
+	MidiMessage get() { return (MidiMessage)*this; }
 } MidiMessage;
 Q_DECLARE_METATYPE(MidiMessage);

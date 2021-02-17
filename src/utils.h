@@ -209,6 +209,10 @@ int get_midi_value(rtmidi::message mess);
 QSpinBox *GetTransitionDurationControl();
 
 QStringList TranslateActions();
+QStringList get_scene_names();
+QStringList get_source_names(QString scene);
+QStringList get_filter_names(QString Source);
+QStringList get_transition_names();
 
 QString untranslate(QString tstring);
 const QList<ActionsClass::Actions> AllActions_raw = {

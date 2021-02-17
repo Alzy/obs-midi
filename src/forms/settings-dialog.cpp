@@ -46,7 +46,6 @@ PluginWindow::PluginWindow(QWidget *parent)
 	title.append(GIT_COMMIT_HASH);
 	this->setWindowTitle(title);
 	HideAllPairs();
-	Utils::TranslateActions();
 	//Connections for Device Tab
 	connect(ui->list_midi_dev, SIGNAL(currentTextChanged(QString)), this,
 		SLOT(on_device_select(QString)));
@@ -83,15 +82,14 @@ void PluginWindow::ToggleShowHide()
 {
 	if (!isVisible()) {
 		SetAvailableDevices();
-		
-
-		get_scene_names();
 		ui->tabWidget->setCurrentIndex(0);
 		setVisible(true);
 	} else {
 		setVisible(false);
 		ui->btn_Listen_many->setChecked(false);
 		ui->btn_Listen_one->setChecked(false);
+		HideAllPairs();
+
 	}
 }
 void PluginWindow::setCheck(bool x)
@@ -261,17 +259,7 @@ PluginWindow::~PluginWindow()
 	disconnect(desconnect);
 	delete ui;
 }
-void PluginWindow::get_scene_names()
-{
-	obs_frontend_source_list sceneList = {};
-	obs_frontend_get_scenes(&sceneList);
-	SceneList.clear();
-	for (size_t i = 0; i < sceneList.sources.num; i++) {
-		SceneList.append(
-			obs_source_get_name(sceneList.sources.array[i]));
-	}
-	obs_frontend_source_list_free(&sceneList);
-}
+
 void PluginWindow::add_midi_device(QString name)
 {
 	blog(LOG_DEBUG, "Adding Midi Device %s", name.toStdString().c_str());
@@ -324,19 +312,19 @@ void PluginWindow::ShowPair(Pairs Pair)
 	case Pairs::Scene:
 		ui->label_obs_output_scene->show();
 		ui->cb_obs_output_scene->show();
-		get_scenes();
+		ui->cb_obs_output_scene->addItems(Utils::get_scene_names());
 		ui->w_scene->show();
 		break;
 	case Pairs::Source:
 		ui->label_obs_output_source->show();
 		ui->cb_obs_output_source->show();
-		get_sources(ui->cb_obs_output_scene->currentText());
+		Utils::get_source_names(ui->cb_obs_output_scene->currentText());
 		ui->w_source->show();
 		break;
 	case Pairs::Filter:
 		ui->label_obs_output_filter->show();
 		ui->cb_obs_output_filter->show();
-
+		ui->cb_obs_output_filter->addItems(Utils::get_filter_names(ui->cb_obs_output_source->currentText()));
 		ui->w_filter->show();
 		break;
 	case Pairs::Transition:
@@ -349,6 +337,7 @@ void PluginWindow::ShowPair(Pairs Pair)
 	case Pairs::Item:
 		ui->label_obs_output_item->show();
 		ui->cb_obs_output_item->show();
+		ui->cb_obs_output_item->addItems(Utils::GetSceneItemsList(ui->cb_obs_output_scene->currentText()));
 		ui->w_item->show();
 		break;
 	case Pairs::Audio:
@@ -459,23 +448,7 @@ void PluginWindow::ResetToDefaults()
 	ui->cb_obs_output_audio_source->setCurrentIndex(0);
 	ui->cb_obs_output_media_source->setCurrentIndex(0);
 }
-void PluginWindow::get_transitions()
-{
-	ui->cb_obs_output_transition->clear();
-	ui->cb_obs_output_transition->addItems(Utils::GetTransitionsList());
-}
-void PluginWindow::on_source_change(QString source)
-{
-	get_filters(source);
-	ui->cb_obs_output_item->clear();
-	ui->cb_obs_output_item->addItems(Utils::GetSceneItemsList(source));
-}
-void PluginWindow::on_scene_change(QString scene)
-{
-	get_sources(scene);
-	ui->cb_obs_output_item->clear();
-	ui->cb_obs_output_item->addItems(Utils::GetSceneItemsList(scene));
-}
+
 void PluginWindow::ShowOnly(QList<ActionsClass::Actions> shows)
 {
 	ui->cb_obs_output_action->clear();
@@ -507,16 +480,14 @@ void PluginWindow::HideEntry(ActionsClass::Actions Entry)
 }
 void PluginWindow::ShowAllActions()
 {
-	int count = Utils::AllActions_raw.count();
-	for (int i = 0; i < count; i++) {
+	for (int i = 0; i < Utils::AllActions_raw.count(); i++)
+	{
 		ShowEntry(Utils::AllActions_raw.at(i));
 	}
 }
 void PluginWindow::HideEntries(QList<ActionsClass::Actions> entrys)
 {
-	int count = ui->cb_obs_output_action->count();
-
-	for (int i = 0; i < count; i++) {
+	for (int i = 0; i < ui->cb_obs_output_action->count(); i++) {
 		if (entrys.contains(Utils::AllActions_raw.at(i))) {
 			HideEntry(Utils::AllActions_raw.at(i));
 		}
@@ -525,60 +496,12 @@ void PluginWindow::HideEntries(QList<ActionsClass::Actions> entrys)
 }
 void PluginWindow::ShowEntries(QList<ActionsClass::Actions> entrys)
 {
-	int count = ui->cb_obs_output_action->count();
-
-	for (int i = 0; i < count; i++) {
+	for (int i = 0; i < ui->cb_obs_output_action->count(); i++) {
 		if (entrys.contains(Utils::AllActions_raw.at(i))) {
 			ShowEntry(Utils::AllActions_raw.at(i));
 		}
 	}
 	listview->adjustSize();
-}
-void PluginWindow::get_sources(QString scene)
-{
-	ui->cb_obs_output_source->clear();
-	auto arrayref = Utils::GetSceneArray(scene);
-	int size = obs_data_array_count(arrayref);
-	for (int i = 0; i < size; i++) {
-		obs_data *item = obs_data_array_item(arrayref, i);
-
-		ui->cb_obs_output_source->addItem(
-			QString(obs_data_get_string(item, "name")));
-		obs_data_release(item);
-	}
-	obs_data_array_release(arrayref);
-}
-void PluginWindow::get_scenes()
-{
-	ui->cb_obs_output_scene->clear();
-	obs_data_array *x = Utils::GetScenes();
-	int cnt = obs_data_array_count(x);
-	for (int i = 0; i <= cnt; i++) {
-		auto it = obs_data_array_item(x, i);
-		ui->cb_obs_output_scene->addItem(
-			obs_data_get_string(it, "name"));
-		obs_data_release(it);
-	}
-
-	obs_data_array_release(x);
-}
-void PluginWindow::get_filters(QString source)
-{
-	ui->cb_obs_output_filter->clear();
-	obs_source* x = obs_get_source_by_name(source.toStdString().c_str());
-	OBSDataArrayAutoRelease y = Utils::GetSourceFiltersList(x, false);
-	for (int i = 0; i < obs_data_array_count(y); i++) {
-		obs_data_t* z = obs_data_array_item(y, i);
-		ui->cb_obs_output_filter->addItem(
-			QString(obs_data_get_string(z, "name")));
-		obs_data_release(z);
-	}
-	obs_data_array_release(y);
-	obs_source_release(x);
-}
-void PluginWindow::check_advanced_switch(bool state)
-{
-	//obs_actions_filter_select(ui->cb_obs_action->currentIndex());
 }
 void PluginWindow::obs_actions_select(QString action)
 {
@@ -728,8 +651,7 @@ void PluginWindow::add_new_mapping()
 {
 	ui->btn_Listen_many->setChecked(false);
 	ui->btn_Listen_one->setChecked(false);
-	if (!map_exists() && verify_mapping() && ui->sb_channel->value() != 0 &&
-		    ui->sb_norc->value() != 0) {
+	if (!map_exists() && verify_mapping() && ui->sb_channel->value() != 0) {
 		int row = ui->table_mapping->rowCount();
 		ui->table_mapping->insertRow(row);
 		QTableWidgetItem *channelitem = new QTableWidgetItem(
@@ -785,9 +707,10 @@ void PluginWindow::add_new_mapping()
 		dev->add_MidiHook(newmh);
 		auto conf = GetConfig();
 		conf->Save();
+
 	} else {
-		if (ui->sb_channel->value() == 0&&ui->sb_norc->value()==0) {
-			Utils::alert_popup("Can Not Map Channel and norc 0. \nPlease Click Listen One or Listen Many to listen for MIDI Event to map");
+		if (ui->sb_channel->value()) {
+			Utils::alert_popup("Can Not Map Channel 0. \nPlease Click Listen One or Listen Many to listen for MIDI Event to map");
 		}
 		if (!verify_mapping()) {
 			Utils::alert_popup("Mapping Missing required variable");

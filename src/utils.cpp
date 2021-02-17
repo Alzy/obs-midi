@@ -14,6 +14,7 @@
 #include <util/platform.h>
 
 #include "utils.h"
+
 //***********************************UTILS*****************************************//
 const QHash<obs_bounds_type, QString> boundTypeNames = {
 	{OBS_BOUNDS_STRETCH, "OBS_BOUNDS_STRETCH"},
@@ -1268,4 +1269,46 @@ void Utils::alert_popup(QString message)
 	QMessageBox msgBox;
 	msgBox.setText(message);
 	msgBox.exec();
+}
+QStringList Utils::get_scene_names() {
+	QStringList names;
+	obs_frontend_source_list sceneList = {};
+	obs_frontend_get_scenes(&sceneList);
+	
+	for (size_t i = 0; i < sceneList.sources.num; i++) {
+		names.append(
+			obs_source_get_name(sceneList.sources.array[i]));
+	}
+	obs_frontend_source_list_free(&sceneList);
+	return names;
+}
+
+QStringList Utils::get_source_names(QString scene)
+{
+	QStringList names;
+
+	auto arrayref = Utils::GetSceneArray(scene);
+	int size = obs_data_array_count(arrayref);
+	for (int i = 0; i < size; i++) {
+		obs_data *item = obs_data_array_item(arrayref, i);
+		names.append(QString(obs_data_get_string(item, "name")));
+		obs_data_release(item);
+	}
+	obs_data_array_release(arrayref);
+	return names;
+}
+
+QStringList Utils::get_filter_names(QString Source)
+{
+	QStringList names;
+	obs_source *x = obs_get_source_by_name(Source.toStdString().c_str());
+	OBSDataArrayAutoRelease y = Utils::GetSourceFiltersList(x, false);
+	for (int i = 0; i < obs_data_array_count(y); i++) {
+		obs_data_t *z = obs_data_array_item(y, i);
+		names.append(QString(obs_data_get_string(z, "name")));
+		obs_data_release(z);
+	}
+	obs_data_array_release(y);
+	obs_source_release(x);
+	return names;
 }

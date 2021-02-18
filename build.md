@@ -29,7 +29,7 @@ On Debian/Ubuntu :
 
 ```shell
 sudo apt-get install libboost-all-dev
-git clone --recursive https://github.com/Palakis/obs-midi.git
+git clone --recursive git@github.com:cpyarger/obs-midi.git
 cd obs-midi
 mkdir build && cd build
 cmake -DLIBOBS_INCLUDE_DIR="<path to the libobs sub-folder in obs-studio's source code>" -DCMAKE_INSTALL_PREFIX=/usr -DUSE_UBUNTU_FIX=true ..
@@ -59,7 +59,7 @@ Of course, you're encouraged to dig through the contents of these scripts to
 look for issues or specificities.
 
 ```shell
-git clone --recursive https://github.com/Palakis/obs-midi.git
+git clone --recursive git@github.com:cpyarger/obs-midi.git
 cd obs-midi
 ./CI/install-dependencies-macos.sh
 ./CI/install-build-obs-macos.sh

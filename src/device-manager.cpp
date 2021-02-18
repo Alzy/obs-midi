@@ -16,10 +16,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 */
 
 #include "device-manager.h"
-
+#include "forms/settings-dialog.h"
 DeviceManager::DeviceManager()
 {
-	
+	this->setParent(plugin_window);
 }
 
 DeviceManager::~DeviceManager()
@@ -37,6 +37,7 @@ void DeviceManager::Load(obs_data_t *data)
 	QStringList portsList = GetPortsList();
 	QStringList outPortsList = GetOutPortsList();
 	obs_data_array_t *devicesData = obs_data_get_array(data, "devices");
+	obs_data_release(data);
 	size_t deviceCount = obs_data_array_count(devicesData);
 	for (size_t i = 0; i < deviceCount; i++) {
 		obs_data_t *deviceData = obs_data_array_item(devicesData, i);
@@ -61,6 +62,7 @@ void DeviceManager::Load(obs_data_t *data)
 			
 		}
 	}
+	obs_data_array_release(devicesData);
 
 }
 

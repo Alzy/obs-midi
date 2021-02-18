@@ -115,7 +115,6 @@ void PluginWindow::SetAvailableDevices()
 		ui->tab_configure->setEnabled(true);
 		ui->bidirectional->setEnabled(true);
 		ui->check_enabled->setEnabled(true);
-		this->ui->outbox->setEnabled(true);
 		ui->tabWidget->setEnabled(true);
 		loadingdevices = true;
 		this->ui->outbox->clear();
@@ -143,6 +142,13 @@ void PluginWindow::SetAvailableDevices()
 	this->ui->list_midi_dev->setCurrentRow(-1);
 	this->ui->list_midi_dev->setCurrentRow(0);
 	on_device_select(ui->list_midi_dev->currentItem()->text());
+	
+	ui->outbox->setEnabled(
+		GetDeviceManager()
+			.get()
+			->GetMidiDeviceByName(
+				ui->list_midi_dev->currentItem()->text())
+			->isBidirectional());
 }
 void PluginWindow::select_output_device(QString selectedDeviceName)
 {
@@ -177,10 +183,9 @@ int PluginWindow::on_check_enabled_state_changed(int state)
 		device->open_midi_input_port(devicePort);
 		device->open_midi_output_port(deviceOutPort);
 		device->set_enabled(true);
-		device->setBidirectional(true);
 		ui->bidirectional->setEnabled(true);
-		ui->bidirectional->setChecked(true);
-		ui->outbox->setEnabled(true);
+		ui->bidirectional->setChecked(device->isBidirectional());
+		ui->outbox->setEnabled(device->isBidirectional());
 	}
 	//ui->outbox->setCurrentText(QString::fromStdString(device->GetOutName()));
 	GetConfig()->Save();
@@ -189,27 +194,35 @@ int PluginWindow::on_check_enabled_state_changed(int state)
 }
 void PluginWindow::on_device_select(QString curitem)
 {
-	auto devicemanager = GetDeviceManager();
-	auto config = GetConfig();
-	MidiAgent *MAdevice = devicemanager->GetMidiDeviceByName(curitem);
-	ui->tabWidget->setTabText(1, QString("Configure - ").append(curitem));
-	// Pull info on if device is enabled, if so set true if not set false
-	if (MAdevice != NULL && MAdevice->isEnabled()) {
-		ui->check_enabled->setChecked(true);
-		ui->outbox->setEnabled(true);
-		ui->bidirectional->setEnabled(true);
-		ui->bidirectional->setChecked(MAdevice->isBidirectional());
-		ui->outbox->setCurrentText(MAdevice->get_midi_output_name());
-	} else {
-		ui->check_enabled->setChecked(false);
-		ui->outbox->setEnabled(false);
-		ui->bidirectional->setEnabled(false);
+	if (!starting) {
+
+		auto devicemanager = GetDeviceManager();
+		auto config = GetConfig();
+		MidiAgent *MAdevice =
+			devicemanager->GetMidiDeviceByName(curitem);
+		ui->tabWidget->setTabText(
+			1, QString("Configure - ").append(curitem));
+		// Pull info on if device is enabled, if so set true if not set false
+		if (MAdevice != NULL && MAdevice->isEnabled()) {
+			ui->check_enabled->setChecked(true);
+			ui->outbox->setEnabled(true);
+			ui->bidirectional->setEnabled(true);
+			ui->bidirectional->setChecked(
+				MAdevice->isBidirectional());
+			ui->outbox->setCurrentText(
+				MAdevice->get_midi_output_name());
+		} else {
+			ui->check_enabled->setChecked(false);
+			ui->outbox->setEnabled(false);
+			ui->bidirectional->setEnabled(false);
+		}
+		///HOOK up the Message Handler
+		connect(MAdevice, SIGNAL(broadcast_midi_message(MidiMessage)),
+			this,
+			SLOT(handle_midi_message(
+				MidiMessage))); /// name, mtype, norc, channel
+		ui->mapping_lbl_device_name->setText(curitem);
 	}
-	///HOOK up the Message Handler
-	connect(MAdevice, SIGNAL(broadcast_midi_message(MidiMessage)), this,
-		SLOT(handle_midi_message(
-			MidiMessage))); /// name, mtype, norc, channel
-	ui->mapping_lbl_device_name->setText(curitem);
 }
 void PluginWindow::handle_midi_message(MidiMessage mess)
 {
@@ -239,6 +252,7 @@ int PluginWindow::on_bid_enabled_state_changed(int state)
 {
 	auto device = GetDeviceManager()->GetMidiDeviceByName(
 		ui->list_midi_dev->currentItem()->text().toStdString().c_str());
+	ui->outbox->setEnabled(state);
 	if (state) {
 		device->setBidirectional(state);
 		return 1;

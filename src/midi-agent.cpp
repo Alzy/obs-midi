@@ -46,7 +46,7 @@ using namespace std;
 ////////////////
 MidiAgent::MidiAgent()
 {
-
+	this->setParent(GetDeviceManager().get());
 	midi_input_name = "Midi Device (uninit)";
 	midi_output_name = "Midi Out Device (uninit)";
 	
@@ -55,6 +55,7 @@ MidiAgent::MidiAgent()
 }
 MidiAgent::MidiAgent(obs_data_t* midiData)
 {
+	this->setParent(GetDeviceManager().get());
 	this->Load(midiData);
 	midiin.set_callback(
 		[this](const auto &message) { HandleInput(message, this); });
@@ -118,8 +119,6 @@ void MidiAgent::open_midi_input_port(int inport)
 
 		midi_input_name =
 			QString::fromStdString(midiin.get_port_name(inport));
-		enabled = true;
-		connected = true;
 		blog(LOG_INFO, "MIDI device connected In: [%d] %s", inport,
 		     midi_input_name.toStdString().c_str());
 
@@ -138,18 +137,20 @@ void MidiAgent::open_midi_output_port(int outport)
 	}
 	midi_output_name =
 		QString::fromStdString(midiout.get_port_name(outport));
-	enabled = true;
-	connected = true;
+\
 }
 
 /* Will close the port and disable this MidiAgent
 */
 void MidiAgent::close_midi_port()
 {
-	midiin.close_port();
-	midiout.close_port();
-	enabled = false;
-	connected = false;
+	if (midiin.is_port_open()) {
+		midiin.close_port();
+	}
+	if (midiout.is_port_open()) {
+		midiout.close_port();
+	}
+
 }
 
 QString MidiAgent::get_midi_input_name()
@@ -172,7 +173,7 @@ void MidiAgent::set_midi_output_name(QString oname)
 }
 bool MidiAgent::setBidirectional(bool state)
 {
-	bidirectional = state;
+	this->bidirectional = state;
 	if (!state) {
 		midiout.close_port();
 
@@ -184,6 +185,7 @@ bool MidiAgent::setBidirectional(bool state)
 			GetDeviceManager()->GetOutPortNumberByDeviceName(
 				midi_output_name));
 	}
+	GetConfig().get()->Save();
 	return state;
 }
 

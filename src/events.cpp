@@ -25,6 +25,7 @@
 #include "obs-midi.h"
 #include "config.h"
 #include "utils.h"
+#include "forms/settings-dialog.h"
 //#include "rpc/RpcEvent.h"
 
 #define STATUS_INTERVAL 2000
@@ -68,6 +69,7 @@ events::events(DeviceManagerPtr srv)
 	  HeartbeatIsActive(false),
 	  pulse(false)
 {
+	this->setParent(plugin_window);
 	//_srv = GetDeviceManager();
 	cpuUsageInfo = os_cpu_usage_info_start();
 	obs_frontend_add_event_callback(events::FrontendEventHandler, this);
@@ -253,11 +255,12 @@ void events::broadcastUpdate(const char *updateType,
 	if (obs_frontend_recording_active()) {
 		recordingTime = std::make_optional(getRecordingTime());
 	}
+	{
 
-	RpcEvent event(QString(updateType), streamTime, recordingTime,
-		       additionalFields);
-	_srv->broadcast_obs_event(event);
-	//emit obsEvent(event);
+		RpcEvent event(QString(updateType), streamTime, recordingTime,
+			       additionalFields);
+		_srv->broadcast_obs_event(event);
+	}
 }
 
 void events::connectSourceSignals(obs_source_t *source)

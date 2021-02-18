@@ -19,7 +19,7 @@
 
 #include "obs-midi.h"
 
-#include "forms/settings-dialog.h"
+#include "src/forms/settings-dialog.h"
 #include "config.h"
 #include "device-manager.h"
 #include "utils.h"
@@ -44,7 +44,6 @@ OBS_MODULE_USE_DEFAULT_LOCALE("obs-midi", "en-US")
 ConfigPtr _config;
 DeviceManagerPtr _deviceManager;
 eventsPtr _eventsSystem;
-
 bool obs_module_load(void)
 {
 	blog(LOG_INFO, "MIDI LOADED! :)");
@@ -60,7 +59,7 @@ bool obs_module_load(void)
 	_config->Load();
 	// UI SETUP
 	QMainWindow *mainWindow = (QMainWindow *)obs_frontend_get_main_window();
-	PluginWindow * plugin_window = new PluginWindow(mainWindow);
+	plugin_window =new PluginWindow(mainWindow);
 	const char *menuActionText = obs_module_text("OBS MIDI Settings");
 	QAction *menuAction =
 		(QAction *)obs_frontend_add_tools_menu_qaction(menuActionText);
@@ -75,15 +74,11 @@ bool obs_module_load(void)
 
 void obs_module_unload()
 {
+	
 	_config.reset();
-	_eventsSystem.reset();
 	_deviceManager.reset();
-	
-	delete (_config.get());
-	delete (_eventsSystem.get());
-	delete (_deviceManager.get());
-	
-	blog(LOG_INFO, "goodbye!");
+	_eventsSystem.reset();
+	blog(LOG_DEBUG, "goodbye!");
 }
 
 ConfigPtr GetConfig()
@@ -100,5 +95,3 @@ eventsPtr GetEventsSystem()
 {
 	return _eventsSystem;
 }
-
-

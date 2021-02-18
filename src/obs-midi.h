@@ -2,7 +2,6 @@
 #include <obs.hpp>
 #include <memory>
 #include <QObject>
-
 void ___source_dummy_addref(obs_source_t *);
 void ___sceneitem_dummy_addref(obs_sceneitem_t *);
 void ___data_dummy_addref(obs_data_t *);
@@ -31,14 +30,14 @@ using OBSDataItemAutoRelease =
 class events;
 class Config;
 class DeviceManager;
-
+class PluginWindow;
 typedef std::shared_ptr<events> eventsPtr;
 typedef std::shared_ptr<Config> ConfigPtr;
 typedef std::shared_ptr<DeviceManager> DeviceManagerPtr;
-
+static PluginWindow *plugin_window;
 ConfigPtr GetConfig();
 DeviceManagerPtr GetDeviceManager();
 eventsPtr GetEventsSystem();
-void reloadEvents();
+
 #define OBS_MIDI_VERSION "0.1"
 #define blog(level, msg, ...) blog(level, "[obs-midi] " msg, ##__VA_ARGS__)

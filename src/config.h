@@ -30,7 +30,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 using namespace std;
 
-class Config {
+class Config :QObject{
+	Q_OBJECT
 public:
 	Config();
 	~Config();

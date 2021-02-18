@@ -73,8 +73,6 @@ void DeviceManager::Unload()
 	for (auto agent : midiAgents) {
 		blog(LOG_DEBUG, "Unloading Midi Device %s",agent->get_midi_input_name().toStdString().c_str());
 		agent->clear_MidiHooks();
-		agent->~MidiAgent();
-		delete agent;
 	}
 }
 

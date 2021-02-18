@@ -58,14 +58,12 @@ PluginWindow::PluginWindow(QWidget *parent)
 		this, SLOT(get_sources(QString)));
 	connect(ui->cb_obs_output_action, SIGNAL(currentTextChanged(QString)),
 		this, SLOT(obs_actions_select(QString)));
-	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(get_sources(QString)));
-	connect(ui->cb_obs_output_source, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(get_filters(QString)));
+
 	connect(ui->cb_obs_output_source, SIGNAL(currentTextChanged(QString)),
 		this, SLOT(on_source_change(QString)));
 	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
 		this, SLOT(on_scene_change(QString)));
+
 	connect(ui->table_mapping, SIGNAL(cellClicked(int,int)), this,
 		SLOT(edit_mapping()));
 	
@@ -894,4 +892,19 @@ bool PluginWindow::verify_mapping()
 	} else {
 		return true;
 	}
+}
+void PluginWindow::on_scene_change(QString newscene) {
+	if (ui->cb_obs_output_source->isVisible()) {
+		ui->cb_obs_output_source->clear();
+		ui->cb_obs_output_source->addItems(
+			Utils::get_source_names(newscene));
+	}
+}
+void PluginWindow::on_source_change(QString newsource) {
+	if (ui->cb_obs_output_filter->isVisible()) {
+		ui->cb_obs_output_filter->clear();
+		ui->cb_obs_output_filter->addItems(
+			Utils::get_filter_names(newsource));
+	}
+
 }

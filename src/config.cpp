@@ -68,7 +68,8 @@ void Config::Load()
 	AlertsEnabled = config_get_bool(obsConfig, SECTION_NAME, PARAM_ALERT);
 
 	auto deviceManager = GetDeviceManager();
-	OBSDataAutoRelease deviceManagerData = obs_data_create_from_json(
+	obs_data_t* deviceManagerData = obs_data_create_from_json(
+
 		config_get_string(obsConfig, SECTION_NAME, PARAM_DEVICES));
 	blog(LOG_INFO, "Loaded: \n %s",
 	     config_get_string(obsConfig, SECTION_NAME, PARAM_DEVICES));

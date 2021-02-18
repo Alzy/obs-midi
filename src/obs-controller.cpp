@@ -380,24 +380,26 @@ void OBSController::TakeSourceScreenshot(QString source) {}
 void OBSController::EnableSourceFilter(obs_source_t *source)
 {
 	obs_source_set_enabled(source, true);
-	obs_source_release(source);
 }
 
 void OBSController::DisableSourceFilter(obs_source_t *source)
 {
-	obs_source_set_enabled(source, true);
-	obs_source_release(source);
+	obs_source_set_enabled(source, false);
 }
 
-void OBSController::ToggleSourceFilter(obs_source_t *source)
+void OBSController::ToggleSourceFilter(QString sourcename, QString filtername)
 {
-	if (obs_source_enabled(source)) {
-		DisableSourceFilter(source);
+	OBSSourceAutoRelease source =
+		obs_get_source_by_name(sourcename.toStdString().c_str());
+
+	OBSSourceAutoRelease filter = obs_source_get_filter_by_name(
+		source, filtername.toStdString().c_str());
+	if (obs_source_enabled(filter)) {
+		obs_source_set_enabled(filter, false);
 	} else {
-		EnableSourceFilter(source);
+		obs_source_set_enabled(filter, true);
 	}
 }
-
 ////////////////
 // CC ACTIONS //
 ////////////////

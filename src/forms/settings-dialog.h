@@ -44,7 +44,8 @@ public slots:
 	void handle_midi_message(MidiMessage mess);
 	void obs_actions_select(QString action);
 	void ResetToDefaults();
-
+	void on_scene_change(QString newscene);
+	void on_source_change(QString newsource);
 	
 	void add_new_mapping();
 	void add_row_from_hook(MidiHook *hook);

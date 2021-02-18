@@ -63,7 +63,6 @@ MidiAgent::MidiAgent(obs_data_t* midiData)
 MidiAgent::~MidiAgent()
 {
 	clear_MidiHooks();
-	close_midi_port();
 	midiin.cancel_callback();
 	
 }
@@ -590,9 +589,7 @@ void MidiAgent::do_obs_action(MidiHook *hook, int MidiVal)
 			OBSController::SetCurrentProfile(hook->profile);
 			break;
 		case ActionsClass::Actions::Toggle_Source_Filter:
-			OBSController::ToggleSourceFilter(
-				obs_get_source_by_name(
-					hook->source.toStdString().c_str()));
+			OBSController::ToggleSourceFilter(hook->source,hook->filter);
 			break;
 		case ActionsClass::Actions::Set_Text_GDIPlus_Text:
 			OBSController::SetTextGDIPlusText(

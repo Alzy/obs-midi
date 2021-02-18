@@ -447,7 +447,7 @@ jobs:
           rm ./release/${{ env.MAC_FILENAME_UNSIGNED }}
 
       - name: 'Notarization'
-        if: success() &&  github.ref == 'refs/heads/master'
+        if: success() &&  github.ref == 'refs/heads/release'
         working-directory: ./obs-midi
         shell: bash
         run: |
@@ -562,7 +562,7 @@ jobs:
       - name: 'Clean old releases'
         uses: dev-drprasad/delete-older-releases@v0.1.0
         with:
-          keep_latest: 3
+          keep_latest: 5
           delete_tags: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

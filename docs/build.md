@@ -1,4 +1,8 @@
-# Compiling obs-midi
+---
+layout: page
+title: Compiling OBS MIDI
+permalink: /build/
+---
 
 ## Prerequisites
 

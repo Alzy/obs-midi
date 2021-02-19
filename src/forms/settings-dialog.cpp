@@ -40,11 +40,15 @@ PluginWindow::PluginWindow(QWidget *parent)
 		QAbstractItemView::SelectionMode::SingleSelection);
 	//Set Window Title
 	QString title;
-	title.append("OBS MIDI Settings -- Branch: ");
+	
 	title.append(GIT_BRANCH);
 	title.append(" -- Commit: ");
 	title.append(GIT_COMMIT_HASH);
+	blog(LOG_DEBUG, "OBS-MIDI Version -- Branch: %s", title.toStdString().c_str());
+	title.prepend("OBS MIDI Settings -- Branch: ");
 	this->setWindowTitle(title);
+	
+	
 	HideAllPairs();
 	//Connections for Device Tab
 	connect(ui->list_midi_dev, SIGNAL(currentTextChanged(QString)), this,

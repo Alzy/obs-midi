@@ -28,7 +28,7 @@ twitter_username: cpyarger
 github_username:  cpyarger
 
 # Build settings
-theme: jekyll-theme-dinky
+theme: jekyll-theme-cayman
 plugins:
   - jekyll-feed
 

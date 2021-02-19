@@ -332,6 +332,7 @@ jobs:
       MACOS_DEPS_VERSION: '2020-04-18'
       QT_VERSION: '5.14.1'
       isCI: true
+    if: contains(github.event.head_commit.message, '[skip ci]') != true
     steps:
       - name: 'Checkout'
         uses: actions/checkout@v2

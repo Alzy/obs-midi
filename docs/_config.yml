@@ -22,7 +22,7 @@ title: OBS-MIDI Plugin
 email: cpyarger@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   Use MIDI devices to trigger events in OBS and vice versa
-baseurl: "/" # the subpath of your site, e.g. /blog
+baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://obs-midi.org" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: cpyarger
 github_username:  cpyarger

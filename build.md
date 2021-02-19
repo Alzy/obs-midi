@@ -6,49 +6,30 @@ You'll need [Qt 5.15.2](https://download.qt.io/official_releases/qt/5.15/),
 [CMake](https://cmake.org/download/) and a working [OBS Studio development environment](https://obsproject.com/wiki/install-instructions) installed on your
 computer.
 
-For Cleanliness and sanity, Do not mix the obs-studio and obs-midi directories.
+Once you have successfully built OBS Studio, in the obs-studio source directory
 
-For Example My Directory structure looks like this
+- Go into the {obs-studio}/plugins
+- `git clone --recursive git@github.com:cpyarger/obs-midi.git`
+- open {obs-studio}/source/CMakeLists.txt
+- append `add_subdirectory(obs-midi)` to the end of the file
+- rerun cmake-gui configure, generate 
+- in cmake-gui you will need to set a few variables
+  - (path)`LIBOBS_INCLUDE_DIR = {obs-studio}/libobs`
+  - (filepath)`LIBOBS_LIB = {obs-studio-build}/libobs/Debug/obs.lib`
+  - (path)`QTDIR = C:\Qt\5.15.2\msvc2019_64`
+  - (boolean)`isCI = true`
+  - (filepath)`OBS_FRONTEND_LIB = {obs-studio-build}/UI/obs-frontend-api/Debug/obs-frontend-api.lib`
+ - in cmake-gui configure, generate, and open project
 
+Now you should be good to edit things
 
-|Directory | Reason|
-|-----------|----------|
-| Desktop\OBS\Build| (OBS-Studio Build Dir) |
-| Desktop\OBS\Deps | (OBS Dependencies from zip file on obs site) |
-| Desktop\OBS\midibuild | (Build Directory for obs-midi) |
-| Desktop\OBS\obs-studio | (obs studio source code) |
-| Desktop\OBS\obs-midi | (obs midi source code) |
-| C:\Qt\5.15.2\msvc2019_64 | (QTDIR) |
-
-
-## Windows
-
-In cmake-gui, you'll have to set the following variables :
-
-| Variable | info | Example Path |
-|----------|-------|-----------|
-| **QTDIR**                      | (path) : location of the Qt environment suited for your compiler and architecture     | C:/Qt/5.15.2/msvc2019_64|
-| **LIBOBS_INCLUDE_DIR**         | (path) : location of the libobs subfolder in the source code of OBS Studio            | C:/Users/User/Desktop/OBS/obs-studio/libobs |
-| **LIBOBS_LIB**                 | (filepath) : location of the obs.lib file                                             | C:/Users/User/Desktop/OBS/build/libobs/RelWithDebInfo/obs.lib|
-| **OBS_FRONTEND_LIB**           | (filepath) : location of the obs-frontend-api.lib file                                | C:/Users/User/Desktop/OBS/build/UI/obs-frontend-api/RelWithDebInfo/obs-frontend-api.lib|
-| **CMAKE_INSTALL_PREFIX**       | (path) : Same location as QTDIR                                                       | C:/Qt/5.15.2/msvc2019_64|
-
-![My CMake Gui Looks like ](https://github.com/cpyarger/obs-midi/blob/master/docs/obs-midi-cmake.PNG?raw=true)
-
-In Visual Studio, Set OBS-Midi as the startup project,
-
-![set obs-midi as startup project ](https://github.com/cpyarger/obs-midi/blob/master/docs/obs-midi-set-as-startup-project.PNG?raw=true)
-Change Output Directory to OBS-Studio projects plugin's folder on the general page
-![My CMake Gui Looks like ](https://github.com/cpyarger/obs-midi/blob/master/docs/obs-midi-general-page.PNG?raw=true)
-Change Debug to obs-studio's exe and exe dir in the debug page
-![My CMake Gui Looks like ](https://github.com/cpyarger/obs-midi/blob/master/docs/obs-midi-debug-page.PNG?raw=true)
 ## Linux
 
 On Debian/Ubuntu :
 
 ```shell
 sudo apt-get install libboost-all-dev
-git clone --recursive https://github.com/Palakis/obs-midi.git
+git clone --recursive git@github.com:cpyarger/obs-midi.git
 cd obs-midi
 mkdir build && cd build
 cmake -DLIBOBS_INCLUDE_DIR="<path to the libobs sub-folder in obs-studio's source code>" -DCMAKE_INSTALL_PREFIX=/usr -DUSE_UBUNTU_FIX=true ..
@@ -78,7 +59,7 @@ Of course, you're encouraged to dig through the contents of these scripts to
 look for issues or specificities.
 
 ```shell
-git clone --recursive https://github.com/Palakis/obs-midi.git
+git clone --recursive git@github.com:cpyarger/obs-midi.git
 cd obs-midi
 ./CI/install-dependencies-macos.sh
 ./CI/install-build-obs-macos.sh

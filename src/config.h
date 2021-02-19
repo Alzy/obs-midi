@@ -30,7 +30,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 using namespace std;
 
-class Config {
+class Config :QObject{
+	Q_OBJECT
 public:
 	Config();
 	~Config();
@@ -45,5 +46,5 @@ public:
 	bool SettingsLoaded;
 
 private:
-	static void OnFrontendEvent(enum obs_frontend_event event, void *param);
+	static void on_frontend_event(obs_frontend_event event, void *param);
 };

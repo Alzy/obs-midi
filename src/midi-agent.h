@@ -55,7 +55,15 @@ public:
 	QString string_override;
 	bool bool_override;
 	int int_override;
-
+	int value = -1;
+	MidiMessage *get_message_from_hook()
+	{
+		MidiMessage *message = new MidiMessage();
+		message->channel = this->channel;
+		message->message_type = this->message_type;
+		message->NORC = this->norc;
+		return message;
+	}
 	MidiHook(){};
 
 	MidiHook(QString jsonString)
@@ -124,6 +132,7 @@ class MidiAgent : public QObject {
 
 public:
 	MidiAgent();
+	MidiAgent(obs_data_t *data);
 	~MidiAgent();
 	void Load(obs_data_t *data);
 
@@ -154,18 +163,19 @@ signals:
 
 private:
 	void send_message_to_midi_device(MidiMessage message);
-	rtmidi::midi_in *midiin;
-	rtmidi::midi_out *midiout;
+	rtmidi::midi_in midiin;
+	rtmidi::midi_out midiout;
 	QString midi_input_name;
 	QString midi_output_name;
 	bool sending;
 	int port;
 	int lastscenebtn;
+	int last_preview_scene_norc;
 	bool enabled;
 	bool connected;
 	bool bidirectional;
+	MidiHook *get_midi_hook_if_exists(MidiMessage *message);
 	bool closing = false;
 	QVector<MidiHook *> midiHooks;
-	void do_obs_action(MidiHook *hook, int MidiVal,
-			   ActionsClass::Actions action);
+	void do_obs_action(MidiHook *hook, int MidiVal);
 };

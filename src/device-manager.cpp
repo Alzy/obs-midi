@@ -16,18 +16,17 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 */
 
 #include "device-manager.h"
-
+#include "forms/settings-dialog.h"
 DeviceManager::DeviceManager()
 {
-	rtMidi = new rtmidi::midi_in();
-	MO = new rtmidi::midi_out();
+	this->setParent(plugin_window);
 }
 
 DeviceManager::~DeviceManager()
 {
 	Unload();
-	delete rtMidi;
-	delete MO;
+	this->deleteLater();
+	
 }
 
 /* Load the Device Manager from saved Config Store data.
@@ -38,18 +37,19 @@ void DeviceManager::Load(obs_data_t *data)
 	QStringList portsList = GetPortsList();
 	QStringList outPortsList = GetOutPortsList();
 	obs_data_array_t *devicesData = obs_data_get_array(data, "devices");
+	obs_data_release(data);
 	size_t deviceCount = obs_data_array_count(devicesData);
 	for (size_t i = 0; i < deviceCount; i++) {
 		obs_data_t *deviceData = obs_data_array_item(devicesData, i);
-		MidiAgent *device = new MidiAgent();
-		device->Load(deviceData);
+		MidiAgent *device = new MidiAgent(deviceData);
+		obs_data_release(deviceData);
 		midiAgents.push_back(device);
-		
+
 		connect(this, SIGNAL(bcast(QString, QString)), device,
-				SLOT(handle_obs_event(QString, QString)));
+			SLOT(handle_obs_event(QString, QString)));
 		if (device->isEnabled()) {
-			int portNumber =
-				GetPortNumberByDeviceName(device->get_midi_input_name());
+			int portNumber = GetPortNumberByDeviceName(
+				device->get_midi_input_name());
 			int outPort = GetOutPortNumberByDeviceName(
 				device->get_midi_output_name());
 
@@ -59,8 +59,11 @@ void DeviceManager::Load(obs_data_t *data)
 			if (outPort != -1) {
 				device->open_midi_output_port(outPort);
 			}
+			
 		}
 	}
+	obs_data_array_release(devicesData);
+
 }
 
 void DeviceManager::Unload()
@@ -68,10 +71,9 @@ void DeviceManager::Unload()
 	blog(LOG_INFO, "UNLOADING DEVICE MANAGER");
 	midiAgents.clear();
 	for (auto agent : midiAgents) {
+		blog(LOG_DEBUG, "Unloading Midi Device %s",agent->get_midi_input_name().toStdString().c_str());
 		agent->clear_MidiHooks();
-		delete agent;
 	}
-	
 }
 
 /* Returns vector list of Port Names 
@@ -79,9 +81,9 @@ void DeviceManager::Unload()
 QStringList DeviceManager::GetPortsList()
 {
 	QStringList ports;
-	int portCount = rtMidi->get_port_count();
+	int portCount = rtMidi.get_port_count();
 	for (int i = 0; i < portCount; i++) {
-		ports.append(QString::fromStdString(rtMidi->get_port_name(i)));
+		ports.append(QString::fromStdString(rtMidi.get_port_name(i)));
 	}
 	return ports;
 }
@@ -92,14 +94,13 @@ QStringList DeviceManager::GetOutPortsList()
 {
 	opl.clear();
 	QStringList outports;
-	int portCount = MO->get_port_count();
+	int portCount = MO.get_port_count();
 	for (int i = 0; i < portCount; i++) {
-		outports.append(QString::fromStdString(MO->get_port_name(i)));
-		opl.append(QString::fromStdString(MO->get_port_name(i)));
+		outports.append(QString::fromStdString(MO.get_port_name(i)));
+		opl.append(QString::fromStdString(MO.get_port_name(i)));
 	}
 	return outports;
 }
-
 
 /* Returns the port number of the specified device.
  * If the device isn't found (possibly due to being disconnected), returns -1
@@ -148,29 +149,26 @@ MidiAgent *DeviceManager::GetMidiDeviceByName(QString deviceName)
 QVector<MidiHook *> DeviceManager::GetMidiHooksByDeviceName(QString deviceName)
 {
 	if (deviceName != QString("No Devices Available")) {
-
 		auto device = GetMidiDeviceByName(deviceName);
 		if (device != NULL) {
 			return device->GetMidiHooks();
 		} else {
 			QVector<MidiHook *> x;
-			//device->set_midi_hooks(x);
 			return x;
 		}
-		//Utils::alert_popup("no midi hooks for this device");
 	}
 }
 
 /* Registers a midi device.
  * Will create, store and enable a midi device.
 */
-void DeviceManager::RegisterMidiDevice(int port, int outport)
+MidiAgent * DeviceManager::RegisterMidiDevice(int port, int outport)
 {
-	MidiAgent *midiA = new MidiAgent();
+	MidiAgent * midiA = new MidiAgent();
 	midiA->open_midi_input_port(port);
 	midiA->open_midi_output_port(outport);
-
 	midiAgents.push_back(midiA);
+	return midiA;
 }
 
 /* Get this Device Manager state as OBS Data. (includes devices and their midi hooks)
@@ -179,9 +177,9 @@ void DeviceManager::RegisterMidiDevice(int port, int outport)
 */
 obs_data_t *DeviceManager::GetData()
 {
-	obs_data_t *data = obs_data_create();
+	obs_data_t* data = obs_data_create();
 
-	obs_data_array_t *deviceData = obs_data_array_create();
+	obs_data_array_t* deviceData = obs_data_array_create();
 	for (int i = 0; i < midiAgents.size(); i++) {
 		obs_data_array_push_back(deviceData,
 					 midiAgents.at(i)->GetData());
@@ -191,8 +189,6 @@ obs_data_t *DeviceManager::GetData()
 	return data;
 }
 
-
-
 void DeviceManager::broadcast_obs_event(const RpcEvent &event)
 {
 	OBSDataAutoRelease eventData = obs_data_create();
@@ -201,28 +197,15 @@ void DeviceManager::broadcast_obs_event(const RpcEvent &event)
 	obs_data_set_string(eventData, "update-type",
 			    updateType.toUtf8().constData());
 
-	std::optional<uint64_t> streamTime = event.streamTime();
-	if (streamTime.has_value()) {
-		QString streamingTimecode =
-			Utils::nsToTimestamp(streamTime.value());
-		obs_data_set_string(eventData, "stream-timecode",
-				    streamingTimecode.toUtf8().constData());
-	}
-
-	std::optional<uint64_t> recordingTime = event.recordingTime();
-	if (recordingTime.has_value()) {
-		QString recordingTimecode =
-			Utils::nsToTimestamp(recordingTime.value());
-		obs_data_set_string(eventData, "rec-timecode",
-				    recordingTimecode.toUtf8().constData());
-	}
+	
 
 	OBSData additionalFields = event.additionalFields();
 	if (additionalFields) {
 		obs_data_apply(eventData, additionalFields);
 	}
 
-	//blog(1, "OBS EVENT %s -- %s", event.updateType().toStdString().c_str(),obs_data_get_json(eventData));
+	blog(1, "OBS EVENT %s -- %s", event.updateType().toStdString().c_str(),obs_data_get_json(eventData));
 	emit bcast(event.updateType(),
 		   QString::fromStdString(obs_data_get_json(eventData)));
+	obs_data_release(additionalFields);
 };

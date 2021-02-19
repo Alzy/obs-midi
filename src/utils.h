@@ -40,15 +40,19 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 typedef void (*PauseRecordingFunction)(bool);
 typedef bool (*RecordingPausedFunction)();
-typedef struct MidiMessage {
-	QString device_name;
-	QString message_type;
-	int channel;
-	int NORC;
-	int value;
-} MidiMessage;
-Q_DECLARE_METATYPE(MidiMessage);
-enum class Pairs { Scene, Source, Item, Transition, Audio, Media, Filter, String, Integer, Boolean };
+
+enum class Pairs {
+	Scene,
+	Source,
+	Item,
+	Transition,
+	Audio,
+	Media,
+	Filter,
+	String,
+	Integer,
+	Boolean
+};
 class ActionsClass : public QObject {
 	Q_OBJECT
 public:
@@ -110,7 +114,8 @@ public:
 		Set_Source_Rotation,
 		Set_Source_Position,
 		Set_Opacity,
-		Move_T_Bar
+		Move_T_Bar,
+		Toggle_Source_Visibility
 	};
 	Q_ENUM(Actions)
 	enum class obs_event_type {
@@ -132,7 +137,6 @@ public:
 	static obs_event_type string_to_event(const QString &string);
 };
 
-
 typedef void (*PauseRecordingFunction)(bool);
 typedef bool (*RecordingPausedFunction)();
 namespace Utils {
@@ -145,13 +149,14 @@ int t_bar_mapper(int x);
 bool is_number(const QString &s);
 bool isJSon(QString val);
 
-QString getMidiMessageType(int in);
+QString get_midi_message_type(rtmidi::message message);
 QStringList GetMediaSourceNames();
 QStringList GetAudioSourceNames();
 
 QString nsToTimestamp(uint64_t ns);
 obs_data_array_t *StringListToArray(char **strings, const char *key);
 obs_data_array_t *GetSceneItems(obs_source_t *source);
+QStringList GetSceneItemsBySource(obs_source_t *source);
 obs_data_t *GetSceneItemData(obs_sceneitem_t *item);
 OBSDataArrayAutoRelease GetSourceArray();
 OBSDataArrayAutoRelease GetSceneArray(QString name = NULL);
@@ -204,6 +209,10 @@ int get_midi_value(rtmidi::message mess);
 QSpinBox *GetTransitionDurationControl();
 
 QStringList TranslateActions();
+QStringList get_scene_names();
+QStringList get_source_names(QString scene);
+QStringList get_filter_names(QString Source);
+QStringList get_transition_names();
 
 QString untranslate(QString tstring);
 const QList<ActionsClass::Actions> AllActions_raw = {
@@ -216,7 +225,7 @@ const QList<ActionsClass::Actions> AllActions_raw = {
 	ActionsClass::Actions::Play_Pause_Media,
 	ActionsClass::Actions::Previous_Media,
 	ActionsClass::Actions::Reset_Scene_Item,
-	
+	ActionsClass::Actions::Toggle_Source_Visibility,
 	ActionsClass::Actions::Restart_Media,
 	ActionsClass::Actions::Set_Current_Scene,
 	ActionsClass::Actions::Set_Current_Transition,
@@ -266,9 +275,27 @@ const QList<ActionsClass::Actions> not_ready_actions{
 	ActionsClass::Actions::Set_Scene_Item_Transform,
 	ActionsClass::Actions::Set_Text_GDIPlus_Text,
 	//ActionsClass::Actions::Set_Opacity,
-	ActionsClass::Actions::Set_Browser_Source_URL};
-
+	ActionsClass::Actions::Set_Browser_Source_URL,
+};
 
 void alert_popup(QString message);
-		QString translate_action(ActionsClass::Actions action);
+QString translate_action(ActionsClass::Actions action);
 };
+
+typedef struct MidiMessage {
+	MidiMessage(){};
+	void set_message(rtmidi::message message)
+	{
+		this->channel = message.get_channel();
+		this->message_type = Utils::get_midi_message_type(message);
+		this->NORC = Utils::get_midi_note_or_control(message);
+		this->value = Utils::get_midi_value(message);
+	}
+	QString device_name;
+	QString message_type;
+	int channel = 0;
+	int NORC = 0;
+	int value = 0;
+	MidiMessage get() { return (MidiMessage) * this; }
+} MidiMessage;
+Q_DECLARE_METATYPE(MidiMessage);

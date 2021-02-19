@@ -49,5 +49,5 @@ private:
 	QString _updateType;
 	std::optional<uint64_t> _streamTime;
 	std::optional<uint64_t> _recordingTime;
-	OBSDataAutoRelease _additionalFields;
+	obs_data_t* _additionalFields;
 };

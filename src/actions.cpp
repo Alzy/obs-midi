@@ -12,16 +12,17 @@ ActionsClass::Actions ActionsClass::string_to_action(const QString &action)
 {
 	return QVariant(action).value<ActionsClass::Actions>();
 }
-QString ActionsClass::event_to_string(const ActionsClass::obs_event_type &enumval)
+QString
+ActionsClass::event_to_string(const ActionsClass::obs_event_type &enumval)
 {
 	return QVariant::fromValue(enumval).toString();
 }
 
-ActionsClass::obs_event_type ActionsClass::string_to_event(const QString &action)
+ActionsClass::obs_event_type
+ActionsClass::string_to_event(const QString &action)
 {
 	return QVariant(action).value<ActionsClass::obs_event_type>();
 }
-
 
 /**
  * Sets the currently active scene
@@ -107,7 +108,7 @@ void ActionsClass::TransitionToProgram()
  * transitionDuration is optional. (milliseconds)
  */
 void ActionsClass::TransitionToProgram(QString transitionName,
-					int transitionDuration)
+				       int transitionDuration)
 {
 	if (!obs_frontend_preview_program_mode_active()) {
 		throw("studio mode not enabled");
@@ -335,12 +336,9 @@ void ActionsClass::SetCurrentProfile(QString profileName)
 
 void ActionsClass::SetTextGDIPlusText(QString text) {}
 
-void ActionsClass::SetBrowserSourceURL(QString url) {
-}
+void ActionsClass::SetBrowserSourceURL(QString url) {}
 
-void ActionsClass::ReloadBrowserSource()
-{
-}
+void ActionsClass::ReloadBrowserSource() {}
 
 void ActionsClass::TakeSourceScreenshot(QString source)
 {
@@ -398,7 +396,7 @@ void ActionsClass::SetGainFilter() {}
 void ActionsClass::SetOpacity() {}
 
 void ActionsClass::do_obs_action(MidiHook *hook, int MidiVal,
-				ActionsClass::Actions action)
+				 ActionsClass::Actions action)
 {
 	switch (action) {
 	case ActionsClass::Actions::Set_Current_Scene:

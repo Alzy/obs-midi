@@ -25,6 +25,7 @@
 #include "obs-midi.h"
 #include "config.h"
 #include "utils.h"
+#include "forms/settings-dialog.h"
 //#include "rpc/RpcEvent.h"
 
 #define STATUS_INTERVAL 2000
@@ -68,19 +69,10 @@ events::events(DeviceManagerPtr srv)
 	  HeartbeatIsActive(false),
 	  pulse(false)
 {
+	this->setParent(plugin_window);
 	//_srv = GetDeviceManager();
 	cpuUsageInfo = os_cpu_usage_info_start();
 	obs_frontend_add_event_callback(events::FrontendEventHandler, this);
-
-	QSpinBox *durationControl = Utils::GetTransitionDurationControl();
-	connect(durationControl, SIGNAL(valueChanged(int)), this,
-		SLOT(TransitionDurationChanged(int)));
-
-	connect(&streamStatusTimer, SIGNAL(timeout()), this,
-		SLOT(StreamStatus()));
-	connect(&heartbeatTimer, SIGNAL(timeout()), this, SLOT(Heartbeat()));
-
-	heartbeatTimer.start(STATUS_INTERVAL);
 
 	// Connect to signals of all existing sources
 	obs_enum_sources(
@@ -261,11 +253,12 @@ void events::broadcastUpdate(const char *updateType,
 	if (obs_frontend_recording_active()) {
 		recordingTime = std::make_optional(getRecordingTime());
 	}
+	{
 
-	RpcEvent event(QString(updateType), streamTime, recordingTime,
-		       additionalFields);
-	_srv->broadcast_obs_event(event);
-	//emit obsEvent(event);
+		RpcEvent event(QString(updateType), streamTime, recordingTime,
+			       additionalFields);
+		_srv->broadcast_obs_event(event);
+	}
 }
 
 void events::connectSourceSignals(obs_source_t *source)
@@ -1848,7 +1841,7 @@ void events::OnBroadcastCustomMessage(QString realm, obs_data_t *data)
  */
 obs_data_t *events::GetStats()
 {
-	obs_data_t *stats = obs_data_create();
+	OBSDataAutoRelease stats = obs_data_create();
 
 	double cpuUsage = os_cpu_usage_info_query(cpuUsageInfo);
 	double memoryUsage =

@@ -43,19 +43,15 @@ public slots:
 	void select_output_device(QString item);
 	void handle_midi_message(MidiMessage mess);
 	void obs_actions_select(QString action);
-	void check_advanced_switch(bool state);
 	void ResetToDefaults();
-	void on_source_change(QString source);
-	void on_scene_change(QString source);
-	void get_sources(QString scene);
-	void get_filters(QString Source);
-	void get_transitions();
-	void get_scenes();
+	void on_scene_change(QString newscene);
+	void on_source_change(QString newsource);
+
 	void add_new_mapping();
 	void add_row_from_hook(MidiHook *hook);
 	void tab_changed(int i);
 	void delete_mapping();
-	void edit_mapping(int row, int col);
+	void edit_mapping();
 	void set_cell_colors(QColor color, QTableWidgetItem *item);
 
 private:
@@ -73,12 +69,12 @@ private:
 	void set_headers();
 	QStringList SceneList;
 	bool listening = false;
-	void get_scene_names();
 
 	bool first_run;
 	bool map_exists();
 	int map_location(MidiMessage message);
 	bool verify_mapping();
+
 private:
 	QGridLayout *layout;
 	QStringList *items;
@@ -92,5 +88,4 @@ private:
 	void ShowEntries(QList<ActionsClass::Actions> entrys);
 	QString untranslate(QString translation);
 	QListView *listview;
-	
 };

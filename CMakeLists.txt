@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_definitions(-DASIO_STANDALONE)
 
-if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm") 
+if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
     set(CMAKE_CXX_FLAGS "-mfpu=neon")
 endif()
 
@@ -90,12 +90,23 @@ include_directories(
 	${Qt5Core_INCLUDES}
 	${Qt5Widgets_INCLUDES}
 	"${CMAKE_SOURCE_DIR}/deps/asio/asio/include")
-target_link_libraries(obs-midi
-	"${OBS_FRONTEND_LIB}"
-	${obs-midi_DEPS}
-	Qt5::Core
-	Qt5::Widgets
-	libobs)
+if(LINUX)
+	include_directories(/usr/include/obs)
+	target_link_libraries(obs-midi
+		"${OBS_FRONTEND_LIB}"
+		${obs-midi_DEPS}
+		Qt5::Core
+		Qt5::Widgets
+		libobs.so)
+
+else()
+	target_link_libraries(obs-midi
+		"${OBS_FRONTEND_LIB}"
+		${obs-midi_DEPS}
+		Qt5::Core
+		Qt5::Widgets
+		libobs)
+endif()
 # --- Windows-specific build settings and tasks ---
 if(WIN32)
 	if(NOT DEFINED OBS_FRONTEND_LIB)
@@ -144,15 +155,7 @@ if(WIN32)
 			"$<TARGET_FILE:obs-midi>"
 			"${RELEASE_DIR}/obs-plugins/${ARCH_NAME}")
 
-		# In Release mode, copy Qt image format plugins
-		COMMAND if $<CONFIG:Release>==1 (
-			"${CMAKE_COMMAND}" -E copy
-			"${QTDIR}/plugins/imageformats/qjpeg.dll"
-			"${RELEASE_DIR}/bin/${ARCH_NAME}/imageformats/qjpeg.dll")
-		COMMAND if $<CONFIG:RelWithDebInfo>==1 (
-			"${CMAKE_COMMAND}" -E copy
-			"${QTDIR}/plugins/imageformats/qjpeg.dll"
-			"${RELEASE_DIR}/bin/${ARCH_NAME}/imageformats/qjpeg.dll")
+
 
 		# If config is RelWithDebInfo, package release files
 		COMMAND if $<CONFIG:RelWithDebInfo>==1 (
@@ -176,21 +179,18 @@ if(WIN32)
 		COMMAND if $<CONFIG:Debug>==1 (
 			"${CMAKE_COMMAND}" -E copy
 				"$<TARGET_FILE:obs-midi>"
-				"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/rundir/$<CONFIG>/obs-plugins/${ARCH_NAME}")
+				"${LibObs_DIR}/../rundir/$<CONFIG>/obs-plugins/${ARCH_NAME}")
 
 		COMMAND if $<CONFIG:Debug>==1 (
 			"${CMAKE_COMMAND}" -E copy
 				"$<TARGET_PDB_FILE:obs-midi>"
-				"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/rundir/$<CONFIG>/obs-plugins/${ARCH_NAME}")
+				"${LibObs_DIR}/../rundir/$<CONFIG>/obs-plugins/${ARCH_NAME}")
 
-		COMMAND if $<CONFIG:Debug>==1 (
-			"${CMAKE_COMMAND}" -E make_directory
-				"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/rundir/$<CONFIG>/data/obs-plugins/obs-midi")
 
 		COMMAND if $<CONFIG:Debug>==1 (
 			"${CMAKE_COMMAND}" -E copy_directory
 				"${PROJECT_SOURCE_DIR}/data"
-				"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/rundir/$<CONFIG>/data/obs-plugins/obs-midi")
+				"${LibObs_DIR}/../rundir/$<CONFIG>/data/obs-plugins/${ARCH_NAME}")
 	)
 	# --- End of sub-section ---
 
@@ -208,8 +208,13 @@ if(UNIX AND NOT APPLE)
 
         set(CMAKE_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
 		OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+	find_program(LSB_RELEASE_EXEC lsb_release)
+	execute_process(COMMAND ${LSB_RELEASE_EXEC} -is
+	OUTPUT_VARIABLE LSB_RELEASE_ID_SHORT
+	OUTPUT_STRIP_TRAILING_WHITESPACE
+	)
+	if(${LSB_RELEASE_ID_SHORT} STREQUAL "Ubuntu")
 
-	if(${USE_UBUNTU_FIX})
 		install(TARGETS obs-midi LIBRARY
 			DESTINATION "/usr/lib/obs-plugins"
 			PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
@@ -232,3 +237,8 @@ if(APPLE)
 	target_link_libraries(obs-midi "${OBS_FRONTEND_LIB}")
 endif()
 # -- End of section --
+if (DEFINED $ENV{isCI})
+install_obs_plugin_with_data(obs-midi data)
+endif()
+set_target_properties(obs-midi PROPERTIES FOLDER "plugins/obs-midi")
+

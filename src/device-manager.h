@@ -52,16 +52,16 @@ public:
 	QVector<MidiAgent *> GetActiveMidiDevices();
 	MidiAgent *GetMidiDeviceByName(QString deviceName);
 	QVector<MidiHook *> GetMidiHooksByDeviceName(QString deviceName);
-	void RegisterMidiDevice(int port, int outport);
-	
+	MidiAgent * RegisterMidiDevice(int port, int outport);
+
 	obs_data_t *GetData();
 	void broadcast_obs_event(const RpcEvent &event);
 signals:
 	void bcast(QString updateType, QString eventData);
 
 private:
-	rtmidi::midi_in *rtMidi;
-	rtmidi::midi_out *MO;
+	rtmidi::midi_in rtMidi;
+	rtmidi::midi_out MO;
 
 	QVector<MidiAgent *> midiAgents;
 };

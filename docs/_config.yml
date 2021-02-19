@@ -28,7 +28,7 @@ twitter_username: cpyarger
 github_username:  cpyarger
 
 # Build settings
-theme: dinky
+theme: minima
 plugins:
   - jekyll-feed
 # The following items will not be processed, by default.

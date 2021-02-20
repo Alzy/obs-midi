@@ -27,8 +27,6 @@ url: "https://obs-midi.org" # the base hostname & protocol for your site, e.g. h
 
 
 plugins:
-  - jekyll-feed
-  - jekyll-github-metadata
   - jekyll-remote-theme
   - jemoji
   
@@ -39,9 +37,10 @@ sass:
   style: compressed
 
 highlighter: rouge #selecting the highlighter, default is rouge
+
 header_pages:
-  - index.markdown
-  - about.markdown
+  - index.md
+  - about.md
   - build.md
   - downloads.md
   - help.md

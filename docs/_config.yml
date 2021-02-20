@@ -31,6 +31,6 @@ plugins:
   - github-pages
   
 
-theme: hacker
+theme: minima
 
 show_downloads: true

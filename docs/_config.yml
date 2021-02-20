@@ -25,12 +25,7 @@ baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://obs-midi.org" # the base hostname & protocol for your site, e.g. http://example.com
 
 
-
+# Build settings
+theme: hacker
 plugins:
   - jekyll-feed
-  - github-pages
-  
-
-theme: minima
-
-show_downloads: true

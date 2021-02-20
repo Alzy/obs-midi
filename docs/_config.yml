@@ -33,16 +33,5 @@ plugins:
 # Including jekyll-shell-theme using the jekyll-remote-theme plugin
 #remote_theme: tareqdandachi/jekyll-shell-theme
 theme: jekyll-theme-midnight
-sass:
-  style: compressed
+
 show_downloads: true
-highlighter: rouge #selecting the highlighter, default is rouge
-
-header_pages:
-  - index.md
-  - about.md
-  - build.md
-  - downloads.md
-  - help.md
-
-font-size: small # options: [small] or [large]

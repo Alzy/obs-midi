@@ -31,8 +31,8 @@ plugins:
   - jemoji
   
 # Including jekyll-shell-theme using the jekyll-remote-theme plugin
-remote_theme: tareqdandachi/jekyll-shell-theme
-
+#remote_theme: tareqdandachi/jekyll-shell-theme
+theme: jekyll-theme-hacker
 sass:
   style: compressed
 

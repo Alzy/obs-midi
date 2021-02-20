@@ -56,9 +56,9 @@ MidiAgent::MidiAgent()
 MidiAgent::MidiAgent(obs_data_t *midiData)
 {
 	this->setParent(GetDeviceManager().get());
-	this->Load(midiData);
 	midiin.set_callback(
 		[this](const auto &message) { HandleInput(message, this); });
+	this->Load(midiData);
 }
 MidiAgent::~MidiAgent()
 {
@@ -112,17 +112,13 @@ void MidiAgent::Load(obs_data_t *data)
 void MidiAgent::open_midi_input_port(int inport)
 {
 	try {
-
 		midiin.open_port(inport);
-
-		midi_input_name =
-			QString::fromStdString(midiin.get_port_name(inport));
-		blog(LOG_INFO, "MIDI device connected In: [%d] %s", inport,
-		     midi_input_name.toStdString().c_str());
-
 	} catch (const rtmidi::midi_exception &error) {
 		blog(LOG_DEBUG, "Midi Error %s", error.what());
 	}
+	midi_input_name = QString::fromStdString(midiin.get_port_name(inport));
+	blog(LOG_INFO, "MIDI device connected In: [%d] %s", inport,
+	     midi_input_name.toStdString().c_str());
 }
 void MidiAgent::open_midi_output_port(int outport)
 {
@@ -135,6 +131,8 @@ void MidiAgent::open_midi_output_port(int outport)
 	}
 	midi_output_name =
 		QString::fromStdString(midiout.get_port_name(outport));
+	blog(LOG_INFO, "MIDI device connected Out: [%d] %s", outport,
+	     midi_output_name.toStdString().c_str());
 }
 
 /* Will close the port and disable this MidiAgent
@@ -209,7 +207,7 @@ bool MidiAgent::isConnected()
 void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 {
 	MidiAgent *self = static_cast<MidiAgent *>(userData);
-	if (self->enabled == false || self->connected == false) {
+	if (self->enabled == false) {
 		return;
 	}
 
@@ -219,7 +217,7 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 	x->set_message(message);
 	/***** Send Messages to emit function *****/
 	x->device_name = self->get_midi_input_name();
-	emit self->broadcast_midi_message(x->get());
+	emit self->broadcast_midi_message((MidiMessage)*x);
 	/** check if hook exists for this note or cc norc and launch it **/
 
 	self->do_obs_action(self->get_midi_hook_if_exists(x), x->value);

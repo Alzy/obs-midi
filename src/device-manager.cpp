@@ -143,7 +143,6 @@ MidiAgent *DeviceManager::GetMidiDeviceByName(QString deviceName)
 			return midiAgents.at(i);
 		}
 	}
-	return NULL;
 }
 
 QVector<MidiHook *> DeviceManager::GetMidiHooksByDeviceName(QString deviceName)

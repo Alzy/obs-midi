@@ -171,9 +171,9 @@ private:
 	int port;
 	int lastscenebtn;
 	int last_preview_scene_norc;
-	bool enabled;
-	bool connected;
-	bool bidirectional;
+	bool enabled=false;
+	bool connected=false;
+	bool bidirectional = false;
 	MidiHook *get_midi_hook_if_exists(MidiMessage *message);
 	bool closing = false;
 	QVector<MidiHook *> midiHooks;

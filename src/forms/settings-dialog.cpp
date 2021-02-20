@@ -78,7 +78,6 @@ PluginWindow::PluginWindow(QWidget *parent)
 	connect(ui->tabWidget, SIGNAL(currentChanged(int)), this,
 		SLOT(tab_changed(int)));
 	this->ui->cb_obs_output_action->addItems(Utils::TranslateActions());
-	loadingdevices = true;
 }
 void PluginWindow::ToggleShowHide()
 {
@@ -99,6 +98,8 @@ void PluginWindow::setCheck(bool x)
 }
 void PluginWindow::SetAvailableDevices()
 {
+	loadingdevices = true;
+
 	auto midiOutDevices = GetDeviceManager()->GetOutPortsList();
 	auto midiDevices = GetDeviceManager()->GetPortsList();
 	this->ui->list_midi_dev->clear();
@@ -120,7 +121,12 @@ void PluginWindow::SetAvailableDevices()
 		loadingdevices = true;
 		this->ui->outbox->clear();
 		this->ui->outbox->insertItems(0, midiOutDevices);
-		loadingdevices = false;
+		if (midiDevices.size() != 0) {
+			desconnect = connect(
+				ui->outbox, SIGNAL(currentTextChanged(QString)),
+				this, SLOT(select_output_device(QString)));
+		}
+		
 	}
 	if (starting) {
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
@@ -133,23 +139,22 @@ void PluginWindow::SetAvailableDevices()
 		this->ui->outbox->setCurrentIndex(0);
 		// Unix
 #endif
-		if (midiDevices.size() != 0) {
-			desconnect = connect(
-				ui->outbox, SIGNAL(currentTextChanged(QString)),
-				this, SLOT(select_output_device(QString)));
-		}
+		
 		starting = false;
 	}
 	this->ui->list_midi_dev->setCurrentRow(-1);
 	this->ui->list_midi_dev->setCurrentRow(0);
 	on_device_select(ui->list_midi_dev->currentItem()->text());
+	if (this->ui->check_enabled->isChecked()) {
 
-	ui->outbox->setEnabled(
-		GetDeviceManager()
-			.get()
-			->GetMidiDeviceByName(
-				ui->list_midi_dev->currentItem()->text())
-			->isBidirectional());
+		ui->outbox->setEnabled(
+			GetDeviceManager()
+				.get()
+				->GetMidiDeviceByName(
+					ui->list_midi_dev->currentItem()->text())
+				->isBidirectional());
+	}
+	loadingdevices = false;
 }
 void PluginWindow::select_output_device(QString selectedDeviceName)
 {
@@ -196,7 +201,8 @@ int PluginWindow::on_check_enabled_state_changed(int state)
 void PluginWindow::on_device_select(QString curitem)
 {
 	if (!starting) {
-
+		blog(LOG_DEBUG, "on_device_select %s",
+		     curitem.toStdString().c_str());
 		auto devicemanager = GetDeviceManager();
 		auto config = GetConfig();
 		MidiAgent *MAdevice =
@@ -220,8 +226,7 @@ void PluginWindow::on_device_select(QString curitem)
 		///HOOK up the Message Handler
 		connect(MAdevice, SIGNAL(broadcast_midi_message(MidiMessage)),
 			this,
-			SLOT(handle_midi_message(
-				MidiMessage))); /// name, mtype, norc, channel
+			SLOT(handle_midi_message(MidiMessage))); /// name, mtype, norc, channel
 		ui->mapping_lbl_device_name->setText(curitem);
 	}
 }
@@ -231,7 +236,7 @@ void PluginWindow::handle_midi_message(MidiMessage mess)
 		if (ui->btn_Listen_one->isChecked() ||
 		    ui->btn_Listen_many->isChecked()) {
 			blog(1,
-			     "got midi message via gui, \n Device = %s \nMType = %s \n NORC : %i \n Channel: %i \n Value: %i",
+			     "got midi message via gui, \n Device = %s \n MType = %s \n NORC : %i \n Channel: %i \n Value: %i",
 			     mess.device_name.toStdString().c_str(),
 			     mess.message_type.toStdString().c_str(), mess.NORC,
 			     mess.channel, mess.value);

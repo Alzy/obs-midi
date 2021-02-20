@@ -28,7 +28,7 @@ url: "https://obs-midi.org" # the base hostname & protocol for your site, e.g. h
 
 # Build settings
 theme: minima
-  skin: dark
+  - skin: dark
 plugins:
   - jekyll-feed
   - jekyll-github-metadata

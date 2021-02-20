@@ -262,7 +262,6 @@ int PluginWindow::on_bid_enabled_state_changed(int state)
 	if (state) {
 		device->setBidirectional(state);
 		return 1;
-
 	} else {
 		device->setBidirectional(state);
 		return 0;
@@ -389,7 +388,6 @@ void PluginWindow::HidePair(Pairs Pair)
 		ui->label_obs_output_scene->hide();
 		ui->cb_obs_output_scene->hide();
 		ui->cb_obs_output_scene->clear();
-
 		ui->w_scene->hide();
 		blog(LOG_DEBUG, "Hide Scene");
 		break;

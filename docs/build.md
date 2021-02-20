@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Compiling OBS MIDI
+title: Build
 permalink: /build/
 ---
 
@@ -75,4 +75,8 @@ This will result in a ready-to-use `obs-midi.pkg` installer in the `release` sub
 
 ## Automated Builds
 
-![CI Multiplatform Build](https://github.com/cpyarger/obs-midi/workflows/CI%20Multiplatform%20Build/badge.svg)
+Currently Automated builds are done using [GitHub Actions](https://github.com/features/actions)
+
+You can check out the [GitHub Actions Documentation](https://docs.github.com/en/actions) for more information
+
+The build workspace file is [here](https://github.com/cpyarger/obs-midi/blob/master/.github/workflows/CI%20Build%20and%20release.yml)

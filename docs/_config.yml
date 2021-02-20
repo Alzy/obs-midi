@@ -35,7 +35,7 @@ plugins:
 theme: jekyll-theme-hacker
 sass:
   style: compressed
-
+show_downloads: true
 highlighter: rouge #selecting the highlighter, default is rouge
 
 header_pages:

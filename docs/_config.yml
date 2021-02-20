@@ -46,3 +46,5 @@ header_pages:
   - build.md
   - downloads.md
   - help.md
+
+font-size: small # options: [small] or [large]

@@ -21,9 +21,7 @@
 title: OBS-MIDI Plugin
 description: >- # this means to ignore newlines until "baseurl:"
   Use MIDI devices to trigger events in OBS and vice versa
-  [![CI Multiplatform Build and release](https://github.com/cpyarger/obs-midi/workflows/CI%20Multiplatform%20Build%20and%20release/badge.svg?branch=master)
-  [![Open Source Helpers](https://www.codetriage.com/cpyarger/obs-midi/badges/users.svg)](https://www.codetriage.com/cpyarger/obs-midi)
-  [![Crowdin](https://badges.crowdin.net/obs-midi/localized.svg)](https://crowdin.com/project/obs-midi)
+  
 baseurl: "/" # the subpath of your site, e.g. /blog
 url: "https://obs-midi.org" # the base hostname & protocol for your site, e.g. http://example.com
 

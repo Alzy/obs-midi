@@ -4,11 +4,15 @@ title: Build
 permalink: /build/
 ---
 
-## Prerequisites
+OBS-MIDI can be built and installed on windows, Mac, and Linux
+
+# Prerequisites
 
 You'll need [Qt 5.15.2](https://download.qt.io/official_releases/qt/5.15/),
 [CMake](https://cmake.org/download/) and a working [OBS Studio development environment](https://obsproject.com/wiki/install-instructions) installed on your
 computer.
+
+# Windows
 
 Once you have successfully built OBS Studio, in the obs-studio source directory
 

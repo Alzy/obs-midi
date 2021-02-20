@@ -388,7 +388,6 @@ void PluginWindow::HidePair(Pairs Pair)
 		ui->label_obs_output_scene->hide();
 		ui->cb_obs_output_scene->hide();
 		ui->cb_obs_output_scene->clear();
-
 		ui->w_scene->hide();
 		blog(LOG_DEBUG, "Hide Scene");
 		break;

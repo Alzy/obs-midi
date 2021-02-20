@@ -25,6 +25,6 @@ Anyone who wants to help out the project
 - Drop any ideas or suggestions or bugs in the issues
 - Leave an honest review on the [obs forum](https://obsproject.com/forum/resources/obs-midi.1023/)
 - If you know anyone who would be willing to help with the programming let them know about the project
-- If you or anyone you know makes youtube videos, we are always looking for reviews, and tutorial videos :smile_cat:
+- If you or anyone you know makes youtube videos, we are always looking for reviews, and tutorial videos 
 - Contribute to translations on [crowdin](https://crowdin.com/project/obs-midi)
 - If you know C++ we can always use help with cleaning up the code base and especially hunting and fixing memory leaks.

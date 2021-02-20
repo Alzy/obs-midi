@@ -48,7 +48,12 @@ sudo make install
 On other linux OS's, use this cmake command instead:
 
 ```shell
+git clone --recursive git@github.com:cpyarger/obs-midi.git
+cd obs-midi
+mkdir build && cd build
 cmake -DLIBOBS_INCLUDE_DIR="<path to the libobs sub-folder in obs-studio's source code>" -DCMAKE_INSTALL_PREFIX=/usr ..
+make -j4
+sudo make install
 ```
 
 ## OS X

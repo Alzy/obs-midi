@@ -262,7 +262,6 @@ int PluginWindow::on_bid_enabled_state_changed(int state)
 	if (state) {
 		device->setBidirectional(state);
 		return 1;
-
 	} else {
 		device->setBidirectional(state);
 		return 0;

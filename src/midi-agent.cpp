@@ -49,22 +49,21 @@ MidiAgent::MidiAgent()
 	this->setParent(GetDeviceManager().get());
 	midi_input_name = "Midi Device (uninit)";
 	midi_output_name = "Midi Out Device (uninit)";
-	
+
 	midiin.set_callback(
 		[this](const auto &message) { HandleInput(message, this); });
 }
-MidiAgent::MidiAgent(obs_data_t* midiData)
+MidiAgent::MidiAgent(obs_data_t *midiData)
 {
 	this->setParent(GetDeviceManager().get());
-	this->Load(midiData);
 	midiin.set_callback(
 		[this](const auto &message) { HandleInput(message, this); });
+	this->Load(midiData);
 }
 MidiAgent::~MidiAgent()
 {
 	clear_MidiHooks();
 	midiin.cancel_callback();
-	
 }
 
 /* Loads information from OBS data. (recalled from Config)
@@ -113,17 +112,13 @@ void MidiAgent::Load(obs_data_t *data)
 void MidiAgent::open_midi_input_port(int inport)
 {
 	try {
-
 		midiin.open_port(inport);
-
-		midi_input_name =
-			QString::fromStdString(midiin.get_port_name(inport));
-		blog(LOG_INFO, "MIDI device connected In: [%d] %s", inport,
-		     midi_input_name.toStdString().c_str());
-
 	} catch (const rtmidi::midi_exception &error) {
 		blog(LOG_DEBUG, "Midi Error %s", error.what());
 	}
+	midi_input_name = QString::fromStdString(midiin.get_port_name(inport));
+	blog(LOG_INFO, "MIDI device connected In: [%d] %s", inport,
+	     midi_input_name.toStdString().c_str());
 }
 void MidiAgent::open_midi_output_port(int outport)
 {
@@ -136,7 +131,8 @@ void MidiAgent::open_midi_output_port(int outport)
 	}
 	midi_output_name =
 		QString::fromStdString(midiout.get_port_name(outport));
-\
+	blog(LOG_INFO, "MIDI device connected Out: [%d] %s", outport,
+	     midi_output_name.toStdString().c_str());
 }
 
 /* Will close the port and disable this MidiAgent
@@ -149,7 +145,6 @@ void MidiAgent::close_midi_port()
 	if (midiout.is_port_open()) {
 		midiout.close_port();
 	}
-
 }
 
 QString MidiAgent::get_midi_input_name()
@@ -212,22 +207,22 @@ bool MidiAgent::isConnected()
 void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 {
 	MidiAgent *self = static_cast<MidiAgent *>(userData);
-	if (self->enabled == false || self->connected == false) {
+	if (self->enabled == false) {
 		return;
 	}
 
 	/*************Get Message parts***********/
 	self->sending = true;
-	MidiMessage *x= new MidiMessage();
+	MidiMessage *x = new MidiMessage();
 	x->set_message(message);
 	/***** Send Messages to emit function *****/
 	x->device_name = self->get_midi_input_name();
-	emit self->broadcast_midi_message(x->get());
+	emit self->broadcast_midi_message((MidiMessage)*x);
 	/** check if hook exists for this note or cc norc and launch it **/
 
 	self->do_obs_action(self->get_midi_hook_if_exists(x), x->value);
 
-	delete(x);
+	delete (x);
 }
 
 /* Get the midi hooks for this device
@@ -236,16 +231,17 @@ QVector<MidiHook *> MidiAgent::GetMidiHooks()
 {
 	return midiHooks;
 }
-MidiHook *MidiAgent::get_midi_hook_if_exists(MidiMessage *message) {
+MidiHook *MidiAgent::get_midi_hook_if_exists(MidiMessage *message)
+{
 	for (int i = 0; i < this->midiHooks.size(); i++) {
-		if (this->midiHooks.at(i)->message_type == message->message_type &&
+		if (this->midiHooks.at(i)->message_type ==
+			    message->message_type &&
 		    this->midiHooks.at(i)->norc == message->NORC &&
 		    this->midiHooks.at(i)->channel == message->channel) {
 			return this->midiHooks.at(i);
 		}
 	}
 	return NULL;
-
 }
 void MidiAgent::add_MidiHook(MidiHook *hook)
 {
@@ -284,7 +280,7 @@ void MidiAgent::clear_MidiHooks()
 */
 obs_data_t *MidiAgent::GetData()
 {
-	obs_data_t* data = obs_data_create();
+	obs_data_t *data = obs_data_create();
 	obs_data_set_string(data, "name",
 			    midi_input_name.toStdString().c_str());
 	obs_data_set_string(data, "outname",
@@ -293,7 +289,7 @@ obs_data_t *MidiAgent::GetData()
 	obs_data_set_bool(data, "enabled", enabled);
 	obs_data_set_bool(data, "bidirectional", bidirectional);
 
-	obs_data_array_t* arrayData = obs_data_array_create();
+	obs_data_array_t *arrayData = obs_data_array_create();
 	for (int i = 0; i < midiHooks.size(); i++) {
 		obs_data_t *hookData = midiHooks.at(i)->GetData();
 		obs_data_array_push_back(arrayData, hookData);
@@ -309,8 +305,6 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 		MidiMessage *message = new MidiMessage();
 		OBSDataAutoRelease data = obs_data_create_from_json(
 			eventData.toStdString().c_str());
-
-		
 
 		// ON EVENT TYPE Find matching hook, pull data from that hook, and do thing.
 
@@ -391,9 +385,7 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 						this->midiHooks.at(i)->norc;
 				}
 			}
-		}
-			else if (eventType == QString("TransitionBegin"))
-			{
+		} else if (eventType == QString("TransitionBegin")) {
 			QString from = obs_data_get_string(data, "from-scene");
 			for (int i = 0; i < this->midiHooks.size(); i++) {
 				if (this->midiHooks.at(i)->action ==
@@ -467,12 +459,11 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 				GetConfig()->Save();
 			}
 		}
-		delete(message);
+		delete (message);
 		obs_data_release(data);
 	} else {
 		this->sending = false;
 	}
-	
 }
 void MidiAgent::send_message_to_midi_device(MidiMessage message)
 {
@@ -589,7 +580,8 @@ void MidiAgent::do_obs_action(MidiHook *hook, int MidiVal)
 			OBSController::SetCurrentProfile(hook->profile);
 			break;
 		case ActionsClass::Actions::Toggle_Source_Filter:
-			OBSController::ToggleSourceFilter(hook->source,hook->filter);
+			OBSController::ToggleSourceFilter(hook->source,
+							  hook->filter);
 			break;
 		case ActionsClass::Actions::Set_Text_GDIPlus_Text:
 			OBSController::SetTextGDIPlusText(

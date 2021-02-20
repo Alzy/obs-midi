@@ -4,11 +4,8 @@ title: Downloads
 permalink: /Downloads/
 ---
 
-You download OBS-MIDI on the latest [GitHub Releases Page](https://github.com/cpyarger/obs-midi/releases/latest)
-
-
 # Installing
-1. Grab the installer from the [OBS-Midi Releases Page](https://github.com/cpyarger/obs-midi/releases)
+1. Grab the installer from the [OBS-Midi Releases Page](https://github.com/cpyarger/obs-midi/releases/latest)
 2. Download and run the installer for your OS
 3. Launch OBS
   * The Configuration is under Tools-> OBS Midi Settings

@@ -40,3 +40,9 @@ sass:
   style: compressed
 
 highlighter: rouge #selecting the highlighter, default is rouge
+header_pages:
+  - index.markdown
+  - about.markdown
+  - build.md
+  - downloads.md
+  - help.md

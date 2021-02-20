@@ -140,7 +140,7 @@ void PluginWindow::SetAvailableDevices()
 		// Unix
 #endif
 		
-		starting = false;
+		
 	}
 	this->ui->list_midi_dev->setCurrentRow(-1);
 	this->ui->list_midi_dev->setCurrentRow(0);
@@ -155,6 +155,7 @@ void PluginWindow::SetAvailableDevices()
 				->isBidirectional());
 	}
 	loadingdevices = false;
+	starting = false;
 }
 void PluginWindow::select_output_device(QString selectedDeviceName)
 {
@@ -210,25 +211,33 @@ void PluginWindow::on_device_select(QString curitem)
 		ui->tabWidget->setTabText(
 			1, QString("Configure - ").append(curitem));
 		// Pull info on if device is enabled, if so set true if not set false
-		if (MAdevice != NULL && MAdevice->isEnabled()) {
-			ui->check_enabled->setChecked(true);
-			ui->outbox->setEnabled(true);
-			ui->bidirectional->setEnabled(true);
-			ui->bidirectional->setChecked(
-				MAdevice->isBidirectional());
-			ui->outbox->setCurrentText(
-				MAdevice->get_midi_output_name());
-		} else {
-			ui->check_enabled->setChecked(false);
-			ui->outbox->setEnabled(false);
-			ui->bidirectional->setEnabled(false);
+		try {
+
+			if (MAdevice != NULL && MAdevice->isEnabled()) {
+				ui->check_enabled->setChecked(true);
+				ui->outbox->setEnabled(true);
+				ui->bidirectional->setEnabled(true);
+				ui->bidirectional->setChecked(
+					MAdevice->isBidirectional());
+				ui->outbox->setCurrentText(
+					MAdevice->get_midi_output_name());
+			} else {
+				ui->check_enabled->setChecked(false);
+				ui->outbox->setEnabled(false);
+				ui->bidirectional->setEnabled(false);
+			}
+			///HOOK up the Message Handler
+			connect(MAdevice,
+				SIGNAL(broadcast_midi_message(MidiMessage)),
+				this,
+				SLOT(handle_midi_message(
+					MidiMessage))); /// name, mtype, norc, channel
+			ui->mapping_lbl_device_name->setText(curitem);
+		} catch( ... ) {
+
 		}
-		///HOOK up the Message Handler
-		connect(MAdevice, SIGNAL(broadcast_midi_message(MidiMessage)),
-			this,
-			SLOT(handle_midi_message(MidiMessage))); /// name, mtype, norc, channel
-		ui->mapping_lbl_device_name->setText(curitem);
 	}
+	
 }
 void PluginWindow::handle_midi_message(MidiMessage mess)
 {

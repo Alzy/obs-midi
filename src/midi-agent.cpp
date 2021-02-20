@@ -71,6 +71,8 @@ MidiAgent::~MidiAgent()
  */
 void MidiAgent::Load(obs_data_t *data)
 {
+	obs_data_set_default_bool(data, "enabled", false);
+	obs_data_set_default_bool(data, "bidirectional", false);
 	midi_input_name = obs_data_get_string(data, "name");
 	midi_output_name = obs_data_get_string(data, "outname");
 	enabled = obs_data_get_bool(data, "enabled");

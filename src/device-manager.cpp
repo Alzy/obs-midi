@@ -138,11 +138,15 @@ QVector<MidiAgent *> DeviceManager::GetActiveMidiDevices()
 
 MidiAgent *DeviceManager::GetMidiDeviceByName(QString deviceName)
 {
+	MidiAgent *returndevice=NULL;
 	for (int i = 0; i < midiAgents.size(); i++) {
 		if (midiAgents.at(i)->get_midi_input_name() == deviceName) {
-			return midiAgents.at(i);
+			returndevice=midiAgents.at(i);
+			return returndevice;
 		}
+
 	}
+	return returndevice;
 }
 
 QVector<MidiHook *> DeviceManager::GetMidiHooksByDeviceName(QString deviceName)
@@ -166,6 +170,7 @@ MidiAgent * DeviceManager::RegisterMidiDevice(int port, int outport)
 	MidiAgent * midiA = new MidiAgent();
 	midiA->open_midi_input_port(port);
 	midiA->open_midi_output_port(outport);
+	midiA->set_enabled(true);
 	midiAgents.push_back(midiA);
 	return midiA;
 }

@@ -26,8 +26,17 @@ baseurl: "/" # the subpath of your site, e.g. /blog
 url: "https://obs-midi.org" # the base hostname & protocol for your site, e.g. http://example.com
 
 
-# Build settings
-theme: tareqdandachi/jekyll-shell-theme
+
 plugins:
   - jekyll-feed
   - jekyll-github-metadata
+  - jekyll-remote-theme
+  - jemoji
+  
+# Including jekyll-shell-theme using the jekyll-remote-theme plugin
+remote_theme: tareqdandachi/jekyll-shell-theme
+
+sass:
+  style: compressed
+
+highlighter: rouge #selecting the highlighter, default is rouge

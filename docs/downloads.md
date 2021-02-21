@@ -7,6 +7,7 @@ permalink: /Downloads/
 [![Open Source Helpers](https://www.codetriage.com/cpyarger/obs-midi/badges/users.svg)](https://www.codetriage.com/cpyarger/obs-midi)
 [![Crowdin](https://badges.crowdin.net/obs-midi/localized.svg)](https://crowdin.com/project/obs-midi)
 [![CodeFactor](https://www.codefactor.io/repository/github/cpyarger/obs-midi/badge/master)](https://www.codefactor.io/repository/github/cpyarger/obs-midi/overview/master)
+
 # Installing
 1. Grab the installer from the [OBS-Midi Releases Page](https://github.com/cpyarger/obs-midi/releases/latest)
 2. Download and run the installer for your OS

@@ -332,6 +332,7 @@ jobs:
       MACOS_DEPS_VERSION: '2020-04-18'
       QT_VERSION: '5.14.1'
       isCI: true
+    if: contains(github.event.head_commit.message, '[skip ci]') != true
     steps:
       - name: 'Checkout'
         uses: actions/checkout@v2
@@ -500,7 +501,7 @@ jobs:
           body_path: ${{ github.workspace }}/obs-midi/docs/releasehead.md
           release_name: obs-midi ALPHA 2 ${{ env.GIT_HASH }}
           draft: false
-          prerelease: true
+          prerelease: false
       - name: 'Download release artifacts'
         uses: actions/download-artifact@v2-preview
       - name: 'Upload Windows .zip artifact to release'

@@ -1,3 +1,4 @@
 files:
   - source: /data/locale/en-US.ini
     translation: /data/locale/%locale%.%file_extension%
+commit_message: "[ci skip]"

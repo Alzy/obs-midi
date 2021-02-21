@@ -45,7 +45,7 @@ public:
 
 	const OBSData additionalFields() const
 	{
-		return OBSData(_additionalFields);
+		return std::move(OBSData(_additionalFields));
 	}
 
 private:

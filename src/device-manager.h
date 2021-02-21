@@ -46,19 +46,19 @@ public:
 	void Unload();
 
 	QStringList GetPortsList();
-	int GetPortNumberByDeviceName(QString deviceName);
+	int GetPortNumberByDeviceName(const QString &deviceName);
 	QStringList GetOutPortsList();
-	int GetOutPortNumberByDeviceName(QString deviceName);
+	int GetOutPortNumberByDeviceName(const QString &deviceName);
 	QStringList opl;
 	QVector<MidiAgent *> GetActiveMidiDevices();
-	MidiAgent *GetMidiDeviceByName(QString deviceName);
-	QVector<MidiHook *> GetMidiHooksByDeviceName(QString deviceName);
+	MidiAgent *GetMidiDeviceByName(const QString &deviceName);
+	QVector<MidiHook *> GetMidiHooksByDeviceName(const QString &deviceName);
 	MidiAgent * RegisterMidiDevice(int port, int outport);
 
 	obs_data_t *GetData();
 	void broadcast_obs_event(const RpcEvent &event);
 signals:
-	void bcast(QString updateType, QString eventData);
+	void bcast(const QString &updateType, const QString &eventData);
 
 private:
 	rtmidi::midi_in rtMidi;

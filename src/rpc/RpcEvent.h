@@ -33,17 +33,11 @@ public:
 
 	const QString &updateType() const { return _updateType; }
 
-	const std::optional<uint64_t> streamTime() const { return _streamTime; }
+	const std::optional<uint64_t> &streamTime() const { return _streamTime; }
 
-	const std::optional<uint64_t> recordingTime() const
-	{
-		return _recordingTime;
-	}
+	const std::optional<uint64_t> &recordingTime() const { return _recordingTime; }
 
-	const OBSData additionalFields() const
-	{
-		return OBSData(_additionalFields);
-	}
+	OBSData additionalFields() const  { return std::move(OBSData(_additionalFields)); }
 
 private:
 	QString _updateType;

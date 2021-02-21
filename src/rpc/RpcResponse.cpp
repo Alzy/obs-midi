@@ -38,7 +38,7 @@ const RpcResponse RpcResponse::ok(const RpcRequest &request,
 {
 	RpcResponse response(Status::Ok, request.messageId(),
 			     request.methodName(), additionalFields);
-	return response;
+	return std::move(response);
 }
 
 const RpcResponse RpcResponse::fail(const RpcRequest &request,
@@ -48,5 +48,5 @@ const RpcResponse RpcResponse::fail(const RpcRequest &request,
 	RpcResponse response(Status::Error, request.messageId(),
 			     request.methodName(), additionalFields);
 	response._errorMessage = errorMessage;
-	return response;
+	return std::move(response);
 }

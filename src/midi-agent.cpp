@@ -24,6 +24,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <map>
 #include <string>
 #include <iostream>
+#include <utility>
 #include "utils.h"
 #include "midi-agent.h"
 #include "obs-midi.h"
@@ -134,15 +135,15 @@ void MidiAgent::close_midi_port()
 		midiout.close_port();
 	}
 }
-QString MidiAgent::get_midi_input_name()
+const QString &MidiAgent::get_midi_input_name()
 {
 	return midi_input_name;
 }
-QString MidiAgent::get_midi_output_name()
+const QString &MidiAgent::get_midi_output_name()
 {
 	return midi_output_name;
 }
-void MidiAgent::set_midi_output_name(QString oname)
+void MidiAgent::set_midi_output_name(const QString &oname)
 {
 	if (midi_output_name != oname) {
 		midiout.close_port();
@@ -236,7 +237,7 @@ void MidiAgent::set_enabled(bool state)
 }
 void MidiAgent::set_midi_hooks(QVector<MidiHook *> mh)
 {
-	midiHooks = mh;
+	midiHooks = std::move(mh);
 }
 void MidiAgent::remove_MidiHook(MidiHook *hook)
 {
@@ -438,7 +439,7 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 		this->sending = false;
 	}
 }
-void MidiAgent::send_message_to_midi_device(MidiMessage message)
+void MidiAgent::send_message_to_midi_device(const MidiMessage& message)
 {
 	std::unique_ptr<rtmidi::message> hello =
 		std::make_unique<rtmidi::message>();

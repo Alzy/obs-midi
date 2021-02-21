@@ -135,8 +135,8 @@ float mapper(int x);
 int mapper2(double x);
 int t_bar_mapper(int x);
 bool is_number(const QString &s);
-bool isJSon(QString val);
-QString get_midi_message_type(rtmidi::message message);
+bool isJSon(const QString& val);
+QString get_midi_message_type(const rtmidi::message& message);
 QStringList GetMediaSourceNames();
 QStringList GetAudioSourceNames();
 QString nsToTimestamp(uint64_t ns);
@@ -145,14 +145,14 @@ obs_data_array_t *GetSceneItems(obs_source_t *source);
 QStringList GetSceneItemsBySource(obs_source_t *source);
 obs_data_t *GetSceneItemData(obs_sceneitem_t *item);
 OBSDataArrayAutoRelease GetSourceArray();
-OBSDataArrayAutoRelease GetSceneArray(QString name = NULL);
+OBSDataArrayAutoRelease GetSceneArray(const QString &name = "");
 // These functions support nested lookup into groups
-obs_sceneitem_t *GetSceneItemFromName(obs_scene_t *scene, QString name);
+obs_sceneitem_t *GetSceneItemFromName(obs_scene_t *scene, const QString &name);
 obs_sceneitem_t *GetSceneItemFromId(obs_scene_t *scene, int64_t id);
 obs_sceneitem_t *GetSceneItemFromItem(obs_scene_t *scene, obs_data_t *item);
 obs_sceneitem_t *GetSceneItemFromRequestField(obs_scene_t *scene,
 					      obs_data_item_t *dataItem);
-obs_scene_t *GetSceneFromNameOrCurrent(QString sceneName);
+obs_scene_t *GetSceneFromNameOrCurrent(const QString& sceneName);
 obs_data_t *GetSceneItemPropertiesData(obs_sceneitem_t *item);
 obs_data_t *GetSourceFilterInfo(obs_source_t *filter, bool includeSettings);
 obs_data_array_t *GetSourceFiltersList(obs_source_t *source,
@@ -162,14 +162,14 @@ obs_data_array_t *GetScenes();
 obs_data_t *GetSceneData(obs_source_t *source);
 // TODO contribute a proper frontend API method for this to OBS and remove this hack
 int GetTransitionDuration(obs_source_t *transition);
-obs_source_t *GetTransitionFromName(QString transitionName);
-bool SetTransitionByName(QString transitionName);
+obs_source_t *GetTransitionFromName(const QString &transitionName);
+bool SetTransitionByName(const QString &transitionName);
 obs_data_t *GetTransitionData(obs_source_t *transition);
 QString OBSVersionString();
 const char *GetRecordingFolder();
 bool SetRecordingFolder(const char *path);
 QString ParseDataToQueryString(obs_data_t *data);
-obs_hotkey_t *FindHotkeyByName(QString name);
+obs_hotkey_t *FindHotkeyByName(const QString &name);
 bool ReplayBufferEnabled();
 void StartReplayBuffer();
 bool IsRPHotkeySet();
@@ -177,18 +177,18 @@ const char *GetFilenameFormatting();
 bool SetFilenameFormatting(const char *filenameFormatting);
 bool inrange(int low, int high, int x);
 QStringList GetTransitionsList();
-QStringList GetSceneItemsList(QString scene);
+QStringList GetSceneItemsList(const QString &scene);
 bool inrange(int low, int high, int x);
 QString mtype_to_string(rtmidi::message_type);
-int get_midi_note_or_control(rtmidi::message mess);
-int get_midi_value(rtmidi::message mess);
+int get_midi_note_or_control(const rtmidi::message &mess);
+int get_midi_value(const rtmidi::message &mess);
 QSpinBox *GetTransitionDurationControl();
 QStringList TranslateActions();
 QStringList get_scene_names();
-QStringList get_source_names(QString scene);
-QStringList get_filter_names(QString Source);
+QStringList get_source_names(const QString &scene);
+QStringList get_filter_names(const QString &Source);
 QStringList get_transition_names();
-QString untranslate(QString tstring);
+QString untranslate(const QString &tstring);
 const QList<ActionsClass::Actions> AllActions_raw = {
 	ActionsClass::Actions::Disable_Preview,
 	ActionsClass::Actions::Disable_Source_Filter,
@@ -251,12 +251,12 @@ const QList<ActionsClass::Actions> not_ready_actions{
 	//ActionsClass::Actions::Set_Opacity,
 	ActionsClass::Actions::Set_Browser_Source_URL,
 };
-void alert_popup(QString message);
+void alert_popup(const QString &message);
 QString translate_action(ActionsClass::Actions action);
 };
 typedef struct MidiMessage {
-	MidiMessage(){};
-	void set_message(rtmidi::message message)
+	MidiMessage() = default;
+	void set_message(const rtmidi::message &message)
 	{
 		this->channel = message.get_channel();
 		this->message_type = Utils::get_midi_message_type(message);
@@ -292,7 +292,7 @@ public:
 	bool bool_override = false;
 	int int_override = -1;
 	int value = -1;
-	MidiMessage *get_message_from_hook()
+	MidiMessage *get_message_from_hook() const
 	{
 		MidiMessage *message = new MidiMessage();
 		message->channel = this->channel;
@@ -301,7 +301,7 @@ public:
 		return message;
 	}
 	MidiHook(){};
-	MidiHook(QString jsonString)
+	MidiHook(const QString& jsonString)
 	{
 		obs_data_t *data = obs_data_create_from_json(
 			jsonString.toStdString().c_str());
@@ -324,7 +324,7 @@ public:
 		bool_override = obs_data_get_bool(data, "bool_override");
 		int_override = obs_data_get_int(data, "int_override");
 	}
-	obs_data_t *GetData()
+	obs_data_t *GetData() const
 	{
 		obs_data_t *data = obs_data_create();
 		obs_data_set_int(data, "channel", channel);

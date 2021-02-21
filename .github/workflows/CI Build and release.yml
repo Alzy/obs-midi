@@ -5,6 +5,7 @@ on:
     branches:
       - release
       - master
+      - test
     paths-ignore:
       - 'docs/**'
   pull_request:

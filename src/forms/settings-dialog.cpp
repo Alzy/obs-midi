@@ -10,7 +10,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>
 */
-
 #if __has_include(<obs-frontend-api.h>)
 #include <obs-frontend-api.h>
 #else
@@ -40,15 +39,13 @@ PluginWindow::PluginWindow(QWidget *parent)
 		QAbstractItemView::SelectionMode::SingleSelection);
 	//Set Window Title
 	QString title;
-	
 	title.append(GIT_BRANCH);
 	title.append(" -- Commit: ");
 	title.append(GIT_COMMIT_HASH);
-	blog(LOG_DEBUG, "OBS-MIDI Version -- Branch: %s", title.toStdString().c_str());
+	blog(LOG_DEBUG, "OBS-MIDI Version -- Branch: %s",
+	     title.toStdString().c_str());
 	title.prepend("OBS MIDI Settings -- Branch: ");
 	this->setWindowTitle(title);
-	
-	
 	HideAllPairs();
 	//Connections for Device Tab
 	connect(ui->list_midi_dev, SIGNAL(currentTextChanged(QString)), this,
@@ -62,15 +59,12 @@ PluginWindow::PluginWindow(QWidget *parent)
 		this, SLOT(get_sources(QString)));
 	connect(ui->cb_obs_output_action, SIGNAL(currentTextChanged(QString)),
 		this, SLOT(obs_actions_select(QString)));
-
 	connect(ui->cb_obs_output_source, SIGNAL(currentTextChanged(QString)),
 		this, SLOT(on_source_change(QString)));
 	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
 		this, SLOT(on_scene_change(QString)));
-
 	connect(ui->table_mapping, SIGNAL(cellClicked(int, int)), this,
 		SLOT(edit_mapping()));
-
 	/**************Connections to mappper****************/
 	connect(ui->btn_add, SIGNAL(clicked()), this, SLOT(add_new_mapping()));
 	connect(ui->btn_delete, SIGNAL(clicked()), this,
@@ -99,7 +93,6 @@ void PluginWindow::setCheck(bool x)
 void PluginWindow::SetAvailableDevices()
 {
 	loadingdevices = true;
-
 	auto midiOutDevices = GetDeviceManager()->GetOutPortsList();
 	auto midiDevices = GetDeviceManager()->GetPortsList();
 	this->ui->list_midi_dev->clear();
@@ -126,7 +119,6 @@ void PluginWindow::SetAvailableDevices()
 				ui->outbox, SIGNAL(currentTextChanged(QString)),
 				this, SLOT(select_output_device(QString)));
 		}
-		
 	}
 	if (starting) {
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
@@ -139,14 +131,11 @@ void PluginWindow::SetAvailableDevices()
 		this->ui->outbox->setCurrentIndex(0);
 		// Unix
 #endif
-		
-		
 	}
 	this->ui->list_midi_dev->setCurrentRow(-1);
 	this->ui->list_midi_dev->setCurrentRow(0);
 	on_device_select(ui->list_midi_dev->currentItem()->text());
 	if (this->ui->check_enabled->isChecked()) {
-
 		ui->outbox->setEnabled(
 			GetDeviceManager()
 				.get()
@@ -212,7 +201,6 @@ void PluginWindow::on_device_select(QString curitem)
 			1, QString("Configure - ").append(curitem));
 		// Pull info on if device is enabled, if so set true if not set false
 		try {
-
 			if (MAdevice != NULL && MAdevice->isEnabled()) {
 				ui->check_enabled->setChecked(true);
 				ui->outbox->setEnabled(true);
@@ -233,11 +221,9 @@ void PluginWindow::on_device_select(QString curitem)
 				SLOT(handle_midi_message(
 					MidiMessage))); /// name, mtype, norc, channel
 			ui->mapping_lbl_device_name->setText(curitem);
-		} catch( ... ) {
-
+		} catch (...) {
 		}
 	}
-	
 }
 void PluginWindow::handle_midi_message(MidiMessage mess)
 {
@@ -283,7 +269,6 @@ PluginWindow::~PluginWindow()
 	disconnect(desconnect);
 	delete ui;
 }
-
 void PluginWindow::add_midi_device(QString name)
 {
 	blog(LOG_DEBUG, "Adding Midi Device %s", name.toStdString().c_str());
@@ -316,7 +301,6 @@ void PluginWindow::set_headers()
 		 "Scene", "Source", "Filter", "Transition", "Item",
 		 "Audio Source", "Media Source"});
 	QColor midicolor("#00aaff");
-
 	QColor actioncolor("#aa00ff");
 	ui->table_mapping->horizontalHeaderItem(0)->setForeground(midicolor);
 	ui->table_mapping->horizontalHeaderItem(1)->setForeground(midicolor);
@@ -473,7 +457,6 @@ void PluginWindow::ResetToDefaults()
 	ui->cb_obs_output_audio_source->setCurrentIndex(0);
 	ui->cb_obs_output_media_source->setCurrentIndex(0);
 }
-
 void PluginWindow::ShowOnly(QList<ActionsClass::Actions> shows)
 {
 	ui->cb_obs_output_action->clear();
@@ -531,7 +514,6 @@ void PluginWindow::obs_actions_select(QString action)
 {
 	if (!switching) {
 		HideAllPairs();
-
 		switch (ActionsClass::string_to_action(untranslate(action))) {
 		case ActionsClass::Actions::Set_Current_Scene:
 			ShowPair(Pairs::Scene);
@@ -731,7 +713,6 @@ void PluginWindow::add_new_mapping()
 		dev->add_MidiHook(newmh);
 		auto conf = GetConfig();
 		conf->Save();
-
 	} else {
 		if (ui->sb_channel->value()) {
 			Utils::alert_popup(
@@ -765,7 +746,6 @@ void PluginWindow::add_row_from_hook(MidiHook *hook)
 	actc.setRgb(170, 0, 255);
 	QTableWidgetItem *channelitem =
 		new QTableWidgetItem(QString::number(hook->channel));
-
 	QTableWidgetItem *mtypeitem = new QTableWidgetItem(hook->message_type);
 	QTableWidgetItem *norcitem =
 		new QTableWidgetItem(QString::number(hook->norc));
@@ -778,7 +758,6 @@ void PluginWindow::add_row_from_hook(MidiHook *hook)
 	QTableWidgetItem *itemitem = new QTableWidgetItem(hook->item);
 	QTableWidgetItem *audioitem = new QTableWidgetItem(hook->audio_source);
 	QTableWidgetItem *mediaitem = new QTableWidgetItem(hook->media_source);
-
 	set_cell_colors(midic, channelitem);
 	set_cell_colors(midic, mtypeitem);
 	set_cell_colors(midic, norcitem);
@@ -790,7 +769,6 @@ void PluginWindow::add_row_from_hook(MidiHook *hook)
 	set_cell_colors(actc, itemitem);
 	set_cell_colors(actc, audioitem);
 	set_cell_colors(actc, mediaitem);
-
 	ui->table_mapping->setItem(row, 0, channelitem);
 	ui->table_mapping->setItem(row, 1, mtypeitem);
 	ui->table_mapping->setItem(row, 2, norcitem);
@@ -818,7 +796,6 @@ void PluginWindow::tab_changed(int i)
 	set_headers();
 	ui->table_mapping->setRowCount(0);
 	auto devicemanager = GetDeviceManager();
-
 	auto hooks = devicemanager->GetMidiHooksByDeviceName(
 		ui->mapping_lbl_device_name->text());
 	if (hooks.count() > 0) {
@@ -852,7 +829,6 @@ void PluginWindow::delete_mapping()
 void PluginWindow::edit_mapping()
 {
 	if (ui->table_mapping->rowCount() != 0) {
-
 		auto sitems = ui->table_mapping->selectedItems();
 		//rebuild midi
 		ui->sb_channel->setValue(sitems.at(0)->text().toInt());
@@ -903,7 +879,6 @@ bool PluginWindow::verify_mapping()
 	    ui->cb_obs_output_media_source->count() == 0) {
 		testresults++;
 	}
-
 	if (testresults > 0) {
 		return false;
 	} else {

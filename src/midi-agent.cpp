@@ -1,20 +1,16 @@
 /*
 obs-midi
-
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-
 You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>
 */
-
 #if __has_include(<obs-frontend-api.h>)
 #include <obs-frontend-api.h>
 #include "rtmidi17/rtmidi17.hpp"
@@ -32,15 +28,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "midi-agent.h"
 #include "obs-midi.h"
 #include "config.h"
-#include "obs-controller.h"
-
 #include "device-manager.h"
 using namespace std;
-
 ///////////////////////
 /* MIDI HOOK ROUTES */
 //////////////////////
-
 ////////////////
 // MIDI AGENT //
 ////////////////
@@ -49,7 +41,6 @@ MidiAgent::MidiAgent()
 	this->setParent(GetDeviceManager().get());
 	midi_input_name = "Midi Device (uninit)";
 	midi_output_name = "Midi Out Device (uninit)";
-
 	midiin.set_callback(
 		[this](const auto &message) { HandleInput(message, this); });
 }
@@ -65,7 +56,6 @@ MidiAgent::~MidiAgent()
 	clear_MidiHooks();
 	midiin.cancel_callback();
 }
-
 /* Loads information from OBS data. (recalled from Config)
  * This will not enable the MidiAgent or open the port. (and shouldn't)
  */
@@ -77,7 +67,6 @@ void MidiAgent::Load(obs_data_t *data)
 	midi_output_name = obs_data_get_string(data, "outname");
 	enabled = obs_data_get_bool(data, "enabled");
 	bidirectional = obs_data_get_bool(data, "bidirectional");
-
 	obs_data_array_t *hooksData = obs_data_get_array(data, "hooks");
 	size_t hooksCount = obs_data_array_count(hooksData);
 	for (size_t i = 0; i < hooksCount; i++) {
@@ -124,11 +113,9 @@ void MidiAgent::open_midi_input_port(int inport)
 }
 void MidiAgent::open_midi_output_port(int outport)
 {
-
 	try {
 		midiout.open_port(outport);
 	} catch (const rtmidi::midi_exception &error) {
-
 		blog(LOG_DEBUG, "Midi Error %s", error.what());
 	}
 	midi_output_name =
@@ -136,7 +123,6 @@ void MidiAgent::open_midi_output_port(int outport)
 	blog(LOG_INFO, "MIDI device connected Out: [%d] %s", outport,
 	     midi_output_name.toStdString().c_str());
 }
-
 /* Will close the port and disable this MidiAgent
 */
 void MidiAgent::close_midi_port()
@@ -148,7 +134,6 @@ void MidiAgent::close_midi_port()
 		midiout.close_port();
 	}
 }
-
 QString MidiAgent::get_midi_input_name()
 {
 	return midi_input_name;
@@ -172,7 +157,6 @@ bool MidiAgent::setBidirectional(bool state)
 	this->bidirectional = state;
 	if (!state) {
 		midiout.close_port();
-
 	} else {
 		if (midiout.is_port_open()) {
 			midiout.close_port();
@@ -184,7 +168,6 @@ bool MidiAgent::setBidirectional(bool state)
 	GetConfig().get()->Save();
 	return state;
 }
-
 int MidiAgent::GetPort()
 {
 	return port;
@@ -201,7 +184,6 @@ bool MidiAgent::isConnected()
 {
 	return connected;
 }
-
 /* Midi input callback.
  * Extend input handling functionality here.
  * For OBS action triggers, edit the funcMap instead.
@@ -212,7 +194,6 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 	if (self->enabled == false) {
 		return;
 	}
-
 	/*************Get Message parts***********/
 	self->sending = true;
 	MidiMessage *x = new MidiMessage();
@@ -221,12 +202,11 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 	x->device_name = self->get_midi_input_name();
 	emit self->broadcast_midi_message((MidiMessage)*x);
 	/** check if hook exists for this note or cc norc and launch it **/
-
-	self->do_obs_action(self->get_midi_hook_if_exists(x), x->value);
-
+	OBSController *oc =
+		new OBSController(self->get_midi_hook_if_exists(x), x->value);
+	oc->~OBSController();
 	delete (x);
 }
-
 /* Get the midi hooks for this device
 */
 QVector<MidiHook *> MidiAgent::GetMidiHooks()
@@ -265,7 +245,6 @@ void MidiAgent::remove_MidiHook(MidiHook *hook)
 		midiHooks.removeOne(hook);
 	}
 }
-
 /* Clears all the MidiHooks for this device.
 */
 void MidiAgent::clear_MidiHooks()
@@ -275,7 +254,6 @@ void MidiAgent::clear_MidiHooks()
 	}
 	midiHooks.clear();
 }
-
 /* Get this MidiAgent state as OBS Data. (includes midi hooks)
 * This is needed to Serialize the state in the config.
 * https://obsproject.com/docs/reference-settings.html
@@ -287,10 +265,8 @@ obs_data_t *MidiAgent::GetData()
 			    midi_input_name.toStdString().c_str());
 	obs_data_set_string(data, "outname",
 			    midi_output_name.toStdString().c_str());
-
 	obs_data_set_bool(data, "enabled", enabled);
 	obs_data_set_bool(data, "bidirectional", bidirectional);
-
 	obs_data_array_t *arrayData = obs_data_array_create();
 	for (int i = 0; i < midiHooks.size(); i++) {
 		obs_data_t *hookData = midiHooks.at(i)->GetData();
@@ -307,9 +283,7 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 		MidiMessage *message = new MidiMessage();
 		OBSDataAutoRelease data = obs_data_create_from_json(
 			eventData.toStdString().c_str());
-
 		// ON EVENT TYPE Find matching hook, pull data from that hook, and do thing.
-
 		if (eventType == QString("SourceVolumeChanged")) {
 			double vol = obs_data_get_double(data, "volume");
 			uint8_t newvol = Utils::mapper2(cbrt(vol));
@@ -360,7 +334,6 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 						this->midiHooks.at(i)->norc;
 				}
 			}
-
 		} else if (eventType == QString("PreviewSceneChanged")) {
 			QString source = QString::fromStdString(
 				obs_data_get_string(data, "scene-name"));
@@ -442,12 +415,10 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 			}
 		} else if (eventType == QString("Exiting")) {
 			closing = true;
-
 		} else if (eventType == QString("SourceDestroyed")) {
 			if (!closing) {
 				QString from =
 					obs_data_get_string(data, "sourceName");
-
 				for (int i = 0; i < this->midiHooks.size();
 				     i++) {
 					if (this->midiHooks.at(i)->source ==
@@ -477,174 +448,8 @@ void MidiAgent::send_message_to_midi_device(MidiMessage message)
 	} else if (message.message_type == "Note On") {
 		this->midiout.send_message(hello->note_on(
 			message.channel, message.NORC, message.value));
-
 	} else if (message.message_type == "Note Off") {
 		this->midiout.send_message(hello->note_off(
 			message.channel, message.NORC, message.value));
-	}
-}
-
-void MidiAgent::do_obs_action(MidiHook *hook, int MidiVal)
-{
-	if (hook != NULL) {
-
-		switch (ActionsClass::string_to_action(
-			Utils::untranslate(hook->action))) {
-		case ActionsClass::Actions::Set_Current_Scene:
-			OBSController::SetCurrentScene(hook->scene);
-			break;
-		case ActionsClass::Actions::Reset_Scene_Item:
-			OBSController::ResetSceneItem(hook->scene, hook->item);
-			break;
-		case ActionsClass::Actions::Toggle_Mute:
-			OBSController::ToggleMute(hook->audio_source);
-			break;
-		case ActionsClass::Actions::Do_Transition:
-			OBSController::TransitionToProgram();
-			break;
-		case ActionsClass::Actions::Set_Current_Transition:
-			OBSController::SetCurrentTransition(hook->transition);
-			break;
-		case ActionsClass::Actions::Set_Mute:
-			OBSController::SetMute(hook->audio_source,
-					       hook->bool_override);
-			break;
-		case ActionsClass::Actions::Toggle_Start_Stop_Streaming:
-			OBSController::StartStopStreaming();
-			break;
-		case ActionsClass::Actions::Set_Preview_Scene:
-			OBSController::SetPreviewScene(hook->scene);
-			break;
-		case ActionsClass::Actions::Set_Current_Scene_Collection:
-			OBSController::SetCurrentSceneCollection(
-				hook->scene_collection);
-			break;
-		case ActionsClass::Actions::Set_Transition_Duration:
-			if (hook->duration != -1) {
-				OBSController::SetTransitionDuration(
-					hook->duration);
-			} else {
-				OBSController::SetTransitionDuration(MidiVal);
-			}
-			break;
-		case ActionsClass::Actions::Start_Streaming:
-			OBSController::StartStreaming();
-			break;
-		case ActionsClass::Actions::Stop_Streaming:
-			OBSController::StopStreaming();
-			break;
-		case ActionsClass::Actions::Start_Recording:
-			OBSController::StartRecording();
-			break;
-		case ActionsClass::Actions::Stop_Recording:
-			OBSController::StopRecording();
-			break;
-		case ActionsClass::Actions::Start_Replay_Buffer:
-			OBSController::StartReplayBuffer();
-			break;
-		case ActionsClass::Actions::Stop_Replay_Buffer:
-			OBSController::StopReplayBuffer();
-			break;
-		case ActionsClass::Actions::Set_Volume:
-			OBSController::SetVolume(hook->audio_source,
-						 pow(Utils::mapper(MidiVal),
-						     3.0));
-			break;
-		case ActionsClass::Actions::Take_Source_Screenshot:
-			OBSController::TakeSourceScreenshot(hook->source);
-			break;
-		case ActionsClass::Actions::Pause_Recording:
-			OBSController::PauseRecording();
-			break;
-		case ActionsClass::Actions::Enable_Source_Filter:
-			OBSController::EnableSourceFilter(
-				obs_get_source_by_name(
-					hook->source.toStdString().c_str()));
-			break;
-		case ActionsClass::Actions::Disable_Source_Filter:
-			OBSController::DisableSourceFilter(
-				obs_get_source_by_name(
-					hook->source.toStdString().c_str()));
-			break;
-		case ActionsClass::Actions::Toggle_Start_Stop_Recording:
-			OBSController::StartStopRecording();
-			break;
-		case ActionsClass::Actions::Toggle_Start_Stop_Replay_Buffer:
-			OBSController::StartStopReplayBuffer();
-			break;
-		case ActionsClass::Actions::Resume_Recording:
-			OBSController::ResumeRecording();
-			break;
-		case ActionsClass::Actions::Save_Replay_Buffer:
-			OBSController::SaveReplayBuffer();
-			break;
-		case ActionsClass::Actions::Set_Current_Profile:
-			OBSController::SetCurrentProfile(hook->profile);
-			break;
-		case ActionsClass::Actions::Toggle_Source_Filter:
-			OBSController::ToggleSourceFilter(hook->source,
-							  hook->filter);
-			break;
-		case ActionsClass::Actions::Set_Text_GDIPlus_Text:
-			OBSController::SetTextGDIPlusText(
-				hook->string_override);
-			break;
-		case ActionsClass::Actions::Set_Browser_Source_URL:
-			OBSController::SetBrowserSourceURL(
-				hook->source, hook->string_override);
-			break;
-		case ActionsClass::Actions::Reload_Browser_Source:
-			OBSController::ReloadBrowserSource(hook->source);
-			break;
-		case ActionsClass::Actions::Set_Sync_Offset:
-			OBSController::SetSyncOffset(hook->media_source,
-						     (int64_t)MidiVal);
-			break;
-		case ActionsClass::Actions::Set_Source_Rotation:
-			OBSController::SetSourceRotation();
-			break;
-		case ActionsClass::Actions::Set_Source_Position:
-			OBSController::SetSourcePosition();
-			break;
-		case ActionsClass::Actions::Set_Gain_Filter:
-			OBSController::SetGainFilter();
-			break;
-		case ActionsClass::Actions::Set_Opacity:
-			OBSController::SetOpacity();
-			break;
-		case ActionsClass::Actions::Set_Source_Scale:
-			OBSController::SetSourceScale();
-			break;
-		case ActionsClass::Actions::Move_T_Bar:
-			OBSController::move_t_bar(MidiVal);
-			break;
-		case ActionsClass::Actions::Play_Pause_Media:
-			OBSController::play_pause_media_source(
-				hook->media_source);
-			break;
-		case ActionsClass::Actions::Studio_Mode:
-			OBSController::toggle_studio_mode();
-			break;
-		case ActionsClass::Actions::Reset_Stats:
-			OBSController::reset_stats();
-			break;
-		case ActionsClass::Actions::Restart_Media:
-			OBSController::restart_media(hook->media_source);
-			break;
-
-		case ActionsClass::Actions::Stop_Media:
-			OBSController::stop_media(hook->media_source);
-			break;
-		case ActionsClass::Actions::Previous_Media:
-			OBSController::prev_media(hook->media_source);
-			break;
-		case ActionsClass::Actions::Next_Media:
-			OBSController::next_media(hook->media_source);
-			break;
-		case ActionsClass::Actions::Toggle_Source_Visibility:
-			OBSController::ToggleSourceVisibility(hook->scene,
-							      hook->source);
-			break;
-		};
 	}
 }

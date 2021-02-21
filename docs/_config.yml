@@ -30,3 +30,4 @@ theme: minima
 plugins:
   - jekyll-feed
 show_downloads: true
+exclude: ["releasehead.md"]

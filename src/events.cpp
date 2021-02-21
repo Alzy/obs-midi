@@ -1563,7 +1563,7 @@ void events::OnStudioModeSwitched(bool checked)
  * @category general
  * @since 4.7.0
  */
-void events::OnBroadcastCustomMessage(QString realm, obs_data_t *data)
+void events::OnBroadcastCustomMessage(const QString &realm, obs_data_t *data)
 {
 	OBSDataAutoRelease broadcastData = obs_data_create();
 	obs_data_set_string(broadcastData, "realm", realm.toUtf8().constData());

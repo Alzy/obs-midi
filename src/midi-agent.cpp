@@ -278,7 +278,7 @@ obs_data_t *MidiAgent::GetData()
 	return data;
 }
 /*Handle OBS events*/
-void MidiAgent::handle_obs_event(QString eventType, QString eventData)
+void MidiAgent::handle_obs_event(const QString &eventType, const QString &eventData)
 {
 	if (!this->sending) {
 		MidiMessage *message = new MidiMessage();

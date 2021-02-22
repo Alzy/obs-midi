@@ -45,12 +45,18 @@ public:
 	MidiAgent(obs_data_t *data);
 	~MidiAgent();
 	void Load(obs_data_t *data);
+	// Open Actions
+	void open_midi_input_port();
+	void open_midi_output_port();
+	//Close Actions
+	void close_both_midi_ports();
+	void close_midi_output_port();
+	void close_midi_input_port();
 
-	void open_midi_input_port(int inport);
-	void open_midi_output_port(int outport);
-	void close_midi_port();
 	QString get_midi_input_name();
 	QString get_midi_output_name();
+	void set_input_port(const int port);
+	void set_output_port(const int port);
 	void set_midi_output_name(QString oname);
 	int GetPort();
 	bool isEnabled();
@@ -65,7 +71,7 @@ public:
 	void remove_MidiHook(MidiHook *hook);
 	void clear_MidiHooks();
 	obs_data_t *GetData();
-
+	
 public slots:
 	void handle_obs_event(QString eventType, QString eventData);
 signals:
@@ -79,7 +85,8 @@ private:
 	QString midi_input_name;
 	QString midi_output_name;
 	bool sending;
-	int port;
+	int input_port=-1;
+	int output_port=-1;
 	int lastscenebtn;
 	int last_preview_scene_norc;
 	bool enabled=false;

@@ -159,13 +159,13 @@ void PluginWindow::select_output_device(QString selectedDeviceName)
 }
 int PluginWindow::on_check_enabled_state_changed(int state)
 {
+	auto selectedDeviceName =
+		ui->list_midi_dev->currentItem()->text().toStdString();
+	auto selectedOutDeviceName = ui->outbox->currentText().toStdString();
+	auto device = GetDeviceManager()->GetMidiDeviceByName(
+		selectedDeviceName.c_str());
 	if (state == Qt::CheckState::Checked) {
-		auto selectedDeviceName =
-			ui->list_midi_dev->currentItem()->text().toStdString();
-		auto selectedOutDeviceName =
-			ui->outbox->currentText().toStdString();
-		auto device = GetDeviceManager()->GetMidiDeviceByName(
-			selectedDeviceName.c_str());
+		
 		blog(LOG_INFO, "Item enabled: %s", selectedDeviceName.c_str());
 		int devicePort = GetDeviceManager()->GetPortNumberByDeviceName(
 			selectedDeviceName.c_str());
@@ -176,12 +176,17 @@ int PluginWindow::on_check_enabled_state_changed(int state)
 			device = GetDeviceManager()->RegisterMidiDevice(
 				devicePort, deviceOutPort);
 		}
-		device->open_midi_input_port(devicePort);
-		device->open_midi_output_port(deviceOutPort);
+		device->open_midi_input_port();
+		device->open_midi_output_port();
 		device->set_enabled(true);
 		ui->bidirectional->setEnabled(true);
 		ui->bidirectional->setChecked(device->isBidirectional());
 		ui->outbox->setEnabled(device->isBidirectional());
+		set_configure_title(QString::fromStdString(selectedDeviceName));
+		connect(device, SIGNAL(broadcast_midi_message(MidiMessage)),
+			this, SLOT(handle_midi_message(MidiMessage)));
+	} else {
+		device->set_enabled(false);
 	}
 	//ui->outbox->setCurrentText(QString::fromStdString(device->GetOutName()));
 	GetConfig()->Save();
@@ -197,8 +202,8 @@ void PluginWindow::on_device_select(QString curitem)
 		auto config = GetConfig();
 		MidiAgent *MAdevice =
 			devicemanager->GetMidiDeviceByName(curitem);
-		ui->tabWidget->setTabText(
-			1, QString("Configure - ").append(curitem));
+		set_configure_title(curitem);
+		
 		// Pull info on if device is enabled, if so set true if not set false
 		try {
 			if (MAdevice != NULL && MAdevice->isEnabled()) {
@@ -224,6 +229,9 @@ void PluginWindow::on_device_select(QString curitem)
 		} catch (...) {
 		}
 	}
+}
+void PluginWindow::set_configure_title(const QString title) {
+	ui->tabWidget->setTabText(1, QString("Configure - ").append(title));
 }
 void PluginWindow::handle_midi_message(MidiMessage mess)
 {
@@ -256,9 +264,12 @@ int PluginWindow::on_bid_enabled_state_changed(int state)
 	ui->outbox->setEnabled(state);
 	if (state) {
 		device->setBidirectional(state);
+		device->open_midi_output_port();
 		return 1;
+
 	} else {
 		device->setBidirectional(state);
+		device->close_midi_output_port();
 		return 0;
 	}
 }

@@ -69,7 +69,7 @@ private:
 	void set_headers();
 	QStringList SceneList;
 	bool listening = false;
-
+	void set_configure_title(const QString title);
 	bool first_run;
 	bool map_exists();
 	int map_location(MidiMessage message);

@@ -78,8 +78,8 @@ void MidiAgent::Load(obs_data_t *data)
 {
 	obs_data_set_default_bool(data, "enabled", false);
 	obs_data_set_default_bool(data, "bidirectional", false);
-	midi_input_name = obs_data_get_string(data, "name");
-	midi_output_name = obs_data_get_string(data, "outname");
+	midi_input_name = QString(obs_data_get_string(data, "name"));
+	midi_output_name = QString(obs_data_get_string(data, "outname"));
 	input_port = DeviceManager().GetPortNumberByDeviceName(midi_input_name);
 	output_port =
 		DeviceManager().GetOutPortNumberByDeviceName(midi_output_name);
@@ -119,32 +119,39 @@ void MidiAgent::Load(obs_data_t *data)
 void MidiAgent::set_input_port(const int port)
 {
 	input_port = port;
+	midi_input_name = QString::fromStdString(midiin.get_port_name(port));
 }
 void MidiAgent::set_output_port(const int port)
 {
 	output_port = port;
+	midi_output_name = QString::fromStdString(midiout.get_port_name(port));
 }
 /* Will open the port and enable this MidiAgent
 */
 void MidiAgent::open_midi_input_port()
 {
-	try {
-		midiin.open_port(input_port);
-	} catch (const rtmidi::midi_exception &error) {
-		blog(LOG_DEBUG, "Midi Error %s", error.what());
+	if (!midiin.is_port_open()) {
+		try {
+			midiin.open_port(input_port);
+		} catch (const rtmidi::midi_exception &error) {
+			blog(LOG_DEBUG, "Midi Error %s", error.what());
+		}
+		blog(LOG_INFO, "MIDI device connected In: [%d] %s", input_port,
+		     midi_input_name.toStdString().c_str());
 	}
-	blog(LOG_INFO, "MIDI device connected In: [%d] %s", input_port,
-	     midi_input_name.toStdString().c_str());
 }
 void MidiAgent::open_midi_output_port()
 {
-	try {
-		midiout.open_port(output_port);
-	} catch (const rtmidi::midi_exception &error) {
-		blog(LOG_DEBUG, "Midi Error %s", error.what());
+	if (!midiout.is_port_open()) {
+
+		try {
+			midiout.open_port(output_port);
+		} catch (const rtmidi::midi_exception &error) {
+			blog(LOG_DEBUG, "Midi Error %s", error.what());
+		}
+		blog(LOG_INFO, "MIDI device connected Out: [%d] %s",
+		     output_port, midi_output_name.toStdString().c_str());
 	}
-	blog(LOG_INFO, "MIDI device connected Out: [%d] %s", output_port,
-	     midi_output_name.toStdString().c_str());
 }
 /* Will close the port and disable this MidiAgent
 */
@@ -229,11 +236,11 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 	oc->~OBSController();
 	delete (x);
 }
-void MidiAgent::HandleError(const rtmidi::midi_error &error,
+void MidiAgent::HandleError(const rtmidi::midi_error &error_type,
 			    const std::string_view &error_message,
 			    void *userData)
 {
-	blog(LOG_ERROR, "Midi Error: %s", error_message);
+	blog(LOG_ERROR, "Midi Error: %s", error_message.data());
 }
 /* Get the midi hooks for this device
 */

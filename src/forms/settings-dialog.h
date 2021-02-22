@@ -21,25 +21,28 @@ class PluginWindow : public QDialog {
 public:
 	PluginWindow(QWidget *parent);
 	~PluginWindow();
-	void setCheck(bool check);
-	void SetAvailableDevices();
+
 signals:
 	void changed(obs_data_t *change);
 private Q_SLOTS:
 	void ToggleShowHide();
 public slots:
-	int on_check_enabled_state_changed(int state);
-	int on_bid_enabled_state_changed(int state);
+	void on_check_enabled_state_changed(int state);
+	void on_bid_enabled_state_changed(int state);
 	void on_device_select(QString curitem);
 	void select_output_device(QString item);
 	void handle_midi_message(MidiMessage mess);
 	void obs_actions_select(QString action);
-	void ResetToDefaults();
+	void set_edit_mode();
+	void save_edit();
+	void reset_to_defaults();
 	void on_scene_change(QString newscene);
 	void on_source_change(QString newsource);
 	void add_new_mapping();
 	void add_row_from_hook(MidiHook *hook);
 	void tab_changed(int i);
+	void clear_table();
+	void load_table();
 	void delete_mapping();
 	void edit_mapping();
 	void set_cell_colors(QColor color, QTableWidgetItem *item);
@@ -48,27 +51,26 @@ private:
 	Ui::PluginWindow *ui;
 	bool hidedebugitems = true;
 	bool loadingdevices = false;
-	QMetaObject::Connection desconnect;
 	bool starting = true;
-	QString DeviceFilter;
-	void ShowPair(Pairs pair);
-	void HidePair(Pairs pair);
-	void HideAllPairs();
-	void add_midi_device(QString Name);
-	void set_headers();
-	QStringList SceneList;
 	bool listening = false;
-	void set_configure_title(const QString title);
+	void configure_table();
+	void set_title_window();
+	void connect_ui_signals();
+	void setCheck(bool check);
+	void load_devices();
+	void show_pair(Pairs pair);
+	void hide_pair(Pairs pair);
+	void hide_all_pairs();
+	void add_midi_device(const QString &Name);
+	void set_headers();
+	
+	void set_configure_title(const QString &title);
 	void connect_midi_message_handler();
-	bool first_run;
 	bool map_exists();
 	int map_location(MidiMessage message);
 	bool verify_mapping();
 
 private:
-	QGridLayout *layout;
-	QStringList *items;
-	QString sceneName;
 	bool switching = false;
 	void ShowOnly(QList<ActionsClass::Actions> shows);
 	void ShowEntry(ActionsClass::Actions Entry);

@@ -254,6 +254,7 @@ const QList<ActionsClass::Actions> not_ready_actions{
 void alert_popup(QString message);
 QString translate_action(ActionsClass::Actions action);
 };
+/*Midi Message Structure*/
 typedef struct MidiMessage {
 	MidiMessage(){};
 	void set_message(rtmidi::message message)
@@ -271,6 +272,10 @@ typedef struct MidiMessage {
 	MidiMessage get() { return (MidiMessage) * this; }
 } MidiMessage;
 Q_DECLARE_METATYPE(MidiMessage);
+
+/*
+ * Midi Hook Class
+*/
 class MidiHook : public QObject {
 	Q_OBJECT
 public:

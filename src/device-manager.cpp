@@ -64,28 +64,27 @@ void DeviceManager::Unload()
 	}
 }
 
-/* Returns vector list of Port Names 
+/* Returns QStringList of Port Names 
  */
 QStringList DeviceManager::GetPortsList()
 {
 	QStringList ports;
-	int portCount = rtMidi.get_port_count();
+	int portCount = rtmidi::midi_in().get_port_count();
 	for (int i = 0; i < portCount; i++) {
-		ports.append(QString::fromStdString(rtMidi.get_port_name(i)));
+		ports.append(QString::fromStdString(rtmidi::midi_in().get_port_name(i)));
 	}
 	return ports;
 }
 
-/* Returns vector list of Port Names 
+/* Returns QStringList of Output  Port Names 
  */
 QStringList DeviceManager::GetOutPortsList()
 {
-	opl.clear();
 	QStringList outports;
-	int portCount = MO.get_port_count();
+	int portCount = rtmidi::midi_out().get_port_count();
 	for (int i = 0; i < portCount; i++) {
-		outports.append(QString::fromStdString(MO.get_port_name(i)));
-		opl.append(QString::fromStdString(MO.get_port_name(i)));
+		outports.append(QString::fromStdString(
+			rtmidi::midi_out().get_port_name(i)));
 	}
 	return outports;
 }

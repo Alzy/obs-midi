@@ -33,7 +33,7 @@ PluginWindow::PluginWindow(QWidget *parent)
 	ui->setupUi(this);
 
 	//Set Window Title
-	confi
+	setup_actions();
 	set_title_window();
 	configure_table();
 	hide_all_pairs();

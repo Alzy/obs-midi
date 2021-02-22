@@ -161,6 +161,12 @@ void MidiAgent::close_both_midi_ports()
 	close_midi_input_port();
 	close_midi_output_port();
 }
+void MidiAgent::close_midi_input_port()
+{
+	if (midiin.is_port_open()) {
+		midiin.close_port();
+	}
+}
 void MidiAgent::close_midi_output_port()
 {
 	if (midiout.is_port_open()) {

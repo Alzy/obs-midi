@@ -44,11 +44,11 @@ public:
 	void close_both_midi_ports();
 	void close_midi_output_port();
 	void close_midi_input_port();
-	QString get_midi_input_name();
-	QString get_midi_output_name();
+	const QString &get_midi_input_name();
+	const QString &get_midi_output_name();
 	void set_input_port(const int port);
 	void set_output_port(const int port);
-	void set_midi_output_name(QString oname);
+	void set_midi_output_name(const QString &oname);
 	int GetPort();
 	bool isEnabled();
 	bool isConnected();

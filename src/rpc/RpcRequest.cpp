@@ -28,6 +28,10 @@ RpcRequest::RpcRequest(const QString &messageId, const QString &methodName,
 		obs_data_apply(_parameters, params);
 	}
 }
+RpcRequest::~RpcRequest()
+{
+	obs_data_release(_parameters);
+}
 
 const RpcResponse RpcRequest::success(obs_data_t *additionalFields) const
 {

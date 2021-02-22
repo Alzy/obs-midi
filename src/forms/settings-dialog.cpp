@@ -15,20 +15,18 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #else
 #include <obs-frontend-api/obs-frontend-api.h>
 #endif
-#include <obs-module.h>
-#include <obs-data.h>
-#include <string>
 #include <map>
-#include <iostream>
 #include <utility>
-#include "../midi-agent.h"
-#include "../obs-midi.h"
+
+#include <QDialogButtonBox>
+
+#include <obs-module.h>
+
+#include "settings-dialog.h"
 #include "../device-manager.h"
 #include "../config.h"
-#include "settings-dialog.h"
-#include <qdialogbuttonbox.h>
-#include <qcheckbox.h>
-#include "../version.h"
+
+
 PluginWindow::PluginWindow(QWidget *parent)
 	: QDialog(parent, Qt::Dialog), ui(new Ui::PluginWindow)
 {
@@ -41,7 +39,8 @@ PluginWindow::PluginWindow(QWidget *parent)
 	connect_ui_signals();
 	starting = false;
 }
-void PluginWindow::configure_table() {
+void PluginWindow::configure_table()
+{
 	ui->table_mapping->setSelectionBehavior(
 		QAbstractItemView::SelectionBehavior::SelectRows);
 	ui->table_mapping->setSelectionMode(
@@ -127,9 +126,10 @@ void PluginWindow::load_devices()
 	}
 	loadingdevices = false;
 }
-void PluginWindow::select_output_device(QString selectedDeviceName)
+void PluginWindow::select_output_device(const QString &selectedDeviceName)
 {
-	if (!loadingdevices) {
+	if (!loadingdevices)
+	{
 		auto selectedDevice =
 			ui->list_midi_dev->currentItem()->text().toStdString();
 		auto device = GetDeviceManager()->GetMidiDeviceByName(
@@ -140,7 +140,8 @@ void PluginWindow::select_output_device(QString selectedDeviceName)
 }
 void  PluginWindow::on_check_enabled_state_changed(int state)
 {
-	if (state == Qt::CheckState::Checked) {
+	if (state == Qt::CheckState::Checked)
+	{
 		auto selectedDeviceName =
 			ui->list_midi_dev->currentItem()->text().toStdString();
 		auto selectedOutDeviceName =
@@ -177,7 +178,7 @@ void PluginWindow::connect_midi_message_handler()
 		SLOT(handle_midi_message(
 			MidiMessage))); /// name, mtype, norc, channel
 }
-void PluginWindow::on_device_select(QString curitem)
+void PluginWindow::on_device_select(const QString &curitem)
 {
 	if (!starting) {
 		blog(LOG_DEBUG, "on_device_select %s",
@@ -216,7 +217,7 @@ void PluginWindow::set_configure_title(const QString &title)
 {
 	ui->tabWidget->setTabText(1, QString("Configure - ").append(title));
 }
-void PluginWindow::handle_midi_message(MidiMessage mess)
+void PluginWindow::handle_midi_message(const MidiMessage &mess)
 {
 	if (ui->tabWidget->currentIndex() == 1) {
 		if (ui->btn_Listen_one->isChecked() ||
@@ -254,10 +255,13 @@ void PluginWindow::on_bid_enabled_state_changed(int state)
 PluginWindow::~PluginWindow()
 {
 	delete ui;
+	delete listview;
 }
 void PluginWindow::add_midi_device(const QString &name)
 {
 	blog(LOG_DEBUG, "Adding Midi Device %s", name.toStdString().c_str());
+
+	// don't delete it, because the table takes ownership of the items
 	QTableWidgetItem *device_name = new QTableWidgetItem();
 	QTableWidgetItem *device_enabled = new QTableWidgetItem();
 	QTableWidgetItem *device_status = new QTableWidgetItem();
@@ -448,7 +452,7 @@ void PluginWindow::reset_to_defaults()
 	ui->slider_value->setValue(0);
 	ui->btn_add->setText("Add Mapping");
 }
-void PluginWindow::ShowOnly(QList<ActionsClass::Actions> shows)
+void PluginWindow::ShowOnly(const QList<ActionsClass::Actions> &shows)
 {
 	ui->cb_obs_output_action->clear();
 	for (int i = 0; i < shows.size(); i++) {
@@ -483,7 +487,7 @@ void PluginWindow::ShowAllActions()
 		ShowEntry(Utils::AllActions_raw.at(i));
 	}
 }
-void PluginWindow::HideEntries(QList<ActionsClass::Actions> entrys)
+void PluginWindow::HideEntries(const QList<ActionsClass::Actions> &entrys)
 {
 	for (int i = 0; i < ui->cb_obs_output_action->count(); i++) {
 		if (entrys.contains(Utils::AllActions_raw.at(i))) {
@@ -492,7 +496,7 @@ void PluginWindow::HideEntries(QList<ActionsClass::Actions> entrys)
 	}
 	listview->adjustSize();
 }
-void PluginWindow::ShowEntries(QList<ActionsClass::Actions> entrys)
+void PluginWindow::ShowEntries(const QList<ActionsClass::Actions> &entrys)
 {
 	for (int i = 0; i < ui->cb_obs_output_action->count(); i++) {
 		if (entrys.contains(Utils::AllActions_raw.at(i))) {
@@ -501,7 +505,7 @@ void PluginWindow::ShowEntries(QList<ActionsClass::Actions> entrys)
 	}
 	listview->adjustSize();
 }
-void PluginWindow::obs_actions_select(QString action)
+void PluginWindow::obs_actions_select(const QString &action)
 {
 	if (!switching) {
 		hide_all_pairs();
@@ -632,7 +636,7 @@ bool PluginWindow::map_exists()
 	}
 	return false;
 }
-int PluginWindow::map_location(MidiMessage message)
+int PluginWindow::map_location(const MidiMessage &message)
 {
 	auto devicemanager = GetDeviceManager();
 	auto hooks = devicemanager->GetMidiHooksByDeviceName(
@@ -657,6 +661,8 @@ void PluginWindow::add_new_mapping()
 	if (!map_exists() && verify_mapping() && ui->sb_channel->value() != 0) {
 		int row = ui->table_mapping->rowCount();
 		ui->table_mapping->insertRow(row);
+
+		// don't delete it, because the table takes ownership of the items
 		QTableWidgetItem *channelitem = new QTableWidgetItem(
 			QString::number(ui->sb_channel->value()));
 		QTableWidgetItem *mtypeitem =
@@ -752,6 +758,8 @@ void PluginWindow::add_row_from_hook(MidiHook *hook)
 	midic.setRgb(0, 170, 255);
 	QColor actc;
 	actc.setRgb(170, 0, 255);
+
+	// don't delete it, because the table takes ownership of the items
 	QTableWidgetItem *channelitem =
 		new QTableWidgetItem(QString::number(hook->channel));
 	QTableWidgetItem *mtypeitem = new QTableWidgetItem(hook->message_type);
@@ -789,7 +797,7 @@ void PluginWindow::add_row_from_hook(MidiHook *hook)
 	ui->table_mapping->setItem(row, 9, audioitem);
 	ui->table_mapping->setItem(row, 10, mediaitem);
 }
-void PluginWindow::set_cell_colors(QColor color, QTableWidgetItem *item)
+void PluginWindow::set_cell_colors(const QColor &color, QTableWidgetItem *item)
 {
 	QColor txcolor;
 	txcolor.black();
@@ -903,7 +911,7 @@ bool PluginWindow::verify_mapping()
 		return true;
 	}
 }
-void PluginWindow::on_scene_change(QString newscene)
+void PluginWindow::on_scene_change(const QString &newscene)
 {
 	if (ui->cb_obs_output_source->isVisible()) {
 		ui->cb_obs_output_source->clear();
@@ -911,7 +919,7 @@ void PluginWindow::on_scene_change(QString newscene)
 			Utils::get_source_names(newscene));
 	}
 }
-void PluginWindow::on_source_change(QString newsource)
+void PluginWindow::on_source_change(const QString &newsource)
 {
 	if (ui->cb_obs_output_filter->isVisible()) {
 		ui->cb_obs_output_filter->clear();

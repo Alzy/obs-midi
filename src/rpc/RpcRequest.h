@@ -29,6 +29,7 @@ class RpcRequest {
 public:
 	explicit RpcRequest(const QString &messageId, const QString &methodName,
 			    obs_data_t *params);
+	~RpcRequest();
 
 	const QString &messageId() const { return _messageId; }
 

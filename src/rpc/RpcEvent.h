@@ -26,10 +26,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 class RpcEvent {
 public:
-	explicit RpcEvent(const QString &updateType,
+	explicit RpcEvent(QString updateType,
 			  std::optional<uint64_t> streamTime,
 			  std::optional<uint64_t> recordingTime,
 			  obs_data_t *additionalFields = nullptr);
+	~RpcEvent();
 
 	const QString &updateType() const { return _updateType; }
 

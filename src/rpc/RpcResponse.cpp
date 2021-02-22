@@ -32,6 +32,10 @@ RpcResponse::RpcResponse(Status status, const QString &messageId,
 		obs_data_apply(_additionalFields, additionalFields);
 	}
 }
+RpcResponse::~RpcResponse()
+{
+	obs_data_release(_parameters);
+}
 
 const RpcResponse RpcResponse::ok(const RpcRequest &request,
 				  obs_data_t *additionalFields)

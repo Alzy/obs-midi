@@ -52,6 +52,8 @@ private:
 	explicit RpcResponse(Status status, const QString &messageId,
 			     const QString &methodName,
 			     obs_data_t *additionalFields = nullptr);
+	~RpcResponse();
+
 	const Status _status;
 	const QString _messageId;
 	const QString _methodName;

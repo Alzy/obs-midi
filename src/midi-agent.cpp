@@ -24,6 +24,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <map>
 #include <string>
 #include <iostream>
+#include <utility>
 #include "utils.h"
 #include "midi-agent.h"
 #include "obs-midi.h"
@@ -160,27 +161,27 @@ void MidiAgent::close_both_midi_ports()
 	close_midi_input_port();
 	close_midi_output_port();
 }
-void MidiAgent::close_midi_output_port()
-{
-	if (midiout.is_port_open()) {
-		midiout.close_port();
-	}
-}
 void MidiAgent::close_midi_input_port()
 {
 	if (midiin.is_port_open()) {
 		midiin.close_port();
 	}
 }
-QString MidiAgent::get_midi_input_name()
+void MidiAgent::close_midi_output_port()
+{
+	if (midiout.is_port_open()) {
+		midiout.close_port();
+	}
+}
+const QString &MidiAgent::get_midi_input_name()
 {
 	return midi_input_name;
 }
-QString MidiAgent::get_midi_output_name()
+const QString &MidiAgent::get_midi_output_name()
 {
 	return midi_output_name;
 }
-void MidiAgent::set_midi_output_name(QString oname)
+void MidiAgent::set_midi_output_name(const QString &oname)
 {
 	midi_output_name = oname;
 }
@@ -271,7 +272,7 @@ void MidiAgent::set_enabled(bool state)
 }
 void MidiAgent::set_midi_hooks(QVector<MidiHook *> mh)
 {
-	midiHooks = mh;
+	midiHooks = std::move(mh);
 }
 void MidiAgent::remove_MidiHook(MidiHook *hook)
 {
@@ -312,7 +313,7 @@ obs_data_t *MidiAgent::GetData()
 	return data;
 }
 /*Handle OBS events*/
-void MidiAgent::handle_obs_event(QString eventType, QString eventData)
+void MidiAgent::handle_obs_event(const QString &eventType, const QString &eventData)
 {
 	if (!this->sending) {
 		MidiMessage *message = new MidiMessage();
@@ -473,7 +474,7 @@ void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 		this->sending = false;
 	}
 }
-void MidiAgent::send_message_to_midi_device(MidiMessage message)
+void MidiAgent::send_message_to_midi_device(const MidiMessage& message)
 {
 	std::unique_ptr<rtmidi::message> hello =
 		std::make_unique<rtmidi::message>();

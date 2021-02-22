@@ -135,21 +135,21 @@ public:
 	static QString event_to_string(const obs_event_type &enumval);
 	static obs_event_type string_to_event(const QString &string);
 
-	void SetCurrentScene(QString sceneName);
-	void SetPreviewScene(QString sceneName);
-	void SetCurrentSceneCollection(QString sceneCollection);
-	void ResetSceneItem(QString sceneName, QString itemName);
+	void SetCurrentScene(const QString &sceneName);
+	void SetPreviewScene(const QString &sceneName);
+	void SetCurrentSceneCollection(const QString &sceneCollection);
+	void ResetSceneItem(const QString &sceneName, const QString &itemName);
 	void TransitionToProgram();
-	void TransitionToProgram(QString transitionName,
+	void TransitionToProgram(const QString &transitionName,
 				 int transitionDuration = 300);
-	void SetCurrentTransition(QString name);
+	void SetCurrentTransition(const QString &name);
 	void SetTransitionDuration(int duration); // can also be used with cc
 
 	void SetSourceVisibility();    // doesn't exist??
 	void ToggleSourceVisibility(); //doesn't exist?
 
-	void ToggleMute(QString sourceName);
-	void SetMute(QString sourceName, bool mute);
+	void ToggleMute(const QString &sourceName);
+	void SetMute(const QString &sourceName, bool mute);
 
 	void StartStopStreaming();
 	void StartStreaming();
@@ -166,18 +166,18 @@ public:
 	void StopReplayBuffer();
 	void SaveReplayBuffer();
 
-	void SetCurrentProfile(QString profileName);
-	void SetTextGDIPlusText(QString text);
-	void SetBrowserSourceURL(QString url);
+	void SetCurrentProfile(const QString &profileName);
+	void SetTextGDIPlusText(const QString &text);
+	void SetBrowserSourceURL(const QString &url);
 	void ReloadBrowserSource();
-	void TakeSourceScreenshot(QString source);
+	void TakeSourceScreenshot(const QString &source);
 	void EnableSourceFilter();
 	void DisableSourceFilter();
 	void ToggleSourceFilter();
 
 	// CC ACTIONS
-	void SetVolume(QString source, float volume);
-	void SetSyncOffset(QString sourceName, int64_t sourceSyncOffset);
+	void SetVolume(const QString &source, float volume);
+	void SetSyncOffset(const QString &sourceName, int64_t sourceSyncOffset);
 	void SetSourcePosition();
 	void SetSourceRotation();
 	void SetSourceScale();

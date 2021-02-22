@@ -28,19 +28,23 @@ RpcRequest::RpcRequest(const QString &messageId, const QString &methodName,
 		obs_data_apply(_parameters, params);
 	}
 }
+RpcRequest::~RpcRequest()
+{
+	obs_data_release(_parameters);
+}
 
 const RpcResponse RpcRequest::success(obs_data_t *additionalFields) const
 {
-	return RpcResponse::ok(*this, additionalFields);
+	return std::move(RpcResponse::ok(*this, additionalFields));
 }
 
 const RpcResponse RpcRequest::failed(const QString &errorMessage,
 				     obs_data_t *additionalFields) const
 {
-	return RpcResponse::fail(*this, errorMessage, additionalFields);
+	return std::move(RpcResponse::fail(*this, errorMessage, additionalFields));
 }
 
-const bool RpcRequest::hasField(QString name, obs_data_type expectedFieldType,
+const bool RpcRequest::hasField(const QString &name, obs_data_type expectedFieldType,
 				obs_data_number_type expectedNumberType) const
 {
 	if (!_parameters || name.isEmpty() || name.isNull()) {
@@ -72,38 +76,38 @@ const bool RpcRequest::hasField(QString name, obs_data_type expectedFieldType,
 	return true;
 }
 
-const bool RpcRequest::hasBool(QString fieldName) const
+const bool RpcRequest::hasBool(const QString &fieldName) const
 {
 	return this->hasField(fieldName, OBS_DATA_BOOLEAN);
 }
 
-const bool RpcRequest::hasString(QString fieldName) const
+const bool RpcRequest::hasString(const QString &fieldName) const
 {
 	return this->hasField(fieldName, OBS_DATA_STRING);
 }
 
-const bool RpcRequest::hasNumber(QString fieldName,
+const bool RpcRequest::hasNumber(const QString &fieldName,
 				 obs_data_number_type expectedNumberType) const
 {
 	return this->hasField(fieldName, OBS_DATA_NUMBER, expectedNumberType);
 }
 
-const bool RpcRequest::hasInteger(QString fieldName) const
+const bool RpcRequest::hasInteger(const QString &fieldName) const
 {
 	return this->hasNumber(fieldName, OBS_DATA_NUM_INT);
 }
 
-const bool RpcRequest::hasDouble(QString fieldName) const
+const bool RpcRequest::hasDouble(const QString &fieldName) const
 {
 	return this->hasNumber(fieldName, OBS_DATA_NUM_DOUBLE);
 }
 
-const bool RpcRequest::hasArray(QString fieldName) const
+const bool RpcRequest::hasArray(const QString &fieldName) const
 {
 	return this->hasField(fieldName, OBS_DATA_ARRAY);
 }
 
-const bool RpcRequest::hasObject(QString fieldName) const
+const bool RpcRequest::hasObject(const QString &fieldName) const
 {
 	return this->hasField(fieldName, OBS_DATA_OBJECT);
 }

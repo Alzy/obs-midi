@@ -65,11 +65,12 @@ public:
 
 	obs_data_t *GetStats();
 
-	void OnBroadcastCustomMessage(QString realm, obs_data_t *data);
+	void OnBroadcastCustomMessage(const QString &realm, obs_data_t *data);
 
 	bool HeartbeatIsActive;
 signals:
-	void obsEvent(RpcEvent event);
+	void obsEvent(const RpcEvent &event);
+
 private slots:
 	void StreamStatus();
 	void Heartbeat();

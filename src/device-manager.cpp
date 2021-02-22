@@ -73,7 +73,7 @@ QStringList DeviceManager::GetPortsList()
 	for (int i = 0; i < portCount; i++) {
 		ports.append(QString::fromStdString(rtmidi::midi_in().get_port_name(i)));
 	}
-	return ports;
+	return std::move(ports);
 }
 
 /* Returns QStringList of Output  Port Names 
@@ -86,13 +86,13 @@ QStringList DeviceManager::GetOutPortsList()
 		outports.append(QString::fromStdString(
 			rtmidi::midi_out().get_port_name(i)));
 	}
-	return outports;
+	return std::move(outports);
 }
 
 /* Returns the port number of the specified device.
  * If the device isn't found (possibly due to being disconnected), returns -1
  */
-int DeviceManager::GetPortNumberByDeviceName(QString deviceName)
+int DeviceManager::GetPortNumberByDeviceName(const QString &deviceName)
 {
 	QStringList portsList = GetPortsList();
 
@@ -106,7 +106,7 @@ int DeviceManager::GetPortNumberByDeviceName(QString deviceName)
 /* Returns the port number of the specified device.
  * If the device isn't found (possibly due to being disconnected), returns -1
  */
-int DeviceManager::GetOutPortNumberByDeviceName(QString deviceName)
+int DeviceManager::GetOutPortNumberByDeviceName(const QString &deviceName)
 {
 
 	QStringList portsList = GetOutPortsList();
@@ -123,7 +123,7 @@ QVector<MidiAgent *> DeviceManager::GetActiveMidiDevices()
 	return midiAgents;
 }
 
-MidiAgent *DeviceManager::GetMidiDeviceByName(QString deviceName)
+MidiAgent *DeviceManager::GetMidiDeviceByName(const QString &deviceName)
 {
 	MidiAgent *returndevice=NULL;
 	for (int i = 0; i < midiAgents.size(); i++) {
@@ -136,15 +136,14 @@ MidiAgent *DeviceManager::GetMidiDeviceByName(QString deviceName)
 	return returndevice;
 }
 
-QVector<MidiHook *> DeviceManager::GetMidiHooksByDeviceName(QString deviceName)
+QVector<MidiHook *> DeviceManager::GetMidiHooksByDeviceName(const QString &deviceName)
 {
 	if (deviceName != QString("No Devices Available")) {
 		auto device = GetMidiDeviceByName(deviceName);
 		if (device != NULL) {
-			return device->GetMidiHooks();
+			return std::move(device->GetMidiHooks());
 		} else {
-			QVector<MidiHook *> x;
-			return x;
+			return {};
 		}
 	}
 }

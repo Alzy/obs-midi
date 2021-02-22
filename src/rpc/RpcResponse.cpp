@@ -32,13 +32,17 @@ RpcResponse::RpcResponse(Status status, const QString &messageId,
 		obs_data_apply(_additionalFields, additionalFields);
 	}
 }
+RpcResponse::~RpcResponse()
+{
+	obs_data_release(_parameters);
+}
 
 const RpcResponse RpcResponse::ok(const RpcRequest &request,
 				  obs_data_t *additionalFields)
 {
 	RpcResponse response(Status::Ok, request.messageId(),
 			     request.methodName(), additionalFields);
-	return response;
+	return std::move(response);
 }
 
 const RpcResponse RpcResponse::fail(const RpcRequest &request,
@@ -48,5 +52,5 @@ const RpcResponse RpcResponse::fail(const RpcRequest &request,
 	RpcResponse response(Status::Error, request.messageId(),
 			     request.methodName(), additionalFields);
 	response._errorMessage = errorMessage;
-	return response;
+	return std::move(response);
 }

@@ -45,13 +45,15 @@ public:
 
 	const OBSData additionalFields() const
 	{
-		return OBSData(_additionalFields);
+		return std::move(OBSData(_additionalFields));
 	}
 
 private:
 	explicit RpcResponse(Status status, const QString &messageId,
 			     const QString &methodName,
 			     obs_data_t *additionalFields = nullptr);
+	~RpcResponse();
+
 	const Status _status;
 	const QString _messageId;
 	const QString _methodName;

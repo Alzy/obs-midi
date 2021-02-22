@@ -29,6 +29,7 @@ class RpcRequest {
 public:
 	explicit RpcRequest(const QString &messageId, const QString &methodName,
 			    obs_data_t *params);
+	~RpcRequest();
 
 	const QString &messageId() const { return _messageId; }
 
@@ -40,19 +41,19 @@ public:
 	const RpcResponse failed(const QString &errorMessage,
 				 obs_data_t *additionalFields = nullptr) const;
 
-	const bool hasField(QString fieldName,
+	const bool hasField(const QString &fieldName,
 			    obs_data_type expectedFieldType = OBS_DATA_NULL,
 			    obs_data_number_type expectedNumberType =
 				    OBS_DATA_NUM_INVALID) const;
-	const bool hasBool(QString fieldName) const;
-	const bool hasString(QString fieldName) const;
-	const bool hasNumber(QString fieldName,
+	const bool hasBool(const QString &fieldName) const;
+	const bool hasString(const QString &fieldName) const;
+	const bool hasNumber(const QString &fieldName,
 			     obs_data_number_type expectedNumberType =
 				     OBS_DATA_NUM_INVALID) const;
-	const bool hasInteger(QString fieldName) const;
-	const bool hasDouble(QString fieldName) const;
-	const bool hasArray(QString fieldName) const;
-	const bool hasObject(QString fieldName) const;
+	const bool hasInteger(const QString &fieldName) const;
+	const bool hasDouble(const QString &fieldName) const;
+	const bool hasArray(const QString &fieldName) const;
+	const bool hasObject(const QString &fieldName) const;
 
 private:
 	const QString _messageId;

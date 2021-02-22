@@ -11,16 +11,21 @@ You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>
 */
 #pragma once
-#include <vector>
 #include <QtWidgets/QDialog>
+
+#include <vector>
+
 #include "ui_settings-dialog.h"
+
 #include "../midi-agent.h"
 #include "../version.h"
+
+
 class PluginWindow : public QDialog {
 	Q_OBJECT
 public:
-	PluginWindow(QWidget *parent);
-	~PluginWindow();
+	explicit PluginWindow(QWidget *parent);
+	~PluginWindow() override;
 
 signals:
 	void changed(obs_data_t *change);
@@ -29,15 +34,15 @@ private Q_SLOTS:
 public slots:
 	void on_check_enabled_state_changed(int state);
 	void on_bid_enabled_state_changed(int state);
-	void on_device_select(QString curitem);
-	void select_output_device(QString item);
-	void handle_midi_message(MidiMessage mess);
-	void obs_actions_select(QString action);
+	void on_device_select(const QString &curitem);
+	void select_output_device(const QString &item);
+	void handle_midi_message(const MidiMessage &mess);
+	void obs_actions_select(const QString &action);
 	void set_edit_mode();
 	void save_edit();
 	void reset_to_defaults();
-	void on_scene_change(QString newscene);
-	void on_source_change(QString newsource);
+	void on_scene_change(const QString &newscene);
+	void on_source_change(const QString &newsource);
 	void add_new_mapping();
 	void add_row_from_hook(MidiHook *hook);
 	void tab_changed(int i);
@@ -45,7 +50,7 @@ public slots:
 	void load_table();
 	void delete_mapping();
 	void edit_mapping();
-	void set_cell_colors(QColor color, QTableWidgetItem *item);
+	void set_cell_colors(const QColor &color, QTableWidgetItem *item);
 
 private:
 	Ui::PluginWindow *ui;
@@ -56,7 +61,7 @@ private:
 	void configure_table();
 	void set_title_window();
 	void connect_ui_signals();
-	void setCheck(bool check);
+//	void setCheck(bool check); // not implemented
 	void load_devices();
 	void show_pair(Pairs pair);
 	void hide_pair(Pairs pair);
@@ -67,17 +72,17 @@ private:
 	void set_configure_title(const QString &title);
 	void connect_midi_message_handler();
 	bool map_exists();
-	int map_location(MidiMessage message);
+	int map_location(const MidiMessage &message);
 	bool verify_mapping();
 
 private:
 	bool switching = false;
-	void ShowOnly(QList<ActionsClass::Actions> shows);
+	void ShowOnly(const QList<ActionsClass::Actions> &shows);
 	void ShowEntry(ActionsClass::Actions Entry);
 	void HideEntry(ActionsClass::Actions Entry);
 	void ShowAllActions();
-	void HideEntries(QList<ActionsClass::Actions> entrys);
-	void ShowEntries(QList<ActionsClass::Actions> entrys);
+	void HideEntries(const QList<ActionsClass::Actions> &entrys);
+	void ShowEntries(const QList<ActionsClass::Actions> &entrys);
 	QString untranslate(QString translation);
 	QListView *listview;
 };

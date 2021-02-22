@@ -293,10 +293,6 @@ obs_data_t *MidiAgent::GetData()
 	obs_data_set_array(data, "hooks", arrayData);
 	return data;
 }
-void MidiAgent::close_midi_output_port()
-{
-	midiout.close_port();
-}
 /*Handle OBS events*/
 void MidiAgent::handle_obs_event(QString eventType, QString eventData)
 {

@@ -30,9 +30,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "config.h"
 #include "device-manager.h"
 using namespace std;
-///////////////////////
-/* MIDI HOOK ROUTES */
-//////////////////////
 ////////////////
 // MIDI AGENT //
 ////////////////
@@ -41,15 +38,32 @@ MidiAgent::MidiAgent()
 	this->setParent(GetDeviceManager().get());
 	midi_input_name = "Midi Device (uninit)";
 	midi_output_name = "Midi Out Device (uninit)";
-	midiin.set_callback(
-		[this](const auto &message) { HandleInput(message, this); });
+	set_callbacks();
 }
 MidiAgent::MidiAgent(obs_data_t *midiData)
 {
+	//Sets the parent of this instance of MidiAgent to Device Manager
 	this->setParent(GetDeviceManager().get());
+	//Sets the Midi Callback function
+	this->Load(midiData);
+	set_callbacks();
+	if (enabled)
+		open_midi_input_port();
+	if (bidirectional)
+		open_midi_output_port();
+}
+void MidiAgent::set_callbacks()
+{
 	midiin.set_callback(
 		[this](const auto &message) { HandleInput(message, this); });
-	this->Load(midiData);
+	midiin.set_error_callback(
+		[this](const auto &error_type, const auto &error_message) {
+			HandleError(error_type, error_message, this);
+		});
+	midiout.set_error_callback(
+		[this](const auto &error_type, const auto &error_message) {
+			HandleError(error_type, error_message, this);
+		});
 }
 MidiAgent::~MidiAgent()
 {
@@ -101,10 +115,6 @@ void MidiAgent::Load(obs_data_t *data)
 		mh->int_override = obs_data_get_int(hookData, "int_override");
 		add_MidiHook(mh);
 	}
-	if (enabled)
-		open_midi_input_port();
-	if (bidirectional)
-		open_midi_output_port();
 }
 void MidiAgent::set_input_port(const int port)
 {
@@ -114,9 +124,8 @@ void MidiAgent::set_output_port(const int port)
 {
 	output_port = port;
 }
-	/* Will open the port and enable this MidiAgent
+/* Will open the port and enable this MidiAgent
 */
-
 void MidiAgent::open_midi_input_port()
 {
 	try {
@@ -127,7 +136,6 @@ void MidiAgent::open_midi_input_port()
 	blog(LOG_INFO, "MIDI device connected In: [%d] %s", input_port,
 	     midi_input_name.toStdString().c_str());
 }
-
 void MidiAgent::open_midi_output_port()
 {
 	try {
@@ -135,7 +143,6 @@ void MidiAgent::open_midi_output_port()
 	} catch (const rtmidi::midi_exception &error) {
 		blog(LOG_DEBUG, "Midi Error %s", error.what());
 	}
-
 	blog(LOG_INFO, "MIDI device connected Out: [%d] %s", output_port,
 	     midi_output_name.toStdString().c_str());
 }
@@ -145,7 +152,6 @@ void MidiAgent::close_both_midi_ports()
 {
 	close_midi_input_port();
 	close_midi_output_port();
-	
 }
 void MidiAgent::close_midi_output_port()
 {
@@ -179,7 +185,6 @@ bool MidiAgent::setBidirectional(bool state)
 			midiout.close_port();
 		}
 	} else {
-		
 		open_midi_output_port();
 	}
 	GetConfig().get()->Save();
@@ -223,6 +228,12 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 		new OBSController(self->get_midi_hook_if_exists(x), x->value);
 	oc->~OBSController();
 	delete (x);
+}
+void MidiAgent::HandleError(const rtmidi::midi_error &error,
+			    const std::string_view &error_message,
+			    void *userData)
+{
+	blog(LOG_ERROR, "Midi Error: %s", error_message);
 }
 /* Get the midi hooks for this device
 */

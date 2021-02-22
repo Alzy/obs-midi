@@ -165,7 +165,6 @@ int PluginWindow::on_check_enabled_state_changed(int state)
 	auto device = GetDeviceManager()->GetMidiDeviceByName(
 		selectedDeviceName.c_str());
 	if (state == Qt::CheckState::Checked) {
-		
 		blog(LOG_INFO, "Item enabled: %s", selectedDeviceName.c_str());
 		int devicePort = GetDeviceManager()->GetPortNumberByDeviceName(
 			selectedDeviceName.c_str());
@@ -183,8 +182,7 @@ int PluginWindow::on_check_enabled_state_changed(int state)
 		ui->bidirectional->setChecked(device->isBidirectional());
 		ui->outbox->setEnabled(device->isBidirectional());
 		set_configure_title(QString::fromStdString(selectedDeviceName));
-		connect(device, SIGNAL(broadcast_midi_message(MidiMessage)),
-			this, SLOT(handle_midi_message(MidiMessage)));
+		connect_midi_message_handler();
 	} else {
 		device->set_enabled(false);
 	}
@@ -192,6 +190,15 @@ int PluginWindow::on_check_enabled_state_changed(int state)
 	GetConfig()->Save();
 	//on_device_select(ui->list_midi_dev->currentItem()->text());
 	return state;
+}
+void PluginWindow::connect_midi_message_handler()
+{
+	auto devicemanager = GetDeviceManager();
+	auto MAdevice = devicemanager->GetMidiDeviceByName(
+		ui->list_midi_dev->currentItem()->text());
+	connect(MAdevice, SIGNAL(broadcast_midi_message(MidiMessage)), this,
+		SLOT(handle_midi_message(
+			MidiMessage))); /// name, mtype, norc, channel
 }
 void PluginWindow::on_device_select(QString curitem)
 {
@@ -203,7 +210,6 @@ void PluginWindow::on_device_select(QString curitem)
 		MidiAgent *MAdevice =
 			devicemanager->GetMidiDeviceByName(curitem);
 		set_configure_title(curitem);
-		
 		// Pull info on if device is enabled, if so set true if not set false
 		try {
 			if (MAdevice != NULL && MAdevice->isEnabled()) {
@@ -220,17 +226,14 @@ void PluginWindow::on_device_select(QString curitem)
 				ui->bidirectional->setEnabled(false);
 			}
 			///HOOK up the Message Handler
-			connect(MAdevice,
-				SIGNAL(broadcast_midi_message(MidiMessage)),
-				this,
-				SLOT(handle_midi_message(
-					MidiMessage))); /// name, mtype, norc, channel
+			connect_midi_message_handler();
 			ui->mapping_lbl_device_name->setText(curitem);
 		} catch (...) {
 		}
 	}
 }
-void PluginWindow::set_configure_title(const QString title) {
+void PluginWindow::set_configure_title(const QString title)
+{
 	ui->tabWidget->setTabText(1, QString("Configure - ").append(title));
 }
 void PluginWindow::handle_midi_message(MidiMessage mess)
@@ -264,12 +267,9 @@ int PluginWindow::on_bid_enabled_state_changed(int state)
 	ui->outbox->setEnabled(state);
 	if (state) {
 		device->setBidirectional(state);
-		device->open_midi_output_port();
 		return 1;
-
 	} else {
 		device->setBidirectional(state);
-		device->close_midi_output_port();
 		return 0;
 	}
 }

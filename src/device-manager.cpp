@@ -49,20 +49,6 @@ void DeviceManager::Load(obs_data_t *data)
 
 		connect(this, SIGNAL(bcast(QString, QString)), device,
 			SLOT(handle_obs_event(QString, QString)));
-		if (device->isEnabled()) {
-			int portNumber = GetPortNumberByDeviceName(
-				device->get_midi_input_name());
-			int outPort = GetOutPortNumberByDeviceName(
-				device->get_midi_output_name());
-
-			if (portNumber != -1) {
-				device->open_midi_input_port(portNumber);
-			}
-			if (outPort != -1) {
-				device->open_midi_output_port(outPort);
-			}
-			
-		}
 	}
 	obs_data_array_release(devicesData);
 
@@ -78,28 +64,27 @@ void DeviceManager::Unload()
 	}
 }
 
-/* Returns vector list of Port Names 
+/* Returns QStringList of Port Names 
  */
 QStringList DeviceManager::GetPortsList()
 {
 	QStringList ports;
-	int portCount = rtMidi.get_port_count();
+	int portCount = rtmidi::midi_in().get_port_count();
 	for (int i = 0; i < portCount; i++) {
-		ports.append(QString::fromStdString(rtMidi.get_port_name(i)));
+		ports.append(QString::fromStdString(rtmidi::midi_in().get_port_name(i)));
 	}
 	return std::move(ports);
 }
 
-/* Returns vector list of Port Names 
+/* Returns QStringList of Output  Port Names 
  */
 QStringList DeviceManager::GetOutPortsList()
 {
-	opl.clear();
 	QStringList outports;
-	int portCount = MO.get_port_count();
+	int portCount = rtmidi::midi_out().get_port_count();
 	for (int i = 0; i < portCount; i++) {
-		outports.append(QString::fromStdString(MO.get_port_name(i)));
-		opl.append(QString::fromStdString(MO.get_port_name(i)));
+		outports.append(QString::fromStdString(
+			rtmidi::midi_out().get_port_name(i)));
 	}
 	return std::move(outports);
 }
@@ -169,8 +154,10 @@ QVector<MidiHook *> DeviceManager::GetMidiHooksByDeviceName(const QString &devic
 MidiAgent * DeviceManager::RegisterMidiDevice(int port, int outport)
 {
 	MidiAgent * midiA = new MidiAgent();
-	midiA->open_midi_input_port(port);
-	midiA->open_midi_output_port(outport);
+	midiA->set_input_port(port);
+	midiA->set_output_port(outport);
+	midiA->open_midi_input_port();
+	midiA->open_midi_output_port();
 	midiA->set_enabled(true);
 	midiAgents.push_back(midiA);
 	return midiA;

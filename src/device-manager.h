@@ -49,7 +49,7 @@ public:
 	int GetPortNumberByDeviceName(const QString &deviceName);
 	QStringList GetOutPortsList();
 	int GetOutPortNumberByDeviceName(const QString &deviceName);
-	QStringList opl;
+	
 	QVector<MidiAgent *> GetActiveMidiDevices();
 	MidiAgent *GetMidiDeviceByName(const QString &deviceName);
 	QVector<MidiHook *> GetMidiHooksByDeviceName(const QString &deviceName);
@@ -61,8 +61,7 @@ signals:
 	void bcast(const QString &updateType, const QString &eventData);
 
 private:
-	rtmidi::midi_in rtMidi;
-	rtmidi::midi_out MO;
+
 
 	QVector<MidiAgent *> midiAgents;
 };

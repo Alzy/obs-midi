@@ -411,7 +411,6 @@ OBSDataArrayAutoRelease Utils::GetSourceArray()
 		obs_data_array_t *sourcesArray =
 			(obs_data_array_t *)privateData;
 		OBSDataAutoRelease sourceData = obs_data_create();
-		auto scene = obs_scene_from_source(source);
 		obs_data_set_string(sourceData, "name",
 				    obs_source_get_name(source));
 		obs_data_set_string(sourceData, "typeId",
@@ -1052,6 +1051,7 @@ QString Utils::get_midi_message_type(const rtmidi::message& message)
 	case rtmidi::message_type::PITCH_BEND:
 		return "Pitch Bend";
 	}
+	return "Unknown Message Type";
 }
 QSpinBox *Utils::GetTransitionDurationControl()
 {

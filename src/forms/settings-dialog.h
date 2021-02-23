@@ -20,7 +20,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "../midi-agent.h"
 #include "../version.h"
 
-
 class PluginWindow : public QDialog {
 	Q_OBJECT
 public:
@@ -62,14 +61,14 @@ private:
 	void set_title_window();
 	void connect_ui_signals();
 	void setup_actions();
-		//	void setCheck(bool check); // not implemented
+	//	void setCheck(bool check); // not implemented
 	void load_devices();
 	void show_pair(Pairs pair);
 	void hide_pair(Pairs pair);
 	void hide_all_pairs();
 	void add_midi_device(const QString &Name);
 	void set_headers();
-	
+
 	void set_configure_title(const QString &title);
 	void connect_midi_message_handler();
 	bool map_exists();
@@ -85,5 +84,4 @@ private:
 	void HideEntries(const QList<ActionsClass::Actions> &entrys);
 	void ShowEntries(const QList<ActionsClass::Actions> &entrys);
 	QString untranslate(QString translation);
-	QListView *listview;
 };

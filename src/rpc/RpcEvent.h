@@ -26,9 +26,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 class RpcEvent {
 public:
-	explicit RpcEvent(QString updateType,
-			  std::optional<uint64_t> streamTime,
-			  std::optional<uint64_t> recordingTime,
+	explicit RpcEvent(QString updateType, std::optional<uint64_t> streamTime, std::optional<uint64_t> recordingTime,
 			  obs_data_t *additionalFields = nullptr);
 	~RpcEvent();
 
@@ -38,11 +36,11 @@ public:
 
 	const std::optional<uint64_t> &recordingTime() const { return _recordingTime; }
 
-	OBSData additionalFields() const  { return std::move(OBSData(_additionalFields)); }
+	OBSData additionalFields() const { return std::move(OBSData(_additionalFields)); }
 
 private:
 	QString _updateType;
 	std::optional<uint64_t> _streamTime;
 	std::optional<uint64_t> _recordingTime;
-	obs_data_t* _additionalFields;
+	obs_data_t *_additionalFields;
 };

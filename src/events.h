@@ -89,8 +89,7 @@ private:
 	uint64_t _lastBytesSent;
 	uint64_t _lastBytesSentTime;
 
-	void broadcastUpdate(const char *updateType,
-			     obs_data_t *additionalFields);
+	void broadcastUpdate(const char *updateType, obs_data_t *additionalFields);
 
 	void OnSceneChange();
 	void OnSceneListChange();
@@ -125,8 +124,7 @@ private:
 
 	void OnExit();
 
-	static void FrontendEventHandler(enum obs_frontend_event event,
-					 void *privateData);
+	static void FrontendEventHandler(enum obs_frontend_event event, void *privateData);
 
 	static void OnTransitionBegin(void *param, calldata_t *data);
 	static void OnTransitionEnd(void *param, calldata_t *data);
@@ -137,16 +135,14 @@ private:
 
 	static void OnSourceVolumeChange(void *param, calldata_t *data);
 	static void OnSourceMuteStateChange(void *param, calldata_t *data);
-	static void OnSourceAudioSyncOffsetChanged(void *param,
-						   calldata_t *data);
+	static void OnSourceAudioSyncOffsetChanged(void *param, calldata_t *data);
 	static void OnSourceAudioMixersChanged(void *param, calldata_t *data);
 
 	static void OnSourceRename(void *param, calldata_t *data);
 
 	static void OnSourceFilterAdded(void *param, calldata_t *data);
 	static void OnSourceFilterRemoved(void *param, calldata_t *data);
-	static void OnSourceFilterVisibilityChanged(void *param,
-						    calldata_t *data);
+	static void OnSourceFilterVisibilityChanged(void *param, calldata_t *data);
 	static void OnSourceFilterOrderChanged(void *param, calldata_t *data);
 
 	static void OnSceneReordered(void *param, calldata_t *data);

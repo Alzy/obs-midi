@@ -56,9 +56,7 @@ public:
 	bool set_bidirectional(const bool &state);
 	void set_enabled(const bool &state);
 	static void HandleInput(const rtmidi::message &message, void *userData);
-	static void HandleError(const rtmidi::midi_error &error,
-				const std::string_view &error_message,
-				void *userData);
+	static void HandleError(const rtmidi::midi_error &error, const std::string_view &error_message, void *userData);
 	void set_callbacks();
 	QVector<MidiHook *> GetMidiHooks();
 	void set_midi_hooks(QVector<MidiHook *>);
@@ -73,7 +71,7 @@ signals:
 	void do_obs_action(MidiHook *, int);
 
 private:
-	void send_message_to_midi_device(const MidiMessage& message);
+	void send_message_to_midi_device(const MidiMessage &message);
 	rtmidi::midi_in midiin;
 	rtmidi::midi_out midiout;
 	QString midi_input_name;

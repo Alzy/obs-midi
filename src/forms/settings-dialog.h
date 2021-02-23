@@ -61,7 +61,8 @@ private:
 	void configure_table();
 	void set_title_window();
 	void connect_ui_signals();
-//	void setCheck(bool check); // not implemented
+	void setup_actions();
+		//	void setCheck(bool check); // not implemented
 	void load_devices();
 	void show_pair(Pairs pair);
 	void hide_pair(Pairs pair);

@@ -61,7 +61,8 @@ void DeviceManager::Unload()
 	}
 }
 
-/* Returns QStringList of Port Names 
+/*
+ * Returns QStringList of Port Names
  */
 QStringList DeviceManager::GetPortsList()
 {
@@ -73,7 +74,8 @@ QStringList DeviceManager::GetPortsList()
 	return std::move(ports);
 }
 
-/* Returns QStringList of Output  Port Names 
+/*
+ * Returns QStringList of Output  Port Names
  */
 QStringList DeviceManager::GetOutPortsList()
 {
@@ -85,7 +87,8 @@ QStringList DeviceManager::GetOutPortsList()
 	return std::move(outports);
 }
 
-/* Returns the port number of the specified device.
+/*
+ * Returns the port number of the specified device.
  * If the device isn't found (possibly due to being disconnected), returns -1
  */
 int DeviceManager::GetPortNumberByDeviceName(const QString &deviceName)
@@ -98,9 +101,16 @@ int DeviceManager::GetPortNumberByDeviceName(const QString &deviceName)
 		return -1;
 	}
 }
-
-/* Returns the port number of the specified device.
- * If the device isn't found (possibly due to being disconnected), returns -1
+/**
+ *
+ * 
+ * @name GetOutPortNumberByDeviceName
+ * @Param deviceName 
+ * @category Device Manager
+ * @description Returns the port number of the specified device. \
+ *		If the device isn't found (possibly due to being disconnected), returns -1
+ * @returns  Device Output Port
+ * @rtype int
  */
 int DeviceManager::GetOutPortNumberByDeviceName(const QString &deviceName)
 {
@@ -145,7 +155,7 @@ QVector<MidiHook *> DeviceManager::GetMidiHooksByDeviceName(const QString &devic
 
 /* Registers a midi device.
  * Will create, store and enable a midi device.
-*/
+ */
 MidiAgent *DeviceManager::RegisterMidiDevice(const int &port, const int &outport)
 {
 	MidiAgent *midiA = new MidiAgent(port, outport);
@@ -155,9 +165,9 @@ MidiAgent *DeviceManager::RegisterMidiDevice(const int &port, const int &outport
 }
 
 /* Get this Device Manager state as OBS Data. (includes devices and their midi hooks)
-* This is needed to Serialize the state in the config.
-* https://obsproject.com/docs/reference-settings.html
-*/
+ * This is needed to Serialize the state in the config.
+ * https://obsproject.com/docs/reference-settings.html
+ */
 obs_data_t *DeviceManager::GetData()
 {
 	obs_data_t *data = obs_data_create();

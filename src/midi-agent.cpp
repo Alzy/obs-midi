@@ -187,7 +187,7 @@ void MidiAgent::set_midi_output_name(const QString &oname)
 {
 	midi_output_name = oname;
 }
-bool MidiAgent::setBidirectional(bool state)
+bool MidiAgent::set_bidirectional(const bool &state)
 {
 	this->bidirectional = state;
 	if (!state) {
@@ -271,6 +271,12 @@ void MidiAgent::add_MidiHook(MidiHook *hook)
 void MidiAgent::set_enabled(bool state)
 {
 	this->enabled = state;
+	if (state)
+		open_midi_input_port();
+	else
+		close_midi_input_port();
+
+	GetConfig().get()->Save();
 }
 void MidiAgent::set_midi_hooks(QVector<MidiHook *> mh)
 {

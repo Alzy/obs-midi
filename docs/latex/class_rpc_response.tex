@@ -1,0 +1,47 @@
+\hypertarget{class_rpc_response}{}\doxysection{Rpc\+Response Class Reference}
+\label{class_rpc_response}\index{RpcResponse@{RpcResponse}}
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_rpc_response_ad35f0f01ed05c727feb01ff6d2171315}\label{class_rpc_response_ad35f0f01ed05c727feb01ff6d2171315}} 
+enum {\bfseries Status} \{ {\bfseries Unknown}
+, {\bfseries Ok}
+, {\bfseries Error}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_rpc_response_a7498168c857bdfaacaf6698162cf0765}\label{class_rpc_response_a7498168c857bdfaacaf6698162cf0765}} 
+Status {\bfseries status} ()
+\item 
+\mbox{\Hypertarget{class_rpc_response_ae3101df4b4338508e72fe11447027339}\label{class_rpc_response_ae3101df4b4338508e72fe11447027339}} 
+const QString \& {\bfseries message\+Id} () const
+\item 
+\mbox{\Hypertarget{class_rpc_response_a3af6ae6453b02baca17b03f10171eae3}\label{class_rpc_response_a3af6ae6453b02baca17b03f10171eae3}} 
+const QString \& {\bfseries method\+Name} () const
+\item 
+\mbox{\Hypertarget{class_rpc_response_a1501457315f37d0e10ca486e815ee2e4}\label{class_rpc_response_a1501457315f37d0e10ca486e815ee2e4}} 
+const QString \& {\bfseries error\+Message} () const
+\item 
+\mbox{\Hypertarget{class_rpc_response_af7596369bc6d00856c7d96147eef6e96}\label{class_rpc_response_af7596369bc6d00856c7d96147eef6e96}} 
+const OBSData {\bfseries additional\+Fields} () const
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_rpc_response_aa10bd174567f41e7b6952656db92a3b6}\label{class_rpc_response_aa10bd174567f41e7b6952656db92a3b6}} 
+static \mbox{\hyperlink{class_rpc_response}{Rpc\+Response}} {\bfseries of\+Request} (const \mbox{\hyperlink{class_rpc_request}{Rpc\+Request}} \&request)
+\item 
+\mbox{\Hypertarget{class_rpc_response_a4024f4fc8ac5825dd21de827a0e3b287}\label{class_rpc_response_a4024f4fc8ac5825dd21de827a0e3b287}} 
+static const \mbox{\hyperlink{class_rpc_response}{Rpc\+Response}} {\bfseries ok} (const \mbox{\hyperlink{class_rpc_request}{Rpc\+Request}} \&request, obs\+\_\+data\+\_\+t $\ast$additional\+Fields=nullptr)
+\item 
+\mbox{\Hypertarget{class_rpc_response_a93b2ca096496b6d39151ca0866e38319}\label{class_rpc_response_a93b2ca096496b6d39151ca0866e38319}} 
+static const \mbox{\hyperlink{class_rpc_response}{Rpc\+Response}} {\bfseries fail} (const \mbox{\hyperlink{class_rpc_request}{Rpc\+Request}} \&request, const QString \&error\+Message, obs\+\_\+data\+\_\+t $\ast$additional\+Fields=nullptr)
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/rpc/Rpc\+Response.\+h\item 
+src/rpc/Rpc\+Response.\+cpp\end{DoxyCompactItemize}

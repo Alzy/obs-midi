@@ -12,6 +12,16 @@ You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>
 */
 #pragma once
+#include <vector>
+#include <functional>
+#include <map>
+#include <string>
+#include <iostream>
+
+#include <QtCore/QObject>
+#include <QtCore/QString>
+#include <QtCore/QSharedPointer>
+
 #if __has_include(<obs-frontend-api.h>)
 #include <obs-frontend-api.h>
 #include "rtmidi17/rtmidi17.hpp"
@@ -19,18 +29,12 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <obs-frontend-api/obs-frontend-api.h>
 #include "rtmidi17/rtmidi17.hpp"
 #endif
-#include <QtCore/QString>
-#include <QtCore/QSharedPointer>
-#include <vector>
-#include <QObject>
-#include <functional>
-#include <map>
-#include <string>
-#include <iostream>
 #include "rpc/RpcEvent.h"
 #include "utils.h"
 #include "obs-controller.h"
-class MidiAgent : public QObject {
+
+class MidiAgent : public QObject
+{
 	Q_OBJECT
 public:
 	MidiAgent(const int &in_port, const int &out_port);
@@ -46,13 +50,13 @@ public:
 	void close_midi_input_port();
 	const QString &get_midi_input_name();
 	const QString &get_midi_output_name();
-	void set_input_port(const int port);
-	void set_output_port(const int port);
+	void set_input_port(int port);
+	void set_output_port(int port);
 	void set_midi_output_name(const QString &oname);
-	int GetPort();
-	bool isEnabled();
-	bool isConnected();
-	bool isBidirectional();
+	int GetPort() const;
+	bool isEnabled() const;
+	bool isConnected() const;
+	bool isBidirectional() const;
 	bool set_bidirectional(const bool &state);
 	void set_enabled(const bool &state);
 	static void HandleInput(const rtmidi::message &message, void *userData);
@@ -76,11 +80,11 @@ private:
 	rtmidi::midi_out midiout;
 	QString midi_input_name;
 	QString midi_output_name;
-	bool sending;
+	bool sending{};
 	int input_port = -1;
 	int output_port = -1;
-	int lastscenebtn;
-	int last_preview_scene_norc;
+	int lastscenebtn{};
+	int last_preview_scene_norc{};
 	bool enabled = false;
 	bool connected = false;
 	bool bidirectional = false;

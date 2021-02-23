@@ -12,12 +12,14 @@ You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>
 */
 #include "obs-controller.h"
+
+
 ////////////////////
 // BUTTON ACTIONS //
 ////////////////////
 OBSController::OBSController(MidiHook *incoming_hook, int incoming_midi_value)
 {
-	if (incoming_hook == NULL)
+	if (incoming_hook == nullptr)
 		return;
 	hook = incoming_hook;
 	midi_value = incoming_midi_value;
@@ -168,7 +170,7 @@ OBSController::OBSController(MidiHook *incoming_hook, int incoming_midi_value)
 	};
 	this->deleteLater();
 }
-OBSController::~OBSController() {}
+OBSController::~OBSController() = default;
 /**
  * Sets the currently active scene
  */
@@ -215,6 +217,7 @@ void OBSController::ResetSceneItem()
 	OBSDataItemAutoRelease itemField = obs_data_item_byname(params, "item");
 	OBSSceneItemAutoRelease sceneItem = Utils::GetSceneItemFromRequestField(scene, itemField);
 	if (!sceneItem) {
+		obs_data_release(params);
 		throw("specified scene item doesn't exist");
 	}
 	OBSSourceAutoRelease sceneItemSource = obs_sceneitem_get_source(sceneItem);
@@ -313,7 +316,7 @@ void OBSController::StartStopStreaming()
  */
 void OBSController::StartStreaming()
 {
-	if (obs_frontend_streaming_active() == false) {
+	if (!obs_frontend_streaming_active()) {
 		obs_frontend_streaming_start();
 	}
 }
@@ -322,7 +325,7 @@ void OBSController::StartStreaming()
  */
 void OBSController::StopStreaming()
 {
-	if (obs_frontend_streaming_active() == true) {
+	if (obs_frontend_streaming_active()) {
 		obs_frontend_streaming_stop();
 	}
 }
@@ -391,7 +394,7 @@ void OBSController::StartReplayBuffer()
 	if (!Utils::ReplayBufferEnabled()) {
 		blog(LOG_DEBUG, "replay buffer disabled in settings");
 	}
-	if (obs_frontend_replay_buffer_active() == false) {
+	if (!obs_frontend_replay_buffer_active()) {
 		Utils::StartReplayBuffer();
 	}
 }
@@ -400,7 +403,7 @@ void OBSController::StartReplayBuffer()
 */
 void OBSController::StopReplayBuffer()
 {
-	if (obs_frontend_replay_buffer_active() == true) {
+	if (obs_frontend_replay_buffer_active()) {
 		obs_frontend_replay_buffer_stop();
 	}
 }

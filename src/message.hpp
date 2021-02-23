@@ -26,6 +26,7 @@ using midi_bytes = std::vector<unsigned char>;
 #define RTMIDI17_INLINE
 #endif
 
+
 namespace rtmidi {
 enum class message_type : uint8_t {
 	INVALID = 0x0,
@@ -105,54 +106,48 @@ struct message {
 	static message note_on(uint8_t channel, uint8_t note,
 			       uint8_t velocity) noexcept
 	{
-		return {make_command(message_type::NOTE_ON, channel), note,
-			velocity};
+		return std::move({make_command(message_type::NOTE_ON, channel), note, velocity});
 	}
 
 	static message note_off(uint8_t channel, uint8_t note,
 				uint8_t velocity) noexcept
 	{
-		return {make_command(message_type::NOTE_OFF, channel), note,
-			velocity};
+		return std::move({make_command(message_type::NOTE_OFF, channel), note, velocity});
 	}
 
 	static message control_change(uint8_t channel, uint8_t control,
 				      uint8_t value) noexcept
 	{
-		return {make_command(message_type::CONTROL_CHANGE, channel),
-			control, value};
+		return std::move({make_command(message_type::CONTROL_CHANGE, channel), control, value});
 	}
 
 	static message program_change(uint8_t channel, uint8_t value) noexcept
 	{
-		return {make_command(message_type::PROGRAM_CHANGE, channel),
-			value};
+		return std::move({make_command(message_type::PROGRAM_CHANGE, channel), value});
 	}
 
 	static message pitch_bend(uint8_t channel, int value) noexcept
 	{
-		return {make_command(message_type::PITCH_BEND, channel),
-			(unsigned char)(value & 0x7F),
-			(uint8_t)((value >> 7) & 0x7F)};
+		return std::move({make_command(message_type::PITCH_BEND, channel),
+						  (unsigned char)(value & 0x7F),
+						  (uint8_t)((value >> 7) & 0x7F)});
 	}
 
 	static message pitch_bend(uint8_t channel, uint8_t lsb,
 				  uint8_t msb) noexcept
 	{
-		return {make_command(message_type::PITCH_BEND, channel), lsb,
-			msb};
+		return std::move({make_command(message_type::PITCH_BEND, channel), lsb, msb});
 	}
 
 	static message poly_pressure(uint8_t channel, uint8_t note,
 				     uint8_t value) noexcept
 	{
-		return {make_command(message_type::POLY_PRESSURE, channel),
-			note, value};
+		return std::move({make_command(message_type::POLY_PRESSURE, channel), note, value});
 	}
 
 	static message aftertouch(uint8_t channel, uint8_t value) noexcept
 	{
-		return {make_command(message_type::AFTERTOUCH, channel), value};
+		return std::move({make_command(message_type::AFTERTOUCH, channel), value});
 	}
 
 	bool uses_channel(int channel) const
@@ -230,21 +225,21 @@ struct message {
 };
 
 struct meta_events {
-	static message end_of_track() { return {0xFF, 0x2F, 0}; }
+	static message end_of_track() { return std::move({0xFF, 0x2F, 0}); }
 
 	static message channel(int channel)
 	{
-		return {0xff, 0x20, 0x01, clamp(0, 0xff, channel - 1)};
+		return std::move(0xff, 0x20, 0x01, clamp(0, 0xff, channel - 1));
 	}
 
 	static message tempo(int mpqn)
 	{
-		return {0xff,
-			81,
-			3,
-			(uint8_t)(mpqn >> 16),
-			(uint8_t)(mpqn >> 8),
-			(uint8_t)mpqn};
+		return std::move({0xff,
+						  81,
+						  3,
+						  (uint8_t) (mpqn >> 16),
+						  (uint8_t) (mpqn >> 8),
+						  (uint8_t) mpqn});
 	}
 
 	static message time_signature(int numerator, int denominator)
@@ -257,8 +252,7 @@ struct meta_events {
 			++powTwo;
 		}
 
-		return {0xff, 0x58, 0x04, (uint8_t)numerator, (uint8_t)powTwo,
-			1,    96};
+		return std::move({0xff, 0x58, 0x04, (uint8_t)numerator, (uint8_t)powTwo, 1, 96});
 	}
 
 	// Where key index goes from -7 (7 flats, C? Major) to +7 (7 sharps, C?
@@ -266,16 +260,13 @@ struct meta_events {
 	static message key_signature(int keyIndex, bool isMinor)
 	{
 		if (keyIndex < -7 || keyIndex > 7)
-			throw std::range_error(
-				"meta_events::key_signature: out of range");
-		return {0xff, 0x59, 0x02, (uint8_t)keyIndex,
-			isMinor ? (uint8_t)1 : (uint8_t)0};
+			throw std::range_error("meta_events::key_signature: out of range");
+		return std::move({0xff, 0x59, 0x02, (uint8_t)keyIndex, isMinor ? (uint8_t)1 : (uint8_t)0});
 	}
 
 	static message song_position(int positionInBeats) noexcept
 	{
-		return {0xf2, (uint8_t)(positionInBeats & 127),
-			(uint8_t)((positionInBeats >> 7) & 127)};
+		return std::move({0xf2, (uint8_t)(positionInBeats & 127), (uint8_t)((positionInBeats >> 7) & 127)});
 	}
 };
 

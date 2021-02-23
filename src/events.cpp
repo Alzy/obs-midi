@@ -16,17 +16,21 @@
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <https://www.gnu.org/licenses/>
  */
-#include <inttypes.h>
+#include <cinttypes>
+#include <utility>
+
 #include <util/platform.h>
 #include <media-io/video-io.h>
-#include <QtWidgets/QPushButton>
+
 #include "events.h"
 #include "obs-midi.h"
 #include "config.h"
 #include "utils.h"
 #include "forms/settings-dialog.h"
-//#include "rpc/RpcEvent.h"
+
 #define STATUS_INTERVAL 2000
+
+
 const char *sourceTypeToString(obs_source_type type)
 {
 	switch (type) {
@@ -54,7 +58,13 @@ const char *calldata_get_string(const calldata_t *data, const char *name)
 	calldata_get_string(data, name, &value);
 	return value;
 }
-events::events(DeviceManagerPtr srv) : _srv(srv), _streamStarttime(0), _lastBytesSent(0), _lastBytesSentTime(0), HeartbeatIsActive(false), pulse(false)
+events::events(DeviceManagerPtr srv)
+	: _srv(std::move(srv)),
+	  _streamStarttime(0),
+	  _lastBytesSent(0),
+	  _lastBytesSentTime(0),
+	  HeartbeatIsActive(false),
+	  pulse(false)
 {
 	this->setParent(GetDeviceManager().get());
 	//_srv = GetDeviceManager();
@@ -325,11 +335,11 @@ uint64_t events::getRecordingTime()
 }
 QString events::getStreamingTimecode()
 {
-	return Utils::nsToTimestamp(getStreamingTime());
+	return std::move(Utils::nsToTimestamp(getStreamingTime()));
 }
 QString events::getRecordingTimecode()
 {
-	return Utils::nsToTimestamp(getRecordingTime());
+	return std::move(Utils::nsToTimestamp(getRecordingTime()));
 }
 /**
  * Indicates a scene change.
@@ -349,7 +359,11 @@ void events::OnSceneChange()
 	OBSDataAutoRelease data = obs_data_create();
 	obs_data_set_string(data, "scene-name", obs_source_get_name(currentScene));
 	obs_data_set_array(data, "sources", sceneItems);
+
+	// we __can__ release data after broadcastUpdate(), because inside this function
+	// data will be copyed (int RcpEvent constructor)
 	broadcastUpdate("SwitchScenes", data);
+	obs_data_release(data);
 }
 /**
  * The scene list has been modified.
@@ -408,6 +422,7 @@ void events::OnTransitionChange()
 	OBSDataAutoRelease data = obs_data_create();
 	obs_data_set_string(data, "transition-name", obs_source_get_name(currentTransition));
 	broadcastUpdate("SwitchTransition", data);
+	obs_data_release(data);
 }
 /**
  * The list of available transitions has been modified.
@@ -461,6 +476,7 @@ void events::OnStreamStarting()
 	OBSDataAutoRelease data = obs_data_create();
 	obs_data_set_bool(data, "preview-only", false);
 	broadcastUpdate("StreamStarting", data);
+	obs_data_release(data);
 }
 /**
  * Streaming started successfully.
@@ -491,6 +507,7 @@ void events::OnStreamStopping()
 	OBSDataAutoRelease data = obs_data_create();
 	obs_data_set_bool(data, "preview-only", false);
 	broadcastUpdate("StreamStopping", data);
+	obs_data_release(data);
 }
 /**
  * Streaming stopped successfully.
@@ -707,6 +724,8 @@ void events::StreamStatus()
 	obs_data_set_bool(data, "preview-only",
 			  false); // Retrocompat with OBSRemote
 	broadcastUpdate("StreamStatus", data);
+	obs_data_release(data);
+	obs_data_release(stats);
 }
 /**
  * Emitted every 2 seconds after enabling it by calling SetHeartbeat.
@@ -761,6 +780,8 @@ void events::Heartbeat()
 	OBSDataAutoRelease stats = GetStats();
 	obs_data_set_obj(data, "stats", stats);
 	broadcastUpdate("Heartbeat", data);
+	obs_data_release(data);
+	obs_data_release(stats);
 }
 /**
  * The active transition duration has been changed.
@@ -777,6 +798,7 @@ void events::TransitionDurationChanged(int ms)
 	OBSDataAutoRelease fields = obs_data_create();
 	obs_data_set_int(fields, "new-duration", ms);
 	broadcastUpdate("TransitionDurationChanged", fields);
+	obs_data_release(fields);
 }
 /**
  * A transition (other than "cut") has begun.
@@ -803,6 +825,7 @@ void events::OnTransitionBegin(void *param, calldata_t *data)
 	}
 	OBSDataAutoRelease fields = Utils::GetTransitionData(transition);
 	instance->broadcastUpdate("TransitionBegin", fields);
+	obs_data_release(fields);
 }
 /**
 * A transition (other than "cut") has ended.
@@ -827,6 +850,7 @@ void events::OnTransitionEnd(void *param, calldata_t *data)
 	}
 	OBSDataAutoRelease fields = Utils::GetTransitionData(transition);
 	instance->broadcastUpdate("TransitionEnd", fields);
+	obs_data_release(fields);
 }
 /**
 * A stinger transition has finished playing its video.
@@ -851,6 +875,7 @@ void events::OnTransitionVideoEnd(void *param, calldata_t *data)
 	}
 	OBSDataAutoRelease fields = Utils::GetTransitionData(transition);
 	instance->broadcastUpdate("TransitionVideoEnd", fields);
+	obs_data_release(fields);
 }
 /**
  * A source has been created. A source can be an input, a scene or a transition.
@@ -880,6 +905,7 @@ void events::OnSourceCreate(void *param, calldata_t *data)
 	obs_data_set_string(fields, "sourceKind", obs_source_get_id(source));
 	obs_data_set_obj(fields, "sourceSettings", sourceSettings);
 	self->broadcastUpdate("SourceCreated", fields);
+	obs_data_release(fields);
 }
 /**
  * A source has been destroyed/removed. A source can be an input, a scene or a transition.
@@ -907,6 +933,7 @@ void events::OnSourceDestroy(void *param, calldata_t *data)
 	obs_data_set_string(fields, "sourceType", sourceTypeToString(sourceType));
 	obs_data_set_string(fields, "sourceKind", obs_source_get_id(source));
 	self->broadcastUpdate("SourceDestroyed", fields);
+	obs_data_release(fields);
 }
 /**
  * The volume of a source has changed.
@@ -934,6 +961,7 @@ void events::OnSourceVolumeChange(void *param, calldata_t *data)
 	obs_data_set_string(fields, "sourceName", obs_source_get_name(source));
 	obs_data_set_double(fields, "volume", volume);
 	self->broadcastUpdate("SourceVolumeChanged", fields);
+	obs_data_release(fields);
 }
 /**
  * A source has been muted or unmuted.
@@ -961,6 +989,7 @@ void events::OnSourceMuteStateChange(void *param, calldata_t *data)
 	obs_data_set_string(fields, "sourceName", obs_source_get_name(source));
 	obs_data_set_bool(fields, "muted", muted);
 	self->broadcastUpdate("SourceMuteStateChanged", fields);
+	obs_data_release(fields);
 }
 /**
  * The audio sync offset of a source has changed.
@@ -988,6 +1017,7 @@ void events::OnSourceAudioSyncOffsetChanged(void *param, calldata_t *data)
 	obs_data_set_string(fields, "sourceName", obs_source_get_name(source));
 	obs_data_set_int(fields, "syncOffset", (int)syncOffset);
 	self->broadcastUpdate("SourceAudioSyncOffsetChanged", fields);
+	obs_data_release(fields);
 }
 /**
  * Audio mixer routing changed on a source.
@@ -1027,6 +1057,7 @@ void events::OnSourceAudioMixersChanged(void *param, calldata_t *data)
 	obs_data_set_array(fields, "mixers", mixers);
 	obs_data_set_string(fields, "hexMixersValue", hexValue.toUtf8());
 	self->broadcastUpdate("SourceAudioMixersChanged", fields);
+	obs_data_release(fields);
 }
 /**
  * A source has been renamed.
@@ -1055,6 +1086,7 @@ void events::OnSourceRename(void *param, calldata_t *data)
 	obs_data_set_string(fields, "previousName", previousName);
 	obs_data_set_string(fields, "newName", newName);
 	self->broadcastUpdate("SourceRenamed", fields);
+	obs_data_release(fields);
 }
 /**
  * A filter was added to a source.
@@ -1088,6 +1120,8 @@ void events::OnSourceFilterAdded(void *param, calldata_t *data)
 	obs_data_set_string(fields, "filterType", obs_source_get_id(filter));
 	obs_data_set_obj(fields, "filterSettings", filterSettings);
 	self->broadcastUpdate("SourceFilterAdded", fields);
+	obs_data_release(filterSettings);
+	obs_data_release(fields);
 }
 /**
  * A filter was removed from a source.
@@ -1118,6 +1152,7 @@ void events::OnSourceFilterRemoved(void *param, calldata_t *data)
 	obs_data_set_string(fields, "filterName", obs_source_get_name(filter));
 	obs_data_set_string(fields, "filterType", obs_source_get_id(filter));
 	self->broadcastUpdate("SourceFilterRemoved", fields);
+	obs_data_release(fields);
 }
 /**
  * The visibility/enabled state of a filter changed
@@ -1144,6 +1179,7 @@ void events::OnSourceFilterVisibilityChanged(void *param, calldata_t *data)
 	obs_data_set_string(fields, "filterName", obs_source_get_name(source));
 	obs_data_set_bool(fields, "filterEnabled", obs_source_enabled(source));
 	self->broadcastUpdate("SourceFilterVisibilityChanged", fields);
+	obs_data_release(fields);
 }
 /**
  * Filters in a source have been reordered.
@@ -1170,6 +1206,7 @@ void events::OnSourceFilterOrderChanged(void *param, calldata_t *data)
 	obs_data_set_string(fields, "sourceName", obs_source_get_name(source));
 	obs_data_set_array(fields, "filters", filters);
 	self->broadcastUpdate("SourceFiltersReordered", fields);
+	obs_data_release(fields);
 }
 /**
  * Scene items have been reordered.
@@ -1208,6 +1245,8 @@ void events::OnSceneReordered(void *param, calldata_t *data)
 	obs_data_set_string(fields, "scene-name", obs_source_get_name(obs_scene_get_source(scene)));
 	obs_data_set_array(fields, "scene-items", sceneItems);
 	instance->broadcastUpdate("SourceOrderChanged", fields);
+	obs_data_release(fields);
+	obs_data_array_release(sceneItems);
 }
 /**
  * An item has been added to the current scene.
@@ -1235,6 +1274,7 @@ void events::OnSceneItemAdd(void *param, calldata_t *data)
 	obs_data_set_string(fields, "item-name", sceneItemName);
 	obs_data_set_int(fields, "item-id", obs_sceneitem_get_id(sceneItem));
 	instance->broadcastUpdate("SceneItemAdded", fields);
+	obs_data_release(fields);
 }
 /**
  * An item has been removed from the current scene.
@@ -1262,6 +1302,7 @@ void events::OnSceneItemDelete(void *param, calldata_t *data)
 	obs_data_set_string(fields, "item-name", sceneItemName);
 	obs_data_set_int(fields, "item-id", obs_sceneitem_get_id(sceneItem));
 	instance->broadcastUpdate("SceneItemRemoved", fields);
+	obs_data_release(fields);
 }
 /**
  * An item's visibility has been toggled.
@@ -1293,6 +1334,7 @@ void events::OnSceneItemVisibilityChanged(void *param, calldata_t *data)
 	obs_data_set_int(fields, "item-id", obs_sceneitem_get_id(sceneItem));
 	obs_data_set_bool(fields, "item-visible", visible);
 	instance->broadcastUpdate("SceneItemVisibilityChanged", fields);
+	obs_data_release(fields);
 }
 /**
  * An item's locked status has been toggled.
@@ -1324,6 +1366,7 @@ void events::OnSceneItemLockChanged(void *param, calldata_t *data)
 	obs_data_set_int(fields, "item-id", obs_sceneitem_get_id(sceneItem));
 	obs_data_set_bool(fields, "item-locked", locked);
 	instance->broadcastUpdate("SceneItemLockChanged", fields);
+	obs_data_release(fields);
 }
 /**
  * An item's transform has been changed.
@@ -1354,6 +1397,7 @@ void events::OnSceneItemTransform(void *param, calldata_t *data)
 	obs_data_set_int(fields, "item-id", obs_sceneitem_get_id(sceneItem));
 	obs_data_set_obj(fields, "transform", transform);
 	instance->broadcastUpdate("SceneItemTransformChanged", fields);
+	obs_data_release(fields);
 }
 /**
  * A scene item is selected.
@@ -1385,6 +1429,7 @@ void events::OnSceneItemSelected(void *param, calldata_t *data)
 	obs_data_set_string(fields, "item-name", obs_source_get_name(itemSource));
 	obs_data_set_int(fields, "item-id", obs_sceneitem_get_id(item));
 	self->broadcastUpdate("SceneItemSelected", fields);
+	obs_data_release(fields);
 }
 /**
  * A scene item is deselected.
@@ -1416,6 +1461,7 @@ void events::OnSceneItemDeselected(void *param, calldata_t *data)
 	obs_data_set_string(fields, "item-name", obs_source_get_name(itemSource));
 	obs_data_set_int(fields, "item-id", obs_sceneitem_get_id(item));
 	self->broadcastUpdate("SceneItemDeselected", fields);
+	obs_data_release(fields);
 }
 /**
  * The selected preview scene has changed (only available in Studio Mode).
@@ -1439,6 +1485,7 @@ void events::OnPreviewSceneChanged()
 		obs_data_set_string(data, "scene-name", obs_source_get_name(scene));
 		obs_data_set_array(data, "sources", sceneItems);
 		broadcastUpdate("PreviewSceneChanged", data);
+		obs_data_release(data);
 	}
 }
 /**
@@ -1456,6 +1503,7 @@ void events::OnStudioModeSwitched(bool checked)
 	OBSDataAutoRelease data = obs_data_create();
 	obs_data_set_bool(data, "new-state", checked);
 	broadcastUpdate("StudioModeSwitched", data);
+	obs_data_release(data);
 }
 /**
  * A custom broadcast message was received
@@ -1474,6 +1522,7 @@ void events::OnBroadcastCustomMessage(const QString &realm, obs_data_t *data)
 	obs_data_set_string(broadcastData, "realm", realm.toUtf8().constData());
 	obs_data_set_obj(broadcastData, "data", data);
 	broadcastUpdate("BroadcastCustomMessage", broadcastData);
+	obs_data_release(data);
 }
 /**
  * @typedef {Object} `OBSStats`

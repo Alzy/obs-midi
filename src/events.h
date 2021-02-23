@@ -19,34 +19,37 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #pragma once
 
+#include <string>
+#include <vector>
+#include <map>
+#include <functional>
+#include <iostream>
+
+#include <QtWidgets/QListWidgetItem>
+#include <QtCore/QSharedPointer>
+#include <QtCore/QTimer>
+#include <QtCore/QObject>
+
+#include <util/platform.h>
 #include <obs.hpp>
 #if __has_include(<obs-frontend-api.h>)
 #include <obs-frontend-api.h>
 #else
 #include <obs-frontend-api/obs-frontend-api.h>
 #endif
-#include <util/platform.h>
+
 #include "obs-midi.h"
 #include "device-manager.h"
-
-#include <QtWidgets/QListWidgetItem>
-#include <QtCore/QSharedPointer>
-#include <QtCore/QTimer>
 #include "rpc/RpcEvent.h"
-#include <vector>
-#include <QObject>
-#include <functional>
-#include <map>
-#include <string>
-#include <iostream>
-//#include "WSServer.h"
 
-class events : public QObject {
+
+class events : public QObject
+{
 	Q_OBJECT
 
 public:
 	explicit events(DeviceManagerPtr srv);
-	~events();
+	~events() override;
 
 	void connectSourceSignals(obs_source_t *source);
 	void disconnectSourceSignals(obs_source_t *source);

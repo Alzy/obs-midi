@@ -12,30 +12,48 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>
 */
-#pragma once
-#if __has_include(<obs-frontend-api.h>)
-#include "rtmidi17/rtmidi17.hpp"
-#else
-#include "rtmidi17/rtmidi17.hpp"
-#endif
-#include <stdio.h>
-#include <iostream>
-#include <vector>
 #include <QtCore/QString>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QSystemTrayIcon>
-#include <QMessageBox>
+#include <QtWidgets/QMessageBox>
+
+#include <cstdio>
+#include <iostream>
+#include <vector>
+
 #include <obs.hpp>
 #include <obs-module.h>
 #include <util/config-file.h>
+#pragma once
+#if __has_include(<obs-frontend-api.h>)
+#include "rtmidi17/rtmidi17.hpp"
+#else
+#include "rtmidi17/rtmidi17.hpp"
+#endif
+
 #include "obs-midi.h"
+
+
 typedef void (*PauseRecordingFunction)(bool);
 typedef bool (*RecordingPausedFunction)();
-enum class Pairs { Scene, Source, Item, Transition, Audio, Media, Filter, String, Integer, Boolean };
-class ActionsClass : public QObject {
+
+enum class Pairs {
+	Scene,
+	Source,
+	Item,
+	Transition,
+	Audio,
+	Media,
+	Filter,
+	String,
+	Integer,
+	Boolean
+};
+class ActionsClass : public QObject
+{
 	Q_OBJECT
 public:
 	enum class Actions {
@@ -143,8 +161,9 @@ obs_sceneitem_t *GetSceneItemFromRequestField(obs_scene_t *scene, obs_data_item_
 obs_scene_t *GetSceneFromNameOrCurrent(const QString &sceneName);
 obs_data_t *GetSceneItemPropertiesData(obs_sceneitem_t *item);
 obs_data_t *GetSourceFilterInfo(obs_source_t *filter, bool includeSettings);
-obs_data_array_t *GetSourceFiltersList(obs_source_t *source, bool includeSettings);
-bool IsValidAlignment(const uint32_t alignment);
+obs_data_array_t *GetSourceFiltersList(obs_source_t *source,
+				       bool includeSettings);
+bool IsValidAlignment(uint32_t alignment);
 obs_data_array_t *GetScenes();
 obs_data_t *GetSceneData(obs_source_t *source);
 // TODO contribute a proper frontend API method for this to OBS and remove this hack

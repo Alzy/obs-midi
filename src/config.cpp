@@ -16,16 +16,15 @@ You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>
 */
 
-#if __has_include(<obs-frontend-api.h>)
-
-#include <obs-frontend-api.h>
-#else
-#include <obs-frontend-api/obs-frontend-api.h>
-#endif
-
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QTime>
 #include <QtWidgets/QSystemTrayIcon>
+
+#include "forms/settings-dialog.h"
+#include "utils.h"
+#include "obs-midi.h"
+#include "config.h"
+#include "device-manager.h"
 
 #define SECTION_NAME "MidiAPI"
 #define PARAM_DEBUG "DebugEnabled"
@@ -34,14 +33,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #define DEFUALT_DEVICES "{\"devices\": []}"
 
-#include "utils.h"
-#include "obs-midi.h"
-#include "config.h"
-#include "device-manager.h"
-#include "forms/settings-dialog.h"
 #define QT_TO_UTF8(str) str.toUtf8().constData()
 
-Config::Config() : DebugEnabled(false), AlertsEnabled(true), SettingsLoaded(false)
+using namespace std;
+
+
+Config::Config()
+	: DebugEnabled(false), AlertsEnabled(true), SettingsLoaded(false)
 {
 	this->setParent(plugin_window);
 	qsrand(QTime::currentTime().msec());
@@ -68,7 +66,6 @@ void Config::Load()
 
 	auto deviceManager = GetDeviceManager();
 	obs_data_t *deviceManagerData = obs_data_create_from_json(
-
 		config_get_string(obsConfig, SECTION_NAME, PARAM_DEVICES));
 	blog(LOG_INFO, "Loaded: \n %s", config_get_string(obsConfig, SECTION_NAME, PARAM_DEVICES));
 	deviceManager->Load(deviceManagerData);

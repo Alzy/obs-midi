@@ -53,7 +53,7 @@ public:
 	QVector<MidiAgent *> GetActiveMidiDevices();
 	MidiAgent *GetMidiDeviceByName(const QString &deviceName);
 	QVector<MidiHook *> GetMidiHooksByDeviceName(const QString &deviceName);
-	MidiAgent * RegisterMidiDevice(int port, int outport);
+	MidiAgent * RegisterMidiDevice(const int &port,const int &outport);
 
 	obs_data_t *GetData();
 	void broadcast_obs_event(const RpcEvent &event);

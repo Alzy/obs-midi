@@ -34,8 +34,10 @@ using namespace std;
 ////////////////
 // MIDI AGENT //
 ////////////////
-MidiAgent::MidiAgent()
+MidiAgent::MidiAgent(const int &in_port, const int &out_port)
 {
+	set_input_port(in_port);
+	set_output_port(out_port);
 	this->setParent(GetDeviceManager().get());
 	midi_input_name = "Midi Device (uninit)";
 	midi_output_name = "Midi Out Device (uninit)";

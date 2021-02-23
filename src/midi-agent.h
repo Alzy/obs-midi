@@ -33,7 +33,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 class MidiAgent : public QObject {
 	Q_OBJECT
 public:
-	MidiAgent();
+	MidiAgent(const int &in_port, const int &out_port);
 	MidiAgent(obs_data_t *data);
 	~MidiAgent();
 	void Load(obs_data_t *data);

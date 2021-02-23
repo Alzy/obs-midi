@@ -5,44 +5,44 @@
 
 #nav-tree ul {
   list-style:none outside none;
-  margin:0px;
-  padding:0px;
+  margin:0;
+  padding:0;
 }
 
 #nav-tree li {
   white-space:nowrap;
-  margin:0px;
-  padding:0px;
+  margin:0;
+  padding:0;
 }
 
 #nav-tree .plus {
-  margin:0px;
+  margin:0;
 }
 
 #nav-tree .selected {
   background-image: url('tab_a.png');
   background-repeat:repeat-x;
   color: #fff;
-  text-shadow: 0px 1px 1px rgba(0, 0, 0, 1.0);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 1.0);
 }
 
 #nav-tree img {
-  margin:0px;
-  padding:0px;
-  border:0px;
+  margin:0;
+  padding:0;
+  border:0;
   vertical-align: middle;
 }
 
 #nav-tree a {
   text-decoration:none;
-  padding:0px;
-  margin:0px;
+  padding:0;
+  margin:0;
   outline:none;
 }
 
 #nav-tree .label {
-  margin:0px;
-  padding:0px;
+  margin:0;
+  padding:0;
   font: 12px 'Lucida Grande',Geneva,Helvetica,Arial,sans-serif;
 }
 
@@ -56,18 +56,18 @@
 }
 
 #nav-tree .children_ul {
-  margin:0px;
-  padding:0px;
+  margin:0;
+  padding:0;
 }
 
 #nav-tree .item {
-  margin:0px;
-  padding:0px;
+  margin:0;
+  padding:0;
 }
 
 #nav-tree {
-  padding: 0px 0px;
-  background-color: #FAFAFF; 
+  padding: 0;
+  background-color: #FAFAFF;
   font-size:14px;
   overflow:auto;
 }
@@ -75,17 +75,17 @@
 #doc-content {
   overflow:auto;
   display:block;
-  padding:0px;
-  margin:0px;
+  padding:0;
+  margin:0;
   -webkit-overflow-scrolling : touch; /* iOS 5+ */
 }
 
 #side-nav {
   padding:0 6px 0 0;
-  margin: 0px;
+  margin: 0;
   display:block;
   position: absolute;
-  left: 0px;
+  left: 0;
   width: 250px;
 }
 
@@ -113,7 +113,7 @@
 }
 
 #nav-tree-contents {
-  margin: 6px 0px 0px 0px;
+  margin: 6px 0 0;
 }
 
 #nav-tree {

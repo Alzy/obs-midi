@@ -268,7 +268,7 @@ void MidiAgent::add_MidiHook(MidiHook *hook)
 	// Add a new MidiHook
 	midiHooks.push_back(hook);
 }
-void MidiAgent::set_enabled(bool state)
+void MidiAgent::set_enabled(const bool &state)
 {
 	this->enabled = state;
 	if (state)

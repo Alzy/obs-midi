@@ -33,6 +33,7 @@ PluginWindow::PluginWindow(QWidget *parent)
 	ui->setupUi(this);
 
 	//Set Window Title
+	setup_actions();
 	set_title_window();
 	configure_table();
 	hide_all_pairs();
@@ -84,6 +85,11 @@ void PluginWindow::connect_ui_signals()
 		SLOT(tab_changed(int)));
 	connect(ui->outbox, SIGNAL(currentTextChanged(QString)), this,
 		SLOT(select_output_device(QString)));
+}
+void PluginWindow::setup_actions()
+{
+	ui->cb_obs_output_action->clear();
+	ui->cb_obs_output_action->addItems(Utils::TranslateActions());
 }
 void PluginWindow::ToggleShowHide()
 {

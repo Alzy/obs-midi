@@ -206,10 +206,11 @@ void DeviceManager::broadcast_obs_event(const RpcEvent &event)
 	{
 		obs_data_apply(eventData, additionalFields);
 	}
-	if (broadcast_connection) {
-
-	blog(1, "OBS EVENT %s -- %s", event.updateType().toStdString().c_str(),obs_data_get_json(eventData));
-	emit bcast(event.updateType(), QString::fromStdString(obs_data_get_json(eventData)));
+	if (broadcast_connection)
+	{
+		blog(1, "OBS EVENT %s -- %s", event.updateType().toStdString().c_str(), obs_data_get_json(eventData));
+		emit bcast(event.updateType(), QString::fromStdString(obs_data_get_json(eventData)));
+	}
 	obs_data_release(additionalFields);
 	obs_data_release(eventData);
 };

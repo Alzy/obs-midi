@@ -57,8 +57,8 @@ public:
 	bool isEnabled() const;
 	bool isConnected() const;
 	bool isBidirectional() const;
-	bool set_bidirectional(const bool &state) const;
-	void set_enabled(const bool &state) const;
+	bool set_bidirectional(const bool &state);
+	void set_enabled(const bool &state);
 	static void HandleInput(const rtmidi::message &message, void *userData);
 	static void HandleError(const rtmidi::midi_error &error, const std::string_view &error_message, void *userData);
 	void set_callbacks();

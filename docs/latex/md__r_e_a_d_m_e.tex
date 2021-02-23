@@ -1,0 +1,38 @@
+Use MIDI devices to trigger events in OBS and visa versa.\hypertarget{md__r_e_a_d_m_e_autotoc_md6}{}\doxysection{Status – $<$img src=\char`\"{}https\+://github.\+com/cpyarger/obs-\/midi/workflows/\+CI\%20\+Multiplatform\%20\+Build\%20and\%20release/badge.\+svg?branch=master\char`\"{} alt=\char`\"{}\+CI Multiplatform Build and release\char`\"{}/$>$}\label{md__r_e_a_d_m_e_autotoc_md6}
+\href{https://www.codetriage.com/cpyarger/obs-midi}{\texttt{ }} \href{https://crowdin.com/project/obs-midi}{\texttt{ }} \href{https://www.codefactor.io/repository/github/cpyarger/obs-midi/overview/master}{\texttt{ }}\hypertarget{md__r_e_a_d_m_e_autotoc_md7}{}\doxysection{Installing}\label{md__r_e_a_d_m_e_autotoc_md7}
+
+\begin{DoxyEnumerate}
+\item Grab the installer from the \href{https://github.com/cpyarger/obs-midi/releases}{\texttt{ OBS-\/\+Midi Releases Page}}
+\item Download and run the installer for your OS
+\item Launch OBS
+\begin{DoxyItemize}
+\item The Configuration is under Tools-\/$>$ OBS Midi Settings
+\item Select your controller, hit configure, Toggle a button and fader, remap it to an action and hit save!
+\end{DoxyItemize}
+\end{DoxyEnumerate}\hypertarget{md__r_e_a_d_m_e_autotoc_md8}{}\doxysection{Installing Extra Steps -\/ MAC}\label{md__r_e_a_d_m_e_autotoc_md8}
+
+\begin{DoxyItemize}
+\item If you are unable to see obs-\/midi in the tools you will need to install jack
+\item \href{https://jackaudio.org/downloads/}{\texttt{ https\+://jackaudio.\+org/downloads/}}
+\end{DoxyItemize}\hypertarget{md__r_e_a_d_m_e_autotoc_md9}{}\doxysection{Ubuntu specifics -\/ SNAP Release}\label{md__r_e_a_d_m_e_autotoc_md9}
+Due to specific ALSA permissions not being set on the ubuntu snap craft package, OBS-\/\+MIDI will not work on the snap version of obs-\/studio
+
+Currently runs on Windows and Linux, and is partly tested on MAC\hypertarget{md__r_e_a_d_m_e_autotoc_md10}{}\doxysection{Special thanks to the following projects}\label{md__r_e_a_d_m_e_autotoc_md10}
+
+\begin{DoxyItemize}
+\item \href{https://github.com/jcelerier/RtMidi17}{\texttt{ RTMidi17}} An amazing modernized RTMIDI library
+\item \href{https://github.com/Palakis/obs-websocket/}{\texttt{ OBSWebsocket}} from which much code was borrowed for interfacing with OBS
+\item \href{https://github.com/lebaston100/MIDItoOBS}{\texttt{ Midi2\+OBS}} Where I got my start playing with this
+\end{DoxyItemize}\hypertarget{md__r_e_a_d_m_e_autotoc_md11}{}\doxysection{Build Instructions}\label{md__r_e_a_d_m_e_autotoc_md11}
+\mbox{\hyperlink{md_build}{Build instructions can be found here}}\hypertarget{md__r_e_a_d_m_e_autotoc_md12}{}\doxysection{Contributing}\label{md__r_e_a_d_m_e_autotoc_md12}
+Anyone who wants to help out the project
+
+
+\begin{DoxyItemize}
+\item Drop any ideas or suggestions or bugs in the issues
+\item Leave an honest review on the \href{https://obsproject.com/forum/resources/obs-midi.1023/}{\texttt{ obs forum}}
+\item If you know anyone who would be willing to help with the programming let them know about the project
+\item If you or anyone you know makes youtube videos, we are always looking for reviews, and tutorial videos {\ucr}
+\item Contribute to translations on \href{https://crowdin.com/project/obs-midi}{\texttt{ crowdin}}
+\item If you know C++ we can always use help with cleaning up the code base and especially hunting and fixing memory leaks. 
+\end{DoxyItemize}

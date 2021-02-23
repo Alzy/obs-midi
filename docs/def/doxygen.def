@@ -361,15 +361,15 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/actions.h';
       sec-mem-desc-line = '138';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Sets the currently active scene.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Sets the currently active scene
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
       sec-mem-kind = 'function';
-      sec-mem-id   = 'class_actions_class_1ad9823c079480a65c39d88d5d3e2bac5a';
+      sec-mem-id   = 'class_actions_class_ad9823c079480a65c39d88d5d3e2bac5a_1ad9823c079480a65c39d88d5d3e2bac5a';
       sec-mem-virt = normal;
       sec-mem-prot = public;
       sec-mem-type = <<_EnD_oF_dEf_TeXt_
@@ -385,10 +385,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/actions.h';
       sec-mem-desc-line = '139';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Sets the scene in preview.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Sets the scene in preview. Must be in Studio mode or will throw error
+ Must be in Studio mode or will throw error
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -409,10 +409,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/actions.h';
       sec-mem-desc-line = '140';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Change the active scene collection.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Change the active scene collection.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -439,10 +439,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/actions.h';
       sec-mem-desc-line = '141';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Reset a scene item.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Reset a scene item.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -457,15 +457,15 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/actions.h';
       sec-mem-desc-line = '142';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Transitions the currently previewed scene to the main output.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Transitions the currently previewed scene to the main output.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
       sec-mem-kind = 'function';
-      sec-mem-id   = 'class_actions_class_1a5d01f5e4225732829bc830a3beb28fcf';
+      sec-mem-id   = 'class_actions_class_a5d01f5e4225732829bc830a3beb28fcf_1a5d01f5e4225732829bc830a3beb28fcf';
       sec-mem-virt = normal;
       sec-mem-prot = public;
       sec-mem-type = <<_EnD_oF_dEf_TeXt_
@@ -490,10 +490,9 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/actions.h';
       sec-mem-desc-line = '143';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Transitions the currently previewed scene to the main output using specified transition.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Transitions the currently previewed scene to the main output using specified transition.
 transitionDuration is optional. (milliseconds)
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
@@ -515,10 +514,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/actions.h';
       sec-mem-desc-line = '145';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Set the active transition.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Set the active transition.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -539,10 +538,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/actions.h';
       sec-mem-desc-line = '146';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Set the duration of the currently active transition.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Set the duration of the currently active transition
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -599,10 +598,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/actions.h';
       sec-mem-desc-line = '151';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Inverts the mute status of a specified source.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Inverts the mute status of a specified source.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -629,10 +628,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/actions.h';
       sec-mem-desc-line = '152';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Sets the mute status of a specified source.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Sets the mute status of a specified source.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -647,10 +646,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/actions.h';
       sec-mem-desc-line = '154';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Toggle streaming on or off.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Toggle streaming on or off.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -665,10 +664,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/actions.h';
       sec-mem-desc-line = '155';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Start streaming.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Start streaming.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -683,10 +682,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/actions.h';
       sec-mem-desc-line = '156';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Stop streaming.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Stop streaming.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -701,10 +700,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/actions.h';
       sec-mem-desc-line = '158';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Toggle recording on or off.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Toggle recording on or off.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -719,10 +718,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/actions.h';
       sec-mem-desc-line = '159';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Start recording.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Start recording.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -737,10 +736,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/actions.h';
       sec-mem-desc-line = '160';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Stop recording.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Stop recording.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -755,10 +754,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/actions.h';
       sec-mem-desc-line = '161';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Pause the current recording.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Pause the current recording.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -773,10 +772,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/actions.h';
       sec-mem-desc-line = '162';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Resume/unpause the current recording (if paused).
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Resume/unpause the current recording (if paused).
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -791,15 +790,15 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/actions.h';
       sec-mem-desc-line = '164';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Toggle the Replay Buffer on/off.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Toggle the Replay Buffer on/off.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
       sec-mem-kind = 'function';
-      sec-mem-id   = 'class_actions_class_1a81edbe4561f7d5f5e63757878872c3ff';
+      sec-mem-id   = 'class_actions_class_a81edbe4561f7d5f5e63757878872c3ff_1a81edbe4561f7d5f5e63757878872c3ff';
       sec-mem-virt = normal;
       sec-mem-prot = public;
       sec-mem-type = <<_EnD_oF_dEf_TeXt_
@@ -809,10 +808,9 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/actions.h';
       sec-mem-desc-line = '165';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Start recording into the Replay Buffer.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Start recording into the Replay Buffer.
 Will throw an error if "Save Replay Buffer" hotkey is not set in OBS' settings.
 Setting this hotkey is mandatory, even when triggering saves only
 through obs-midi.
@@ -830,15 +828,15 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/actions.h';
       sec-mem-desc-line = '166';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Stop recording into the Replay Buffer.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Stop recording into the Replay Buffer.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
       sec-mem-kind = 'function';
-      sec-mem-id   = 'class_actions_class_1a3878886decec40637487b905ddcd26e6';
+      sec-mem-id   = 'class_actions_class_a3878886decec40637487b905ddcd26e6_1a3878886decec40637487b905ddcd26e6';
       sec-mem-virt = normal;
       sec-mem-prot = public;
       sec-mem-type = <<_EnD_oF_dEf_TeXt_
@@ -848,10 +846,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/actions.h';
       sec-mem-desc-line = '167';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Flush and save the contents of the Replay Buffer to disk.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Flush and save the contents of the Replay Buffer to disk. This is
+ This is
 basically the same as triggering the "Save Replay Buffer" hotkey.
 Will return an <tt>error</tt> if the Replay Buffer is not active.
 _EnD_oF_dEf_TeXt_;
@@ -1078,10 +1076,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/actions.h';
       sec-mem-desc-line = '180';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Set the audio sync offset of a specified source.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Set the audio sync offset of a specified source.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -4219,7 +4217,7 @@ _EnD_oF_dEf_TeXt_;
     sec-kind = 'public-static-func';
     sec-member = {
       sec-mem-kind = 'function';
-      sec-mem-id   = 'class_midi_agent_1a753ea4f73d897eb7faed1c8b507ff920';
+      sec-mem-id   = 'class_midi_agent_a753ea4f73d897eb7faed1c8b507ff920_1a753ea4f73d897eb7faed1c8b507ff920';
       sec-mem-virt = normal;
       sec-mem-prot = public;
       sec-mem-type = <<_EnD_oF_dEf_TeXt_
@@ -5330,12 +5328,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/obs-controller.h';
       sec-mem-desc-line = '48';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Actions.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Actions
-
-Sets the currently active scene
+Sets the currently active scene.
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -5350,10 +5346,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/obs-controller.h';
       sec-mem-desc-line = '49';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Sets the scene in preview.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Sets the scene in preview. Must be in Studio mode or will throw error
+ Must be in Studio mode or will throw error
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -5368,10 +5364,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/obs-controller.h';
       sec-mem-desc-line = '50';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Change the active scene collection.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Change the active scene collection.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -5386,10 +5382,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/obs-controller.h';
       sec-mem-desc-line = '51';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Reset a scene item.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Reset a scene item.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -5404,10 +5400,9 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/obs-controller.h';
       sec-mem-desc-line = '52';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Transitions the currently previewed scene to the main output.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Transitions the currently previewed scene to the main output.
 Transitions the currently previewed scene to the main output using specified transition.
 transitionDuration is optional. (milliseconds)
 _EnD_oF_dEf_TeXt_;
@@ -5424,10 +5419,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/obs-controller.h';
       sec-mem-desc-line = '53';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Set the active transition.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Set the active transition.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -5442,10 +5437,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/obs-controller.h';
       sec-mem-desc-line = '54';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Set the duration of the currently active transition.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Set the duration of the currently active transition
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -5496,10 +5491,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/obs-controller.h';
       sec-mem-desc-line = '57';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Inverts the mute status of a specified source.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Inverts the mute status of a specified source.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -5514,10 +5509,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/obs-controller.h';
       sec-mem-desc-line = '58';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Sets the mute status of a specified source.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Sets the mute status of a specified source.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -5532,10 +5527,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/obs-controller.h';
       sec-mem-desc-line = '59';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Toggle streaming on or off.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Toggle streaming on or off.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -5550,10 +5545,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/obs-controller.h';
       sec-mem-desc-line = '60';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Start streaming.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Start streaming.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -5568,10 +5563,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/obs-controller.h';
       sec-mem-desc-line = '61';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Stop streaming.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Stop streaming.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -5586,10 +5581,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/obs-controller.h';
       sec-mem-desc-line = '62';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Toggle recording on or off.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Toggle recording on or off.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -5604,10 +5599,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/obs-controller.h';
       sec-mem-desc-line = '63';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Start recording.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Start recording.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -5622,10 +5617,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/obs-controller.h';
       sec-mem-desc-line = '64';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Stop recording.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Stop recording.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -5640,10 +5635,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/obs-controller.h';
       sec-mem-desc-line = '65';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Pause the current recording.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Pause the current recording.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -5658,10 +5653,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/obs-controller.h';
       sec-mem-desc-line = '66';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Resume/unpause the current recording (if paused).
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Resume/unpause the current recording (if paused).
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -5676,10 +5671,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/obs-controller.h';
       sec-mem-desc-line = '67';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Toggle the Replay Buffer on/off.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Toggle the Replay Buffer on/off.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -5694,10 +5689,9 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/obs-controller.h';
       sec-mem-desc-line = '68';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Start recording into the Replay Buffer.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Start recording into the Replay Buffer.
 Will throw an error if "Save Replay Buffer" hotkey is not set in OBS' settings.
 Setting this hotkey is mandatory, even when triggering saves only
 through obs-midi.
@@ -5715,10 +5709,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/obs-controller.h';
       sec-mem-desc-line = '69';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Stop recording into the Replay Buffer.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Stop recording into the Replay Buffer.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -5733,10 +5727,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/obs-controller.h';
       sec-mem-desc-line = '70';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Flush and save the contents of the Replay Buffer to disk.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Flush and save the contents of the Replay Buffer to disk. This is
+ This is
 basically the same as triggering the "Save Replay Buffer" hotkey.
 Will return an <tt>error</tt> if the Replay Buffer is not active.
 _EnD_oF_dEf_TeXt_;
@@ -5915,10 +5909,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/obs-controller.h';
       sec-mem-desc-line = '82';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Set the audio sync offset of a specified source.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Set the audio sync offset of a specified source.
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -6188,10 +6182,10 @@ _EnD_oF_dEf_TeXt_;
       sec-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/obs-controller.h';
       sec-mem-desc-line = '41';
       sec-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
+Variables.
 _EnD_oF_dEf_TeXt_;
       sec-mem-documentation = <<_EnD_oF_dEf_TeXt_
-Variables
+
 _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
@@ -6328,7 +6322,7 @@ _EnD_oF_dEf_TeXt_;
     }; /* sec-member */
     sec-member = {
       sec-mem-kind = 'slot';
-      sec-mem-id   = 'class_plugin_window_1a5f871dd54fdb6f438a81121fe2ed3a7a';
+      sec-mem-id   = 'class_plugin_window_a5f871dd54fdb6f438a81121fe2ed3a7a_1a5f871dd54fdb6f438a81121fe2ed3a7a';
       sec-mem-virt = normal;
       sec-mem-prot = public;
       sec-mem-type = <<_EnD_oF_dEf_TeXt_
@@ -8753,7 +8747,7 @@ file = {
     define = {
     define-member = {
       define-mem-kind = 'define';
-      define-mem-id   = 'events_8cpp_1a1318607ea684942880766287b17ada75';
+      define-mem-id   = 'events_8cpp_a1318607ea684942880766287b17ada75_1a1318607ea684942880766287b17ada75';
       define-mem-virt = normal;
       define-mem-prot = public;
       define-mem-name = 'STATUS_INTERVAL';
@@ -8763,13 +8757,11 @@ _EnD_oF_dEf_TeXt_;
       define-mem-desc-file = 'C:/Users/User/Desktop/OBS/obs-studio/plugins/obs-midi/src/events.cpp';
       define-mem-desc-line = '29';
       define-mem-briefdesc =    <<_EnD_oF_dEf_TeXt_
-
-_EnD_oF_dEf_TeXt_;
-      define-mem-documentation = <<_EnD_oF_dEf_TeXt_
 obs-websocket
 Copyright (C) 2016-2017 Stéphane Lepin <stephane.lepin@gmail.com>
 Copyright (C) 2017  Brendan Hagan <https://github.com/haganbmj>
-
+_EnD_oF_dEf_TeXt_;
+      define-mem-documentation = <<_EnD_oF_dEf_TeXt_
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -10132,7 +10124,7 @@ _EnD_oF_dEf_TeXt_;
     var = {
     var-member = {
       var-mem-kind = 'variable';
-      var-mem-id   = 'utils_8cpp_1ac6c64512e059ff6980c6b78ce4c3beb2';
+      var-mem-id   = 'utils_8cpp_ac6c64512e059ff6980c6b78ce4c3beb2_1ac6c64512e059ff6980c6b78ce4c3beb2';
       var-mem-virt = normal;
       var-mem-prot = public;
       var-mem-type = <<_EnD_oF_dEf_TeXt_
@@ -11625,7 +11617,7 @@ _EnD_oF_dEf_TeXt_;
     }; /* var-member */
     var-member = {
       var-mem-kind = 'variable';
-      var-mem-id   = 'utils_8h_1ad3aacf41eabe2831bd370fc25d3e61fa';
+      var-mem-id   = 'utils_8h_ad3aacf41eabe2831bd370fc25d3e61fa_1ad3aacf41eabe2831bd370fc25d3e61fa';
       var-mem-virt = normal;
       var-mem-prot = public;
       var-mem-type = <<_EnD_oF_dEf_TeXt_

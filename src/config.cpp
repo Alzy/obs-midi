@@ -67,8 +67,7 @@ void Config::Load()
 	auto deviceManager = GetDeviceManager();
 	obs_data_t *deviceManagerData = obs_data_create_from_json(
 		config_get_string(obsConfig, SECTION_NAME, PARAM_DEVICES));
-	blog(LOG_INFO, "Loaded: \n %s",
-	     config_get_string(obsConfig, SECTION_NAME, PARAM_DEVICES));
+	blog(LOG_INFO, "Loaded: \n %s", config_get_string(obsConfig, SECTION_NAME, PARAM_DEVICES));
 	deviceManager->Load(deviceManagerData);
 	SettingsLoaded = true;
 }
@@ -84,8 +83,7 @@ void Config::Save()
 
 	auto deviceManager = GetDeviceManager();
 	auto data = deviceManager->GetData();
-	config_set_string(obsConfig, SECTION_NAME, PARAM_DEVICES,
-			  obs_data_get_json(data));
+	config_set_string(obsConfig, SECTION_NAME, PARAM_DEVICES, obs_data_get_json(data));
 	obs_data_release(data);
 	config_save(obsConfig);
 }
@@ -95,12 +93,9 @@ void Config::SetDefaults()
 	// OBS Config defaults
 	config_t *obsConfig = GetConfigStore();
 	if (obsConfig) {
-		config_set_default_bool(obsConfig, SECTION_NAME, PARAM_DEBUG,
-					DebugEnabled);
-		config_set_default_bool(obsConfig, SECTION_NAME, PARAM_ALERT,
-					AlertsEnabled);
-		config_set_default_string(obsConfig, SECTION_NAME,
-					  PARAM_DEVICES, DEFUALT_DEVICES);
+		config_set_default_bool(obsConfig, SECTION_NAME, PARAM_DEBUG, DebugEnabled);
+		config_set_default_bool(obsConfig, SECTION_NAME, PARAM_ALERT, AlertsEnabled);
+		config_set_default_string(obsConfig, SECTION_NAME, PARAM_DEVICES, DEFUALT_DEVICES);
 	}
 }
 

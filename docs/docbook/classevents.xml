@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_classevents" xml:lang="en-US">
+<title>events Class Reference</title>
+<indexterm><primary>events</primary></indexterm>
+<para>Inheritance diagram for events:    <informalfigure>
+        <mediaobject>
+            <imageobject>
+                <imagedata width="50%" align="center" valign="middle" scalefit="0" fileref="classevents.png"></imagedata>
+            </imageobject>
+        </mediaobject>
+    </informalfigure>
+</para>
+<simplesect>
+    <title>Signals    </title>
+        <itemizedlist>
+            <listitem><para><anchor xml:id="_classevents_1ac89008a3e3bc44585faa5c78a7ebb876"/>void <emphasis role="strong">obsEvent</emphasis> (const <link linkend="_class_rpc_event">RpcEvent</link> &amp;event)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para><anchor xml:id="_classevents_1a64208090853f4bc92dbb40f47de9eb42"/><emphasis role="strong">events</emphasis> (DeviceManagerPtr srv)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_classevents_1a706de1ed8575d1462d3f62d7fd690bf8"/>void <emphasis role="strong">connectSourceSignals</emphasis> (obs_source_t *source)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_classevents_1a57d0a0cc66ec958d525dcfe1ce127d73"/>void <emphasis role="strong">disconnectSourceSignals</emphasis> (obs_source_t *source)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_classevents_1a58fe3cc193996d6d26ac2726c0d05a5e"/>void <emphasis role="strong">connectFilterSignals</emphasis> (obs_source_t *filter)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_classevents_1a701e5102308015990acdf8fc6a9e49a1"/>void <emphasis role="strong">disconnectFilterSignals</emphasis> (obs_source_t *filter)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_classevents_1a0daec77e73be0208579436924530fee3"/>void <emphasis role="strong">hookTransitionPlaybackEvents</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_classevents_1aead6012f6f76d4525ba05b1e97876e98"/>void <emphasis role="strong">unhookTransitionPlaybackEvents</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_classevents_1a986917e5ebb7cd00364146663c85a91e"/>uint64_t <emphasis role="strong">getStreamingTime</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_classevents_1ad3858ba208d6452a5bbdb201369d224d"/>uint64_t <emphasis role="strong">getRecordingTime</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_classevents_1a180558b5341c7761947bb8a61f13b6b2"/>QString <emphasis role="strong">getStreamingTimecode</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_classevents_1aa022e359f619c30a7ce089591c1a10f7"/>QString <emphasis role="strong">getRecordingTimecode</emphasis> ()</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect><title>BroadcastCustomMessage</title>
+
+<para>A custom broadcast message was received</para>
+
+<para><formalpara><title>Returns</title>
+
+<para>{String} <computeroutput>realm</computeroutput> Identifier provided by the sender </para>
+
+<para>{Object} <computeroutput>data</computeroutput> User-defined data</para>
+</formalpara>
+@api events </para>
+        <itemizedlist>
+            <listitem><para><anchor xml:id="_classevents_1a49b6dabaccdcd153616272c44b0a1673"/>obs_data_t * <emphasis role="strong">GetStats</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_classevents_1a01c1e47922423c2ab94fca7b834d1805"/>void <emphasis role="strong">OnBroadcastCustomMessage</emphasis> (const QString &amp;realm, obs_data_t *data)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Public Attributes    </title>
+        <itemizedlist>
+            <listitem><para><anchor xml:id="_classevents_1ac8cfa04efd71cf75693ecb19b9b54f32"/>bool <emphasis role="strong">HeartbeatIsActive</emphasis></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<para>
+The documentation for this class was generated from the following files:</para>
+src/events.hsrc/events.cpp</section>

@@ -142,8 +142,8 @@ float mapper(int x);
 int mapper2(double x);
 int t_bar_mapper(int x);
 bool is_number(const QString &s);
-bool isJSon(const QString& val);
-QString get_midi_message_type(const rtmidi::message& message);
+bool isJSon(const QString &val);
+QString get_midi_message_type(const rtmidi::message &message);
 QStringList GetMediaSourceNames();
 QStringList GetAudioSourceNames();
 QString nsToTimestamp(uint64_t ns);
@@ -157,9 +157,8 @@ OBSDataArrayAutoRelease GetSceneArray(const QString &name = "");
 obs_sceneitem_t *GetSceneItemFromName(obs_scene_t *scene, const QString &name);
 obs_sceneitem_t *GetSceneItemFromId(obs_scene_t *scene, int64_t id);
 obs_sceneitem_t *GetSceneItemFromItem(obs_scene_t *scene, obs_data_t *item);
-obs_sceneitem_t *GetSceneItemFromRequestField(obs_scene_t *scene,
-					      obs_data_item_t *dataItem);
-obs_scene_t *GetSceneFromNameOrCurrent(const QString& sceneName);
+obs_sceneitem_t *GetSceneItemFromRequestField(obs_scene_t *scene, obs_data_item_t *dataItem);
+obs_scene_t *GetSceneFromNameOrCurrent(const QString &sceneName);
 obs_data_t *GetSceneItemPropertiesData(obs_sceneitem_t *item);
 obs_data_t *GetSourceFilterInfo(obs_source_t *filter, bool includeSettings);
 obs_data_array_t *GetSourceFiltersList(obs_source_t *source,
@@ -196,42 +195,41 @@ QStringList get_source_names(const QString &scene);
 QStringList get_filter_names(const QString &Source);
 QStringList get_transition_names();
 QString untranslate(const QString &tstring);
-const QList<ActionsClass::Actions> AllActions_raw = {
-	ActionsClass::Actions::Disable_Preview,
-	ActionsClass::Actions::Disable_Source_Filter,
-	ActionsClass::Actions::Enable_Preview,
-	ActionsClass::Actions::Enable_Source_Filter,
-	ActionsClass::Actions::Next_Media,
-	ActionsClass::Actions::Pause_Recording,
-	ActionsClass::Actions::Play_Pause_Media,
-	ActionsClass::Actions::Previous_Media,
-	ActionsClass::Actions::Reset_Scene_Item,
-	ActionsClass::Actions::Toggle_Source_Visibility,
-	ActionsClass::Actions::Restart_Media,
-	ActionsClass::Actions::Set_Current_Scene,
-	ActionsClass::Actions::Set_Current_Transition,
-	ActionsClass::Actions::Set_Preview_Scene,
-	ActionsClass::Actions::Set_Scene_Transition_Override,
-	ActionsClass::Actions::Set_Volume,
-	ActionsClass::Actions::Start_Recording,
-	ActionsClass::Actions::Start_Replay_Buffer,
-	ActionsClass::Actions::Start_Streaming,
-	ActionsClass::Actions::Stop_Media,
-	ActionsClass::Actions::Stop_Recording,
-	ActionsClass::Actions::Stop_Replay_Buffer,
-	ActionsClass::Actions::Stop_Streaming,
-	ActionsClass::Actions::Take_Source_Screenshot,
-	ActionsClass::Actions::Toggle_Mute,
-	ActionsClass::Actions::Toggle_Source_Filter,
-	ActionsClass::Actions::Toggle_Start_Stop_Streaming,
-	ActionsClass::Actions::Toggle_Start_Stop_Recording,
-	ActionsClass::Actions::Toggle_Start_Stop_Replay_Buffer,
-	ActionsClass::Actions::Do_Transition,
-	ActionsClass::Actions::Unpause_Recording,
-	ActionsClass::Actions::Resume_Recording,
-	ActionsClass::Actions::Save_Replay_Buffer,
-	ActionsClass::Actions::Reload_Browser_Source,
-	ActionsClass::Actions::Move_T_Bar};
+const QList<ActionsClass::Actions> AllActions_raw = {ActionsClass::Actions::Disable_Preview,
+						     ActionsClass::Actions::Disable_Source_Filter,
+						     ActionsClass::Actions::Enable_Preview,
+						     ActionsClass::Actions::Enable_Source_Filter,
+						     ActionsClass::Actions::Next_Media,
+						     ActionsClass::Actions::Pause_Recording,
+						     ActionsClass::Actions::Play_Pause_Media,
+						     ActionsClass::Actions::Previous_Media,
+						     ActionsClass::Actions::Reset_Scene_Item,
+						     ActionsClass::Actions::Toggle_Source_Visibility,
+						     ActionsClass::Actions::Restart_Media,
+						     ActionsClass::Actions::Set_Current_Scene,
+						     ActionsClass::Actions::Set_Current_Transition,
+						     ActionsClass::Actions::Set_Preview_Scene,
+						     ActionsClass::Actions::Set_Scene_Transition_Override,
+						     ActionsClass::Actions::Set_Volume,
+						     ActionsClass::Actions::Start_Recording,
+						     ActionsClass::Actions::Start_Replay_Buffer,
+						     ActionsClass::Actions::Start_Streaming,
+						     ActionsClass::Actions::Stop_Media,
+						     ActionsClass::Actions::Stop_Recording,
+						     ActionsClass::Actions::Stop_Replay_Buffer,
+						     ActionsClass::Actions::Stop_Streaming,
+						     ActionsClass::Actions::Take_Source_Screenshot,
+						     ActionsClass::Actions::Toggle_Mute,
+						     ActionsClass::Actions::Toggle_Source_Filter,
+						     ActionsClass::Actions::Toggle_Start_Stop_Streaming,
+						     ActionsClass::Actions::Toggle_Start_Stop_Recording,
+						     ActionsClass::Actions::Toggle_Start_Stop_Replay_Buffer,
+						     ActionsClass::Actions::Do_Transition,
+						     ActionsClass::Actions::Unpause_Recording,
+						     ActionsClass::Actions::Resume_Recording,
+						     ActionsClass::Actions::Save_Replay_Buffer,
+						     ActionsClass::Actions::Reload_Browser_Source,
+						     ActionsClass::Actions::Move_T_Bar};
 const QList<ActionsClass::Actions> not_ready_actions{
 	ActionsClass::Actions::Studio_Mode,
 	ActionsClass::Actions::Set_Current_Scene_Collection,
@@ -313,10 +311,9 @@ public:
 		return message;
 	}
 	MidiHook(){};
-	MidiHook(const QString& jsonString)
+	MidiHook(const QString &jsonString)
 	{
-		obs_data_t *data = obs_data_create_from_json(
-			jsonString.toStdString().c_str());
+		obs_data_t *data = obs_data_create_from_json(jsonString.toStdString().c_str());
 		channel = obs_data_get_int(data, "channel");
 		message_type = obs_data_get_string(data, "message_type");
 		norc = obs_data_get_int(data, "norc");
@@ -329,8 +326,7 @@ public:
 		audio_source = obs_data_get_string(data, "audio_source");
 		media_source = obs_data_get_string(data, "media_source");
 		duration = obs_data_get_int(data, "duration");
-		scene_collection =
-			obs_data_get_string(data, "scene_collection");
+		scene_collection = obs_data_get_string(data, "scene_collection");
 		profile = obs_data_get_string(data, "profile");
 		string_override = obs_data_get_string(data, "string_override");
 		bool_override = obs_data_get_bool(data, "bool_override");
@@ -340,30 +336,20 @@ public:
 	{
 		obs_data_t *data = obs_data_create();
 		obs_data_set_int(data, "channel", channel);
-		obs_data_set_string(data, "message_type",
-				    message_type.toStdString().c_str());
+		obs_data_set_string(data, "message_type", message_type.toStdString().c_str());
 		obs_data_set_int(data, "norc", norc);
-		obs_data_set_string(data, "action",
-				    action.toStdString().c_str());
+		obs_data_set_string(data, "action", action.toStdString().c_str());
 		obs_data_set_string(data, "scene", scene.toStdString().c_str());
-		obs_data_set_string(data, "source",
-				    source.toStdString().c_str());
-		obs_data_set_string(data, "filter",
-				    filter.toStdString().c_str());
-		obs_data_set_string(data, "transition",
-				    transition.toStdString().c_str());
+		obs_data_set_string(data, "source", source.toStdString().c_str());
+		obs_data_set_string(data, "filter", filter.toStdString().c_str());
+		obs_data_set_string(data, "transition", transition.toStdString().c_str());
 		obs_data_set_string(data, "item", item.toStdString().c_str());
-		obs_data_set_string(data, "audio_source",
-				    audio_source.toStdString().c_str());
-		obs_data_set_string(data, "media_source",
-				    media_source.toStdString().c_str());
+		obs_data_set_string(data, "audio_source", audio_source.toStdString().c_str());
+		obs_data_set_string(data, "media_source", media_source.toStdString().c_str());
 		obs_data_set_int(data, "duration", duration);
-		obs_data_set_string(data, "scene_collection",
-				    scene_collection.toStdString().c_str());
-		obs_data_set_string(data, "profile",
-				    profile.toStdString().c_str());
-		obs_data_set_string(data, "string_override",
-				    string_override.toStdString().c_str());
+		obs_data_set_string(data, "scene_collection", scene_collection.toStdString().c_str());
+		obs_data_set_string(data, "profile", profile.toStdString().c_str());
+		obs_data_set_string(data, "string_override", string_override.toStdString().c_str());
 		obs_data_set_bool(data, "bool_override", bool_override);
 		obs_data_set_int(data, "int_override", int_override);
 		return data;

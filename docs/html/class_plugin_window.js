@@ -1,0 +1,25 @@
+var class_plugin_window =
+[
+    [ "PluginWindow", "class_plugin_window.html#ac10939736525e59520096f324985cf2a", null ],
+    [ "~PluginWindow", "class_plugin_window.html#a533eaa363fb31ce29bf7d5bbfb07b4ec", null ],
+    [ "add_new_mapping", "class_plugin_window.html#aa71df7d602583944e26469c4de3be4a3", null ],
+    [ "add_row_from_hook", "class_plugin_window.html#a61bf0f4c66481f6f8f4459cc919792dc", null ],
+    [ "changed", "class_plugin_window.html#a1ab7d501e4b764964fc413216eb5607b", null ],
+    [ "clear_table", "class_plugin_window.html#ade7c598acf96264c10e8a84e9b44b962", null ],
+    [ "delete_mapping", "class_plugin_window.html#a4ecf6f2e57ab98f9247d51b7aafb69a7", null ],
+    [ "edit_mapping", "class_plugin_window.html#a2c90defe57c87bfc746583bb9e5ff66c", null ],
+    [ "handle_midi_message", "class_plugin_window.html#ac2c861da8552cafb85c59598ca761605", null ],
+    [ "load_table", "class_plugin_window.html#a9fb1ebf1aeb2e4f5e419bdc45af28953", null ],
+    [ "obs_actions_select", "class_plugin_window.html#ace888227a9dbfb65cee4fd7d1b6556fa", null ],
+    [ "on_bid_enabled_state_changed", "class_plugin_window.html#a971fa90069bc452c94e60fd38cc27f12", null ],
+    [ "on_check_enabled_state_changed", "class_plugin_window.html#ac17cdfc1e6bcd56fc6e8c4d8177afcbd", null ],
+    [ "on_device_select", "class_plugin_window.html#a5f871dd54fdb6f438a81121fe2ed3a7a", null ],
+    [ "on_scene_change", "class_plugin_window.html#a70f065fdb649ff09bb99ca4dd7fc389b", null ],
+    [ "on_source_change", "class_plugin_window.html#a9c8ade7b8811bf8fd6ab46b9c4147981", null ],
+    [ "reset_to_defaults", "class_plugin_window.html#af11ac6f36db32026163eae532cfff5d6", null ],
+    [ "save_edit", "class_plugin_window.html#a7eb16aaaa06ee72668c7c7e104ab49d4", null ],
+    [ "select_output_device", "class_plugin_window.html#aa26daa7de6a2ebbb19b7c199ad1e54dc", null ],
+    [ "set_cell_colors", "class_plugin_window.html#af630f57e30ba0e0ae8aebf443c2b956b", null ],
+    [ "set_edit_mode", "class_plugin_window.html#a80d6cb2278fb797283e64a050c750767", null ],
+    [ "tab_changed", "class_plugin_window.html#a7ef082dd8b94f05437e9479a9a74e9ac", null ]
+];

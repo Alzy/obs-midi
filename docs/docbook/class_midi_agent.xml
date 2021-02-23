@@ -1,0 +1,107 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_class_midi_agent" xml:lang="en-US">
+<title>MidiAgent Class Reference</title>
+<indexterm><primary>MidiAgent</primary></indexterm>
+<para>Inheritance diagram for MidiAgent:    <informalfigure>
+        <mediaobject>
+            <imageobject>
+                <imagedata width="50%" align="center" valign="middle" scalefit="0" fileref="class_midi_agent.png"></imagedata>
+            </imageobject>
+        </mediaobject>
+    </informalfigure>
+</para>
+<simplesect>
+    <title>Public Slots    </title>
+        <itemizedlist>
+            <listitem><para><anchor xml:id="_class_midi_agent_1a5e0a2a4f5e92cdc28f06e177d9a489ff"/>void <emphasis role="strong">handle_obs_event</emphasis> (const QString &amp;eventType, const QString &amp;eventData)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Signals    </title>
+        <itemizedlist>
+            <listitem><para><anchor xml:id="_class_midi_agent_1a62298980cd5a7b0fd07494c09d61c000"/>void <emphasis role="strong">broadcast_midi_message</emphasis> (const <link linkend="_struct_midi_message">MidiMessage</link> &amp;)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1a4517c521b41826db70bdfb1b9ac7b593"/>void <emphasis role="strong">do_obs_action</emphasis> (<link linkend="_class_midi_hook">MidiHook</link> *, int)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para><anchor xml:id="_class_midi_agent_1a42c04925c0104f93a3f6a16bdc0b5fbd"/><emphasis role="strong">MidiAgent</emphasis> (const int &amp;in_port, const int &amp;out_port)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1a52b7fc9ef3d4c8cb6e993e07e44f77e3"/><emphasis role="strong">MidiAgent</emphasis> (obs_data_t *data)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1ad6dcfd046447406f8314653ae2c2e970"/>void <emphasis role="strong">Load</emphasis> (obs_data_t *data)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1a44970e048aaddf916ce470585d06095c"/>void <emphasis role="strong">open_midi_input_port</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1af2f496ebcb9813ac7db26ec00dcab735"/>void <emphasis role="strong">open_midi_output_port</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1a76bcd9bcacf2b401a31049286d483828"/>void <emphasis role="strong">close_both_midi_ports</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1ace515fe822bab92c0f64f25b09ee1cbe"/>void <emphasis role="strong">close_midi_output_port</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1af31c15c49d5f2915359568b0420c6dde"/>void <emphasis role="strong">close_midi_input_port</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1a9ce5dc8d839ffd016ea5517907add9fa"/>const QString &amp; <emphasis role="strong">get_midi_input_name</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1a79ce8ae2fb9c4e45f289b3e222a00dfd"/>const QString &amp; <emphasis role="strong">get_midi_output_name</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1a45a0ad55fbbb1f8890a3abcb5e9f88c6"/>void <emphasis role="strong">set_input_port</emphasis> (const int port)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1a3bb256b6d9d81543de214fe95be02b55"/>void <emphasis role="strong">set_output_port</emphasis> (const int port)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1a2878f0e7650559a16d27944ad393e2f5"/>void <emphasis role="strong">set_midi_output_name</emphasis> (const QString &amp;oname)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1a5c2532e5d23c660ce8c60fe3a713df59"/>int <emphasis role="strong">GetPort</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1a622d3a48441f7b2a5c44b14c4cbbfb12"/>bool <emphasis role="strong">isEnabled</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1a9a7e415be55249fa750c726cb9a84a60"/>bool <emphasis role="strong">isConnected</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1aca8d02257d342ad4bb2a5cf94aeeeef2"/>bool <emphasis role="strong">isBidirectional</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1aa546462876f880b6ecbb5debdcbd329a"/>bool <emphasis role="strong">set_bidirectional</emphasis> (const bool &amp;state)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1a2c4d31d63272a3fac277efe68240cb6f"/>void <emphasis role="strong">set_enabled</emphasis> (const bool &amp;state)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1a45e806f62ce7535100d4ecb4a48b098e"/>void <emphasis role="strong">set_callbacks</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1a1be29250b633c0c9205af8365fe7f32a"/>QVector&lt; <link linkend="_class_midi_hook">MidiHook</link> * &gt; <emphasis role="strong">GetMidiHooks</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1a4029893298f271745661c0e704dc6963"/>void <emphasis role="strong">set_midi_hooks</emphasis> (QVector&lt; <link linkend="_class_midi_hook">MidiHook</link> * &gt;)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1aef22bdfce758d8b5b7d207ceb1a81131"/>void <emphasis role="strong">add_MidiHook</emphasis> (<link linkend="_class_midi_hook">MidiHook</link> *hook)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1a5675d966fb10a8641bc466ec4f85a3a9"/>void <emphasis role="strong">remove_MidiHook</emphasis> (<link linkend="_class_midi_hook">MidiHook</link> *hook)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1a7c3506f6defb4d982c21c6c50fb89e06"/>void <emphasis role="strong">clear_MidiHooks</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1ac4f9ca485792f8abd65d2507fda56d35"/>obs_data_t * <emphasis role="strong">GetData</emphasis> ()</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Static Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para>static void <link linkend="_class_midi_agent_1a753ea4f73d897eb7faed1c8b507ff920">HandleInput</link> (const <link linkend="_structrtmidi_1_1message">rtmidi::message</link> &amp;message, void *userData)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_agent_1a342a0fd172f6e0bd5f1051166df93eab"/>static void <emphasis role="strong">HandleError</emphasis> (const rtmidi::midi_error &amp;error, const std::string_view &amp;error_message, void *userData)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Member Function Documentation</title>
+<anchor xml:id="_class_midi_agent_1a753ea4f73d897eb7faed1c8b507ff920"/>    <section>
+    <title>HandleInput()</title>
+<indexterm><primary>HandleInput</primary><secondary>MidiAgent</secondary></indexterm>
+<indexterm><primary>MidiAgent</primary><secondary>HandleInput</secondary></indexterm>
+<para><computeroutput>void MidiAgent::HandleInput (const <link linkend="_structrtmidi_1_1message">rtmidi::message</link> &amp; message, void * userData)<computeroutput>[static]</computeroutput></computeroutput></para>
+<para>check if hook exists for this note or cc norc and launch it</para>
+</section>
+<para>
+The documentation for this class was generated from the following files:</para>
+src/midi-agent.hsrc/midi-agent.cpp</section>
+</section>

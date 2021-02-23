@@ -26,13 +26,12 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "../device-manager.h"
 #include "../config.h"
 
-
-PluginWindow::PluginWindow(QWidget *parent)
-	: QDialog(parent, Qt::Dialog), ui(new Ui::PluginWindow)
+PluginWindow::PluginWindow(QWidget *parent) : QDialog(parent, Qt::Dialog), ui(new Ui::PluginWindow)
 {
 	ui->setupUi(this);
 
 	//Set Window Title
+	setup_actions();
 	set_title_window();
 	configure_table();
 	hide_all_pairs();
@@ -41,10 +40,8 @@ PluginWindow::PluginWindow(QWidget *parent)
 }
 void PluginWindow::configure_table()
 {
-	ui->table_mapping->setSelectionBehavior(
-		QAbstractItemView::SelectionBehavior::SelectRows);
-	ui->table_mapping->setSelectionMode(
-		QAbstractItemView::SelectionMode::SingleSelection);
+	ui->table_mapping->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
+	ui->table_mapping->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
 }
 void PluginWindow::set_title_window()
 {
@@ -52,38 +49,31 @@ void PluginWindow::set_title_window()
 	title.append(GIT_BRANCH);
 	title.append(" -- Commit: ");
 	title.append(GIT_COMMIT_HASH);
-	blog(LOG_DEBUG, "OBS-MIDI Version -- Branch: %s",
-	     title.toStdString().c_str());
+	blog(LOG_DEBUG, "OBS-MIDI Version -- Branch: %s", title.toStdString().c_str());
 	title.prepend("OBS MIDI Settings -- Branch: ");
 	this->setWindowTitle(title);
 }
 void PluginWindow::connect_ui_signals()
 {
-	connect(ui->list_midi_dev, SIGNAL(currentTextChanged(QString)), this,
-		SLOT(on_device_select(QString)));
-	connect(ui->check_enabled, SIGNAL(stateChanged(int)), this,
-		SLOT(on_check_enabled_state_changed(int)));
-	connect(ui->bidirectional, SIGNAL(stateChanged(int)), this,
-		SLOT(on_bid_enabled_state_changed(int)));
+	connect(ui->list_midi_dev, SIGNAL(currentTextChanged(QString)), this, SLOT(on_device_select(QString)));
+	connect(ui->check_enabled, SIGNAL(stateChanged(int)), this, SLOT(on_check_enabled_state_changed(int)));
+	connect(ui->bidirectional, SIGNAL(stateChanged(int)), this, SLOT(on_bid_enabled_state_changed(int)));
 	//Connections for Configure Tab
-	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(get_sources(QString)));
-	connect(ui->cb_obs_output_action, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(obs_actions_select(QString)));
-	connect(ui->cb_obs_output_source, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(on_source_change(QString)));
-	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)),
-		this, SLOT(on_scene_change(QString)));
-	connect(ui->table_mapping, SIGNAL(cellClicked(int, int)), this,
-		SLOT(edit_mapping()));
+	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)), this, SLOT(get_sources(QString)));
+	connect(ui->cb_obs_output_action, SIGNAL(currentTextChanged(QString)), this, SLOT(obs_actions_select(QString)));
+	connect(ui->cb_obs_output_source, SIGNAL(currentTextChanged(QString)), this, SLOT(on_source_change(QString)));
+	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)), this, SLOT(on_scene_change(QString)));
+	connect(ui->table_mapping, SIGNAL(cellClicked(int, int)), this, SLOT(edit_mapping()));
 	/**************Connections to mappper****************/
 	connect(ui->btn_add, SIGNAL(clicked()), this, SLOT(add_new_mapping()));
-	connect(ui->btn_delete, SIGNAL(clicked()), this,
-		SLOT(delete_mapping()));
-	connect(ui->tabWidget, SIGNAL(currentChanged(int)), this,
-		SLOT(tab_changed(int)));
-	connect(ui->outbox, SIGNAL(currentTextChanged(QString)), this,
-		SLOT(select_output_device(QString)));
+	connect(ui->btn_delete, SIGNAL(clicked()), this, SLOT(delete_mapping()));
+	connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tab_changed(int)));
+	connect(ui->outbox, SIGNAL(currentTextChanged(QString)), this, SLOT(select_output_device(QString)));
+}
+void PluginWindow::setup_actions()
+{
+	ui->cb_obs_output_action->clear();
+	ui->cb_obs_output_action->addItems(Utils::TranslateActions());
 }
 void PluginWindow::ToggleShowHide()
 {
@@ -128,35 +118,24 @@ void PluginWindow::load_devices()
 }
 void PluginWindow::select_output_device(const QString &selectedDeviceName)
 {
-	if (!loadingdevices)
-	{
-		auto selectedDevice =
-			ui->list_midi_dev->currentItem()->text().toStdString();
-		auto device = GetDeviceManager()->GetMidiDeviceByName(
-			selectedDevice.c_str());
+	if (!loadingdevices) {
+		auto selectedDevice = ui->list_midi_dev->currentItem()->text().toStdString();
+		auto device = GetDeviceManager()->GetMidiDeviceByName(selectedDevice.c_str());
 		device->set_midi_output_name(selectedDeviceName);
 		GetConfig()->Save();
 	}
 }
-void  PluginWindow::on_check_enabled_state_changed(int state)
+void PluginWindow::on_check_enabled_state_changed(int state)
 {
-	if (state == Qt::CheckState::Checked)
-	{
-		auto selectedDeviceName =
-			ui->list_midi_dev->currentItem()->text().toStdString();
-		auto selectedOutDeviceName =
-			ui->outbox->currentText().toStdString();
-		auto device = GetDeviceManager()->GetMidiDeviceByName(
-			selectedDeviceName.c_str());
+	if (state == Qt::CheckState::Checked) {
+		auto selectedDeviceName = ui->list_midi_dev->currentItem()->text().toStdString();
+		auto selectedOutDeviceName = ui->outbox->currentText().toStdString();
+		auto device = GetDeviceManager()->GetMidiDeviceByName(selectedDeviceName.c_str());
 		blog(LOG_INFO, "Item enabled: %s", selectedDeviceName.c_str());
-		int devicePort = GetDeviceManager()->GetPortNumberByDeviceName(
-			selectedDeviceName.c_str());
-		int deviceOutPort =
-			GetDeviceManager()->GetOutPortNumberByDeviceName(
-				selectedOutDeviceName.c_str());
+		int devicePort = GetDeviceManager()->GetPortNumberByDeviceName(selectedDeviceName.c_str());
+		int deviceOutPort = GetDeviceManager()->GetOutPortNumberByDeviceName(selectedOutDeviceName.c_str());
 		if (device == NULL) {
-			device = GetDeviceManager()->RegisterMidiDevice(
-				devicePort, deviceOutPort);
+			device = GetDeviceManager()->RegisterMidiDevice(devicePort, deviceOutPort);
 		}
 		device->open_midi_input_port();
 		device->open_midi_output_port();
@@ -172,21 +151,17 @@ void  PluginWindow::on_check_enabled_state_changed(int state)
 void PluginWindow::connect_midi_message_handler()
 {
 	auto devicemanager = GetDeviceManager();
-	auto MAdevice = devicemanager->GetMidiDeviceByName(
-		ui->list_midi_dev->currentItem()->text());
+	auto MAdevice = devicemanager->GetMidiDeviceByName(ui->list_midi_dev->currentItem()->text());
 	connect(MAdevice, SIGNAL(broadcast_midi_message(MidiMessage)), this,
-		SLOT(handle_midi_message(
-			MidiMessage))); /// name, mtype, norc, channel
+		SLOT(handle_midi_message(MidiMessage))); /// name, mtype, norc, channel
 }
 void PluginWindow::on_device_select(const QString &curitem)
 {
 	if (!starting) {
-		blog(LOG_DEBUG, "on_device_select %s",
-		     curitem.toStdString().c_str());
+		blog(LOG_DEBUG, "on_device_select %s", curitem.toStdString().c_str());
 		auto devicemanager = GetDeviceManager();
 		auto config = GetConfig();
-		MidiAgent *MAdevice =
-			devicemanager->GetMidiDeviceByName(curitem);
+		MidiAgent *MAdevice = devicemanager->GetMidiDeviceByName(curitem);
 		set_configure_title(curitem);
 		// Pull info on if device is enabled, if so set true if not set false
 		try {
@@ -194,12 +169,10 @@ void PluginWindow::on_device_select(const QString &curitem)
 				ui->check_enabled->setChecked(true);
 				ui->outbox->setEnabled(true);
 				ui->bidirectional->setEnabled(true);
-				ui->bidirectional->setChecked(
-					MAdevice->isBidirectional());
-				
+				ui->bidirectional->setChecked(MAdevice->isBidirectional());
+
 				if (MAdevice->isBidirectional()) {
-					ui->outbox->setCurrentText(
-						MAdevice->get_midi_output_name());
+					ui->outbox->setCurrentText(MAdevice->get_midi_output_name());
 				}
 				connect_midi_message_handler();
 			} else {
@@ -220,13 +193,9 @@ void PluginWindow::set_configure_title(const QString &title)
 void PluginWindow::handle_midi_message(const MidiMessage &mess)
 {
 	if (ui->tabWidget->currentIndex() == 1) {
-		if (ui->btn_Listen_one->isChecked() ||
-		    ui->btn_Listen_many->isChecked()) {
-			blog(1,
-			     "got midi message via gui, \n Device = %s \n MType = %s \n NORC : %i \n Channel: %i \n Value: %i",
-			     mess.device_name.toStdString().c_str(),
-			     mess.message_type.toStdString().c_str(), mess.NORC,
-			     mess.channel, mess.value);
+		if (ui->btn_Listen_one->isChecked() || ui->btn_Listen_many->isChecked()) {
+			blog(1, "got midi message via gui, \n Device = %s \n MType = %s \n NORC : %i \n Channel: %i \n Value: %i",
+			     mess.device_name.toStdString().c_str(), mess.message_type.toStdString().c_str(), mess.NORC, mess.channel, mess.value);
 			ui->mapping_lbl_device_name->setText(mess.device_name);
 			ui->sb_channel->setValue(mess.channel);
 			ui->sb_norc->setValue(mess.NORC);
@@ -235,27 +204,24 @@ void PluginWindow::handle_midi_message(const MidiMessage &mess)
 			ui->btn_Listen_one->setChecked(false);
 		} else {
 			if (map_location(mess) != -1) {
-				ui->table_mapping->selectRow(
-					map_location(mess));
+				ui->table_mapping->selectRow(map_location(mess));
 			}
 		}
 	}
 }
 void PluginWindow::on_bid_enabled_state_changed(int state)
 {
-	auto device = GetDeviceManager()->GetMidiDeviceByName(
-		ui->list_midi_dev->currentItem()->text().toStdString().c_str());
+	auto device = GetDeviceManager()->GetMidiDeviceByName(ui->list_midi_dev->currentItem()->text().toStdString().c_str());
 	ui->outbox->setEnabled(state);
 	if (state) {
-		device->setBidirectional(state);
+		device->set_bidirectional(state);
 	} else {
-		device->setBidirectional(state);
+		device->set_bidirectional(state);
 	}
 }
 PluginWindow::~PluginWindow()
 {
 	delete ui;
-	delete listview;
 }
 void PluginWindow::add_midi_device(const QString &name)
 {
@@ -287,9 +253,7 @@ void PluginWindow::add_midi_device(const QString &name)
 void PluginWindow::set_headers()
 {
 	ui->table_mapping->setHorizontalHeaderLabels(
-		{"Channel", "Message Type", "Note or Control", "Action",
-		 "Scene", "Source", "Filter", "Transition", "Item",
-		 "Audio Source", "Media Source"});
+		{"Channel", "Message Type", "Note or Control", "Action", "Scene", "Source", "Filter", "Transition", "Item", "Audio Source", "Media Source"});
 	QColor midicolor("#00aaff");
 	QColor actioncolor("#aa00ff");
 	ui->table_mapping->horizontalHeaderItem(0)->setForeground(midicolor);
@@ -322,36 +286,31 @@ void PluginWindow::show_pair(Pairs Pair)
 	case Pairs::Filter:
 		ui->label_obs_output_filter->show();
 		ui->cb_obs_output_filter->show();
-		ui->cb_obs_output_filter->addItems(Utils::get_filter_names(
-			ui->cb_obs_output_source->currentText()));
+		ui->cb_obs_output_filter->addItems(Utils::get_filter_names(ui->cb_obs_output_source->currentText()));
 		ui->w_filter->show();
 		break;
 	case Pairs::Transition:
 		ui->label_obs_output_transition->show();
 		ui->cb_obs_output_transition->show();
 		ui->w_transition->show();
-		ui->cb_obs_output_transition->addItems(
-			Utils::GetTransitionsList());
+		ui->cb_obs_output_transition->addItems(Utils::GetTransitionsList());
 		break;
 	case Pairs::Item:
 		ui->label_obs_output_item->show();
 		ui->cb_obs_output_item->show();
-		ui->cb_obs_output_item->addItems(Utils::GetSceneItemsList(
-			ui->cb_obs_output_scene->currentText()));
+		ui->cb_obs_output_item->addItems(Utils::GetSceneItemsList(ui->cb_obs_output_scene->currentText()));
 		ui->w_item->show();
 		break;
 	case Pairs::Audio:
 		ui->cb_obs_output_audio_source->clear();
-		ui->cb_obs_output_audio_source->addItems(
-			Utils::GetAudioSourceNames());
+		ui->cb_obs_output_audio_source->addItems(Utils::GetAudioSourceNames());
 		ui->label_obs_output_audio_source->show();
 		ui->cb_obs_output_audio_source->show();
 		ui->w_audio->show();
 		break;
 	case Pairs::Media:
 		ui->cb_obs_output_media_source->clear();
-		ui->cb_obs_output_media_source->addItems(
-			Utils::GetMediaSourceNames());
+		ui->cb_obs_output_media_source->addItems(Utils::GetMediaSourceNames());
 		ui->label_obs_output_media_source->show();
 		ui->cb_obs_output_media_source->show();
 		ui->w_media->show();
@@ -456,29 +415,19 @@ void PluginWindow::ShowOnly(const QList<ActionsClass::Actions> &shows)
 {
 	ui->cb_obs_output_action->clear();
 	for (int i = 0; i < shows.size(); i++) {
-		ui->cb_obs_output_action->addItem(obs_module_text(
-			ActionsClass::action_to_string(shows.at(i))
-				.toStdString()
-				.c_str()));
+		ui->cb_obs_output_action->addItem(obs_module_text(ActionsClass::action_to_string(shows.at(i)).toStdString().c_str()));
 	}
 }
 void PluginWindow::ShowEntry(ActionsClass::Actions Entry)
 {
-	if (ui->cb_obs_output_action->findText(
-		    ActionsClass::action_to_string(Entry)) == -1) {
-		ui->cb_obs_output_action->addItem(
-			obs_module_text(ActionsClass::action_to_string(Entry)
-						.toStdString()
-						.c_str()));
+	if (ui->cb_obs_output_action->findText(ActionsClass::action_to_string(Entry)) == -1) {
+		ui->cb_obs_output_action->addItem(obs_module_text(ActionsClass::action_to_string(Entry).toStdString().c_str()));
 	}
 }
 void PluginWindow::HideEntry(ActionsClass::Actions Entry)
 {
-	if (ui->cb_obs_output_action->findText(
-		    ActionsClass::action_to_string(Entry)) > 0) {
-		ui->cb_obs_output_action->removeItem(
-			ui->cb_obs_output_action->findText(
-				ActionsClass::action_to_string(Entry)));
+	if (ui->cb_obs_output_action->findText(ActionsClass::action_to_string(Entry)) > 0) {
+		ui->cb_obs_output_action->removeItem(ui->cb_obs_output_action->findText(ActionsClass::action_to_string(Entry)));
 	}
 }
 void PluginWindow::ShowAllActions()
@@ -494,7 +443,6 @@ void PluginWindow::HideEntries(const QList<ActionsClass::Actions> &entrys)
 			HideEntry(Utils::AllActions_raw.at(i));
 		}
 	}
-	listview->adjustSize();
 }
 void PluginWindow::ShowEntries(const QList<ActionsClass::Actions> &entrys)
 {
@@ -503,7 +451,6 @@ void PluginWindow::ShowEntries(const QList<ActionsClass::Actions> &entrys)
 			ShowEntry(Utils::AllActions_raw.at(i));
 		}
 	}
-	listview->adjustSize();
 }
 void PluginWindow::obs_actions_select(const QString &action)
 {
@@ -618,19 +565,15 @@ void PluginWindow::set_edit_mode() {}
 void PluginWindow::save_edit() {}
 QString PluginWindow::untranslate(QString tstring)
 {
-	return ActionsClass::action_to_string(Utils::AllActions_raw.at(
-		Utils::TranslateActions().indexOf(tstring)));
+	return ActionsClass::action_to_string(Utils::AllActions_raw.at(Utils::TranslateActions().indexOf(tstring)));
 }
 bool PluginWindow::map_exists()
 {
 	auto devicemanager = GetDeviceManager();
-	auto hooks = devicemanager->GetMidiHooksByDeviceName(
-		ui->mapping_lbl_device_name->text());
+	auto hooks = devicemanager->GetMidiHooksByDeviceName(ui->mapping_lbl_device_name->text());
 	for (int i = 0; i < hooks.size(); i++) {
-		if ((hooks.at(i)->channel == ui->sb_channel->value()) &&
-		    (hooks.at(i)->norc == ui->sb_norc->value()) &&
-		    (hooks.at(i)->message_type ==
-		     ui->cb_mtype->currentText())) {
+		if ((hooks.at(i)->channel == ui->sb_channel->value()) && (hooks.at(i)->norc == ui->sb_norc->value()) &&
+		    (hooks.at(i)->message_type == ui->cb_mtype->currentText())) {
 			return true;
 		}
 	}
@@ -639,12 +582,9 @@ bool PluginWindow::map_exists()
 int PluginWindow::map_location(const MidiMessage &message)
 {
 	auto devicemanager = GetDeviceManager();
-	auto hooks = devicemanager->GetMidiHooksByDeviceName(
-		ui->mapping_lbl_device_name->text());
+	auto hooks = devicemanager->GetMidiHooksByDeviceName(ui->mapping_lbl_device_name->text());
 	for (int i = 0; i < hooks.size(); i++) {
-		if ((hooks.at(i)->channel == message.channel) &&
-		    (hooks.at(i)->norc == message.NORC) &&
-		    (hooks.at(i)->message_type == message.message_type)) {
+		if ((hooks.at(i)->channel == message.channel) && (hooks.at(i)->norc == message.NORC) && (hooks.at(i)->message_type == message.message_type)) {
 			return i;
 		}
 	}
@@ -663,28 +603,17 @@ void PluginWindow::add_new_mapping()
 		ui->table_mapping->insertRow(row);
 
 		// don't delete it, because the table takes ownership of the items
-		QTableWidgetItem *channelitem = new QTableWidgetItem(
-			QString::number(ui->sb_channel->value()));
-		QTableWidgetItem *mtypeitem =
-			new QTableWidgetItem(ui->cb_mtype->currentText());
-		QTableWidgetItem *norcitem = new QTableWidgetItem(
-			QString::number(ui->sb_norc->value()));
-		QTableWidgetItem *actionitem = new QTableWidgetItem(
-			ui->cb_obs_output_action->currentText());
-		QTableWidgetItem *sceneitem = new QTableWidgetItem(
-			ui->cb_obs_output_scene->currentText());
-		QTableWidgetItem *sourceitem = new QTableWidgetItem(
-			ui->cb_obs_output_source->currentText());
-		QTableWidgetItem *filteritem = new QTableWidgetItem(
-			ui->cb_obs_output_filter->currentText());
-		QTableWidgetItem *transitionitem = new QTableWidgetItem(
-			ui->cb_obs_output_transition->currentText());
-		QTableWidgetItem *itemitem = new QTableWidgetItem(
-			ui->cb_obs_output_item->currentText());
-		QTableWidgetItem *audioitem = new QTableWidgetItem(
-			ui->cb_obs_output_audio_source->currentText());
-		QTableWidgetItem *mediaitem = new QTableWidgetItem(
-			ui->cb_obs_output_media_source->currentText());
+		QTableWidgetItem *channelitem = new QTableWidgetItem(QString::number(ui->sb_channel->value()));
+		QTableWidgetItem *mtypeitem = new QTableWidgetItem(ui->cb_mtype->currentText());
+		QTableWidgetItem *norcitem = new QTableWidgetItem(QString::number(ui->sb_norc->value()));
+		QTableWidgetItem *actionitem = new QTableWidgetItem(ui->cb_obs_output_action->currentText());
+		QTableWidgetItem *sceneitem = new QTableWidgetItem(ui->cb_obs_output_scene->currentText());
+		QTableWidgetItem *sourceitem = new QTableWidgetItem(ui->cb_obs_output_source->currentText());
+		QTableWidgetItem *filteritem = new QTableWidgetItem(ui->cb_obs_output_filter->currentText());
+		QTableWidgetItem *transitionitem = new QTableWidgetItem(ui->cb_obs_output_transition->currentText());
+		QTableWidgetItem *itemitem = new QTableWidgetItem(ui->cb_obs_output_item->currentText());
+		QTableWidgetItem *audioitem = new QTableWidgetItem(ui->cb_obs_output_audio_source->currentText());
+		QTableWidgetItem *mediaitem = new QTableWidgetItem(ui->cb_obs_output_media_source->currentText());
 		set_cell_colors(midic, channelitem);
 		set_cell_colors(midic, mtypeitem);
 		set_cell_colors(midic, norcitem);
@@ -717,20 +646,16 @@ void PluginWindow::add_new_mapping()
 		newmh->filter = ui->cb_obs_output_filter->currentText();
 		newmh->transition = ui->cb_obs_output_transition->currentText();
 		newmh->item = ui->cb_obs_output_item->currentText();
-		newmh->audio_source =
-			ui->cb_obs_output_audio_source->currentText();
-		newmh->media_source =
-			ui->cb_obs_output_media_source->currentText();
+		newmh->audio_source = ui->cb_obs_output_audio_source->currentText();
+		newmh->media_source = ui->cb_obs_output_media_source->currentText();
 		auto dm = GetDeviceManager();
-		auto dev = dm->GetMidiDeviceByName(
-			ui->mapping_lbl_device_name->text());
+		auto dev = dm->GetMidiDeviceByName(ui->mapping_lbl_device_name->text());
 		dev->add_MidiHook(newmh);
 		auto conf = GetConfig();
 		conf->Save();
 	} else {
 		if (ui->sb_channel->value()) {
-			Utils::alert_popup(
-				"Can Not Map Channel 0. \nPlease Click Listen One or Listen Many to listen for MIDI Event to map");
+			Utils::alert_popup("Can Not Map Channel 0. \nPlease Click Listen One or Listen Many to listen for MIDI Event to map");
 		}
 		if (!verify_mapping()) {
 			Utils::alert_popup("Mapping Missing required variable");
@@ -760,17 +685,14 @@ void PluginWindow::add_row_from_hook(MidiHook *hook)
 	actc.setRgb(170, 0, 255);
 
 	// don't delete it, because the table takes ownership of the items
-	QTableWidgetItem *channelitem =
-		new QTableWidgetItem(QString::number(hook->channel));
+	QTableWidgetItem *channelitem = new QTableWidgetItem(QString::number(hook->channel));
 	QTableWidgetItem *mtypeitem = new QTableWidgetItem(hook->message_type);
-	QTableWidgetItem *norcitem =
-		new QTableWidgetItem(QString::number(hook->norc));
+	QTableWidgetItem *norcitem = new QTableWidgetItem(QString::number(hook->norc));
 	QTableWidgetItem *actionitem = new QTableWidgetItem(hook->action);
 	QTableWidgetItem *sceneitem = new QTableWidgetItem(hook->scene);
 	QTableWidgetItem *sourceitem = new QTableWidgetItem(hook->source);
 	QTableWidgetItem *filteritem = new QTableWidgetItem(hook->filter);
-	QTableWidgetItem *transitionitem =
-		new QTableWidgetItem(hook->transition);
+	QTableWidgetItem *transitionitem = new QTableWidgetItem(hook->transition);
 	QTableWidgetItem *itemitem = new QTableWidgetItem(hook->item);
 	QTableWidgetItem *audioitem = new QTableWidgetItem(hook->audio_source);
 	QTableWidgetItem *mediaitem = new QTableWidgetItem(hook->media_source);
@@ -807,8 +729,7 @@ void PluginWindow::set_cell_colors(const QColor &color, QTableWidgetItem *item)
 void PluginWindow::tab_changed(int tab)
 {
 	if (tab == 1)
-		ui->mapping_lbl_device_name->setText(
-			ui->list_midi_dev->currentItem()->text());
+		ui->mapping_lbl_device_name->setText(ui->list_midi_dev->currentItem()->text());
 	clear_table();
 	load_table();
 }
@@ -821,8 +742,7 @@ void PluginWindow::clear_table()
 void PluginWindow::load_table()
 {
 	auto devicemanager = GetDeviceManager();
-	auto hooks = devicemanager->GetMidiHooksByDeviceName(
-		ui->mapping_lbl_device_name->text());
+	auto hooks = devicemanager->GetMidiHooksByDeviceName(ui->mapping_lbl_device_name->text());
 	if (hooks.count() > 0) {
 		for (int i = 0; i < hooks.size(); i++) {
 			add_row_from_hook(hooks.at(i));
@@ -835,15 +755,12 @@ void PluginWindow::delete_mapping()
 	if (ui->table_mapping->rowCount() > 0) {
 		int row = ui->table_mapping->selectedItems().at(0)->row();
 		auto devicemanager = GetDeviceManager();
-		auto dev = devicemanager->GetMidiDeviceByName(
-			ui->mapping_lbl_device_name->text());
+		auto dev = devicemanager->GetMidiDeviceByName(ui->mapping_lbl_device_name->text());
 		auto hooks = dev->GetMidiHooks();
 		auto conf = GetConfig();
 		for (int i = 0; i < hooks.size(); i++) {
-			if ((hooks.at(i)->channel == ui->sb_channel->value()) &&
-			    (hooks.at(i)->norc == ui->sb_norc->value()) &&
-			    (hooks.at(i)->message_type ==
-			     ui->cb_mtype->currentText())) {
+			if ((hooks.at(i)->channel == ui->sb_channel->value()) && (hooks.at(i)->norc == ui->sb_norc->value()) &&
+			    (hooks.at(i)->message_type == ui->cb_mtype->currentText())) {
 				dev->remove_MidiHook(hooks.at(i));
 				conf->Save();
 				ui->table_mapping->removeRow(row);
@@ -865,44 +782,34 @@ void PluginWindow::edit_mapping()
 		ui->cb_obs_output_scene->setCurrentText(sitems.at(4)->text());
 		ui->cb_obs_output_source->setCurrentText(sitems.at(5)->text());
 		ui->cb_obs_output_filter->setCurrentText(sitems.at(6)->text());
-		ui->cb_obs_output_transition->setCurrentText(
-			sitems.at(7)->text());
+		ui->cb_obs_output_transition->setCurrentText(sitems.at(7)->text());
 		ui->cb_obs_output_item->setCurrentText(sitems.at(8)->text());
-		ui->cb_obs_output_audio_source->setCurrentText(
-			sitems.at(9)->text());
-		ui->cb_obs_output_media_source->setCurrentText(
-			sitems.at(10)->text());
+		ui->cb_obs_output_audio_source->setCurrentText(sitems.at(9)->text());
+		ui->cb_obs_output_media_source->setCurrentText(sitems.at(10)->text());
 	}
 }
 bool PluginWindow::verify_mapping()
 {
 	int testresults = 0;
-	if (ui->cb_obs_output_audio_source->isVisible() &&
-	    ui->cb_obs_output_audio_source->count() == 0) {
+	if (ui->cb_obs_output_audio_source->isVisible() && ui->cb_obs_output_audio_source->count() == 0) {
 		testresults++;
 	}
-	if (ui->cb_obs_output_scene->isVisible() &&
-	    ui->cb_obs_output_scene->count() == 0) {
+	if (ui->cb_obs_output_scene->isVisible() && ui->cb_obs_output_scene->count() == 0) {
 		testresults++;
 	}
-	if (ui->cb_obs_output_source->isVisible() &&
-	    ui->cb_obs_output_source->count() == 0) {
+	if (ui->cb_obs_output_source->isVisible() && ui->cb_obs_output_source->count() == 0) {
 		testresults++;
 	}
-	if (ui->cb_obs_output_filter->isVisible() &&
-	    ui->cb_obs_output_filter->count() == 0) {
+	if (ui->cb_obs_output_filter->isVisible() && ui->cb_obs_output_filter->count() == 0) {
 		testresults++;
 	}
-	if (ui->cb_obs_output_transition->isVisible() &&
-	    ui->cb_obs_output_transition->count() == 0) {
+	if (ui->cb_obs_output_transition->isVisible() && ui->cb_obs_output_transition->count() == 0) {
 		testresults++;
 	}
-	if (ui->cb_obs_output_item->isVisible() &&
-	    ui->cb_obs_output_item->count() == 0) {
+	if (ui->cb_obs_output_item->isVisible() && ui->cb_obs_output_item->count() == 0) {
 		testresults++;
 	}
-	if (ui->cb_obs_output_media_source->isVisible() &&
-	    ui->cb_obs_output_media_source->count() == 0) {
+	if (ui->cb_obs_output_media_source->isVisible() && ui->cb_obs_output_media_source->count() == 0) {
 		testresults++;
 	}
 	if (testresults > 0) {
@@ -915,15 +822,13 @@ void PluginWindow::on_scene_change(const QString &newscene)
 {
 	if (ui->cb_obs_output_source->isVisible()) {
 		ui->cb_obs_output_source->clear();
-		ui->cb_obs_output_source->addItems(
-			Utils::get_source_names(newscene));
+		ui->cb_obs_output_source->addItems(Utils::get_source_names(newscene));
 	}
 }
 void PluginWindow::on_source_change(const QString &newsource)
 {
 	if (ui->cb_obs_output_filter->isVisible()) {
 		ui->cb_obs_output_filter->clear();
-		ui->cb_obs_output_filter->addItems(
-			Utils::get_filter_names(newsource));
+		ui->cb_obs_output_filter->addItems(Utils::get_filter_names(newsource));
 	}
 }

@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_class_rpc_event" xml:lang="en-US">
+<title>RpcEvent Class Reference</title>
+<indexterm><primary>RpcEvent</primary></indexterm>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para><anchor xml:id="_class_rpc_event_1a28a3b14e1d2ba58514d4ad2453d66ed9"/><emphasis role="strong">RpcEvent</emphasis> (QString updateType, std::optional&lt; uint64_t &gt; streamTime, std::optional&lt; uint64_t &gt; recordingTime, obs_data_t *additionalFields=nullptr)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_rpc_event_1a1a9595944ea1a881e5918b2f62598c82"/>const QString &amp; <emphasis role="strong">updateType</emphasis> () const</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_rpc_event_1add6b8c1a46a8d005052e2a1b469cd1b9"/>const std::optional&lt; uint64_t &gt; &amp; <emphasis role="strong">streamTime</emphasis> () const</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_rpc_event_1ab9b24711f6bb8f118ebe5fdec7bd90af"/>const std::optional&lt; uint64_t &gt; &amp; <emphasis role="strong">recordingTime</emphasis> () const</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_rpc_event_1a58cd39de873e617f9a95910a3940d9d4"/>OBSData <emphasis role="strong">additionalFields</emphasis> () const</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<para>
+The documentation for this class was generated from the following files:</para>
+src/rpc/RpcEvent.hsrc/rpc/RpcEvent.cpp</section>

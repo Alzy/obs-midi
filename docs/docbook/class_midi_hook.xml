@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_class_midi_hook" xml:lang="en-US">
+<title>MidiHook Class Reference</title>
+<indexterm><primary>MidiHook</primary></indexterm>
+<para>Inheritance diagram for MidiHook:    <informalfigure>
+        <mediaobject>
+            <imageobject>
+                <imagedata width="50%" align="center" valign="middle" scalefit="0" fileref="class_midi_hook.png"></imagedata>
+            </imageobject>
+        </mediaobject>
+    </informalfigure>
+</para>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para><anchor xml:id="_class_midi_hook_1a970ad7e6157320d093be34155684aa0f"/><link linkend="_struct_midi_message">MidiMessage</link> * <emphasis role="strong">get_message_from_hook</emphasis> () const</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_hook_1a25a8612bfeb50bf613656621150df47e"/><emphasis role="strong">MidiHook</emphasis> (const QString &amp;jsonString)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_hook_1ac8b06f173f02087ecadb19de521f26ce"/>obs_data_t * <emphasis role="strong">GetData</emphasis> () const</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_hook_1afb1dbc57a9237d37a46ec94e3e8d00f7"/>const char * <emphasis role="strong">ToJSON</emphasis> ()</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Public Attributes    </title>
+        <itemizedlist>
+            <listitem><para><anchor xml:id="_class_midi_hook_1a4c32b00d5cae14648a92e9eaff5e1baf"/>int <emphasis role="strong">channel</emphasis> = -1</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_hook_1af9411b15aabfc7bcb6c122cde0ae64c4"/>QString <emphasis role="strong">message_type</emphasis></para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_hook_1a55e77f2035eef4b79ee6b8ff9d3d200d"/>int <emphasis role="strong">norc</emphasis> = -1</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_hook_1a8bbff467cc42f04d37b865b22ebc77d3"/>QString <emphasis role="strong">action</emphasis></para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_hook_1a9786f25b4c941bc0c3c06c9333c30c64"/>QString <emphasis role="strong">scene</emphasis></para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_hook_1a62d58826605161250c2c6c93b21c0e4f"/>QString <emphasis role="strong">source</emphasis></para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_hook_1aaa5f7383716ef39e7e14604081962611"/>QString <emphasis role="strong">filter</emphasis></para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_hook_1a0e2b7237223683c654204155e1c185ac"/>QString <emphasis role="strong">transition</emphasis></para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_hook_1adc5c18bd4000af761bbc97ec075a7767"/>QString <emphasis role="strong">item</emphasis></para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_hook_1ab03369f43691b437601ba0b110d5b92b"/>QString <emphasis role="strong">audio_source</emphasis></para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_hook_1aadd2c672eaaacb8bd16ef394ab413c11"/>QString <emphasis role="strong">media_source</emphasis></para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_hook_1a3f3d449bebda7bafa69e65eb15c906e8"/>int <emphasis role="strong">duration</emphasis> = -1</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_hook_1a5264cf91c733c94640cecc8ed711bde0"/>QString <emphasis role="strong">scene_collection</emphasis></para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_hook_1adb4bee9745727bb52802e11888ae7345"/>QString <emphasis role="strong">profile</emphasis></para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_hook_1a59c32f8d88d94344a36854f7c800b956"/>QString <emphasis role="strong">string_override</emphasis></para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_hook_1a12301a5b8596ac790e01003a24295714"/>bool <emphasis role="strong">bool_override</emphasis> = false</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_hook_1a31419c3907bb4c0cd15f764e88819dff"/>int <emphasis role="strong">int_override</emphasis> = -1</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_midi_hook_1a76e29acbf187d6ea5b32bfe137dc59ee"/>int <emphasis role="strong">value</emphasis> = -1</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<para>
+The documentation for this class was generated from the following file:</para>
+src/utils.h</section>

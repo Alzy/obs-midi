@@ -1,0 +1,79 @@
+\hypertarget{classevents}{}\doxysection{events Class Reference}
+\label{classevents}\index{events@{events}}
+Inheritance diagram for events\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classevents}
+\end{center}
+\end{figure}
+\doxysubsection*{Signals}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classevents_ac89008a3e3bc44585faa5c78a7ebb876}\label{classevents_ac89008a3e3bc44585faa5c78a7ebb876}} 
+void {\bfseries obs\+Event} (const \mbox{\hyperlink{class_rpc_event}{Rpc\+Event}} \&event)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classevents_a64208090853f4bc92dbb40f47de9eb42}\label{classevents_a64208090853f4bc92dbb40f47de9eb42}} 
+{\bfseries events} (Device\+Manager\+Ptr srv)
+\item 
+\mbox{\Hypertarget{classevents_a706de1ed8575d1462d3f62d7fd690bf8}\label{classevents_a706de1ed8575d1462d3f62d7fd690bf8}} 
+void {\bfseries connect\+Source\+Signals} (obs\+\_\+source\+\_\+t $\ast$source)
+\item 
+\mbox{\Hypertarget{classevents_a57d0a0cc66ec958d525dcfe1ce127d73}\label{classevents_a57d0a0cc66ec958d525dcfe1ce127d73}} 
+void {\bfseries disconnect\+Source\+Signals} (obs\+\_\+source\+\_\+t $\ast$source)
+\item 
+\mbox{\Hypertarget{classevents_a58fe3cc193996d6d26ac2726c0d05a5e}\label{classevents_a58fe3cc193996d6d26ac2726c0d05a5e}} 
+void {\bfseries connect\+Filter\+Signals} (obs\+\_\+source\+\_\+t $\ast$filter)
+\item 
+\mbox{\Hypertarget{classevents_a701e5102308015990acdf8fc6a9e49a1}\label{classevents_a701e5102308015990acdf8fc6a9e49a1}} 
+void {\bfseries disconnect\+Filter\+Signals} (obs\+\_\+source\+\_\+t $\ast$filter)
+\item 
+\mbox{\Hypertarget{classevents_a0daec77e73be0208579436924530fee3}\label{classevents_a0daec77e73be0208579436924530fee3}} 
+void {\bfseries hook\+Transition\+Playback\+Events} ()
+\item 
+\mbox{\Hypertarget{classevents_aead6012f6f76d4525ba05b1e97876e98}\label{classevents_aead6012f6f76d4525ba05b1e97876e98}} 
+void {\bfseries unhook\+Transition\+Playback\+Events} ()
+\item 
+\mbox{\Hypertarget{classevents_a986917e5ebb7cd00364146663c85a91e}\label{classevents_a986917e5ebb7cd00364146663c85a91e}} 
+uint64\+\_\+t {\bfseries get\+Streaming\+Time} ()
+\item 
+\mbox{\Hypertarget{classevents_ad3858ba208d6452a5bbdb201369d224d}\label{classevents_ad3858ba208d6452a5bbdb201369d224d}} 
+uint64\+\_\+t {\bfseries get\+Recording\+Time} ()
+\item 
+\mbox{\Hypertarget{classevents_a180558b5341c7761947bb8a61f13b6b2}\label{classevents_a180558b5341c7761947bb8a61f13b6b2}} 
+QString {\bfseries get\+Streaming\+Timecode} ()
+\item 
+\mbox{\Hypertarget{classevents_aa022e359f619c30a7ce089591c1a10f7}\label{classevents_aa022e359f619c30a7ce089591c1a10f7}} 
+QString {\bfseries get\+Recording\+Timecode} ()
+\end{DoxyCompactItemize}
+\begin{Indent}\textbf{ Broadcast\+Custom\+Message}\par
+{\em A custom broadcast message was received
+
+\begin{DoxyReturn}{Returns}
+\{String\} {\ttfamily realm} Identifier provided by the sender 
+
+\{Object\} {\ttfamily data} User-\/defined data
+\end{DoxyReturn}
+@api events }\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classevents_a49b6dabaccdcd153616272c44b0a1673}\label{classevents_a49b6dabaccdcd153616272c44b0a1673}} 
+obs\+\_\+data\+\_\+t $\ast$ {\bfseries Get\+Stats} ()
+\item 
+\mbox{\Hypertarget{classevents_a01c1e47922423c2ab94fca7b834d1805}\label{classevents_a01c1e47922423c2ab94fca7b834d1805}} 
+void {\bfseries On\+Broadcast\+Custom\+Message} (const QString \&realm, obs\+\_\+data\+\_\+t $\ast$data)
+\end{DoxyCompactItemize}
+\end{Indent}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classevents_ac8cfa04efd71cf75693ecb19b9b54f32}\label{classevents_ac8cfa04efd71cf75693ecb19b9b54f32}} 
+bool {\bfseries Heartbeat\+Is\+Active}
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/events.\+h\item 
+src/events.\+cpp\end{DoxyCompactItemize}

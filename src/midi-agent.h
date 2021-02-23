@@ -37,10 +37,9 @@ class MidiAgent : public QObject
 {
 	Q_OBJECT
 public:
-	MidiAgent();
-	explicit MidiAgent(obs_data_t *data);
-	~MidiAgent() override;
-
+	MidiAgent(const int &in_port, const int &out_port);
+	MidiAgent(obs_data_t *data);
+	~MidiAgent();
 	void Load(obs_data_t *data);
 	// Open Actions
 	void open_midi_input_port();
@@ -58,12 +57,10 @@ public:
 	bool isEnabled() const;
 	bool isConnected() const;
 	bool isBidirectional() const;
-	bool setBidirectional(bool state);
-	void set_enabled(bool enabled);
+	bool set_bidirectional(const bool &state) const;
+	void set_enabled(const bool &state) const;
 	static void HandleInput(const rtmidi::message &message, void *userData);
-	static void HandleError(const rtmidi::midi_error &error,
-				const std::string_view &error_message,
-				void *userData);
+	static void HandleError(const rtmidi::midi_error &error, const std::string_view &error_message, void *userData);
 	void set_callbacks();
 	QVector<MidiHook *> GetMidiHooks();
 	void set_midi_hooks(QVector<MidiHook *>);
@@ -78,7 +75,7 @@ signals:
 	void do_obs_action(MidiHook *, int);
 
 private:
-	void send_message_to_midi_device(const MidiMessage& message);
+	void send_message_to_midi_device(const MidiMessage &message);
 	rtmidi::midi_in midiin;
 	rtmidi::midi_out midiout;
 	QString midi_input_name;

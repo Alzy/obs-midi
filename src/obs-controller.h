@@ -16,23 +16,29 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 */
 
 #pragma once
+
+#include <iostream>
+
+#include <QtCore/QObject>
+
 #if __has_include(<obs-frontend-api.h>)
 #include <obs-frontend-api.h>
 #else
 #include <obs-frontend-api/obs-frontend-api.h>
 #endif
-#include <iostream>
+
 #include "utils.h"
 #include "obs-midi.h"
-#include "qobject.h"
 
-class OBSController : public QObject {
+
+class OBSController : public QObject
+{
 	Q_OBJECT
 	// BUTTON ACTIONS
 
 public:
 	OBSController(MidiHook *incoming_midi_hook, int incoming_midi_value);
-	~OBSController();
+	~OBSController() override;
 
 private:
 	/**

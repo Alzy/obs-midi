@@ -66,7 +66,6 @@ bool obs_module_load(void)
 	QObject::connect(menuAction, SIGNAL(triggered()), plugin_window,
 			 SLOT(ToggleShowHide()));
 
-
 	return true;
 }
 

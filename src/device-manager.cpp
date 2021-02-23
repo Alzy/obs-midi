@@ -17,10 +17,10 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #include "device-manager.h"
 #include "forms/settings-dialog.h"
+
+
 DeviceManager::DeviceManager()
 {
-
-
 	this->setParent(plugin_window);
 }
 
@@ -28,7 +28,6 @@ DeviceManager::~DeviceManager()
 {
 	Unload();
 	this->deleteLater();
-	
 }
 
 /* Load the Device Manager from saved Config Store data.
@@ -51,17 +50,18 @@ void DeviceManager::Load(obs_data_t *data)
 			SLOT(handle_obs_event(QString, QString)));
 	}
 	obs_data_array_release(devicesData);
-
 }
 
 void DeviceManager::Unload()
 {
 	blog(LOG_INFO, "UNLOADING DEVICE MANAGER");
-	midiAgents.clear();
-	for (auto agent : midiAgents) {
-		blog(LOG_DEBUG, "Unloading Midi Device %s",agent->get_midi_input_name().toStdString().c_str());
-		agent->clear_MidiHooks();
+	for (auto & midiAgent : midiAgents)
+	{
+		blog(LOG_DEBUG, "Unloading Midi Device %s", midiAgent->get_midi_input_name().toStdString().c_str());
+		midiAgent->clear_MidiHooks();
+		delete midiAgent;
 	}
+	midiAgents.clear();
 }
 
 /* Returns QStringList of Port Names 
@@ -69,8 +69,9 @@ void DeviceManager::Unload()
 QStringList DeviceManager::GetPortsList()
 {
 	QStringList ports;
-	int portCount = rtmidi::midi_in().get_port_count();
-	for (int i = 0; i < portCount; i++) {
+	unsigned int portCount = rtmidi::midi_in().get_port_count();
+	for (unsigned int i = 0; i < portCount; ++i)
+	{
 		ports.append(QString::fromStdString(rtmidi::midi_in().get_port_name(i)));
 	}
 	return std::move(ports);
@@ -81,8 +82,9 @@ QStringList DeviceManager::GetPortsList()
 QStringList DeviceManager::GetOutPortsList()
 {
 	QStringList outports;
-	int portCount = rtmidi::midi_out().get_port_count();
-	for (int i = 0; i < portCount; i++) {
+	unsigned int portCount = rtmidi::midi_out().get_port_count();
+	for (unsigned int i = 0; i < portCount; ++i)
+	{
 		outports.append(QString::fromStdString(
 			rtmidi::midi_out().get_port_name(i)));
 	}
@@ -108,7 +110,6 @@ int DeviceManager::GetPortNumberByDeviceName(const QString &deviceName)
  */
 int DeviceManager::GetOutPortNumberByDeviceName(const QString &deviceName)
 {
-
 	QStringList portsList = GetOutPortsList();
 
 	if (portsList.contains(deviceName)) {
@@ -125,24 +126,29 @@ QVector<MidiAgent *> DeviceManager::GetActiveMidiDevices()
 
 MidiAgent *DeviceManager::GetMidiDeviceByName(const QString &deviceName)
 {
-	MidiAgent *returndevice=NULL;
-	for (int i = 0; i < midiAgents.size(); i++) {
-		if (midiAgents.at(i)->get_midi_input_name() == deviceName) {
-			returndevice=midiAgents.at(i);
-			return returndevice;
+	MidiAgent *returndevice = nullptr;
+	for (auto midiAgent : midiAgents)
+	{
+		if (midiAgent->get_midi_input_name() == deviceName)
+		{
+			returndevice = midiAgent;
+			break;
 		}
-
 	}
 	return returndevice;
 }
 
 QVector<MidiHook *> DeviceManager::GetMidiHooksByDeviceName(const QString &deviceName)
 {
-	if (deviceName != QString("No Devices Available")) {
+	if (deviceName != QString("No Devices Available"))
+	{
 		auto device = GetMidiDeviceByName(deviceName);
-		if (device != NULL) {
+		if (device != nullptr)
+		{
 			return std::move(device->GetMidiHooks());
-		} else {
+		}
+		else
+		{
 			return {};
 		}
 	}
@@ -151,7 +157,7 @@ QVector<MidiHook *> DeviceManager::GetMidiHooksByDeviceName(const QString &devic
 /* Registers a midi device.
  * Will create, store and enable a midi device.
 */
-MidiAgent * DeviceManager::RegisterMidiDevice(int port, int outport)
+MidiAgent *DeviceManager::RegisterMidiDevice(int port, int outport)
 {
 	MidiAgent * midiA = new MidiAgent();
 	midiA->set_input_port(port);
@@ -172,9 +178,9 @@ obs_data_t *DeviceManager::GetData()
 	obs_data_t* data = obs_data_create();
 
 	obs_data_array_t* deviceData = obs_data_array_create();
-	for (int i = 0; i < midiAgents.size(); i++) {
-		obs_data_array_push_back(deviceData,
-					 midiAgents.at(i)->GetData());
+	for (auto midiAgent : midiAgents)
+	{
+		obs_data_array_push_back(deviceData, midiAgent->GetData());
 	}
 
 	obs_data_set_array(data, "devices", deviceData);
@@ -185,19 +191,17 @@ void DeviceManager::broadcast_obs_event(const RpcEvent &event)
 {
 	OBSDataAutoRelease eventData = obs_data_create();
 
-	QString updateType = event.updateType();
-	obs_data_set_string(eventData, "update-type",
-			    updateType.toUtf8().constData());
-
-	
+	const QString& updateType = event.updateType();
+	obs_data_set_string(eventData, "update-type", updateType.toUtf8().constData());
 
 	OBSData additionalFields = event.additionalFields();
-	if (additionalFields) {
+	if (additionalFields)
+	{
 		obs_data_apply(eventData, additionalFields);
 	}
 
 	blog(1, "OBS EVENT %s -- %s", event.updateType().toStdString().c_str(),obs_data_get_json(eventData));
-	emit bcast(event.updateType(),
-		   QString::fromStdString(obs_data_get_json(eventData)));
+	emit bcast(event.updateType(), QString::fromStdString(obs_data_get_json(eventData)));
 	obs_data_release(additionalFields);
+	obs_data_release(eventData);
 };

@@ -1,7 +1,10 @@
 #pragma once
-#include <obs.hpp>
 #include <memory>
+
 #include <QObject>
+
+#include <obs.hpp>
+
 void ___source_dummy_addref(obs_source_t *);
 void ___sceneitem_dummy_addref(obs_sceneitem_t *);
 void ___data_dummy_addref(obs_data_t *);
@@ -20,7 +23,7 @@ using OBSDataArrayAutoRelease =
 	       obs_data_array_release>;
 using OBSOutputAutoRelease =
 	OBSRef<obs_output_t *, ___output_dummy_addref, obs_output_release>;
-void setup_ui();
+//void setup_ui();
 
 void ___data_item_dummy_addref(obs_data_item_t *);
 void ___data_item_release(obs_data_item_t *);

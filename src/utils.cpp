@@ -1,17 +1,20 @@
-#include <iostream>
 #include <map>
-#include <inttypes.h>
+#include <cinttypes>
+
 #include <QtWidgets/QMainWindow>
 #include <QtCore/QDir>
 #include <QtCore/QUrl>
+
+#include <util/platform.h>
 #if __has_include(<obs-frontend-api.h>)
 #include <obs-frontend-api.h>
 #else
 #include <obs-frontend-api/obs-frontend-api.h>
 #endif
-#include <obs.hpp>
-#include <util/platform.h>
+
 #include "utils.h"
+
+
 //***********************************UTILS*****************************************//
 const QHash<obs_bounds_type, QString> boundTypeNames = {
 	{OBS_BOUNDS_STRETCH, "OBS_BOUNDS_STRETCH"},

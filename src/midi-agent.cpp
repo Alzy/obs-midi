@@ -11,26 +11,22 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>
 */
-#if __has_include(<obs-frontend-api.h>)
-#include <obs-frontend-api.h>
-#include "rtmidi17/rtmidi17.hpp"
-#else
-#include <obs-frontend-api/obs-frontend-api.h>
-#include "rtmidi17/rtmidi17.hpp"
-#endif
-#include <QtCore/QTime>
-//#include <Python.h>
+
 #include <functional>
-#include <map>
 #include <string>
-#include <iostream>
 #include <utility>
+
+#include <QtCore/QTime>
+
 #include "utils.h"
 #include "midi-agent.h"
 #include "obs-midi.h"
 #include "config.h"
 #include "device-manager.h"
+
 using namespace std;
+
+
 ////////////////
 // MIDI AGENT //
 ////////////////
@@ -198,19 +194,19 @@ bool MidiAgent::setBidirectional(bool state)
 	GetConfig().get()->Save();
 	return state;
 }
-int MidiAgent::GetPort()
+int MidiAgent::GetPort() const
 {
 	return input_port;
 }
-bool MidiAgent::isEnabled()
+bool MidiAgent::isEnabled() const
 {
 	return enabled;
 }
-bool MidiAgent::isBidirectional()
+bool MidiAgent::isBidirectional() const
 {
 	return bidirectional;
 }
-bool MidiAgent::isConnected()
+bool MidiAgent::isConnected() const
 {
 	return connected;
 }
@@ -221,7 +217,7 @@ bool MidiAgent::isConnected()
 void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 {
 	MidiAgent *self = static_cast<MidiAgent *>(userData);
-	if (self->enabled == false) {
+	if (!self->enabled) {
 		return;
 	}
 	/*************Get Message parts***********/
@@ -232,10 +228,8 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 	x->device_name = self->get_midi_input_name();
 	emit self->broadcast_midi_message((MidiMessage)*x);
 	/** check if hook exists for this note or cc norc and launch it **/
-	OBSController *oc =
-		new OBSController(self->get_midi_hook_if_exists(x), x->value);
-	oc->~OBSController();
-	delete (x);
+	new OBSController(self->get_midi_hook_if_exists(x), x->value);
+	delete x;
 }
 void MidiAgent::HandleError(const rtmidi::midi_error &error_type,
 			    const std::string_view &error_message,
@@ -251,15 +245,15 @@ QVector<MidiHook *> MidiAgent::GetMidiHooks()
 }
 MidiHook *MidiAgent::get_midi_hook_if_exists(MidiMessage *message)
 {
-	for (int i = 0; i < this->midiHooks.size(); i++) {
-		if (this->midiHooks.at(i)->message_type ==
+	for (auto midiHook : this->midiHooks) {
+		if (midiHook->message_type ==
 			    message->message_type &&
-		    this->midiHooks.at(i)->norc == message->NORC &&
-		    this->midiHooks.at(i)->channel == message->channel) {
-			return this->midiHooks.at(i);
+		    midiHook->norc == message->NORC &&
+		    midiHook->channel == message->channel) {
+			return midiHook;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 void MidiAgent::add_MidiHook(MidiHook *hook)
 {

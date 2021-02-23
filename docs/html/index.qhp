@@ -49,6 +49,7 @@
       <file>sync_on.png</file>
       <file>sync_off.png</file>
       <file>doxygen.css</file>
+      <file>custom.css</file>
       <file>jquery.js</file>
       <file>dynsections.js</file>
       <file>search/search_l.png</file>

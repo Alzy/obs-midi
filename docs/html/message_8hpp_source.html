@@ -9,6 +9,10 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
@@ -46,6 +50,23 @@ $(function() {
 });
 /* @license-end */</script>
 <div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('message_8hpp_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -60,46 +81,41 @@ $(function() {
 </iframe>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
   <div class="headertitle">
 <div class="title">message.hpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#pragma once</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#if defined(MSC_VER)</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#define NOMINMAX 1</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#define WIN32_LEAN_AND_MEAN</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;cinttypes&gt;</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;memory&gt;</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;algorithm&gt;</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &lt;stdexcept&gt;</span></div>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#</span><span class="preprocessor">pragma</span> <span class="preprocessor">once</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#</span><span class="preprocessor">if</span> <span class="preprocessor">defined</span><span class="preprocessor">(</span><span class="preprocessor">MSC_VER</span><span class="preprocessor">)</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#</span><span class="preprocessor">define</span> <span class="preprocessor">NOMINMAX</span> 1</div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#</span><span class="preprocessor">define</span> <span class="preprocessor">WIN32_LEAN_AND_MEAN</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#</span><span class="preprocessor">endif</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#</span><span class="preprocessor">include</span> <span class="preprocessor">&lt;</span><span class="preprocessor">cinttypes</span><span class="preprocessor">&gt;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#</span><span class="preprocessor">include</span> <span class="preprocessor">&lt;</span><span class="preprocessor">memory</span><span class="preprocessor">&gt;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#</span><span class="preprocessor">include</span> <span class="preprocessor">&lt;</span><span class="preprocessor">vector</span><span class="preprocessor">&gt;</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#</span><span class="preprocessor">include</span> <span class="preprocessor">&lt;</span><span class="preprocessor">algorithm</span><span class="preprocessor">&gt;</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#</span><span class="preprocessor">include</span> <span class="preprocessor">&lt;</span><span class="preprocessor">stdexcept</span><span class="preprocessor">&gt;</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#if __has_include(&lt;boost/container/small_vector.hpp&gt;) &amp;&amp; !defined(RTMIDI17_NO_BOOST)</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &lt;boost/container/small_vector.hpp&gt;</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">namespace </span>rtmidi {</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">using</span> midi_bytes = boost::container::small_vector&lt;unsigned char, 4&gt;;</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#</span><span class="preprocessor">if</span> __has_include<span class="preprocessor">(</span><span class="preprocessor">&lt;</span><span class="preprocessor">boost</span><span class="preprocessor">/</span><span class="preprocessor">container</span><span class="preprocessor">/</span><span class="preprocessor">small_vector</span><span class="preprocessor">.</span><span class="preprocessor">hpp</span><span class="preprocessor">&gt;</span><span class="preprocessor">)</span> <span class="preprocessor">&amp;&amp;</span> <span class="preprocessor">!</span><span class="preprocessor">defined</span><span class="preprocessor">(</span><span class="preprocessor">RTMIDI17_NO_BOOST</span><span class="preprocessor">)</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#</span><span class="preprocessor">include</span> <span class="preprocessor">&lt;</span><span class="preprocessor">boost</span><span class="preprocessor">/</span><span class="preprocessor">container</span><span class="preprocessor">/</span><span class="preprocessor">small_vector</span><span class="preprocessor">.</span><span class="preprocessor">hpp</span><span class="preprocessor">&gt;</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">namespace</span> rtmidi {</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">using</span> midi_bytes = boost::container::small_vector&lt;<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>, 4&gt;;</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;}</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">namespace </span>rtmidi {</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="keyword">using</span> midi_bytes = std::vector&lt;unsigned char&gt;;</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#</span><span class="preprocessor">else</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">namespace</span> rtmidi {</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="keyword">using</span> midi_bytes = std::vector&lt;<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>&gt;;</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;}</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#</span><span class="preprocessor">endif</span></div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#if defined(RTMIDI17_HEADER_ONLY)</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#define RTMIDI17_INLINE inline</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#define RTMIDI17_INLINE</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#</span><span class="preprocessor">if</span> <span class="preprocessor">defined</span><span class="preprocessor">(</span><span class="preprocessor">RTMIDI17_HEADER_ONLY</span><span class="preprocessor">)</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#</span><span class="preprocessor">define</span> <span class="preprocessor">RTMIDI17_INLINE</span> <span class="preprocessor">inline</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#</span><span class="preprocessor">else</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#</span><span class="preprocessor">define</span> <span class="preprocessor">RTMIDI17_INLINE</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#</span><span class="preprocessor">endif</span></div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">namespace </span>rtmidi {</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">enum class</span> message_type : uint8_t {</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">namespace</span> rtmidi {</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">enum</span> <span class="keyword">class</span> message_type : uint8_t {</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    INVALID = 0x0,</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="comment">// Standard Message</span></div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    NOTE_OFF = 0x80,</div>
@@ -131,7 +147,7 @@ $(function() {
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    SYSTEM_RESET = 0xFF</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;};</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="keyword">enum class</span> meta_event_type : uint8_t {</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="keyword">enum</span> <span class="keyword">class</span> meta_event_type : uint8_t {</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    SEQUENCE_NUMBER = 0x00,</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    TEXT = 0x01,</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    COPYRIGHT = 0x02,</div>
@@ -153,82 +169,82 @@ $(function() {
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    UNKNOWN = 0xFF</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;};</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;constexpr <span class="keyword">inline</span> uint8_t clamp(uint8_t val, uint8_t min, uint8_t max)</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="keyword">constexpr</span> <span class="keyword">inline</span> uint8_t clamp(uint8_t val, uint8_t min, uint8_t max)</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;{</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keywordflow">return</span> std::max(std::min(val, max), min);</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;}</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
-<div class="line"><a name="l00089"></a><span class="lineno"><a class="line" href="structrtmidi_1_1message.html">   89</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structrtmidi_1_1message.html">message</a> {</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="keyword">struct</span> message {</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    midi_bytes bytes;</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="keywordtype">double</span> timestamp{};</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160; </div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <a class="code" href="structrtmidi_1_1message.html">message</a>() noexcept = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    message() <span class="keyword">noexcept</span> = <span class="keywordflow">default</span>;</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span>... Args&gt;</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <a class="code" href="structrtmidi_1_1message.html">message</a>(Args... args) noexcept : bytes{(uint8_t)args...}</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    message(Args... args) <span class="keyword">noexcept</span> : bytes{(uint8_t)args...}</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    {</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    }</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="keyword">static</span> uint8_t make_command(<span class="keyword">const</span> message_type type,</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;                    <span class="keyword">const</span> <span class="keywordtype">int</span> channel) noexcept</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;                    <span class="keyword">const</span> <span class="keywordtype">int</span> channel) <span class="keyword">noexcept</span></div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    {</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        <span class="keywordflow">return</span> (uint8_t)((uint8_t)type |</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;                 clamp(channel, 0, channel - 1));</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    }</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="keyword">static</span> <a class="code" href="structrtmidi_1_1message.html">message</a> note_on(uint8_t channel, uint8_t note,</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;                   uint8_t velocity) noexcept</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="keyword">static</span> message note_on(uint8_t channel, uint8_t note,</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;                   uint8_t velocity) <span class="keyword">noexcept</span></div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    {</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        <span class="keywordflow">return</span> {make_command(message_type::NOTE_ON, channel), note,</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;            velocity};</div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    }</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; </div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="keyword">static</span> <a class="code" href="structrtmidi_1_1message.html">message</a> note_off(uint8_t channel, uint8_t note,</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;                uint8_t velocity) noexcept</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="keyword">static</span> message note_off(uint8_t channel, uint8_t note,</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;                uint8_t velocity) <span class="keyword">noexcept</span></div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    {</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        <span class="keywordflow">return</span> {make_command(message_type::NOTE_OFF, channel), note,</div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;            velocity};</div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    }</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="keyword">static</span> <a class="code" href="structrtmidi_1_1message.html">message</a> control_change(uint8_t channel, uint8_t control,</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;                      uint8_t value) noexcept</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="keyword">static</span> message control_change(uint8_t channel, uint8_t control,</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;                      uint8_t value) <span class="keyword">noexcept</span></div>
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    {</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        <span class="keywordflow">return</span> {make_command(message_type::CONTROL_CHANGE, channel),</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;            control, value};</div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    }</div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="keyword">static</span> <a class="code" href="structrtmidi_1_1message.html">message</a> program_change(uint8_t channel, uint8_t value) noexcept</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="keyword">static</span> message program_change(uint8_t channel, uint8_t value) <span class="keyword">noexcept</span></div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    {</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        <span class="keywordflow">return</span> {make_command(message_type::PROGRAM_CHANGE, channel),</div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;            value};</div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    }</div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160; </div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keyword">static</span> <a class="code" href="structrtmidi_1_1message.html">message</a> pitch_bend(uint8_t channel, <span class="keywordtype">int</span> value) noexcept</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keyword">static</span> message pitch_bend(uint8_t channel, <span class="keywordtype">int</span> value) <span class="keyword">noexcept</span></div>
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    {</div>
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        <span class="keywordflow">return</span> {make_command(message_type::PITCH_BEND, channel),</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;            (<span class="keywordtype">unsigned</span> char)(value &amp; 0x7F),</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;            (<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>)(value &amp; 0x7F),</div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;            (uint8_t)((value &gt;&gt; 7) &amp; 0x7F)};</div>
 <div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    }</div>
 <div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160; </div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    <span class="keyword">static</span> <a class="code" href="structrtmidi_1_1message.html">message</a> pitch_bend(uint8_t channel, uint8_t lsb,</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;                  uint8_t msb) noexcept</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    <span class="keyword">static</span> message pitch_bend(uint8_t channel, uint8_t lsb,</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;                  uint8_t msb) <span class="keyword">noexcept</span></div>
 <div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    {</div>
 <div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;        <span class="keywordflow">return</span> {make_command(message_type::PITCH_BEND, channel), lsb,</div>
 <div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;            msb};</div>
 <div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    }</div>
 <div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160; </div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    <span class="keyword">static</span> <a class="code" href="structrtmidi_1_1message.html">message</a> poly_pressure(uint8_t channel, uint8_t note,</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;                     uint8_t value) noexcept</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    <span class="keyword">static</span> message poly_pressure(uint8_t channel, uint8_t note,</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;                     uint8_t value) <span class="keyword">noexcept</span></div>
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    {</div>
 <div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        <span class="keywordflow">return</span> {make_command(message_type::POLY_PRESSURE, channel),</div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;            note, value};</div>
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    }</div>
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160; </div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="keyword">static</span> <a class="code" href="structrtmidi_1_1message.html">message</a> aftertouch(uint8_t channel, uint8_t value) noexcept</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="keyword">static</span> message aftertouch(uint8_t channel, uint8_t value) <span class="keyword">noexcept</span></div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    {</div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;        <span class="keywordflow">return</span> {make_command(message_type::AFTERTOUCH, channel), value};</div>
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    }</div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160; </div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    <span class="keywordtype">bool</span> uses_channel(<span class="keywordtype">int</span> channel)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    <span class="keywordtype">bool</span> uses_channel(<span class="keywordtype">int</span> channel) <span class="keyword">const</span></div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    {</div>
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;        <span class="keywordflow">if</span> (channel &lt;= 0 || channel &gt; 16)</div>
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;            <span class="keywordflow">throw</span> std::range_error(</div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;                <span class="stringliteral">&quot;message::uses_channel: out of range&quot;</span>);</div>
@@ -236,24 +252,24 @@ $(function() {
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;               ((bytes[0] &amp; 0xF0) != 0xF0);</div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    }</div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160; </div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <span class="keywordtype">int</span> get_channel()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <span class="keywordtype">int</span> get_channel() <span class="keyword">const</span></div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    {</div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;        <span class="keywordflow">if</span> ((bytes[0] &amp; 0xF0) != 0xF0)</div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;            <span class="keywordflow">return</span> (bytes[0] &amp; 0xF) + 1;</div>
 <div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        <span class="keywordflow">return</span> 0;</div>
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    }</div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160; </div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <span class="keywordtype">bool</span> is_meta_event()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> bytes[0] == 0xFF; }</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <span class="keywordtype">bool</span> is_meta_event() <span class="keyword">const</span> { <span class="keywordflow">return</span> bytes[0] == 0xFF; }</div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160; </div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    meta_event_type get_meta_event_type()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    meta_event_type get_meta_event_type() <span class="keyword">const</span></div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    {</div>
 <div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;        <span class="keywordflow">if</span> (!is_meta_event())</div>
 <div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;            <span class="keywordflow">return</span> meta_event_type::UNKNOWN;</div>
 <div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;        <span class="keywordflow">return</span> (meta_event_type)bytes[1];</div>
 <div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    }</div>
 <div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160; </div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    message_type get_message_type()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    message_type get_message_type() <span class="keyword">const</span></div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    {</div>
 <div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        <span class="keywordflow">if</span> (bytes[0] &gt;= uint8_t(message_type::SYSTEM_EXCLUSIVE)) {</div>
 <div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;            <span class="keywordflow">return</span> (message_type)(bytes[0] &amp; 0xFF);</div>
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;        } <span class="keywordflow">else</span> {</div>
@@ -261,18 +277,18 @@ $(function() {
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;        }</div>
 <div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    }</div>
 <div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160; </div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <span class="keywordtype">bool</span> is_note_on_or_off()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <span class="keywordtype">bool</span> is_note_on_or_off() <span class="keyword">const</span></div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    {</div>
 <div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> status = get_message_type();</div>
 <div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;        <span class="keywordflow">return</span> (status == message_type::NOTE_ON) ||</div>
 <div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;               (status == message_type::NOTE_OFF);</div>
 <div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    }</div>
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160; </div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    <span class="keyword">auto</span> size()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> bytes.size(); }</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    <span class="keyword">auto</span> size() <span class="keyword">const</span> { <span class="keywordflow">return</span> bytes.size(); }</div>
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160; </div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    <span class="keyword">auto</span> &amp;front()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> bytes.front(); }</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <span class="keyword">auto</span> &amp;back()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> bytes.back(); }</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    <span class="keyword">auto</span> &amp;operator[](<span class="keywordtype">int</span> i)<span class="keyword"> const </span>{ <span class="keywordflow">return</span> bytes[i]; }</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    <span class="keyword">auto</span> &amp;front() <span class="keyword">const</span> { <span class="keywordflow">return</span> bytes.front(); }</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <span class="keyword">auto</span> &amp;back() <span class="keyword">const</span> { <span class="keywordflow">return</span> bytes.back(); }</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    <span class="keyword">auto</span> &amp;operator[](<span class="keywordtype">int</span> i) <span class="keyword">const</span> { <span class="keywordflow">return</span> bytes[i]; }</div>
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    <span class="keyword">auto</span> &amp;front() { <span class="keywordflow">return</span> bytes.front(); }</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    <span class="keyword">auto</span> &amp;back() { <span class="keywordflow">return</span> bytes.back(); }</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="keyword">auto</span> &amp;operator[](<span class="keywordtype">int</span> i) { <span class="keywordflow">return</span> bytes[i]; }</div>
@@ -287,29 +303,29 @@ $(function() {
 <div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    }</div>
 <div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    <span class="keyword">auto</span> clear() { bytes.clear(); }</div>
 <div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160; </div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    <span class="keyword">auto</span> begin()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> bytes.begin(); }</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    <span class="keyword">auto</span> end()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> bytes.end(); }</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    <span class="keyword">auto</span> begin() <span class="keyword">const</span> { <span class="keywordflow">return</span> bytes.begin(); }</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    <span class="keyword">auto</span> end() <span class="keyword">const</span> { <span class="keywordflow">return</span> bytes.end(); }</div>
 <div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    <span class="keyword">auto</span> begin() { <span class="keywordflow">return</span> bytes.begin(); }</div>
 <div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    <span class="keyword">auto</span> end() { <span class="keywordflow">return</span> bytes.end(); }</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    <span class="keyword">auto</span> cbegin()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> bytes.cbegin(); }</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    <span class="keyword">auto</span> cend()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> bytes.cend(); }</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    <span class="keyword">auto</span> cbegin() <span class="keyword">const</span> { <span class="keywordflow">return</span> bytes.cbegin(); }</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    <span class="keyword">auto</span> cend() <span class="keyword">const</span> { <span class="keywordflow">return</span> bytes.cend(); }</div>
 <div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    <span class="keyword">auto</span> cbegin() { <span class="keywordflow">return</span> bytes.cbegin(); }</div>
 <div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <span class="keyword">auto</span> cend() { <span class="keywordflow">return</span> bytes.cend(); }</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <span class="keyword">auto</span> rbegin()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> bytes.rbegin(); }</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="keyword">auto</span> rend()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> bytes.rend(); }</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <span class="keyword">auto</span> rbegin() <span class="keyword">const</span> { <span class="keywordflow">return</span> bytes.rbegin(); }</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="keyword">auto</span> rend() <span class="keyword">const</span> { <span class="keywordflow">return</span> bytes.rend(); }</div>
 <div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <span class="keyword">auto</span> rbegin() { <span class="keywordflow">return</span> bytes.rbegin(); }</div>
 <div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <span class="keyword">auto</span> rend() { <span class="keywordflow">return</span> bytes.rend(); }</div>
 <div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;};</div>
 <div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160; </div>
-<div class="line"><a name="l00232"></a><span class="lineno"><a class="line" href="structrtmidi_1_1meta__events.html">  232</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structrtmidi_1_1meta__events.html">meta_events</a> {</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    <span class="keyword">static</span> <a class="code" href="structrtmidi_1_1message.html">message</a> end_of_track() { <span class="keywordflow">return</span> {0xFF, 0x2F, 0}; }</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;<span class="keyword">struct</span> meta_events {</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    <span class="keyword">static</span> message end_of_track() { <span class="keywordflow">return</span> {0xFF, 0x2F, 0}; }</div>
 <div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160; </div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    <span class="keyword">static</span> <a class="code" href="structrtmidi_1_1message.html">message</a> channel(<span class="keywordtype">int</span> channel)</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    <span class="keyword">static</span> message channel(<span class="keywordtype">int</span> channel)</div>
 <div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    {</div>
 <div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;        <span class="keywordflow">return</span> {0xff, 0x20, 0x01, clamp(0, 0xff, channel - 1)};</div>
 <div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    }</div>
 <div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160; </div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <span class="keyword">static</span> <a class="code" href="structrtmidi_1_1message.html">message</a> tempo(<span class="keywordtype">int</span> mpqn)</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <span class="keyword">static</span> message tempo(<span class="keywordtype">int</span> mpqn)</div>
 <div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    {</div>
 <div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;        <span class="keywordflow">return</span> {0xff,</div>
 <div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;            81,</div>
@@ -319,7 +335,7 @@ $(function() {
 <div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;            (uint8_t)mpqn};</div>
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    }</div>
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160; </div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <span class="keyword">static</span> <a class="code" href="structrtmidi_1_1message.html">message</a> time_signature(<span class="keywordtype">int</span> numerator, <span class="keywordtype">int</span> denominator)</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <span class="keyword">static</span> message time_signature(<span class="keywordtype">int</span> numerator, <span class="keywordtype">int</span> denominator)</div>
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    {</div>
 <div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;        <span class="keywordtype">int</span> n = 1;</div>
 <div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;        <span class="keywordtype">int</span> powTwo = 0;</div>
@@ -335,7 +351,7 @@ $(function() {
 <div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160; </div>
 <div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    <span class="comment">// Where key index goes from -7 (7 flats, C? Major) to +7 (7 sharps, C?</span></div>
 <div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    <span class="comment">// Major)</span></div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    <span class="keyword">static</span> <a class="code" href="structrtmidi_1_1message.html">message</a> key_signature(<span class="keywordtype">int</span> keyIndex, <span class="keywordtype">bool</span> isMinor)</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    <span class="keyword">static</span> message key_signature(<span class="keywordtype">int</span> keyIndex, <span class="keywordtype">bool</span> isMinor)</div>
 <div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    {</div>
 <div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;        <span class="keywordflow">if</span> (keyIndex &lt; -7 || keyIndex &gt; 7)</div>
 <div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;            <span class="keywordflow">throw</span> std::range_error(</div>
@@ -344,28 +360,29 @@ $(function() {
 <div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;            isMinor ? (uint8_t)1 : (uint8_t)0};</div>
 <div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    }</div>
 <div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160; </div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    <span class="keyword">static</span> <a class="code" href="structrtmidi_1_1message.html">message</a> song_position(<span class="keywordtype">int</span> positionInBeats) noexcept</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    <span class="keyword">static</span> message song_position(<span class="keywordtype">int</span> positionInBeats) <span class="keyword">noexcept</span></div>
 <div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;    {</div>
 <div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;        <span class="keywordflow">return</span> {0xf2, (uint8_t)(positionInBeats &amp; 127),</div>
 <div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;            (uint8_t)((positionInBeats &gt;&gt; 7) &amp; 127)};</div>
 <div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    }</div>
 <div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;};</div>
 <div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160; </div>
-<div class="line"><a name="l00282"></a><span class="lineno"><a class="line" href="structrtmidi_1_1track__event.html">  282</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structrtmidi_1_1track__event.html">track_event</a> {</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;<span class="keyword">struct</span> track_event {</div>
 <div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;    <span class="keywordtype">int</span> tick = 0;</div>
 <div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    <span class="keywordtype">int</span> track = 0;</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    <a class="code" href="structrtmidi_1_1message.html">message</a> m;</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    message m;</div>
 <div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;};</div>
 <div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160; </div>
 <div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;<span class="keyword">typedef</span> std::vector&lt;track_event&gt; midi_track;</div>
 <div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;}</div>
-<div class="ttc" id="astructrtmidi_1_1message_html"><div class="ttname"><a href="structrtmidi_1_1message.html">rtmidi::message</a></div><div class="ttdef"><b>Definition:</b> message.hpp:89</div></div>
-<div class="ttc" id="astructrtmidi_1_1meta__events_html"><div class="ttname"><a href="structrtmidi_1_1meta__events.html">rtmidi::meta_events</a></div><div class="ttdef"><b>Definition:</b> message.hpp:232</div></div>
-<div class="ttc" id="astructrtmidi_1_1track__event_html"><div class="ttname"><a href="structrtmidi_1_1track__event.html">rtmidi::track_event</a></div><div class="ttdef"><b>Definition:</b> message.hpp:282</div></div>
 </div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
-Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><b>message.hpp</b></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+  </ul>
+</div>
 </body>
 </html>

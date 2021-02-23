@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_class_plugin_window" xml:lang="en-US">
+<title>PluginWindow Class Reference</title>
+<indexterm><primary>PluginWindow</primary></indexterm>
+<para>Inheritance diagram for PluginWindow:    <informalfigure>
+        <mediaobject>
+            <imageobject>
+                <imagedata width="50%" align="center" valign="middle" scalefit="0" fileref="class_plugin_window.png"></imagedata>
+            </imageobject>
+        </mediaobject>
+    </informalfigure>
+</para>
+<simplesect>
+    <title>Public Slots    </title>
+        <itemizedlist>
+            <listitem><para><anchor xml:id="_class_plugin_window_1ac17cdfc1e6bcd56fc6e8c4d8177afcbd"/>void <emphasis role="strong">on_check_enabled_state_changed</emphasis> (int state)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_plugin_window_1a971fa90069bc452c94e60fd38cc27f12"/>void <emphasis role="strong">on_bid_enabled_state_changed</emphasis> (int state)</para>
+</listitem>
+            <listitem><para>void <link linkend="_class_plugin_window_1a5f871dd54fdb6f438a81121fe2ed3a7a">on_device_select</link> (const QString &amp;curitem)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_plugin_window_1aa26daa7de6a2ebbb19b7c199ad1e54dc"/>void <emphasis role="strong">select_output_device</emphasis> (const QString &amp;item)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_plugin_window_1ac2c861da8552cafb85c59598ca761605"/>void <emphasis role="strong">handle_midi_message</emphasis> (const <link linkend="_struct_midi_message">MidiMessage</link> &amp;mess)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_plugin_window_1ace888227a9dbfb65cee4fd7d1b6556fa"/>void <emphasis role="strong">obs_actions_select</emphasis> (const QString &amp;action)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_plugin_window_1a80d6cb2278fb797283e64a050c750767"/>void <emphasis role="strong">set_edit_mode</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_plugin_window_1a7eb16aaaa06ee72668c7c7e104ab49d4"/>void <emphasis role="strong">save_edit</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_plugin_window_1af11ac6f36db32026163eae532cfff5d6"/>void <emphasis role="strong">reset_to_defaults</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_plugin_window_1a70f065fdb649ff09bb99ca4dd7fc389b"/>void <emphasis role="strong">on_scene_change</emphasis> (const QString &amp;newscene)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_plugin_window_1a9c8ade7b8811bf8fd6ab46b9c4147981"/>void <emphasis role="strong">on_source_change</emphasis> (const QString &amp;newsource)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_plugin_window_1aa71df7d602583944e26469c4de3be4a3"/>void <emphasis role="strong">add_new_mapping</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_plugin_window_1a61bf0f4c66481f6f8f4459cc919792dc"/>void <emphasis role="strong">add_row_from_hook</emphasis> (<link linkend="_class_midi_hook">MidiHook</link> *hook)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_plugin_window_1a7ef082dd8b94f05437e9479a9a74e9ac"/>void <emphasis role="strong">tab_changed</emphasis> (int i)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_plugin_window_1ade7c598acf96264c10e8a84e9b44b962"/>void <emphasis role="strong">clear_table</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_plugin_window_1a9fb1ebf1aeb2e4f5e419bdc45af28953"/>void <emphasis role="strong">load_table</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_plugin_window_1a4ecf6f2e57ab98f9247d51b7aafb69a7"/>void <emphasis role="strong">delete_mapping</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_plugin_window_1a2c90defe57c87bfc746583bb9e5ff66c"/>void <emphasis role="strong">edit_mapping</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_plugin_window_1af630f57e30ba0e0ae8aebf443c2b956b"/>void <emphasis role="strong">set_cell_colors</emphasis> (const QColor &amp;color, QTableWidgetItem *item)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Signals    </title>
+        <itemizedlist>
+            <listitem><para><anchor xml:id="_class_plugin_window_1a1ab7d501e4b764964fc413216eb5607b"/>void <emphasis role="strong">changed</emphasis> (obs_data_t *change)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para><anchor xml:id="_class_plugin_window_1ac10939736525e59520096f324985cf2a"/><emphasis role="strong">PluginWindow</emphasis> (QWidget *parent)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Member Function Documentation</title>
+<anchor xml:id="_class_plugin_window_1a5f871dd54fdb6f438a81121fe2ed3a7a"/>    <section>
+    <title>on_device_select</title>
+<indexterm><primary>on_device_select</primary><secondary>PluginWindow</secondary></indexterm>
+<indexterm><primary>PluginWindow</primary><secondary>on_device_select</secondary></indexterm>
+<para><computeroutput>void PluginWindow::on_device_select (const QString &amp; curitem)<computeroutput>[slot]</computeroutput></computeroutput></para>
+<para>HOOK up the Message Handler</para>
+</section>
+<para>
+The documentation for this class was generated from the following files:</para>
+src/forms/settings-dialog.hsrc/forms/settings-dialog.cpp</section>
+</section>

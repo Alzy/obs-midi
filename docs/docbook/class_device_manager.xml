@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_class_device_manager" xml:lang="en-US">
+<title>DeviceManager Class Reference</title>
+<indexterm><primary>DeviceManager</primary></indexterm>
+<para>Inheritance diagram for DeviceManager:    <informalfigure>
+        <mediaobject>
+            <imageobject>
+                <imagedata width="50%" align="center" valign="middle" scalefit="0" fileref="class_device_manager.png"></imagedata>
+            </imageobject>
+        </mediaobject>
+    </informalfigure>
+</para>
+<simplesect>
+    <title>Signals    </title>
+        <itemizedlist>
+            <listitem><para><anchor xml:id="_class_device_manager_1a35d95fd713211c59974dbc1381a8b65e"/>void <emphasis role="strong">bcast</emphasis> (const QString &amp;updateType, const QString &amp;eventData)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para><anchor xml:id="_class_device_manager_1a7cb4d93e6e79b76e9716b082778c6608"/>void <emphasis role="strong">Load</emphasis> (obs_data_t *data)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_device_manager_1a175672d5cb872a64ef754255f4525e5a"/>void <emphasis role="strong">Unload</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_device_manager_1a310e3f26ed9190d94de4dad7ecf3d70d"/>QStringList <emphasis role="strong">GetPortsList</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_device_manager_1a182d28bf1a3562254607f59d796c3118"/>int <emphasis role="strong">GetPortNumberByDeviceName</emphasis> (const QString &amp;deviceName)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_device_manager_1a42716b5b7fa70d890cb9f2150c1f6faa"/>QStringList <emphasis role="strong">GetOutPortsList</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_device_manager_1a5da2f64bb83095e9fbc0223d56880ef2"/>int <emphasis role="strong">GetOutPortNumberByDeviceName</emphasis> (const QString &amp;deviceName)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_device_manager_1a6106862dc260d130ab8209955ee97207"/>QVector&lt; <link linkend="_class_midi_agent">MidiAgent</link> * &gt; <emphasis role="strong">GetActiveMidiDevices</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_device_manager_1a2a34b034babf2cf5c92b5527a30477f5"/><link linkend="_class_midi_agent">MidiAgent</link> * <emphasis role="strong">GetMidiDeviceByName</emphasis> (const QString &amp;deviceName)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_device_manager_1a6e4bef215514046f75fcfa95b8dee835"/>QVector&lt; <link linkend="_class_midi_hook">MidiHook</link> * &gt; <emphasis role="strong">GetMidiHooksByDeviceName</emphasis> (const QString &amp;deviceName)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_device_manager_1a67f1e0f67bc241f730f10693d6116734"/><link linkend="_class_midi_agent">MidiAgent</link> * <emphasis role="strong">RegisterMidiDevice</emphasis> (const int &amp;port, const int &amp;outport)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_device_manager_1af6781c6fa58dc890e426fefbd94a1073"/>obs_data_t * <emphasis role="strong">GetData</emphasis> ()</para>
+</listitem>
+            <listitem><para><anchor xml:id="_class_device_manager_1a005505a874a358312cf623c0a71fdea5"/>void <emphasis role="strong">broadcast_obs_event</emphasis> (const <link linkend="_class_rpc_event">RpcEvent</link> &amp;event)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<para>
+The documentation for this class was generated from the following files:</para>
+src/device-manager.hsrc/device-manager.cpp</section>

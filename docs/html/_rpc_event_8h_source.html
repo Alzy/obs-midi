@@ -9,6 +9,10 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
@@ -46,6 +50,23 @@ $(function() {
 });
 /* @license-end */</script>
 <div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('_rpc_event_8h_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -60,11 +81,6 @@ $(function() {
 </iframe>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_1d8fd1f10602b1b3ec6e7b702d4ec182.html">rpc</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
   <div class="headertitle">
 <div class="title">RpcEvent.h</div>  </div>
@@ -88,27 +104,27 @@ $(function() {
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="comment">with this program. If not, see &lt;https://www.gnu.org/licenses/&gt;</span></div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment">*/</span></div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#pragma once</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#</span><span class="preprocessor">pragma</span> <span class="preprocessor">once</span></div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;optional&gt;</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &lt;obs-data.h&gt;</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;QtCore/QString&gt;</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#</span><span class="preprocessor">include</span> <span class="preprocessor">&lt;</span><span class="preprocessor">optional</span><span class="preprocessor">&gt;</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#</span><span class="preprocessor">include</span> <span class="preprocessor">&lt;</span><span class="preprocessor">obs</span><span class="preprocessor">-</span><span class="preprocessor">data</span><span class="preprocessor">.</span><span class="preprocessor">h</span><span class="preprocessor">&gt;</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#</span><span class="preprocessor">include</span> <span class="preprocessor">&lt;</span><span class="preprocessor">QtCore</span><span class="preprocessor">/</span><span class="preprocessor">QString</span><span class="preprocessor">&gt;</span></div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &quot;../obs-midi.h&quot;</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#</span><span class="preprocessor">include</span> <span class="preprocessor">&quot;../obs-midi.h&quot;</span></div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
-<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="class_rpc_event.html">   27</a></span>&#160;<span class="keyword">class </span><a class="code" href="class_rpc_event.html">RpcEvent</a> {</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">class</span> RpcEvent {</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="class_rpc_event.html">RpcEvent</a>(QString updateType, std::optional&lt;uint64_t&gt; streamTime, std::optional&lt;uint64_t&gt; recordingTime,</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;              obs_data_t *additionalFields = <span class="keyword">nullptr</span>);</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    ~<a class="code" href="class_rpc_event.html">RpcEvent</a>();</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">explicit</span> RpcEvent(QString updateType, std::optional&lt;uint64_t&gt; streamTime, std::optional&lt;uint64_t&gt; recordingTime,</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;              obs_data_t *additionalFields = <span class="keywordtype">nullptr</span>);</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    ~RpcEvent();</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keyword">const</span> QString &amp;updateType()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _updateType; }</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keyword">const</span> QString &amp;updateType() <span class="keyword">const</span> { <span class="keywordflow">return</span> _updateType; }</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">const</span> std::optional&lt;uint64_t&gt; &amp;streamTime()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _streamTime; }</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">const</span> std::optional&lt;uint64_t&gt; &amp;streamTime() <span class="keyword">const</span> { <span class="keywordflow">return</span> _streamTime; }</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keyword">const</span> std::optional&lt;uint64_t&gt; &amp;recordingTime()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _recordingTime; }</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keyword">const</span> std::optional&lt;uint64_t&gt; &amp;recordingTime() <span class="keyword">const</span> { <span class="keywordflow">return</span> _recordingTime; }</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    OBSData additionalFields()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> std::move(OBSData(_additionalFields)); }</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    OBSData additionalFields() <span class="keyword">const</span> { <span class="keywordflow">return</span> std::move(OBSData(_additionalFields)); }</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="keyword">private</span>:</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    QString _updateType;</div>
@@ -116,11 +132,14 @@ $(function() {
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    std::optional&lt;uint64_t&gt; _recordingTime;</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    obs_data_t *_additionalFields;</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;};</div>
-<div class="ttc" id="aclass_rpc_event_html"><div class="ttname"><a href="class_rpc_event.html">RpcEvent</a></div><div class="ttdef"><b>Definition:</b> RpcEvent.h:27</div></div>
 </div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
-Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_1d8fd1f10602b1b3ec6e7b702d4ec182.html">rpc</a></li><li class="navelem"><b>RpcEvent.h</b></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+  </ul>
+</div>
 </body>
 </html>

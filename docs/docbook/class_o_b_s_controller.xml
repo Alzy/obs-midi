@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_class_o_b_s_controller" xml:lang="en-US">
+<title>OBSController Class Reference</title>
+<indexterm><primary>OBSController</primary></indexterm>
+<para>Inheritance diagram for OBSController:    <informalfigure>
+        <mediaobject>
+            <imageobject>
+                <imagedata width="50%" align="center" valign="middle" scalefit="0" fileref="class_o_b_s_controller.png"></imagedata>
+            </imageobject>
+        </mediaobject>
+    </informalfigure>
+</para>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para><anchor xml:id="_class_o_b_s_controller_1a6426006bf2a5685253ffada5aa5be9f3"/><emphasis role="strong">OBSController</emphasis> (<link linkend="_class_midi_hook">MidiHook</link> *incoming_midi_hook, int incoming_midi_value)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<para>
+The documentation for this class was generated from the following files:</para>
+src/obs-controller.hsrc/obs-controller.cpp</section>

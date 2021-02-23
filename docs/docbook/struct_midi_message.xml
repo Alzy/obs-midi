@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_struct_midi_message" xml:lang="en-US">
+<title>MidiMessage Struct Reference</title>
+<indexterm><primary>MidiMessage</primary></indexterm>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para><anchor xml:id="_struct_midi_message_1a9911cb33540d08d574ed1df6696989c9"/>void <emphasis role="strong">set_message</emphasis> (const <link linkend="_structrtmidi_1_1message">rtmidi::message</link> &amp;message)</para>
+</listitem>
+            <listitem><para><anchor xml:id="_struct_midi_message_1a9f964208eec1435c325ef7fa3bbaa6ef"/><link linkend="_struct_midi_message">MidiMessage</link> <emphasis role="strong">get</emphasis> ()</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Public Attributes    </title>
+        <itemizedlist>
+            <listitem><para><anchor xml:id="_struct_midi_message_1a2b00adfb8bc28e3480322fd35d90e8a3"/>QString <emphasis role="strong">device_name</emphasis></para>
+</listitem>
+            <listitem><para><anchor xml:id="_struct_midi_message_1a28cc790e0fc0fead3a432f4d0338482c"/>QString <emphasis role="strong">message_type</emphasis></para>
+</listitem>
+            <listitem><para><anchor xml:id="_struct_midi_message_1a24c25e5319246a79b73036d39747765b"/>int <emphasis role="strong">channel</emphasis> = 0</para>
+</listitem>
+            <listitem><para><anchor xml:id="_struct_midi_message_1a4088329311dbbbd881378d371813e905"/>int <emphasis role="strong">NORC</emphasis> = 0</para>
+</listitem>
+            <listitem><para><anchor xml:id="_struct_midi_message_1a990e5a1f076f4ec987b544877eafcebc"/>int <emphasis role="strong">value</emphasis> = 0</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<para>
+The documentation for this struct was generated from the following file:</para>
+src/utils.h</section>

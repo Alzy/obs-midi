@@ -242,3 +242,5 @@ install_obs_plugin_with_data(obs-midi data)
 endif()
 set_target_properties(obs-midi PROPERTIES FOLDER "plugins/obs-midi")
 
+# Documentation Generation
+add_subdirectory ("docs/devdocs")

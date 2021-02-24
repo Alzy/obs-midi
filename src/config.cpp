@@ -16,15 +16,7 @@ You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>
 */
 
-#include <QtCore/QCryptographicHash>
-#include <QtCore/QTime>
-#include <QtWidgets/QSystemTrayIcon>
-
-#include "forms/settings-dialog.h"
-#include "utils.h"
-#include "obs-midi.h"
 #include "config.h"
-#include "device-manager.h"
 
 #define PARAM_DEVICES "MidiDevices"
 
@@ -32,17 +24,14 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 using namespace std;
 
-Config::Config() : DebugEnabled(false), AlertsEnabled(true), SettingsLoaded(false)
+Config::Config()
 {
-	this->setParent(plugin_window);
-	qsrand(QTime::currentTime().msec());
 	GetConfigStore();
-	obs_frontend_add_event_callback(on_frontend_event, this);
 }
 
 Config::~Config()
 {
-	obs_frontend_remove_event_callback(on_frontend_event, this);
+	obs_data_release(midiConfig);
 }
 
 /* Load the configuration from the OBS Config Store
@@ -50,9 +39,7 @@ Config::~Config()
 void Config::Load()
 {
 	auto deviceManager = GetDeviceManager();
-	obs_data_array_t *deviceManagerData = obs_data_get_array(midiConfig, PARAM_DEVICES);
-	deviceManager->Load(deviceManagerData);
-	SettingsLoaded = true;
+	deviceManager->Load(std::move(obs_data_get_array(midiConfig, PARAM_DEVICES)));
 }
 
 /* Save the configuration to the OBS Config Store
@@ -69,7 +56,6 @@ void Config::Save()
 	bfree(path);
 }
 
-
 void Config::GetConfigStore()
 {
 	const char *file = "obs-midi.json";
@@ -84,14 +70,5 @@ void Config::GetConfigStore()
 		obs_data_save_json(midiConfig, filepath);
 	}
 	bfree(filepath);
-}
-
-void Config::on_frontend_event(obs_frontend_event event, void *param)
-{
-	if (event == OBS_FRONTEND_EVENT_PROFILE_CHANGED) {
-		auto deviceManager = GetDeviceManager();
-		deviceManager->Unload();
-		auto config = GetConfig();
-		config->Load();
-	}
+	bfree(path);
 }

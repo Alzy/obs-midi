@@ -17,41 +17,24 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 */
 
 #pragma once
-
-#include <vector>
-
-#include <QtCore/QString>
-#include <QtCore/QSharedPointer>
-
+#include "obs-data.h"
 #include <util/config-file.h>
 #include <util/util.hpp>
 #include <util/platform.h>
-#if __has_include(<obs-frontend-api.h>)
-#include <obs-frontend-api.h>
-#else
-#include <obs-frontend-api/obs-frontend-api.h>
-#endif
+#include <qobject.h>
+#include "device-manager.h"
 
-
-class Config : QObject
-{
+class Config : QObject {
 	Q_OBJECT
 public:
 	Config();
 	~Config() override;
 
-	void Load();
-	
-	void check_or_create_path(const char *path);
-	void GetConfigStore();
-	bool DebugEnabled;
-	bool AlertsEnabled;
-
-	bool SettingsLoaded;
 public slots:
+	void Load();
 	void Save();
 
 private:
 	obs_data_t *midiConfig;
-	static void on_frontend_event(obs_frontend_event event, void *param);
+	void GetConfigStore();
 };

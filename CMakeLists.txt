@@ -55,7 +55,8 @@ set(obs-midi_SOURCES
 	src/forms/settings-dialog.cpp
 	src/obs-midi.cpp
 	src/events.cpp
-	src/rpc/RpcEvent.cpp)
+	src/rpc/RpcEvent.cpp
+	)
 list(APPEND obs-midi_HEADERS
 	src/utils.h
 	src/config.h
@@ -65,7 +66,8 @@ list(APPEND obs-midi_HEADERS
 	src/forms/settings-dialog.h
 	src/obs-midi.h
 	src/events.h
-	src/rpc/RpcEvent.h)
+	src/rpc/RpcEvent.h
+	)
 add_library(obs-midi MODULE
 	${obs-midi_SOURCES}
 	${obs-midi_HEADERS})

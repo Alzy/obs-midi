@@ -68,6 +68,8 @@ public:
 	void remove_MidiHook(MidiHook *hook);
 	void clear_MidiHooks();
 	obs_data_t *GetData();
+	MidiHook *find_midi_hook(const ActionsClass::Actions &action, const QString &source);
+	MidiHook *find_midi_hook_from_source(const QString &source);
 public slots:
 	void handle_obs_event(const QString &eventType, const QString &eventData);
 signals:

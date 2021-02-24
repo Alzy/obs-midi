@@ -30,7 +30,6 @@
 
 #define STATUS_INTERVAL 2000
 
-
 const char *sourceTypeToString(obs_source_type type)
 {
 	switch (type) {
@@ -59,14 +58,10 @@ const char *calldata_get_string(const calldata_t *data, const char *name)
 	return value;
 }
 events::events(DeviceManagerPtr srv)
-	: _srv(std::move(srv)),
-	  _streamStarttime(0),
-	  _lastBytesSent(0),
-	  _lastBytesSentTime(0),
-	  HeartbeatIsActive(false),
-	  pulse(false)
+	: _srv(std::move(srv)), _streamStarttime(0), _lastBytesSent(0), _lastBytesSentTime(0), HeartbeatIsActive(false), pulse(false)
 {
 	this->setParent(GetDeviceManager().get());
+	connect(this, &events::obsEvent, _srv.get(), &DeviceManager::broadcast_obs_event);
 	//_srv = GetDeviceManager();
 	cpuUsageInfo = os_cpu_usage_info_start();
 	obs_frontend_add_event_callback(events::FrontendEventHandler, this);
@@ -83,6 +78,7 @@ events::events(DeviceManagerPtr srv)
 		signal_handler_connect(coreSignalHandler, "source_create", OnSourceCreate, this);
 		signal_handler_connect(coreSignalHandler, "source_destroy", OnSourceDestroy, this);
 	}
+	active = true;
 }
 events::~events()
 {
@@ -101,6 +97,7 @@ events::~events()
 		this);
 	obs_frontend_remove_event_callback(events::FrontendEventHandler, this);
 	os_cpu_usage_info_destroy(cpuUsageInfo);
+	active = false;
 	this->deleteLater();
 }
 void events::FrontendEventHandler(enum obs_frontend_event event, void *private_data)
@@ -201,17 +198,19 @@ void events::FrontendEventHandler(enum obs_frontend_event event, void *private_d
 }
 void events::broadcastUpdate(const char *updateType, obs_data_t *additionalFields = nullptr)
 {
-	std::optional<uint64_t> streamTime;
-	if (obs_frontend_streaming_active()) {
-		streamTime = std::make_optional(getStreamingTime());
-	}
-	std::optional<uint64_t> recordingTime;
-	if (obs_frontend_recording_active()) {
-		recordingTime = std::make_optional(getRecordingTime());
-	}
-	{
-		RpcEvent event(QString(updateType), streamTime, recordingTime, additionalFields);
-		_srv->broadcast_obs_event(event);
+	if (active) {
+		std::optional<uint64_t> streamTime;
+		if (obs_frontend_streaming_active()) {
+			streamTime = std::make_optional(getStreamingTime());
+		}
+		std::optional<uint64_t> recordingTime;
+		if (obs_frontend_recording_active()) {
+			recordingTime = std::make_optional(getRecordingTime());
+		}
+		{
+			RpcEvent event(QString(updateType), streamTime, recordingTime, additionalFields);
+			emit obsEvent(event);
+		}
 	}
 }
 void events::connectSourceSignals(obs_source_t *source)
@@ -362,7 +361,7 @@ void events::OnSceneChange()
 
 	// we __can__ release data after broadcastUpdate(), because inside this function
 	// data will be copyed (int RcpEvent constructor)
-	broadcastUpdate("SwitchScenes", data);
+	broadcastUpdate("SceneChange", data);
 	obs_data_release(data);
 }
 /**
@@ -370,13 +369,13 @@ void events::OnSceneChange()
  * Scenes have been added, removed, or renamed.
  *
  * @api events
- * @name ScenesChanged
+ * @name SceneListChanged
  * @category scenes
  * @since 0.3
  */
 void events::OnSceneListChange()
 {
-	broadcastUpdate("ScenesChanged");
+	broadcastUpdate("SceneListChanged");
 }
 /**
  * Triggered when switching to another scene collection or when renaming the current scene collection.
@@ -595,49 +594,49 @@ void events::OnRecordingResumed()
 	broadcastUpdate("RecordingResumed");
 }
 /**
-* A request to start the replay buffer has been issued.
-*
-* @api events
-* @name ReplayStarting
-* @category replay buffer
-* @since 4.2.0
-*/
+ * A request to start the replay buffer has been issued.
+ *
+ * @api events
+ * @name ReplayStarting
+ * @category replay buffer
+ * @since 4.2.0
+ */
 void events::OnReplayStarting()
 {
 	broadcastUpdate("ReplayStarting");
 }
 /**
-* Replay Buffer started successfully
-*
-* @api events
-* @name ReplayStarted
-* @category replay buffer
-* @since 4.2.0
-*/
+ * Replay Buffer started successfully
+ *
+ * @api events
+ * @name ReplayStarted
+ * @category replay buffer
+ * @since 4.2.0
+ */
 void events::OnReplayStarted()
 {
 	broadcastUpdate("ReplayStarted");
 }
 /**
-* A request to stop the replay buffer has been issued.
-*
-* @api events
-* @name ReplayStopping
-* @category replay buffer
-* @since 4.2.0
-*/
+ * A request to stop the replay buffer has been issued.
+ *
+ * @api events
+ * @name ReplayStopping
+ * @category replay buffer
+ * @since 4.2.0
+ */
 void events::OnReplayStopping()
 {
 	broadcastUpdate("ReplayStopping");
 }
 /**
-* Replay Buffer stopped successfully
-*
-* @api events
-* @name ReplayStopped
-* @category replay buffer
-* @since 4.2.0
-*/
+ * Replay Buffer stopped successfully
+ *
+ * @api events
+ * @name ReplayStopped
+ * @category replay buffer
+ * @since 4.2.0
+ */
 void events::OnReplayStopped()
 {
 	broadcastUpdate("ReplayStopped");
@@ -805,8 +804,8 @@ void events::TransitionDurationChanged(int ms)
  *
  * @return {String} `name` Transition name.
  * @return {String} `type` Transition type.
- * @return {int} `duration` Transition duration (in milliseconds). 
- * Will be -1 for any transition with a fixed duration, 
+ * @return {int} `duration` Transition duration (in milliseconds).
+ * Will be -1 for any transition with a fixed duration,
  * such as a Stinger, due to limitations of the OBS API.
  * @return {String} `from-scene` Source scene of the transition
  * @return {String} `to-scene` Destination scene of the transition
@@ -828,19 +827,19 @@ void events::OnTransitionBegin(void *param, calldata_t *data)
 	obs_data_release(fields);
 }
 /**
-* A transition (other than "cut") has ended.
-* Please note that the `from-scene` field is not available in TransitionEnd.
-*
-* @return {String} `name` Transition name.
-* @return {String} `type` Transition type.
-* @return {int} `duration` Transition duration (in milliseconds).
-* @return {String} `to-scene` Destination scene of the transition
-*
-* @api events
-* @name TransitionEnd
-* @category transitions
-* @since 4.8.0
-*/
+ * A transition (other than "cut") has ended.
+ * Please note that the `from-scene` field is not available in TransitionEnd.
+ *
+ * @return {String} `name` Transition name.
+ * @return {String} `type` Transition type.
+ * @return {int} `duration` Transition duration (in milliseconds).
+ * @return {String} `to-scene` Destination scene of the transition
+ *
+ * @api events
+ * @name TransitionEnd
+ * @category transitions
+ * @since 4.8.0
+ */
 void events::OnTransitionEnd(void *param, calldata_t *data)
 {
 	auto instance = reinterpret_cast<events *>(param);
@@ -853,19 +852,19 @@ void events::OnTransitionEnd(void *param, calldata_t *data)
 	obs_data_release(fields);
 }
 /**
-* A stinger transition has finished playing its video.
-*
-* @return {String} `name` Transition name.
-* @return {String} `type` Transition type.
-* @return {int} `duration` Transition duration (in milliseconds).
-* @return {String} `from-scene` Source scene of the transition
-* @return {String} `to-scene` Destination scene of the transition
-*
-* @api events
-* @name TransitionVideoEnd
-* @category transitions
-* @since 4.8.0
-*/
+ * A stinger transition has finished playing its video.
+ *
+ * @return {String} `name` Transition name.
+ * @return {String} `type` Transition type.
+ * @return {int} `duration` Transition duration (in milliseconds).
+ * @return {String} `from-scene` Source scene of the transition
+ * @return {String} `to-scene` Destination scene of the transition
+ *
+ * @api events
+ * @name TransitionVideoEnd
+ * @category transitions
+ * @since 4.8.0
+ */
 void events::OnTransitionVideoEnd(void *param, calldata_t *data)
 {
 	auto instance = reinterpret_cast<events *>(param);

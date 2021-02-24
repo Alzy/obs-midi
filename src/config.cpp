@@ -46,12 +46,10 @@ Config::Config()
 
 	SetDefaults();
 
-	obs_frontend_add_event_callback(on_frontend_event, this);
 }
 
 Config::~Config()
 {
-	obs_frontend_remove_event_callback(on_frontend_event, this);
 }
 
 /* Load the configuration from the OBS Config Store
@@ -99,18 +97,9 @@ void Config::SetDefaults()
 	}
 }
 
-config_t *Config::GetConfigStore()
+config_t * Config::GetConfigStore()
 {
 	return obs_frontend_get_profile_config();
 }
 
-void Config::on_frontend_event(obs_frontend_event event, void *param)
-{
-	if (event == OBS_FRONTEND_EVENT_PROFILE_CHANGED) {
-		auto deviceManager = GetDeviceManager();
-		deviceManager->Unload();
-		auto config = GetConfig();
-		config->SetDefaults();
-		config->Load();
-	}
-}
+

@@ -86,6 +86,7 @@ private:
 	os_cpu_usage_info_t *cpuUsageInfo;
 
 	bool pulse;
+	bool active;
 
 	uint64_t _streamStarttime;
 

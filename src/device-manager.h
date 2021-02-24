@@ -63,11 +63,11 @@ public:
 	MidiAgent *RegisterMidiDevice(const int &port, const int &outport);
 
 	obs_data_t *GetData();
+public slots:
 	void broadcast_obs_event(const RpcEvent &event);
 signals:
 	void bcast(const QString &updateType, const QString &eventData);
 
 private:
-	QMetaObject::Connection broadcast_connection;
 	QVector<MidiAgent *> midiAgents;
 };

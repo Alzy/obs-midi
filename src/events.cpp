@@ -472,7 +472,7 @@ void Events::OnProfileListChange()
  */
 void Events::OnStreamStarting()
 {
-	OBSDataAutoRelease data = obs_data_create();
+	obs_data_t *data = obs_data_create();
 	obs_data_set_bool(data, "preview-only", false);
 	broadcastUpdate("StreamStarting", data);
 	obs_data_release(data);
@@ -503,7 +503,7 @@ void Events::OnStreamStarted()
  */
 void Events::OnStreamStopping()
 {
-	OBSDataAutoRelease data = obs_data_create();
+	obs_data_t *data = obs_data_create();
 	obs_data_set_bool(data, "preview-only", false);
 	broadcastUpdate("StreamStopping", data);
 	obs_data_release(data);
@@ -706,7 +706,7 @@ void Events::StreamStatus()
 	int totalFrames = obs_output_get_total_frames(streamOutput);
 	int droppedFrames = obs_output_get_frames_dropped(streamOutput);
 	float strain = obs_output_get_congestion(streamOutput);
-	OBSDataAutoRelease data = obs_data_create();
+	obs_data_t *data = obs_data_create();
 	obs_data_set_bool(data, "streaming", streamingActive);
 	obs_data_set_bool(data, "recording", recordingActive);
 	obs_data_set_bool(data, "recording-paused", recordingPaused);
@@ -718,7 +718,7 @@ void Events::StreamStatus()
 	obs_data_set_int(data, "num-dropped-frames", droppedFrames);
 	obs_data_set_double(data, "strain", strain);
 	// `stats` contains fps, cpu usage, memory usage, render missed frames, ...
-	OBSDataAutoRelease stats = GetStats();
+	obs_data_t *stats = GetStats();
 	obs_data_apply(data, stats);
 	obs_data_set_bool(data, "preview-only",
 			  false); // Retrocompat with OBSRemote
@@ -753,7 +753,7 @@ void Events::Heartbeat()
 	bool streamingActive = obs_frontend_streaming_active();
 	bool recordingActive = obs_frontend_recording_active();
 	bool recordingPaused = obs_frontend_recording_paused();
-	OBSDataAutoRelease data = obs_data_create();
+	obs_data_t *data = obs_data_create();
 	OBSOutputAutoRelease recordOutput = obs_frontend_get_recording_output();
 	OBSOutputAutoRelease streamOutput = obs_frontend_get_streaming_output();
 	pulse = !pulse;
@@ -776,7 +776,7 @@ void Events::Heartbeat()
 		obs_data_set_int(data, "total-record-bytes", (uint64_t)obs_output_get_total_bytes(recordOutput));
 		obs_data_set_int(data, "total-record-frames", obs_output_get_total_frames(recordOutput));
 	}
-	OBSDataAutoRelease stats = GetStats();
+	obs_data_t *stats = GetStats();
 	obs_data_set_obj(data, "stats", stats);
 	broadcastUpdate("Heartbeat", data);
 	obs_data_release(data);
@@ -794,7 +794,7 @@ void Events::Heartbeat()
  */
 void Events::TransitionDurationChanged(int ms)
 {
-	OBSDataAutoRelease fields = obs_data_create();
+	obs_data_t *fields = obs_data_create();
 	obs_data_set_int(fields, "new-duration", ms);
 	broadcastUpdate("TransitionDurationChanged", fields);
 	obs_data_release(fields);
@@ -822,7 +822,7 @@ void Events::OnTransitionBegin(void *param, calldata_t *data)
 	if (!transition) {
 		return;
 	}
-	OBSDataAutoRelease fields = Utils::GetTransitionData(transition);
+	obs_data_t *fields = Utils::GetTransitionData(transition);
 	instance->broadcastUpdate("TransitionBegin", fields);
 	obs_data_release(fields);
 }
@@ -847,7 +847,7 @@ void Events::OnTransitionEnd(void *param, calldata_t *data)
 	if (!transition) {
 		return;
 	}
-	OBSDataAutoRelease fields = Utils::GetTransitionData(transition);
+	obs_data_t *fields = Utils::GetTransitionData(transition);
 	instance->broadcastUpdate("TransitionEnd", fields);
 	obs_data_release(fields);
 }
@@ -872,7 +872,7 @@ void Events::OnTransitionVideoEnd(void *param, calldata_t *data)
 	if (!transition) {
 		return;
 	}
-	OBSDataAutoRelease fields = Utils::GetTransitionData(transition);
+	obs_data_t *fields = Utils::GetTransitionData(transition);
 	instance->broadcastUpdate("TransitionVideoEnd", fields);
 	obs_data_release(fields);
 }
@@ -898,7 +898,7 @@ void Events::OnSourceCreate(void *param, calldata_t *data)
 	}
 	self->connectSourceSignals(source);
 	OBSDataAutoRelease sourceSettings = obs_source_get_settings(source);
-	OBSDataAutoRelease fields = obs_data_create();
+	obs_data_t *fields = obs_data_create();
 	obs_data_set_string(fields, "sourceName", obs_source_get_name(source));
 	obs_data_set_string(fields, "sourceType", sourceTypeToString(obs_source_get_type(source)));
 	obs_data_set_string(fields, "sourceKind", obs_source_get_id(source));
@@ -956,7 +956,7 @@ void Events::OnSourceVolumeChange(void *param, calldata_t *data)
 	if (!calldata_get_float(data, "volume", &volume)) {
 		return;
 	}
-	OBSDataAutoRelease fields = obs_data_create();
+	obs_data_t *fields = obs_data_create();
 	obs_data_set_string(fields, "sourceName", obs_source_get_name(source));
 	obs_data_set_double(fields, "volume", volume);
 	self->broadcastUpdate("SourceVolumeChanged", fields);
@@ -984,7 +984,7 @@ void Events::OnSourceMuteStateChange(void *param, calldata_t *data)
 	if (!calldata_get_bool(data, "muted", &muted)) {
 		return;
 	}
-	OBSDataAutoRelease fields = obs_data_create();
+	obs_data_t *fields = obs_data_create();
 	obs_data_set_string(fields, "sourceName", obs_source_get_name(source));
 	obs_data_set_bool(fields, "muted", muted);
 	self->broadcastUpdate("SourceMuteStateChanged", fields);
@@ -1012,7 +1012,7 @@ void Events::OnSourceAudioSyncOffsetChanged(void *param, calldata_t *data)
 	if (!calldata_get_int(data, "offset", &syncOffset)) {
 		return;
 	}
-	OBSDataAutoRelease fields = obs_data_create();
+	obs_data_t *fields = obs_data_create();
 	obs_data_set_string(fields, "sourceName", obs_source_get_name(source));
 	obs_data_set_int(fields, "syncOffset", (int)syncOffset);
 	self->broadcastUpdate("SourceAudioSyncOffsetChanged", fields);
@@ -1051,7 +1051,7 @@ void Events::OnSourceAudioMixersChanged(void *param, calldata_t *data)
 		obs_data_array_push_back(mixers, item);
 	}
 	const QString hexValue = QString::number(audioMixers, 16).toUpper().prepend("0x");
-	OBSDataAutoRelease fields = obs_data_create();
+	obs_data_t *fields = obs_data_create();
 	obs_data_set_string(fields, "sourceName", obs_source_get_name(source));
 	obs_data_set_array(fields, "mixers", mixers);
 	obs_data_set_string(fields, "hexMixersValue", hexValue.toUtf8());
@@ -1081,7 +1081,7 @@ void Events::OnSourceRename(void *param, calldata_t *data)
 		return;
 	}
 	const char *previousName = calldata_get_string(data, "prev_name");
-	OBSDataAutoRelease fields = obs_data_create();
+	obs_data_t *fields = obs_data_create();
 	obs_data_set_string(fields, "previousName", previousName);
 	obs_data_set_string(fields, "newName", newName);
 	self->broadcastUpdate("SourceRenamed", fields);
@@ -1112,8 +1112,8 @@ void Events::OnSourceFilterAdded(void *param, calldata_t *data)
 		return;
 	}
 	self->connectFilterSignals(filter);
-	OBSDataAutoRelease filterSettings = obs_source_get_settings(filter);
-	OBSDataAutoRelease fields = obs_data_create();
+	obs_data_t *filterSettings = obs_source_get_settings(filter);
+	obs_data_t *fields = obs_data_create();
 	obs_data_set_string(fields, "sourceName", obs_source_get_name(source));
 	obs_data_set_string(fields, "filterName", obs_source_get_name(filter));
 	obs_data_set_string(fields, "filterType", obs_source_get_id(filter));
@@ -1146,7 +1146,7 @@ void Events::OnSourceFilterRemoved(void *param, calldata_t *data)
 		return;
 	}
 	self->disconnectFilterSignals(filter);
-	OBSDataAutoRelease fields = obs_data_create();
+	obs_data_t *fields = obs_data_create();
 	obs_data_set_string(fields, "sourceName", obs_source_get_name(source));
 	obs_data_set_string(fields, "filterName", obs_source_get_name(filter));
 	obs_data_set_string(fields, "filterType", obs_source_get_id(filter));
@@ -1173,7 +1173,7 @@ void Events::OnSourceFilterVisibilityChanged(void *param, calldata_t *data)
 		return;
 	}
 	OBSSource parent = obs_filter_get_parent(source);
-	OBSDataAutoRelease fields = obs_data_create();
+	obs_data_t *fields = obs_data_create();
 	obs_data_set_string(fields, "sourceName", obs_source_get_name(parent));
 	obs_data_set_string(fields, "filterName", obs_source_get_name(source));
 	obs_data_set_bool(fields, "filterEnabled", obs_source_enabled(source));
@@ -1201,7 +1201,7 @@ void Events::OnSourceFilterOrderChanged(void *param, calldata_t *data)
 		return;
 	}
 	OBSDataArrayAutoRelease filters = Utils::GetSourceFiltersList(source, false);
-	OBSDataAutoRelease fields = obs_data_create();
+	obs_data_t *fields = obs_data_create();
 	obs_data_set_string(fields, "sourceName", obs_source_get_name(source));
 	obs_data_set_array(fields, "filters", filters);
 	self->broadcastUpdate("SourceFiltersReordered", fields);
@@ -1240,7 +1240,7 @@ void Events::OnSceneReordered(void *param, calldata_t *data)
 			return true;
 		},
 		sceneItems);
-	OBSDataAutoRelease fields = obs_data_create();
+	obs_data_t *fields = obs_data_create();
 	obs_data_set_string(fields, "scene-name", obs_source_get_name(obs_scene_get_source(scene)));
 	obs_data_set_array(fields, "scene-items", sceneItems);
 	instance->broadcastUpdate("SourceOrderChanged", fields);
@@ -1268,7 +1268,7 @@ void Events::OnSceneItemAdd(void *param, calldata_t *data)
 	calldata_get_ptr(data, "item", &sceneItem);
 	const char *sceneName = obs_source_get_name(obs_scene_get_source(scene));
 	const char *sceneItemName = obs_source_get_name(obs_sceneitem_get_source(sceneItem));
-	OBSDataAutoRelease fields = obs_data_create();
+	obs_data_t *fields = obs_data_create();
 	obs_data_set_string(fields, "scene-name", sceneName);
 	obs_data_set_string(fields, "item-name", sceneItemName);
 	obs_data_set_int(fields, "item-id", obs_sceneitem_get_id(sceneItem));
@@ -1296,7 +1296,7 @@ void Events::OnSceneItemDelete(void *param, calldata_t *data)
 	calldata_get_ptr(data, "item", &sceneItem);
 	const char *sceneName = obs_source_get_name(obs_scene_get_source(scene));
 	const char *sceneItemName = obs_source_get_name(obs_sceneitem_get_source(sceneItem));
-	OBSDataAutoRelease fields = obs_data_create();
+	obs_data_t *fields = obs_data_create();
 	obs_data_set_string(fields, "scene-name", sceneName);
 	obs_data_set_string(fields, "item-name", sceneItemName);
 	obs_data_set_int(fields, "item-id", obs_sceneitem_get_id(sceneItem));
@@ -1327,7 +1327,7 @@ void Events::OnSceneItemVisibilityChanged(void *param, calldata_t *data)
 	calldata_get_bool(data, "visible", &visible);
 	const char *sceneName = obs_source_get_name(obs_scene_get_source(scene));
 	const char *sceneItemName = obs_source_get_name(obs_sceneitem_get_source(sceneItem));
-	OBSDataAutoRelease fields = obs_data_create();
+	obs_data_t *fields = obs_data_create();
 	obs_data_set_string(fields, "scene-name", sceneName);
 	obs_data_set_string(fields, "item-name", sceneItemName);
 	obs_data_set_int(fields, "item-id", obs_sceneitem_get_id(sceneItem));
@@ -1359,7 +1359,7 @@ void Events::OnSceneItemLockChanged(void *param, calldata_t *data)
 	calldata_get_bool(data, "locked", &locked);
 	const char *sceneName = obs_source_get_name(obs_scene_get_source(scene));
 	const char *sceneItemName = obs_source_get_name(obs_sceneitem_get_source(sceneItem));
-	OBSDataAutoRelease fields = obs_data_create();
+	obs_data_t *fields = obs_data_create();
 	obs_data_set_string(fields, "scene-name", sceneName);
 	obs_data_set_string(fields, "item-name", sceneItemName);
 	obs_data_set_int(fields, "item-id", obs_sceneitem_get_id(sceneItem));
@@ -1389,8 +1389,8 @@ void Events::OnSceneItemTransform(void *param, calldata_t *data)
 	calldata_get_ptr(data, "item", &sceneItem);
 	const char *sceneName = obs_source_get_name(obs_scene_get_source(scene));
 	const char *sceneItemName = obs_source_get_name(obs_sceneitem_get_source(sceneItem));
-	OBSDataAutoRelease transform = Utils::GetSceneItemPropertiesData(sceneItem);
-	OBSDataAutoRelease fields = obs_data_create();
+	obs_data_t *transform = Utils::GetSceneItemPropertiesData(sceneItem);
+	obs_data_t *fields = obs_data_create();
 	obs_data_set_string(fields, "scene-name", sceneName);
 	obs_data_set_string(fields, "item-name", sceneItemName);
 	obs_data_set_int(fields, "item-id", obs_sceneitem_get_id(sceneItem));
@@ -1423,7 +1423,7 @@ void Events::OnSceneItemSelected(void *param, calldata_t *data)
 	}
 	OBSSource sceneSource = obs_scene_get_source(scene);
 	OBSSource itemSource = obs_sceneitem_get_source(item);
-	OBSDataAutoRelease fields = obs_data_create();
+	obs_data_t *fields = obs_data_create();
 	obs_data_set_string(fields, "scene-name", obs_source_get_name(sceneSource));
 	obs_data_set_string(fields, "item-name", obs_source_get_name(itemSource));
 	obs_data_set_int(fields, "item-id", obs_sceneitem_get_id(item));
@@ -1455,7 +1455,7 @@ void Events::OnSceneItemDeselected(void *param, calldata_t *data)
 	}
 	OBSSource sceneSource = obs_scene_get_source(scene);
 	OBSSource itemSource = obs_sceneitem_get_source(item);
-	OBSDataAutoRelease fields = obs_data_create();
+	obs_data_t *fields = obs_data_create();
 	obs_data_set_string(fields, "scene-name", obs_source_get_name(sceneSource));
 	obs_data_set_string(fields, "item-name", obs_source_get_name(itemSource));
 	obs_data_set_int(fields, "item-id", obs_sceneitem_get_id(item));
@@ -1480,7 +1480,7 @@ void Events::OnPreviewSceneChanged()
 		if (!scene)
 			return;
 		OBSDataArrayAutoRelease sceneItems = Utils::GetSceneItems(scene);
-		OBSDataAutoRelease data = obs_data_create();
+		obs_data_t *data = obs_data_create();
 		obs_data_set_string(data, "scene-name", obs_source_get_name(scene));
 		obs_data_set_array(data, "sources", sceneItems);
 		broadcastUpdate("PreviewSceneChanged", data);
@@ -1499,7 +1499,7 @@ void Events::OnPreviewSceneChanged()
  */
 void Events::OnStudioModeSwitched(bool checked)
 {
-	OBSDataAutoRelease data = obs_data_create();
+	obs_data_t *data = obs_data_create();
 	obs_data_set_bool(data, "new-state", checked);
 	broadcastUpdate("StudioModeSwitched", data);
 	obs_data_release(data);
@@ -1517,7 +1517,7 @@ void Events::OnStudioModeSwitched(bool checked)
  */
 void Events::OnBroadcastCustomMessage(const QString &realm, obs_data_t *data)
 {
-	OBSDataAutoRelease broadcastData = obs_data_create();
+	obs_data_t *broadcastData = obs_data_create();
 	obs_data_set_string(broadcastData, "realm", realm.toUtf8().constData());
 	obs_data_set_obj(broadcastData, "data", data);
 	broadcastUpdate("BroadcastCustomMessage", broadcastData);
@@ -1537,7 +1537,7 @@ void Events::OnBroadcastCustomMessage(const QString &realm, obs_data_t *data)
  */
 obs_data_t *Events::GetStats()
 {
-	OBSDataAutoRelease stats = obs_data_create();
+	obs_data_t *stats = obs_data_create();
 	double cpuUsage = os_cpu_usage_info_query(cpuUsageInfo);
 	double memoryUsage = (double)os_get_proc_resident_size() / (1024.0 * 1024.0);
 	video_t *mainVideo = obs_get_video();

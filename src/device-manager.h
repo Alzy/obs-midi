@@ -49,7 +49,7 @@ public:
 	DeviceManager();
 	~DeviceManager() override;
 
-	void Load(obs_data_t *data);
+	void Load(obs_data_array_t *data);
 	void Unload();
 
 	QStringList GetPortsList();
@@ -62,7 +62,7 @@ public:
 	QVector<MidiHook *> GetMidiHooksByDeviceName(const QString &deviceName);
 	MidiAgent *RegisterMidiDevice(const int &port, const int &outport);
 
-	obs_data_t *GetData();
+	obs_data_array_t *GetData();
 	void broadcast_obs_event(const RpcEvent &event);
 signals:
 	void bcast(const QString &updateType, const QString &eventData);

@@ -34,22 +34,21 @@ DeviceManager::~DeviceManager()
 /* Load the Device Manager from saved Config Store data.
  * This method is called from Config. Should only be called once on runtime
  */
-void DeviceManager::Load(obs_data_t *data)
+void DeviceManager::Load(obs_data_array_t *data)
 {
 	QStringList portsList = GetPortsList();
 	QStringList outPortsList = GetOutPortsList();
-	obs_data_array_t *devicesData = obs_data_get_array(data, "devices");
-	obs_data_release(data);
-	size_t deviceCount = obs_data_array_count(devicesData);
+	
+	
+	size_t deviceCount = obs_data_array_count(data);
 	for (size_t i = 0; i < deviceCount; i++) {
-		obs_data_t *deviceData = obs_data_array_item(devicesData, i);
+		obs_data_t *deviceData = obs_data_array_item(data, i);
 		MidiAgent *device = new MidiAgent(deviceData);
 		obs_data_release(deviceData);
 		midiAgents.push_back(device);
 
 		broadcast_connection = connect(this, SIGNAL(bcast(QString, QString)), device, SLOT(handle_obs_event(QString, QString)));
 	}
-	obs_data_array_release(devicesData);
 }
 
 void DeviceManager::Unload()
@@ -180,17 +179,16 @@ MidiAgent *DeviceManager::RegisterMidiDevice(const int &port, const int &outport
  * This is needed to Serialize the state in the config.
  * https://obsproject.com/docs/reference-settings.html
  */
-obs_data_t *DeviceManager::GetData()
+obs_data_array_t *DeviceManager::GetData()
 {
-	obs_data_t* data = obs_data_create();
 
-	obs_data_array_t* deviceData = obs_data_array_create();
+
+	obs_data_array_t* data = obs_data_array_create();
 	for (auto midiAgent : midiAgents)
 	{
-		obs_data_array_push_back(deviceData, midiAgent->GetData());
+		obs_data_array_push_back(data, midiAgent->GetData());
 	}
 
-	obs_data_set_array(data, "devices", deviceData);
 	return data;
 }
 

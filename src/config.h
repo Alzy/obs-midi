@@ -24,6 +24,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <QtCore/QSharedPointer>
 
 #include <util/config-file.h>
+#include <util/util.hpp>
+#include <util/platform.h>
 #if __has_include(<obs-frontend-api.h>)
 #include <obs-frontend-api.h>
 #else
@@ -39,15 +41,17 @@ public:
 	~Config() override;
 
 	void Load();
-	void Save();
-	void SetDefaults();
-	config_t *GetConfigStore();
-
+	
+	void check_or_create_path(const char *path);
+	void GetConfigStore();
 	bool DebugEnabled;
 	bool AlertsEnabled;
 
 	bool SettingsLoaded;
+public slots:
+	void Save();
 
 private:
+	obs_data_t *midiConfig;
 	static void on_frontend_event(obs_frontend_event event, void *param);
 };

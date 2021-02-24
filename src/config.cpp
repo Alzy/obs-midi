@@ -26,26 +26,17 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "config.h"
 #include "device-manager.h"
 
-#define SECTION_NAME "MidiAPI"
-#define PARAM_DEBUG "DebugEnabled"
-#define PARAM_ALERT "AlertsEnabled"
 #define PARAM_DEVICES "MidiDevices"
-
-#define DEFUALT_DEVICES "{\"devices\": []}"
 
 #define QT_TO_UTF8(str) str.toUtf8().constData()
 
 using namespace std;
 
-
-Config::Config()
-	: DebugEnabled(false), AlertsEnabled(true), SettingsLoaded(false)
+Config::Config() : DebugEnabled(false), AlertsEnabled(true), SettingsLoaded(false)
 {
 	this->setParent(plugin_window);
 	qsrand(QTime::currentTime().msec());
-
-	SetDefaults();
-
+	GetConfigStore();
 	obs_frontend_add_event_callback(on_frontend_event, this);
 }
 
@@ -58,16 +49,8 @@ Config::~Config()
  */
 void Config::Load()
 {
-	SetDefaults();
-	config_t *obsConfig = GetConfigStore();
-
-	DebugEnabled = config_get_bool(obsConfig, SECTION_NAME, PARAM_DEBUG);
-	AlertsEnabled = config_get_bool(obsConfig, SECTION_NAME, PARAM_ALERT);
-
 	auto deviceManager = GetDeviceManager();
-	obs_data_t *deviceManagerData = obs_data_create_from_json(
-		config_get_string(obsConfig, SECTION_NAME, PARAM_DEVICES));
-	blog(LOG_INFO, "Loaded: \n %s", config_get_string(obsConfig, SECTION_NAME, PARAM_DEVICES));
+	obs_data_array_t *deviceManagerData = obs_data_get_array(midiConfig, PARAM_DEVICES);
 	deviceManager->Load(deviceManagerData);
 	SettingsLoaded = true;
 }
@@ -76,32 +59,31 @@ void Config::Load()
  */
 void Config::Save()
 {
-	config_t *obsConfig = GetConfigStore();
-
-	config_set_bool(obsConfig, SECTION_NAME, PARAM_DEBUG, DebugEnabled);
-	config_set_bool(obsConfig, SECTION_NAME, PARAM_ALERT, AlertsEnabled);
 
 	auto deviceManager = GetDeviceManager();
 	auto data = deviceManager->GetData();
-	config_set_string(obsConfig, SECTION_NAME, PARAM_DEVICES, obs_data_get_json(data));
-	obs_data_release(data);
-	config_save(obsConfig);
+	obs_data_set_array(midiConfig, PARAM_DEVICES, data);
+	const char *file = "obs-midi.json";
+	auto path = obs_module_config_path(file);
+	obs_data_save_json(midiConfig, path);
+	bfree(path);
 }
 
-void Config::SetDefaults()
+
+void Config::GetConfigStore()
 {
-	// OBS Config defaults
-	config_t *obsConfig = GetConfigStore();
-	if (obsConfig) {
-		config_set_default_bool(obsConfig, SECTION_NAME, PARAM_DEBUG, DebugEnabled);
-		config_set_default_bool(obsConfig, SECTION_NAME, PARAM_ALERT, AlertsEnabled);
-		config_set_default_string(obsConfig, SECTION_NAME, PARAM_DEVICES, DEFUALT_DEVICES);
+	const char *file = "obs-midi.json";
+	auto path = obs_module_config_path(NULL);
+	auto filepath = obs_module_config_path(file);
+	os_mkdirs(path);
+	blog(LOG_DEBUG, "config path is %s", file);
+	if (os_file_exists(filepath)) {
+		midiConfig = obs_data_create_from_json_file(filepath);
+	} else {
+		midiConfig = obs_data_create();
+		obs_data_save_json(midiConfig, filepath);
 	}
-}
-
-config_t *Config::GetConfigStore()
-{
-	return obs_frontend_get_profile_config();
+	bfree(filepath);
 }
 
 void Config::on_frontend_event(obs_frontend_event event, void *param)
@@ -110,7 +92,6 @@ void Config::on_frontend_event(obs_frontend_event event, void *param)
 		auto deviceManager = GetDeviceManager();
 		deviceManager->Unload();
 		auto config = GetConfig();
-		config->SetDefaults();
 		config->Load();
 	}
 }

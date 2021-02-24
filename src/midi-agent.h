@@ -69,7 +69,7 @@ public:
 	void clear_MidiHooks();
 	obs_data_t *GetData();
 public slots:
-	void handle_obs_event(const QString &eventType, const QString &eventData);
+	void handle_obs_event(const RpcEvent &event);
 signals:
 	void broadcast_midi_message(const MidiMessage &);
 	void do_obs_action(MidiHook *, int);

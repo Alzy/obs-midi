@@ -43,13 +43,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "rpc/RpcEvent.h"
 
 
-class events : public QObject
+class Events : public QObject
 {
 	Q_OBJECT
 
 public:
-	explicit events(DeviceManagerPtr srv);
-	~events() override;
+	explicit Events(DeviceManagerPtr srv);
+	~Events() override;
 
 	void connectSourceSignals(obs_source_t *source);
 	void disconnectSourceSignals(obs_source_t *source);

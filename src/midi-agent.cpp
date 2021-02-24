@@ -21,6 +21,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "utils.h"
 #include "midi-agent.h"
 #include "obs-midi.h"
+#include "events.h"
 #include "config.h"
 #include "device-manager.h"
 
@@ -51,12 +52,14 @@ MidiAgent::MidiAgent(obs_data_t *midiData)
 }
 void MidiAgent::set_callbacks()
 {
+	connect(GetEventsSystem().get(), &Events::obsEvent, this, &MidiAgent::handle_obs_event);
 	midiin.set_callback([this](const auto &message) { HandleInput(message, this); });
 	midiin.set_error_callback([this](const auto &error_type, const auto &error_message) { HandleError(error_type, error_message, this); });
 	midiout.set_error_callback([this](const auto &error_type, const auto &error_message) { HandleError(error_type, error_message, this); });
 }
 MidiAgent::~MidiAgent()
 {
+	disconnect(GetEventsSystem().get(), &Events::obsEvent, this, &MidiAgent::handle_obs_event);
 	clear_MidiHooks();
 	close_both_midi_ports();
 	midiin.cancel_callback();
@@ -293,8 +296,24 @@ obs_data_t *MidiAgent::GetData()
 	return data;
 }
 /*Handle OBS events*/
-void MidiAgent::handle_obs_event(const QString &eventType, const QString &eventData)
+void MidiAgent::handle_obs_event(const RpcEvent &event)
 {
+	OBSDataAutoRelease eventsData = obs_data_create();
+
+	const QString &updateType = event.updateType();
+	obs_data_set_string(eventsData, "update-type", updateType.toUtf8().constData());
+
+	OBSData additionalFields = event.additionalFields();
+	if (additionalFields) {
+		obs_data_apply(eventsData, additionalFields);
+	}
+	
+	blog(LOG_DEBUG, "OBS EVENT %s -- %s", event.updateType().toStdString().c_str(), obs_data_get_json(eventsData));
+	QString eventType = event.updateType();
+	QString eventData = QString::fromStdString(obs_data_get_json(eventsData));
+	
+	obs_data_release(additionalFields);
+	obs_data_release(eventsData);
 	if (!this->sending) {
 		MidiMessage *message = new MidiMessage();
 		OBSDataAutoRelease data = obs_data_create_from_json(eventData.toStdString().c_str());

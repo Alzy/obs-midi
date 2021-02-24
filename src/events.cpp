@@ -58,7 +58,7 @@ const char *calldata_get_string(const calldata_t *data, const char *name)
 	calldata_get_string(data, name, &value);
 	return value;
 }
-events::events(DeviceManagerPtr srv)
+Events::Events(DeviceManagerPtr srv)
 	: _srv(std::move(srv)),
 	  _streamStarttime(0),
 	  _lastBytesSent(0),
@@ -69,11 +69,11 @@ events::events(DeviceManagerPtr srv)
 	this->setParent(GetDeviceManager().get());
 	//_srv = GetDeviceManager();
 	cpuUsageInfo = os_cpu_usage_info_start();
-	obs_frontend_add_event_callback(events::FrontendEventHandler, this);
+	obs_frontend_add_event_callback(Events::FrontendEventHandler, this);
 	// Connect to signals of all existing sources
 	obs_enum_sources(
 		[](void *param, obs_source_t *source) {
-			auto self = reinterpret_cast<events *>(param);
+			auto self = reinterpret_cast<Events *>(param);
 			self->connectSourceSignals(source);
 			return true;
 		},
@@ -84,7 +84,7 @@ events::events(DeviceManagerPtr srv)
 		signal_handler_connect(coreSignalHandler, "source_destroy", OnSourceDestroy, this);
 	}
 }
-events::~events()
+Events::~Events()
 {
 	signal_handler_t *coreSignalHandler = obs_get_signal_handler();
 	if (coreSignalHandler) {
@@ -94,17 +94,17 @@ events::~events()
 	// Disconnect from signals of all existing sources
 	obs_enum_sources(
 		[](void *param, obs_source_t *source) {
-			auto self = reinterpret_cast<events *>(param);
+			auto self = reinterpret_cast<Events *>(param);
 			self->disconnectSourceSignals(source);
 			return true;
 		},
 		this);
-	obs_frontend_remove_event_callback(events::FrontendEventHandler, this);
+	obs_frontend_remove_event_callback(Events::FrontendEventHandler, this);
 	os_cpu_usage_info_destroy(cpuUsageInfo);
 }
-void events::FrontendEventHandler(enum obs_frontend_event event, void *private_data)
+void Events::FrontendEventHandler(enum obs_frontend_event event, void *private_data)
 {
-	auto owner = reinterpret_cast<events *>(private_data);
+	auto owner = reinterpret_cast<Events *>(private_data);
 	if (!owner->_srv) {
 		return;
 	}
@@ -198,7 +198,7 @@ void events::FrontendEventHandler(enum obs_frontend_event event, void *private_d
 		break;
 	}
 }
-void events::broadcastUpdate(const char *updateType, obs_data_t *additionalFields = nullptr)
+void Events::broadcastUpdate(const char *updateType, obs_data_t *additionalFields = nullptr)
 {
 	std::optional<uint64_t> streamTime;
 	if (obs_frontend_streaming_active()) {
@@ -210,10 +210,10 @@ void events::broadcastUpdate(const char *updateType, obs_data_t *additionalField
 	}
 	{
 		RpcEvent event(QString(updateType), streamTime, recordingTime, additionalFields);
-		_srv->broadcast_obs_event(event);
+		emit obsEvent(event);
 	}
 }
-void events::connectSourceSignals(obs_source_t *source)
+void Events::connectSourceSignals(obs_source_t *source)
 {
 	if (!source) {
 		return;
@@ -241,7 +241,7 @@ void events::connectSourceSignals(obs_source_t *source)
 		signal_handler_connect(sh, "item_deselect", OnSceneItemDeselected, this);
 	}
 }
-void events::disconnectSourceSignals(obs_source_t *source)
+void Events::disconnectSourceSignals(obs_source_t *source)
 {
 	if (!source) {
 		return;
@@ -267,7 +267,7 @@ void events::disconnectSourceSignals(obs_source_t *source)
 	signal_handler_disconnect(sh, "transition_stop", OnTransitionEnd, this);
 	signal_handler_disconnect(sh, "transition_video_stop", OnTransitionVideoEnd, this);
 }
-void events::connectFilterSignals(obs_source_t *filter)
+void Events::connectFilterSignals(obs_source_t *filter)
 {
 	if (!filter) {
 		return;
@@ -275,7 +275,7 @@ void events::connectFilterSignals(obs_source_t *filter)
 	signal_handler_t *sh = obs_source_get_signal_handler(filter);
 	signal_handler_connect(sh, "enable", OnSourceFilterVisibilityChanged, this);
 }
-void events::disconnectFilterSignals(obs_source_t *filter)
+void Events::disconnectFilterSignals(obs_source_t *filter)
 {
 	if (!filter) {
 		return;
@@ -283,7 +283,7 @@ void events::disconnectFilterSignals(obs_source_t *filter)
 	signal_handler_t *sh = obs_source_get_signal_handler(filter);
 	signal_handler_disconnect(sh, "enable", OnSourceFilterVisibilityChanged, this);
 }
-void events::hookTransitionPlaybackEvents()
+void Events::hookTransitionPlaybackEvents()
 {
 	obs_frontend_source_list transitions = {};
 	obs_frontend_get_transitions(&transitions);
@@ -299,7 +299,7 @@ void events::hookTransitionPlaybackEvents()
 	}
 	obs_frontend_source_list_free(&transitions);
 }
-void events::unhookTransitionPlaybackEvents()
+void Events::unhookTransitionPlaybackEvents()
 {
 	obs_frontend_source_list transitions = {};
 	obs_frontend_get_transitions(&transitions);
@@ -322,21 +322,21 @@ uint64_t getOutputRunningTime(obs_output_t *output)
 	int totalFrames = obs_output_get_total_frames(output);
 	return (((uint64_t)totalFrames) * frameTimeNs);
 }
-uint64_t events::getStreamingTime()
+uint64_t Events::getStreamingTime()
 {
 	OBSOutputAutoRelease streamingOutput = obs_frontend_get_streaming_output();
 	return getOutputRunningTime(streamingOutput);
 }
-uint64_t events::getRecordingTime()
+uint64_t Events::getRecordingTime()
 {
 	OBSOutputAutoRelease recordingOutput = obs_frontend_get_recording_output();
 	return getOutputRunningTime(recordingOutput);
 }
-QString events::getStreamingTimecode()
+QString Events::getStreamingTimecode()
 {
 	return std::move(Utils::nsToTimestamp(getStreamingTime()));
 }
-QString events::getRecordingTimecode()
+QString Events::getRecordingTimecode()
 {
 	return std::move(Utils::nsToTimestamp(getRecordingTime()));
 }
@@ -351,7 +351,7 @@ QString events::getRecordingTimecode()
  * @category scenes
  * @since 0.3
  */
-void events::OnSceneChange()
+void Events::OnSceneChange()
 {
 	OBSSourceAutoRelease currentScene = obs_frontend_get_current_scene();
 	OBSDataArrayAutoRelease sceneItems = Utils::GetSceneItems(currentScene);
@@ -373,7 +373,7 @@ void events::OnSceneChange()
  * @category scenes
  * @since 0.3
  */
-void events::OnSceneListChange()
+void Events::OnSceneListChange()
 {
 	broadcastUpdate("ScenesChanged");
 }
@@ -385,7 +385,7 @@ void events::OnSceneListChange()
  * @category scenes
  * @since 4.0.0
  */
-void events::OnSceneCollectionChange()
+void Events::OnSceneCollectionChange()
 {
 	broadcastUpdate("SceneCollectionChanged");
 	OnTransitionListChange();
@@ -401,7 +401,7 @@ void events::OnSceneCollectionChange()
  * @category scenes
  * @since 4.0.0
  */
-void events::OnSceneCollectionListChange()
+void Events::OnSceneCollectionListChange()
 {
 	broadcastUpdate("SceneCollectionListChanged");
 }
@@ -415,7 +415,7 @@ void events::OnSceneCollectionListChange()
  * @category transitions
  * @since 4.0.0
  */
-void events::OnTransitionChange()
+void Events::OnTransitionChange()
 {
 	OBSSourceAutoRelease currentTransition = obs_frontend_get_current_transition();
 	OBSDataAutoRelease data = obs_data_create();
@@ -432,7 +432,7 @@ void events::OnTransitionChange()
  * @category transitions
  * @since 4.0.0
  */
-void events::OnTransitionListChange()
+void Events::OnTransitionListChange()
 {
 	broadcastUpdate("TransitionListChanged");
 }
@@ -444,7 +444,7 @@ void events::OnTransitionListChange()
  * @category profiles
  * @since 4.0.0
  */
-void events::OnProfileChange()
+void Events::OnProfileChange()
 {
 	broadcastUpdate("ProfileChanged");
 }
@@ -456,7 +456,7 @@ void events::OnProfileChange()
  * @category profiles
  * @since 4.0.0
  */
-void events::OnProfileListChange()
+void Events::OnProfileListChange()
 {
 	broadcastUpdate("ProfileListChanged");
 }
@@ -470,7 +470,7 @@ void events::OnProfileListChange()
  * @category streaming
  * @since 0.3
  */
-void events::OnStreamStarting()
+void Events::OnStreamStarting()
 {
 	OBSDataAutoRelease data = obs_data_create();
 	obs_data_set_bool(data, "preview-only", false);
@@ -485,7 +485,7 @@ void events::OnStreamStarting()
  * @category streaming
  * @since 0.3
  */
-void events::OnStreamStarted()
+void Events::OnStreamStarted()
 {
 	_streamStarttime = os_gettime_ns();
 	_lastBytesSent = 0;
@@ -501,7 +501,7 @@ void events::OnStreamStarted()
  * @category streaming
  * @since 0.3
  */
-void events::OnStreamStopping()
+void Events::OnStreamStopping()
 {
 	OBSDataAutoRelease data = obs_data_create();
 	obs_data_set_bool(data, "preview-only", false);
@@ -516,7 +516,7 @@ void events::OnStreamStopping()
  * @category streaming
  * @since 0.3
  */
-void events::OnStreamStopped()
+void Events::OnStreamStopped()
 {
 	_streamStarttime = 0;
 	broadcastUpdate("StreamStopped");
@@ -529,7 +529,7 @@ void events::OnStreamStopped()
  * @category recording
  * @since 0.3
  */
-void events::OnRecordingStarting()
+void Events::OnRecordingStarting()
 {
 	broadcastUpdate("RecordingStarting");
 }
@@ -541,7 +541,7 @@ void events::OnRecordingStarting()
  * @category recording
  * @since 0.3
  */
-void events::OnRecordingStarted()
+void Events::OnRecordingStarted()
 {
 	broadcastUpdate("RecordingStarted");
 }
@@ -553,7 +553,7 @@ void events::OnRecordingStarted()
  * @category recording
  * @since 0.3
  */
-void events::OnRecordingStopping()
+void Events::OnRecordingStopping()
 {
 	broadcastUpdate("RecordingStopping");
 }
@@ -565,7 +565,7 @@ void events::OnRecordingStopping()
  * @category recording
  * @since 0.3
  */
-void events::OnRecordingStopped()
+void Events::OnRecordingStopped()
 {
 	broadcastUpdate("RecordingStopped");
 }
@@ -577,7 +577,7 @@ void events::OnRecordingStopped()
  * @category recording
  * @since 4.7.0
  */
-void events::OnRecordingPaused()
+void Events::OnRecordingPaused()
 {
 	broadcastUpdate("RecordingPaused");
 }
@@ -589,7 +589,7 @@ void events::OnRecordingPaused()
  * @category recording
  * @since 4.7.0
  */
-void events::OnRecordingResumed()
+void Events::OnRecordingResumed()
 {
 	broadcastUpdate("RecordingResumed");
 }
@@ -601,7 +601,7 @@ void events::OnRecordingResumed()
 * @category replay buffer
 * @since 4.2.0
 */
-void events::OnReplayStarting()
+void Events::OnReplayStarting()
 {
 	broadcastUpdate("ReplayStarting");
 }
@@ -613,7 +613,7 @@ void events::OnReplayStarting()
 * @category replay buffer
 * @since 4.2.0
 */
-void events::OnReplayStarted()
+void Events::OnReplayStarted()
 {
 	broadcastUpdate("ReplayStarted");
 }
@@ -625,7 +625,7 @@ void events::OnReplayStarted()
 * @category replay buffer
 * @since 4.2.0
 */
-void events::OnReplayStopping()
+void Events::OnReplayStopping()
 {
 	broadcastUpdate("ReplayStopping");
 }
@@ -637,7 +637,7 @@ void events::OnReplayStopping()
 * @category replay buffer
 * @since 4.2.0
 */
-void events::OnReplayStopped()
+void Events::OnReplayStopped()
 {
 	broadcastUpdate("ReplayStopped");
 }
@@ -649,7 +649,7 @@ void events::OnReplayStopped()
  * @category other
  * @since 0.3
  */
-void events::OnExit()
+void Events::OnExit()
 {
 	broadcastUpdate("Exiting");
 }
@@ -681,7 +681,7 @@ void events::OnExit()
  * @category streaming
  * @since 0.3
  */
-void events::StreamStatus()
+void Events::StreamStatus()
 {
 	bool streamingActive = obs_frontend_streaming_active();
 	bool recordingActive = obs_frontend_recording_active();
@@ -746,7 +746,7 @@ void events::StreamStatus()
  * @name Heartbeat
  * @category general
  */
-void events::Heartbeat()
+void Events::Heartbeat()
 {
 	if (!HeartbeatIsActive)
 		return;
@@ -792,7 +792,7 @@ void events::Heartbeat()
  * @category transitions
  * @since 4.0.0
  */
-void events::TransitionDurationChanged(int ms)
+void Events::TransitionDurationChanged(int ms)
 {
 	OBSDataAutoRelease fields = obs_data_create();
 	obs_data_set_int(fields, "new-duration", ms);
@@ -815,9 +815,9 @@ void events::TransitionDurationChanged(int ms)
  * @category transitions
  * @since 4.0.0
  */
-void events::OnTransitionBegin(void *param, calldata_t *data)
+void Events::OnTransitionBegin(void *param, calldata_t *data)
 {
-	auto instance = reinterpret_cast<events *>(param);
+	auto instance = reinterpret_cast<Events *>(param);
 	OBSSource transition = calldata_get_pointer<obs_source_t>(data, "source");
 	if (!transition) {
 		return;
@@ -840,9 +840,9 @@ void events::OnTransitionBegin(void *param, calldata_t *data)
 * @category transitions
 * @since 4.8.0
 */
-void events::OnTransitionEnd(void *param, calldata_t *data)
+void Events::OnTransitionEnd(void *param, calldata_t *data)
 {
-	auto instance = reinterpret_cast<events *>(param);
+	auto instance = reinterpret_cast<Events *>(param);
 	OBSSource transition = calldata_get_pointer<obs_source_t>(data, "source");
 	if (!transition) {
 		return;
@@ -865,9 +865,9 @@ void events::OnTransitionEnd(void *param, calldata_t *data)
 * @category transitions
 * @since 4.8.0
 */
-void events::OnTransitionVideoEnd(void *param, calldata_t *data)
+void Events::OnTransitionVideoEnd(void *param, calldata_t *data)
 {
-	auto instance = reinterpret_cast<events *>(param);
+	auto instance = reinterpret_cast<Events *>(param);
 	OBSSource transition = calldata_get_pointer<obs_source_t>(data, "source");
 	if (!transition) {
 		return;
@@ -889,9 +889,9 @@ void events::OnTransitionVideoEnd(void *param, calldata_t *data)
  * @category sources
  * @since 4.6.0
  */
-void events::OnSourceCreate(void *param, calldata_t *data)
+void Events::OnSourceCreate(void *param, calldata_t *data)
 {
-	auto self = reinterpret_cast<events *>(param);
+	auto self = reinterpret_cast<Events *>(param);
 	OBSSource source = calldata_get_pointer<obs_source_t>(data, "source");
 	if (!source) {
 		return;
@@ -918,9 +918,9 @@ void events::OnSourceCreate(void *param, calldata_t *data)
  * @category sources
  * @since 4.6.0
  */
-void events::OnSourceDestroy(void *param, calldata_t *data)
+void Events::OnSourceDestroy(void *param, calldata_t *data)
 {
-	auto self = reinterpret_cast<events *>(param);
+	auto self = reinterpret_cast<Events *>(param);
 	obs_source_t *source = calldata_get_pointer<obs_source_t>(data, "source");
 	if (!source) {
 		return;
@@ -945,9 +945,9 @@ void events::OnSourceDestroy(void *param, calldata_t *data)
  * @category sources
  * @since 4.6.0
  */
-void events::OnSourceVolumeChange(void *param, calldata_t *data)
+void Events::OnSourceVolumeChange(void *param, calldata_t *data)
 {
-	auto self = reinterpret_cast<events *>(param);
+	auto self = reinterpret_cast<Events *>(param);
 	OBSSource source = calldata_get_pointer<obs_source_t>(data, "source");
 	if (!source) {
 		return;
@@ -973,9 +973,9 @@ void events::OnSourceVolumeChange(void *param, calldata_t *data)
  * @category sources
  * @since 4.6.0
  */
-void events::OnSourceMuteStateChange(void *param, calldata_t *data)
+void Events::OnSourceMuteStateChange(void *param, calldata_t *data)
 {
-	auto self = reinterpret_cast<events *>(param);
+	auto self = reinterpret_cast<Events *>(param);
 	OBSSource source = calldata_get_pointer<obs_source_t>(data, "source");
 	if (!source) {
 		return;
@@ -1001,9 +1001,9 @@ void events::OnSourceMuteStateChange(void *param, calldata_t *data)
  * @category sources
  * @since 4.6.0
  */
-void events::OnSourceAudioSyncOffsetChanged(void *param, calldata_t *data)
+void Events::OnSourceAudioSyncOffsetChanged(void *param, calldata_t *data)
 {
-	auto self = reinterpret_cast<events *>(param);
+	auto self = reinterpret_cast<Events *>(param);
 	OBSSource source = calldata_get_pointer<obs_source_t>(data, "source");
 	if (!source) {
 		return;
@@ -1032,9 +1032,9 @@ void events::OnSourceAudioSyncOffsetChanged(void *param, calldata_t *data)
  * @category sources
  * @since 4.6.0
  */
-void events::OnSourceAudioMixersChanged(void *param, calldata_t *data)
+void Events::OnSourceAudioMixersChanged(void *param, calldata_t *data)
 {
-	auto self = reinterpret_cast<events *>(param);
+	auto self = reinterpret_cast<Events *>(param);
 	OBSSource source = calldata_get_pointer<obs_source_t>(data, "source");
 	if (!source) {
 		return;
@@ -1069,9 +1069,9 @@ void events::OnSourceAudioMixersChanged(void *param, calldata_t *data)
  * @category sources
  * @since 4.6.0
  */
-void events::OnSourceRename(void *param, calldata_t *data)
+void Events::OnSourceRename(void *param, calldata_t *data)
 {
-	auto self = reinterpret_cast<events *>(param);
+	auto self = reinterpret_cast<Events *>(param);
 	OBSSource source = calldata_get_pointer<obs_source_t>(data, "source");
 	if (!source) {
 		return;
@@ -1100,9 +1100,9 @@ void events::OnSourceRename(void *param, calldata_t *data)
  * @category sources
  * @since 4.6.0
  */
-void events::OnSourceFilterAdded(void *param, calldata_t *data)
+void Events::OnSourceFilterAdded(void *param, calldata_t *data)
 {
-	auto self = reinterpret_cast<events *>(param);
+	auto self = reinterpret_cast<Events *>(param);
 	OBSSource source = calldata_get_pointer<obs_source_t>(data, "source");
 	if (!source) {
 		return;
@@ -1134,9 +1134,9 @@ void events::OnSourceFilterAdded(void *param, calldata_t *data)
  * @category sources
  * @since 4.6.0
  */
-void events::OnSourceFilterRemoved(void *param, calldata_t *data)
+void Events::OnSourceFilterRemoved(void *param, calldata_t *data)
 {
-	auto self = reinterpret_cast<events *>(param);
+	auto self = reinterpret_cast<Events *>(param);
 	obs_source_t *source = calldata_get_pointer<obs_source_t>(data, "source");
 	if (!source) {
 		return;
@@ -1165,9 +1165,9 @@ void events::OnSourceFilterRemoved(void *param, calldata_t *data)
  * @category sources
  * @since 4.7.0
  */
-void events::OnSourceFilterVisibilityChanged(void *param, calldata_t *data)
+void Events::OnSourceFilterVisibilityChanged(void *param, calldata_t *data)
 {
-	auto self = reinterpret_cast<events *>(param);
+	auto self = reinterpret_cast<Events *>(param);
 	OBSSource source = calldata_get_pointer<obs_source_t>(data, "source");
 	if (!source) {
 		return;
@@ -1193,9 +1193,9 @@ void events::OnSourceFilterVisibilityChanged(void *param, calldata_t *data)
  * @category sources
  * @since 4.6.0
  */
-void events::OnSourceFilterOrderChanged(void *param, calldata_t *data)
+void Events::OnSourceFilterOrderChanged(void *param, calldata_t *data)
 {
-	auto self = reinterpret_cast<events *>(param);
+	auto self = reinterpret_cast<Events *>(param);
 	OBSSource source = calldata_get_pointer<obs_source_t>(data, "source");
 	if (!source) {
 		return;
@@ -1220,9 +1220,9 @@ void events::OnSourceFilterOrderChanged(void *param, calldata_t *data)
  * @category scene items
  * @since 4.0.0
  */
-void events::OnSceneReordered(void *param, calldata_t *data)
+void Events::OnSceneReordered(void *param, calldata_t *data)
 {
-	auto instance = reinterpret_cast<events *>(param);
+	auto instance = reinterpret_cast<Events *>(param);
 	OBSScene scene = calldata_get_pointer<obs_scene_t>(data, "scene");
 	if (!scene) {
 		return;
@@ -1259,9 +1259,9 @@ void events::OnSceneReordered(void *param, calldata_t *data)
  * @category scene items
  * @since 4.0.0
  */
-void events::OnSceneItemAdd(void *param, calldata_t *data)
+void Events::OnSceneItemAdd(void *param, calldata_t *data)
 {
-	auto instance = reinterpret_cast<events *>(param);
+	auto instance = reinterpret_cast<Events *>(param);
 	obs_scene_t *scene = nullptr;
 	calldata_get_ptr(data, "scene", &scene);
 	obs_sceneitem_t *sceneItem = nullptr;
@@ -1287,9 +1287,9 @@ void events::OnSceneItemAdd(void *param, calldata_t *data)
  * @category scene items
  * @since 4.0.0
  */
-void events::OnSceneItemDelete(void *param, calldata_t *data)
+void Events::OnSceneItemDelete(void *param, calldata_t *data)
 {
-	auto instance = reinterpret_cast<events *>(param);
+	auto instance = reinterpret_cast<Events *>(param);
 	obs_scene_t *scene = nullptr;
 	calldata_get_ptr(data, "scene", &scene);
 	obs_sceneitem_t *sceneItem = nullptr;
@@ -1316,9 +1316,9 @@ void events::OnSceneItemDelete(void *param, calldata_t *data)
  * @category scene items
  * @since 4.0.0
  */
-void events::OnSceneItemVisibilityChanged(void *param, calldata_t *data)
+void Events::OnSceneItemVisibilityChanged(void *param, calldata_t *data)
 {
-	auto instance = reinterpret_cast<events *>(param);
+	auto instance = reinterpret_cast<Events *>(param);
 	obs_scene_t *scene = nullptr;
 	calldata_get_ptr(data, "scene", &scene);
 	obs_sceneitem_t *sceneItem = nullptr;
@@ -1348,9 +1348,9 @@ void events::OnSceneItemVisibilityChanged(void *param, calldata_t *data)
  * @category scene items
  * @since 4.8.0
  */
-void events::OnSceneItemLockChanged(void *param, calldata_t *data)
+void Events::OnSceneItemLockChanged(void *param, calldata_t *data)
 {
-	auto instance = reinterpret_cast<events *>(param);
+	auto instance = reinterpret_cast<Events *>(param);
 	obs_scene_t *scene = nullptr;
 	calldata_get_ptr(data, "scene", &scene);
 	obs_sceneitem_t *sceneItem = nullptr;
@@ -1380,9 +1380,9 @@ void events::OnSceneItemLockChanged(void *param, calldata_t *data)
  * @category scene items
  * @since 4.6.0
  */
-void events::OnSceneItemTransform(void *param, calldata_t *data)
+void Events::OnSceneItemTransform(void *param, calldata_t *data)
 {
-	auto instance = reinterpret_cast<events *>(param);
+	auto instance = reinterpret_cast<Events *>(param);
 	obs_scene_t *scene = nullptr;
 	calldata_get_ptr(data, "scene", &scene);
 	obs_sceneitem_t *sceneItem = nullptr;
@@ -1410,9 +1410,9 @@ void events::OnSceneItemTransform(void *param, calldata_t *data)
  * @category scene items
  * @since 4.6.0
  */
-void events::OnSceneItemSelected(void *param, calldata_t *data)
+void Events::OnSceneItemSelected(void *param, calldata_t *data)
 {
-	auto self = reinterpret_cast<events *>(param);
+	auto self = reinterpret_cast<Events *>(param);
 	OBSScene scene = calldata_get_pointer<obs_scene_t>(data, "scene");
 	if (!scene) {
 		return;
@@ -1442,9 +1442,9 @@ void events::OnSceneItemSelected(void *param, calldata_t *data)
  * @category scene items
  * @since 4.6.0
  */
-void events::OnSceneItemDeselected(void *param, calldata_t *data)
+void Events::OnSceneItemDeselected(void *param, calldata_t *data)
 {
-	auto self = reinterpret_cast<events *>(param);
+	auto self = reinterpret_cast<Events *>(param);
 	OBSScene scene = calldata_get_pointer<obs_scene_t>(data, "scene");
 	if (!scene) {
 		return;
@@ -1473,7 +1473,7 @@ void events::OnSceneItemDeselected(void *param, calldata_t *data)
  * @category studio mode
  * @since 4.1.0
  */
-void events::OnPreviewSceneChanged()
+void Events::OnPreviewSceneChanged()
 {
 	if (obs_frontend_preview_program_mode_active()) {
 		OBSSourceAutoRelease scene = obs_frontend_get_current_preview_scene();
@@ -1497,7 +1497,7 @@ void events::OnPreviewSceneChanged()
  * @category studio mode
  * @since 4.1.0
  */
-void events::OnStudioModeSwitched(bool checked)
+void Events::OnStudioModeSwitched(bool checked)
 {
 	OBSDataAutoRelease data = obs_data_create();
 	obs_data_set_bool(data, "new-state", checked);
@@ -1515,7 +1515,7 @@ void events::OnStudioModeSwitched(bool checked)
  * @category general
  * @since 4.7.0
  */
-void events::OnBroadcastCustomMessage(const QString &realm, obs_data_t *data)
+void Events::OnBroadcastCustomMessage(const QString &realm, obs_data_t *data)
 {
 	OBSDataAutoRelease broadcastData = obs_data_create();
 	obs_data_set_string(broadcastData, "realm", realm.toUtf8().constData());
@@ -1535,7 +1535,7 @@ void events::OnBroadcastCustomMessage(const QString &realm, obs_data_t *data)
  * @property {double} `memory-usage` Current RAM usage (in megabytes)
  * @property {double} `free-disk-space` Free recording disk space (in megabytes)
  */
-obs_data_t *events::GetStats()
+obs_data_t *Events::GetStats()
 {
 	OBSDataAutoRelease stats = obs_data_create();
 	double cpuUsage = os_cpu_usage_info_query(cpuUsageInfo);

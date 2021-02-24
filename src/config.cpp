@@ -52,7 +52,7 @@ void Config::Save()
 	obs_data_set_array(midiConfig, PARAM_DEVICES, data);
 	const char *file = "obs-midi.json";
 	auto path = obs_module_config_path(file);
-	obs_data_save_json(midiConfig, path);
+	obs_data_save_json_safe(midiConfig, path, ".tmp", ".bkp");
 	bfree(path);
 }
 
@@ -67,7 +67,7 @@ void Config::GetConfigStore()
 		midiConfig = obs_data_create_from_json_file(filepath);
 	} else {
 		midiConfig = obs_data_create();
-		obs_data_save_json(midiConfig, filepath);
+		obs_data_save_json_safe(midiConfig, filepath, ".tmp", ".bkp");
 	}
 	bfree(filepath);
 	bfree(path);

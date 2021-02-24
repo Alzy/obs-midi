@@ -36,24 +36,16 @@ DeviceManager::~DeviceManager()
  */
 void DeviceManager::Load(const OBSDataArray &data)
 {
-	QStringList portsList = GetPortsList();
-	QStringList outPortsList = GetOutPortsList();
-	
-	
 	size_t deviceCount = obs_data_array_count(data);
 	for (size_t i = 0; i < deviceCount; i++) {
-		
 		MidiAgent *device = new MidiAgent(std::move(obs_data_array_item(data, i)));
-		//obs_data_release(deviceData);
 		midiAgents.push_back(device);
-		broadcast_connection = connect(this, SIGNAL(bcast(QString, QString)), device, SLOT(handle_obs_event(QString, QString)));
 	}
 }
 
 void DeviceManager::Unload()
 {
 	blog(LOG_INFO, "UNLOADING DEVICE MANAGER");
-	disconnect(broadcast_connection);
 	for (auto & midiAgent : midiAgents)
 	{
 		blog(LOG_DEBUG, "Unloading Midi Device %s", midiAgent->get_midi_input_name().toStdString().c_str());
@@ -190,24 +182,3 @@ obs_data_array_t *DeviceManager::GetData()
 
 	return data;
 }
-
-void DeviceManager::broadcast_obs_event(const RpcEvent &event)
-{
-	OBSDataAutoRelease eventData = obs_data_create();
-
-	const QString& updateType = event.updateType();
-	obs_data_set_string(eventData, "update-type", updateType.toUtf8().constData());
-
-	OBSData additionalFields = event.additionalFields();
-	if (additionalFields)
-	{
-		obs_data_apply(eventData, additionalFields);
-	}
-	if (broadcast_connection)
-	{
-		blog(1, "OBS EVENT %s -- %s", event.updateType().toStdString().c_str(), obs_data_get_json(eventData));
-		emit bcast(event.updateType(), QString::fromStdString(obs_data_get_json(eventData)));
-	}
-	obs_data_release(additionalFields);
-	obs_data_release(eventData);
-};

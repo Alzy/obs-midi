@@ -24,8 +24,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #include "../obs-midi.h"
 
-class RpcEvent :public QObject {
-	Q_OBJECT
+class RpcEvent {
 public:
 	explicit RpcEvent(QString updateType, std::optional<uint64_t> streamTime, std::optional<uint64_t> recordingTime,
 			  obs_data_t *additionalFields = nullptr);

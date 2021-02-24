@@ -45,6 +45,9 @@ public:
 
 	bool DebugEnabled;
 	bool AlertsEnabled;
+
 	bool SettingsLoaded;
 
+private:
+	static void on_frontend_event(obs_frontend_event event, void *param);
 };

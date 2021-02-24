@@ -34,7 +34,7 @@ DeviceManager::~DeviceManager()
 /* Load the Device Manager from saved Config Store data.
  * This method is called from Config. Should only be called once on runtime
  */
-void DeviceManager::Load(obs_data_array_t *data)
+void DeviceManager::Load(const OBSDataArray &data)
 {
 	QStringList portsList = GetPortsList();
 	QStringList outPortsList = GetOutPortsList();
@@ -42,11 +42,10 @@ void DeviceManager::Load(obs_data_array_t *data)
 	
 	size_t deviceCount = obs_data_array_count(data);
 	for (size_t i = 0; i < deviceCount; i++) {
-		obs_data_t *deviceData = obs_data_array_item(data, i);
-		MidiAgent *device = new MidiAgent(deviceData);
-		obs_data_release(deviceData);
+		
+		MidiAgent *device = new MidiAgent(std::move(obs_data_array_item(data, i)));
+		//obs_data_release(deviceData);
 		midiAgents.push_back(device);
-
 		broadcast_connection = connect(this, SIGNAL(bcast(QString, QString)), device, SLOT(handle_obs_event(QString, QString)));
 	}
 }

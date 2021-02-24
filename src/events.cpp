@@ -101,7 +101,6 @@ events::~events()
 		this);
 	obs_frontend_remove_event_callback(events::FrontendEventHandler, this);
 	os_cpu_usage_info_destroy(cpuUsageInfo);
-	this->deleteLater();
 }
 void events::FrontendEventHandler(enum obs_frontend_event event, void *private_data)
 {

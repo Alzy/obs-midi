@@ -414,7 +414,7 @@ OBSDataArrayAutoRelease Utils::GetSourceArray()
 }
 obs_data_t *Utils::GetSceneData(obs_source_t *source)
 {
-	OBSDataArrayAutoRelease sceneItems = GetSceneItems(source);
+	obs_data_array_t*  sceneItems = GetSceneItems(source);
 	obs_data_t *sceneData = obs_data_create();
 	obs_data_set_string(sceneData, "name", obs_source_get_name(source));
 	obs_data_set_array(sceneData, "sources", sceneItems);

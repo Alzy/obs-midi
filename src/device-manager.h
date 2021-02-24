@@ -49,7 +49,7 @@ public:
 	DeviceManager();
 	~DeviceManager() override;
 
-	void Load(obs_data_array_t *data);
+	void Load(const OBSDataArray &data);
 	void Unload();
 
 	QStringList GetPortsList();

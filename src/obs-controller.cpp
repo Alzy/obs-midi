@@ -278,10 +278,10 @@ void OBSController::ToggleSourceVisibility()
 */
 void OBSController::ToggleMute()
 {
-	if (hook->source.isEmpty()) {
+	if (hook->audio_source.isEmpty()) {
 		throw("sourceName is empty");
 	}
-	OBSSourceAutoRelease source = obs_get_source_by_name(hook->source.toUtf8());
+	obs_source * source = obs_get_source_by_name(hook->audio_source.toStdString().c_str());
 	if (!source) {
 		throw("sourceName not found");
 	}

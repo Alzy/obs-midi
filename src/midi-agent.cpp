@@ -332,17 +332,21 @@ MidiHook *MidiAgent::find_midi_hook_from_source(const QString &source)
 	}
 	return NULL;
 }
-	void MidiAgent::handle_obs_event(const QString &eventType, const QString &eventData)
+void MidiAgent::handle_obs_event(const QString &eventType, const QString &eventData)
 {
 	if (!this->sending) {
 		MidiMessage *message = new MidiMessage();
 		OBSDataAutoRelease data = obs_data_create_from_json(eventData.toStdString().c_str());
 		QString source;
+		MidiHook *hook;
+		uint8_t newvol;
+		double vol;
+		bool muted;
 		// ON EVENT TYPE Find matching hook, pull data from that hook, and do thing.
 		switch (ActionsClass::string_to_event(eventType)) {
 		case ActionsClass::obs_event_type::SourceVolumeChanged:
-			double vol = obs_data_get_double(data, "volume");
-			uint8_t newvol = Utils::mapper2(cbrt(vol));
+			vol = obs_data_get_double(data, "volume");
+			newvol = Utils::mapper2(cbrt(vol));
 			source = QString(obs_data_get_string(data, "sourceName"));
 			message = find_midi_hook(ActionsClass::Actions::Set_Volume, source)->get_message_from_hook();
 			message->value = newvol;
@@ -350,7 +354,7 @@ MidiHook *MidiAgent::find_midi_hook_from_source(const QString &source)
 			break;
 		case ActionsClass::obs_event_type::SceneChanged:
 			source = QString::fromStdString(obs_data_get_string(data, "scene-name"));
-			auto hook = find_midi_hook(ActionsClass::Actions::Set_Volume, source);
+			hook = find_midi_hook(ActionsClass::Actions::Set_Volume, source);
 			message = hook->get_message_from_hook();
 			message->message_type = "Note Off";
 			message->NORC = lastscenebtn;
@@ -363,8 +367,8 @@ MidiHook *MidiAgent::find_midi_hook_from_source(const QString &source)
 			lastscenebtn = hook->norc;
 			break;
 		case ActionsClass::obs_event_type::PreviewSceneChanged:
-			 source = QString::fromStdString(obs_data_get_string(data, "scene-name"));
-			auto hook = find_midi_hook(ActionsClass::Actions::Set_Volume, source);
+			source = QString::fromStdString(obs_data_get_string(data, "scene-name"));
+			 hook = find_midi_hook(ActionsClass::Actions::Set_Volume, source);
 			message = hook->get_message_from_hook();
 			message->message_type = "Note Off";
 			message->channel = hook->channel;
@@ -389,7 +393,7 @@ MidiHook *MidiAgent::find_midi_hook_from_source(const QString &source)
 		case ActionsClass::obs_event_type::SourceMuteStateChanged:
 			source = obs_data_get_string(data, "sourceName");
 			message = find_midi_hook(ActionsClass::Actions::Set_Mute, source)->get_message_from_hook();
-			bool muted = obs_data_get_bool(data, "muted");
+			muted = obs_data_get_bool(data, "muted");
 			message->message_type = "Note On";
 			message->value = muted;
 			this->send_message_to_midi_device(message->get());

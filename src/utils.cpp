@@ -406,7 +406,7 @@ OBSDataArrayAutoRelease Utils::GetSourceArray()
 		}
 		obs_data_set_string(sourceData, "type", typeString.toUtf8());
 		obs_data_array_push_back(sourcesArray, sourceData);
-		//obs_scene_release(scene);
+	
 		return true;
 	};
 	obs_enum_sources(sourceEnumProc, sourcesArray);

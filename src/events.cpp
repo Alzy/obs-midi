@@ -355,7 +355,7 @@ void Events::OnSceneChange()
 {
 	OBSSourceAutoRelease currentScene = obs_frontend_get_current_scene();
 	OBSDataArrayAutoRelease sceneItems = Utils::GetSceneItems(currentScene);
-	OBSDataAutoRelease data = obs_data_create();
+	obs_data_t * data = obs_data_create();
 	obs_data_set_string(data, "scene-name", obs_source_get_name(currentScene));
 	obs_data_set_array(data, "sources", sceneItems);
 
@@ -418,7 +418,7 @@ void Events::OnSceneCollectionListChange()
 void Events::OnTransitionChange()
 {
 	OBSSourceAutoRelease currentTransition = obs_frontend_get_current_transition();
-	OBSDataAutoRelease data = obs_data_create();
+	obs_data_t* data = obs_data_create();
 	obs_data_set_string(data, "transition-name", obs_source_get_name(currentTransition));
 	broadcastUpdate("SwitchTransition", data);
 	obs_data_release(data);
@@ -927,7 +927,7 @@ void Events::OnSourceDestroy(void *param, calldata_t *data)
 	}
 	self->disconnectSourceSignals(source);
 	obs_source_type sourceType = obs_source_get_type(source);
-	OBSDataAutoRelease fields = obs_data_create();
+	obs_data_t* fields = obs_data_create();
 	obs_data_set_string(fields, "sourceName", obs_source_get_name(source));
 	obs_data_set_string(fields, "sourceType", sourceTypeToString(sourceType));
 	obs_data_set_string(fields, "sourceKind", obs_source_get_id(source));

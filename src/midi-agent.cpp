@@ -350,40 +350,44 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 	obs_data_release(additionalFields);
 	obs_data_release(eventsData);
 	MidiHook *hook = get_midi_hook_if_exists(event);
-	if (!this->sending && hook != NULL) {
+	if (!this->sending) {
 		MidiMessage *message = new MidiMessage();
 		OBSDataAutoRelease data = obs_data_create_from_json(eventData.toStdString().c_str());
 		// ON EVENT TYPE Find matching hook, pull data from that hook, and do thing.
-		if (eventType == QString("SourceVolumeChanged")) {
-			double vol = obs_data_get_double(data, "volume");
-			uint8_t newvol = Utils::mapper2(cbrt(vol));
-			message = hook->get_message_from_hook();
-			message->value = newvol;
-			this->send_message_to_midi_device(message->get());
-		} else if (eventType == QString("SwitchScenes")) {
-			message->message_type = "Note Off";
-			message->channel = hook->channel;
-			message->NORC = lastscenebtn;
-			message->value = 0;
-			this->send_message_to_midi_device(message->get());
-			message->NORC = hook->norc;
-			message->message_type = "Note On";
-			message->value = 1;
-			this->send_message_to_midi_device(message->get());
-			lastscenebtn = hook->norc;
+		if (hook != NULL) {
 
-		} else if (eventType == QString("PreviewSceneChanged")) {
-			message->message_type = "Note Off";
-			message->channel = hook->channel;
-			message->NORC = last_preview_scene_norc;
-			message->value = 0;
-			this->send_message_to_midi_device(message->get());
-			message->NORC = hook->norc;
-			message->message_type = "Note On";
-			message->value = 1;
-			this->send_message_to_midi_device(message->get());
-			last_preview_scene_norc = hook->norc;
-		} else if (eventType == QString("TransitionBegin")) {
+			if (eventType == QString("SourceVolumeChanged")) {
+				double vol = obs_data_get_double(data, "volume");
+				uint8_t newvol = Utils::mapper2(cbrt(vol));
+				message = hook->get_message_from_hook();
+				message->value = newvol;
+				this->send_message_to_midi_device(message->get());
+			} else if (eventType == QString("SwitchScenes")) {
+				message->message_type = "Note Off";
+				message->channel = hook->channel;
+				message->NORC = lastscenebtn;
+				message->value = 0;
+				this->send_message_to_midi_device(message->get());
+				message->NORC = hook->norc;
+				message->message_type = "Note On";
+				message->value = 1;
+				this->send_message_to_midi_device(message->get());
+				lastscenebtn = hook->norc;
+
+			} else if (eventType == QString("PreviewSceneChanged")) {
+				message->message_type = "Note Off";
+				message->channel = hook->channel;
+				message->NORC = last_preview_scene_norc;
+				message->value = 0;
+				this->send_message_to_midi_device(message->get());
+				message->NORC = hook->norc;
+				message->message_type = "Note On";
+				message->value = 1;
+				this->send_message_to_midi_device(message->get());
+				last_preview_scene_norc = hook->norc;
+			}
+		}
+		if (eventType == QString("TransitionBegin")) {
 			QString from = obs_data_get_string(data, "from-scene");
 			for (int i = 0; i < this->midiHooks.size(); i++) {
 				if (this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Set_Current_Scene) &&
@@ -411,7 +415,7 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 					message->message_type = "Note On";
 					message->channel = this->midiHooks.at(i)->channel;
 					message->NORC = this->midiHooks.at(i)->norc;
-					
+
 					this->send_message_to_midi_device(message->get());
 				}
 			}
@@ -422,7 +426,7 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 					message->message_type = "Note On";
 					message->channel = this->midiHooks.at(i)->channel;
 					message->NORC = this->midiHooks.at(i)->norc;
-					message->value = 1;
+					message->value = 2;
 					this->send_message_to_midi_device(message->get());
 				}
 			}
@@ -455,7 +459,7 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 					message->message_type = "Note On";
 					message->channel = this->midiHooks.at(i)->channel;
 					message->NORC = this->midiHooks.at(i)->norc;
-					message->value = 1;
+					message->value = 2;
 					this->send_message_to_midi_device(message->get());
 				}
 			}

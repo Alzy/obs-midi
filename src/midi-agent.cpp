@@ -432,6 +432,28 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 					this->send_message_to_midi_device(message->get());
 				}
 			}
+					} else if (eventType == QString("RecordingStarted")) {
+			for (int i = 0; i < this->midiHooks.size(); i++) {
+				if (this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Toggle_Start_Stop_Recording) ||
+				    this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Start_Recording)) {
+					message->message_type = "Note On";
+					message->channel = this->midiHooks.at(i)->channel;
+					message->NORC = this->midiHooks.at(i)->norc;
+					message->value = 1;
+					this->send_message_to_midi_device(message->get());
+				}
+			}
+		} else if (eventType == QString("RecordingStopped")) {
+			for (int i = 0; i < this->midiHooks.size(); i++) {
+				if (this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Toggle_Start_Stop_Recording) ||
+				    this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Stop_Recording)) {
+					message->message_type = "Note Off";
+					message->channel = this->midiHooks.at(i)->channel;
+					message->NORC = this->midiHooks.at(i)->norc;
+					message->value = 0;
+					this->send_message_to_midi_device(message->get());
+				}
+			}
 		} else if (eventType == QString("SourceRenamed")) {
 			QString from = obs_data_get_string(data, "previousName");
 			for (int i = 0; i < this->midiHooks.size(); i++) {

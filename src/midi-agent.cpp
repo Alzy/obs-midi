@@ -432,7 +432,18 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 					this->send_message_to_midi_device(message->get());
 				}
 			}
-					} else if (eventType == QString("RecordingStarted")) {
+		} else if (eventType == QString("StreamStopping")) {
+			for (int i = 0; i < this->midiHooks.size(); i++) {
+				if (this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Toggle_Start_Stop_Streaming) ||
+				    this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Stop_Streaming)) {
+					message->message_type = "Note On";
+					message->channel = this->midiHooks.at(i)->channel;
+					message->NORC = this->midiHooks.at(i)->norc;
+					message->value = 2;
+					this->send_message_to_midi_device(message->get());
+				}
+			}
+		} else if (eventType == QString("RecordingStarted")) {
 			for (int i = 0; i < this->midiHooks.size(); i++) {
 				if (this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Toggle_Start_Stop_Recording) ||
 				    this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Start_Recording)) {
@@ -451,6 +462,17 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 					message->channel = this->midiHooks.at(i)->channel;
 					message->NORC = this->midiHooks.at(i)->norc;
 					message->value = 0;
+					this->send_message_to_midi_device(message->get());
+				}
+			}
+		} else if (eventType == QString("RecordingStopping")) {
+			for (int i = 0; i < this->midiHooks.size(); i++) {
+				if (this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Toggle_Start_Stop_Recording) ||
+				    this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Stop_Recording)) {
+					message->message_type = "Note On";
+					message->channel = this->midiHooks.at(i)->channel;
+					message->NORC = this->midiHooks.at(i)->norc;
+					message->value = 2;
 					this->send_message_to_midi_device(message->get());
 				}
 			}

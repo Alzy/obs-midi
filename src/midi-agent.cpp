@@ -403,10 +403,15 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 				if (this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Toggle_Mute) &&
 				    this->midiHooks.at(i)->audio_source == from) {
 					bool muted = obs_data_get_bool(data, "muted");
+					if (muted) {
+						message->value = 2;
+					} else {
+						message->value = muted;
+					}
 					message->message_type = "Note On";
 					message->channel = this->midiHooks.at(i)->channel;
 					message->NORC = this->midiHooks.at(i)->norc;
-					message->value = muted;
+					
 					this->send_message_to_midi_device(message->get());
 				}
 			}

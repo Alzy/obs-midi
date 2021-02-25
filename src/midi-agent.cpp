@@ -353,7 +353,6 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 		obs_data_t *data = obs_data_create_from_json(eventData.toStdString().c_str());
 		// ON EVENT TYPE Find matching hook, pull data from that hook, and do thing.
 		if (hook != NULL) {
-
 			if (eventType == QString("SourceVolumeChanged")) {
 				double vol = obs_data_get_double(data, "volume");
 				uint8_t newvol = Utils::mapper2(cbrt(vol));
@@ -402,7 +401,6 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 				this->send_message_to_midi_device(message->get());
 
 			} else if (eventType == QString("StreamStopped")) {
-
 				message->message_type = "Note Off";
 				message->channel = hook->channel;
 				message->NORC = hook->norc;

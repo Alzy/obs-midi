@@ -296,32 +296,29 @@ obs_data_t *MidiAgent::GetData()
  */
 MidiHook *MidiAgent::get_midi_hook_if_exists(const RpcEvent &event)
 {
-	OBSDataAutoRelease eventsData = obs_data_create();
 
-	const QString &updateType = event.updateType();
-	obs_data_set_string(eventsData, "update-type", updateType.toUtf8().constData());
-
-	OBSData additionalFields = event.additionalFields();
-	if (additionalFields) {
-		obs_data_apply(eventsData, additionalFields);
-	}
-
-	blog(LOG_DEBUG, "OBS EVENT %s -- %s", event.updateType().toStdString().c_str(), obs_data_get_json(eventsData));
-	QString eventType = event.updateType();
-	QString eventData = QString::fromStdString(obs_data_get_json(eventsData));
-
-	obs_data_release(additionalFields);
-	obs_data_release(eventsData);
-	OBSDataAutoRelease data = obs_data_create_from_json(eventData.toStdString().c_str());
 	for (int i = 0; i < this->midiHooks.size(); i++) {
 		bool found = false;
 		switch (ActionsClass::string_to_action(Utils::untranslate(midiHooks.at(i)->action))) {
 		case ActionsClass::Actions::Set_Volume:
-			found = (midiHooks.at(i)->audio_source == QString(obs_data_get_string(data, "sourceName")));
+		case ActionsClass::Actions::Toggle_Mute:
+			found = (midiHooks.at(i)->audio_source == QString(obs_data_get_string(event.additionalFields(), "sourceName")));
 			break;
 		case ActionsClass::Actions::Set_Preview_Scene:
 		case ActionsClass::Actions::Set_Current_Scene:
-			found = (midiHooks.at(i)->scene == QString(obs_data_get_string(data, "scene-name")));
+			found = (midiHooks.at(i)->scene == QString(obs_data_get_string(event.additionalFields(), "scene-name")));
+			break;
+		case ActionsClass::Actions::Toggle_Start_Stop_Recording:
+		case ActionsClass::Actions::Start_Recording:
+		case ActionsClass::Actions::Stop_Recording:
+			found = ((event.updateType() == "RecordingStarted") || (event.updateType() == "RecordingStopped") ||
+				 (event.updateType() == "RecordingStopping"));
+			break;
+		case ActionsClass::Actions::Toggle_Start_Stop_Streaming:
+		case ActionsClass::Actions::Start_Streaming:
+		case ActionsClass::Actions::Stop_Streaming:
+			found = ((event.updateType() == "StreamStarted") || (event.updateType() == "StreamStopped") ||
+				 (event.updateType() == "StreamStopping"));
 			break;
 		}
 		if (found)
@@ -333,12 +330,13 @@ MidiHook *MidiAgent::get_midi_hook_if_exists(const RpcEvent &event)
 /*Handle OBS events*/
 void MidiAgent::handle_obs_event(const RpcEvent &event)
 {
-	OBSDataAutoRelease eventsData = obs_data_create();
+	MidiHook *hook = get_midi_hook_if_exists(event);
+	obs_data_t *eventsData = obs_data_create();
 
 	const QString &updateType = event.updateType();
 	obs_data_set_string(eventsData, "update-type", updateType.toUtf8().constData());
 
-	OBSData additionalFields = event.additionalFields();
+	obs_data_t *additionalFields = event.additionalFields();
 	if (additionalFields) {
 		obs_data_apply(eventsData, additionalFields);
 	}
@@ -349,10 +347,10 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 
 	obs_data_release(additionalFields);
 	obs_data_release(eventsData);
-	MidiHook *hook = get_midi_hook_if_exists(event);
+
 	if (!this->sending) {
 		MidiMessage *message = new MidiMessage();
-		OBSDataAutoRelease data = obs_data_create_from_json(eventData.toStdString().c_str());
+		obs_data_t *data = obs_data_create_from_json(eventData.toStdString().c_str());
 		// ON EVENT TYPE Find matching hook, pull data from that hook, and do thing.
 		if (hook != NULL) {
 
@@ -385,6 +383,58 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 				message->value = 1;
 				this->send_message_to_midi_device(message->get());
 				last_preview_scene_norc = hook->norc;
+			} else if (eventType == QString("SourceMuteStateChanged")) {
+				bool muted = obs_data_get_bool(data, "muted");
+				if (muted) {
+					message->value = 2;
+				} else {
+					message->value = muted;
+				}
+				message->message_type = "Note On";
+				message->channel = hook->channel;
+				message->NORC = hook->norc;
+				this->send_message_to_midi_device(message->get());
+			} else if (eventType == QString("StreamStarted")) {
+				message->message_type = "Note On";
+				message->channel = hook->channel;
+				message->NORC = hook->norc;
+				message->value = 2;
+				this->send_message_to_midi_device(message->get());
+
+			} else if (eventType == QString("StreamStopped")) {
+
+				message->message_type = "Note Off";
+				message->channel = hook->channel;
+				message->NORC = hook->norc;
+				message->value = 0;
+				this->send_message_to_midi_device(message->get());
+
+			} else if (eventType == QString("StreamStopping")) {
+				message->message_type = "Note On";
+				message->channel = hook->channel;
+				message->NORC = hook->norc;
+				message->value = 2;
+				this->send_message_to_midi_device(message->get());
+
+			} else if (eventType == QString("RecordingStarted")) {
+				message->message_type = "Note On";
+				message->channel = hook->channel;
+				message->NORC = hook->norc;
+				message->value = 2;
+				this->send_message_to_midi_device(message->get());
+
+			} else if (eventType == QString("RecordingStopped")) {
+				message->message_type = "Note Off";
+				message->channel = hook->channel;
+				message->NORC = hook->norc;
+				message->value = 0;
+				this->send_message_to_midi_device(message->get());
+			} else if (eventType == QString("RecordingStopping")) {
+				message->message_type = "Note On";
+				message->channel = hook->channel;
+				message->NORC = hook->norc;
+				message->value = 2;
+				this->send_message_to_midi_device(message->get());
 			}
 		}
 		if (eventType == QString("TransitionBegin")) {
@@ -398,90 +448,6 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 					message->value = 0;
 					this->send_message_to_midi_device(message->get());
 					message->message_type = "Note Off";
-					this->send_message_to_midi_device(message->get());
-				}
-			}
-		} else if (eventType == QString("SourceMuteStateChanged")) {
-			QString from = obs_data_get_string(data, "sourceName");
-			for (int i = 0; i < this->midiHooks.size(); i++) {
-				if (this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Toggle_Mute) &&
-				    this->midiHooks.at(i)->audio_source == from) {
-					bool muted = obs_data_get_bool(data, "muted");
-					if (muted) {
-						message->value = 2;
-					} else {
-						message->value = muted;
-					}
-					message->message_type = "Note On";
-					message->channel = this->midiHooks.at(i)->channel;
-					message->NORC = this->midiHooks.at(i)->norc;
-
-					this->send_message_to_midi_device(message->get());
-				}
-			}
-		} else if (eventType == QString("StreamStarted")) {
-			for (int i = 0; i < this->midiHooks.size(); i++) {
-				if (this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Toggle_Start_Stop_Streaming) ||
-				    this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Start_Streaming)) {
-					message->message_type = "Note On";
-					message->channel = this->midiHooks.at(i)->channel;
-					message->NORC = this->midiHooks.at(i)->norc;
-					message->value = 2;
-					this->send_message_to_midi_device(message->get());
-				}
-			}
-		} else if (eventType == QString("StreamStopped")) {
-			for (int i = 0; i < this->midiHooks.size(); i++) {
-				if (this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Toggle_Start_Stop_Streaming) ||
-				    this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Stop_Streaming)) {
-					message->message_type = "Note Off";
-					message->channel = this->midiHooks.at(i)->channel;
-					message->NORC = this->midiHooks.at(i)->norc;
-					message->value = 0;
-					this->send_message_to_midi_device(message->get());
-				}
-			}
-		} else if (eventType == QString("StreamStopping")) {
-			for (int i = 0; i < this->midiHooks.size(); i++) {
-				if (this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Toggle_Start_Stop_Streaming) ||
-				    this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Stop_Streaming)) {
-					message->message_type = "Note On";
-					message->channel = this->midiHooks.at(i)->channel;
-					message->NORC = this->midiHooks.at(i)->norc;
-					message->value = 2;
-					this->send_message_to_midi_device(message->get());
-				}
-			}
-		} else if (eventType == QString("RecordingStarted")) {
-			for (int i = 0; i < this->midiHooks.size(); i++) {
-				if (this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Toggle_Start_Stop_Recording) ||
-				    this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Start_Recording)) {
-					message->message_type = "Note On";
-					message->channel = this->midiHooks.at(i)->channel;
-					message->NORC = this->midiHooks.at(i)->norc;
-					message->value = 2;
-					this->send_message_to_midi_device(message->get());
-				}
-			}
-		} else if (eventType == QString("RecordingStopped")) {
-			for (int i = 0; i < this->midiHooks.size(); i++) {
-				if (this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Toggle_Start_Stop_Recording) ||
-				    this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Stop_Recording)) {
-					message->message_type = "Note Off";
-					message->channel = this->midiHooks.at(i)->channel;
-					message->NORC = this->midiHooks.at(i)->norc;
-					message->value = 0;
-					this->send_message_to_midi_device(message->get());
-				}
-			}
-		} else if (eventType == QString("RecordingStopping")) {
-			for (int i = 0; i < this->midiHooks.size(); i++) {
-				if (this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Toggle_Start_Stop_Recording) ||
-				    this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Stop_Recording)) {
-					message->message_type = "Note On";
-					message->channel = this->midiHooks.at(i)->channel;
-					message->NORC = this->midiHooks.at(i)->norc;
-					message->value = 2;
 					this->send_message_to_midi_device(message->get());
 				}
 			}
@@ -502,7 +468,6 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 					if (this->midiHooks.at(i)->source == from) {
 						this->remove_MidiHook(this->midiHooks.at(i));
 						this->GetData();
-						i--;
 					}
 				}
 				GetConfig()->Save();

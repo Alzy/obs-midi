@@ -68,6 +68,7 @@ public:
 	void remove_MidiHook(MidiHook *hook);
 	void clear_MidiHooks();
 	obs_data_t *GetData();
+	
 public slots:
 	void handle_obs_event(const RpcEvent &event);
 signals:
@@ -89,6 +90,7 @@ private:
 	bool connected = false;
 	bool bidirectional = false;
 	MidiHook *get_midi_hook_if_exists(MidiMessage *message);
+	MidiHook *get_midi_hook_if_exists(const RpcEvent &event);
 	bool closing = false;
 	QVector<MidiHook *> midiHooks;
 };

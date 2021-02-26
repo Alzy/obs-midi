@@ -652,6 +652,7 @@ void Events::OnReplayStopped()
  */
 void Events::OnExit()
 {
+	this->disconnect();
 	broadcastUpdate("Exiting");
 }
 /**

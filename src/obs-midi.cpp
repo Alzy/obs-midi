@@ -72,7 +72,7 @@ void obs_module_unload()
 	_eventsSystem.reset();
 	_deviceManager.reset();
 	_config.reset();
-
+	
 	blog(LOG_DEBUG, "goodbye!");
 }
 

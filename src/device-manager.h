@@ -62,7 +62,7 @@ public:
 	QVector<MidiHook *> GetMidiHooksByDeviceName(const QString &deviceName);
 	MidiAgent *RegisterMidiDevice(const int &port, const int &outport);
 
-	obs_data_array_t *GetData();
+	OBSDataArray GetData();
 
 private:
 	QMetaObject::Connection broadcast_connection;

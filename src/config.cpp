@@ -26,44 +26,52 @@ using namespace std;
 
 Config::Config()
 {
-	GetConfigStore();
 }
 
 Config::~Config()
 {
-	obs_data_release(midiConfig);
+	
 }
 
 /* Load the configuration from the OBS Config Store
  */
 void Config::Load()
 {
+	OBSData saveddata = GetConfigStore();
 	auto deviceManager = GetDeviceManager();
-	deviceManager->Load(std::move(obs_data_get_array(midiConfig, PARAM_DEVICES)));
+	deviceManager->Load(std::move(obs_data_get_array(saveddata, PARAM_DEVICES)));
+	obs_data_release(saveddata);
 }
 
 /* Save the configuration to the OBS Config Store
  */
 void Config::Save()
 {
-
+	OBSData newmidi = obs_data_create();
 	auto deviceManager = GetDeviceManager();
 	auto data = deviceManager->GetData();
-	obs_data_set_array(midiConfig, PARAM_DEVICES, data);
-	const char *file = "obs-midi.json";
-	auto path = obs_module_config_path(file);
-	obs_data_save_json_safe(midiConfig, path, ".tmp", ".bkp");
+	obs_data_set_array(newmidi, PARAM_DEVICES, data);
+	auto path = obs_module_config_path(get_file_name().c_str());
+	obs_data_save_json_safe(newmidi, path, ".tmp", ".bkp");
 	bfree(path);
+	obs_data_array_release(data);
+	obs_data_release(newmidi);
 }
-
-void Config::GetConfigStore()
+std::string Config::get_file_name()
 {
-	//delete (midiConfig);
-	const char *file = "obs-midi.json";
+	std::string file = "obs-midi_";
+	file += obs_frontend_get_current_profile();
+	file += "_";
+	file += obs_frontend_get_current_scene_collection();
+	file += ".json";
+	return file;
+}
+OBSData Config::GetConfigStore()
+{
+	OBSData midiConfig;
 	auto path = obs_module_config_path(NULL);
-	auto filepath = obs_module_config_path(file);
+	auto filepath = obs_module_config_path(get_file_name().c_str());
 	os_mkdirs(path);
-	blog(LOG_DEBUG, "config path is %s", file);
 	if (os_file_exists(filepath)) {
 		midiConfig = obs_data_create_from_json_file(filepath);
 	} else {
@@ -72,4 +80,5 @@ void Config::GetConfigStore()
 	}
 	bfree(filepath);
 	bfree(path);
+	return std::move(midiConfig);
 }

@@ -34,7 +34,9 @@ public slots:
 	void Load();
 	void Save();
 
+	
+
 private:
-	obs_data_t *midiConfig;
-	void GetConfigStore();
+	std::string get_file_name();
+	OBSData GetConfigStore();
 };

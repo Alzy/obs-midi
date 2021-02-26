@@ -278,16 +278,17 @@ void MidiAgent::clear_MidiHooks()
  */
 obs_data_t *MidiAgent::GetData()
 {
-	OBSDataAutoRelease data = obs_data_create();
+	OBSData data = obs_data_create();
 	obs_data_set_string(data, "name", midi_input_name.toStdString().c_str());
 	obs_data_set_string(data, "outname", midi_output_name.toStdString().c_str());
 	obs_data_set_bool(data, "enabled", enabled);
 	obs_data_set_bool(data, "bidirectional", bidirectional);
 	OBSDataArrayAutoRelease arrayData = obs_data_array_create();
 	for (int i = 0; i < midiHooks.size(); i++) {
-		obs_data_t *hookData = midiHooks.at(i)->GetData();
+		OBSData hookData = midiHooks.at(i)->GetData();
 		obs_data_array_push_back(arrayData, hookData);
 		obs_data_release(hookData);
+		
 	}
 	obs_data_set_array(data, "hooks", arrayData);
 	return data;

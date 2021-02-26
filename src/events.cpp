@@ -209,8 +209,9 @@ void Events::broadcastUpdate(const char *updateType, obs_data_t *additionalField
 		recordingTime = std::make_optional(getRecordingTime());
 	}
 	{
-		RpcEvent event(QString(updateType), streamTime, recordingTime, additionalFields);
-		emit obsEvent(event);
+		RpcEvent *event= new RpcEvent(QString(updateType), streamTime, recordingTime, additionalFields);
+		emit obsEvent((RpcEvent)*event);
+		delete (event);
 	}
 }
 void Events::connectSourceSignals(obs_source_t *source)
@@ -1397,6 +1398,8 @@ void Events::OnSceneItemTransform(void *param, calldata_t *data)
 	obs_data_set_obj(fields, "transform", transform);
 	instance->broadcastUpdate("SceneItemTransformChanged", fields);
 	obs_data_release(fields);
+	obs_data_release(transform);
+
 }
 /**
  * A scene item is selected.

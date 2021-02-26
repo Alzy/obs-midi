@@ -331,59 +331,45 @@ MidiHook *MidiAgent::get_midi_hook_if_exists(const RpcEvent &event)
 void MidiAgent::handle_obs_event(const RpcEvent &event)
 {
 	MidiHook *hook = get_midi_hook_if_exists(event);
-	obs_data_t *eventsData = obs_data_create();
 
-	const QString &updateType = event.updateType();
-	obs_data_set_string(eventsData, "update-type", updateType.toUtf8().constData());
-
-	obs_data_t *additionalFields = event.additionalFields();
-	if (additionalFields) {
-		obs_data_apply(eventsData, additionalFields);
-	}
-
-	blog(LOG_DEBUG, "OBS EVENT %s -- %s", event.updateType().toStdString().c_str(), obs_data_get_json(eventsData));
-	QString eventType = event.updateType();
-	QString eventData = QString::fromStdString(obs_data_get_json(eventsData));
-
-	obs_data_release(additionalFields);
-	obs_data_release(eventsData);
+	
 
 	if (!this->sending) {
-		MidiMessage *message = new MidiMessage();
-		obs_data_t *data = obs_data_create_from_json(eventData.toStdString().c_str());
+
 		// ON EVENT TYPE Find matching hook, pull data from that hook, and do thing.
 		if (hook != NULL) {
-			if (eventType == QString("SourceVolumeChanged")) {
-				double vol = obs_data_get_double(data, "volume");
+			MidiMessage *message = 	hook->get_message_from_hook();
+			if (event.updateType() == QString("SourceVolumeChanged")) {
+				double vol = obs_data_get_double(event.additionalFields(), "volume");
 				uint8_t newvol = Utils::mapper2(cbrt(vol));
-				message = hook->get_message_from_hook();
+				
 				message->value = newvol;
-				this->send_message_to_midi_device(message->get());
-			} else if (eventType == QString("SwitchScenes")) {
+				this->send_message_to_midi_device(std::move(message));
+			} else if (event.updateType() == QString("SwitchScenes")) {
 				message->message_type = "Note Off";
 				message->channel = hook->channel;
 				message->NORC = lastscenebtn;
 				message->value = 0;
-				this->send_message_to_midi_device(message->get());
+				this->send_message_to_midi_device(std::move(message));
 				message->NORC = hook->norc;
 				message->message_type = "Note On";
 				message->value = 1;
-				this->send_message_to_midi_device(message->get());
+				this->send_message_to_midi_device(std::move(message));
 				lastscenebtn = hook->norc;
 
-			} else if (eventType == QString("PreviewSceneChanged")) {
+			} else if (event.updateType() == QString("PreviewSceneChanged")) {
 				message->message_type = "Note Off";
 				message->channel = hook->channel;
 				message->NORC = last_preview_scene_norc;
 				message->value = 0;
-				this->send_message_to_midi_device(message->get());
+				this->send_message_to_midi_device(std::move(message));
 				message->NORC = hook->norc;
 				message->message_type = "Note On";
 				message->value = 1;
-				this->send_message_to_midi_device(message->get());
+				this->send_message_to_midi_device(std::move(message));
 				last_preview_scene_norc = hook->norc;
-			} else if (eventType == QString("SourceMuteStateChanged")) {
-				bool muted = obs_data_get_bool(data, "muted");
+			} else if (event.updateType() == QString("SourceMuteStateChanged")) {
+				bool muted = obs_data_get_bool(event.additionalFields(), "muted");
 				if (muted) {
 					message->value = 2;
 				} else {
@@ -392,51 +378,53 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 				message->message_type = "Note On";
 				message->channel = hook->channel;
 				message->NORC = hook->norc;
-				this->send_message_to_midi_device(message->get());
-			} else if (eventType == QString("StreamStarted")) {
+				this->send_message_to_midi_device(std::move(message));
+			} else if (event.updateType() == QString("StreamStarted")) {
 				message->message_type = "Note On";
 				message->channel = hook->channel;
 				message->NORC = hook->norc;
 				message->value = 2;
-				this->send_message_to_midi_device(message->get());
+				this->send_message_to_midi_device(std::move(message));
 
-			} else if (eventType == QString("StreamStopped")) {
+			} else if (event.updateType() == QString("StreamStopped")) {
 				message->message_type = "Note Off";
 				message->channel = hook->channel;
 				message->NORC = hook->norc;
 				message->value = 0;
-				this->send_message_to_midi_device(message->get());
+				this->send_message_to_midi_device(std::move(message));
 
-			} else if (eventType == QString("StreamStopping")) {
+			} else if (event.updateType() == QString("StreamStopping")) {
 				message->message_type = "Note On";
 				message->channel = hook->channel;
 				message->NORC = hook->norc;
 				message->value = 2;
-				this->send_message_to_midi_device(message->get());
+				this->send_message_to_midi_device(std::move(message));
 
-			} else if (eventType == QString("RecordingStarted")) {
+			} else if (event.updateType() == QString("RecordingStarted")) {
 				message->message_type = "Note On";
 				message->channel = hook->channel;
 				message->NORC = hook->norc;
 				message->value = 2;
-				this->send_message_to_midi_device(message->get());
+				this->send_message_to_midi_device(std::move(message));
 
-			} else if (eventType == QString("RecordingStopped")) {
+			} else if (event.updateType() == QString("RecordingStopped")) {
 				message->message_type = "Note Off";
 				message->channel = hook->channel;
 				message->NORC = hook->norc;
 				message->value = 0;
-				this->send_message_to_midi_device(message->get());
-			} else if (eventType == QString("RecordingStopping")) {
+				this->send_message_to_midi_device(std::move(message));
+			} else if (event.updateType() == QString("RecordingStopping")) {
 				message->message_type = "Note On";
 				message->channel = hook->channel;
 				message->NORC = hook->norc;
 				message->value = 2;
-				this->send_message_to_midi_device(message->get());
+				this->send_message_to_midi_device(std::move(message));
 			}
+			delete (message);
 		}
-		if (eventType == QString("TransitionBegin")) {
-			QString from = obs_data_get_string(data, "from-scene");
+		MidiMessage *message = new MidiMessage();
+		if (event.updateType() == QString("TransitionBegin")) {
+			QString from = obs_data_get_string(event.additionalFields(), "from-scene");
 			for (int i = 0; i < this->midiHooks.size(); i++) {
 				if (this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Set_Current_Scene) &&
 				    this->midiHooks.at(i)->scene == from) {
@@ -444,24 +432,24 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 					message->message_type = "Note On";
 					message->NORC = this->midiHooks.at(i)->norc;
 					message->value = 0;
-					this->send_message_to_midi_device(message->get());
+					this->send_message_to_midi_device(std::move(message));
 					message->message_type = "Note Off";
-					this->send_message_to_midi_device(message->get());
+					this->send_message_to_midi_device(std::move(message));
 				}
 			}
-		} else if (eventType == QString("SourceRenamed")) {
-			QString from = obs_data_get_string(data, "previousName");
+		} else if (event.updateType() == QString("SourceRenamed")) {
+			QString from = obs_data_get_string(event.additionalFields(), "previousName");
 			for (int i = 0; i < this->midiHooks.size(); i++) {
 				if (this->midiHooks.at(i)->source == from) {
-					this->midiHooks.at(i)->source = obs_data_get_string(data, "newName");
+					this->midiHooks.at(i)->source = obs_data_get_string(event.additionalFields(), "newName");
 					this->GetData();
 				}
 			}
-		} else if (eventType == QString("Exiting")) {
+		} else if (event.updateType() == QString("Exiting")) {
 			closing = true;
-		} else if (eventType == QString("SourceDestroyed")) {
+		} else if (event.updateType() == QString("SourceDestroyed")) {
 			if (!closing) {
-				QString from = obs_data_get_string(data, "sourceName");
+				QString from = obs_data_get_string(event.additionalFields(), "sourceName");
 				for (int i = 0; i < this->midiHooks.size(); i++) {
 					if (this->midiHooks.at(i)->source == from) {
 						this->remove_MidiHook(this->midiHooks.at(i));
@@ -472,19 +460,23 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 			}
 		}
 		delete (message);
-		obs_data_release(data);
+
 	} else {
 		this->sending = false;
 	}
+	
 }
-void MidiAgent::send_message_to_midi_device(const MidiMessage &message)
+void MidiAgent::send_message_to_midi_device(MidiMessage *message)
 {
-	std::unique_ptr<rtmidi::message> hello = std::make_unique<rtmidi::message>();
-	if (message.message_type == "Control Change") {
-		this->midiout.send_message(hello->control_change(message.channel, message.NORC, message.value));
-	} else if (message.message_type == "Note On") {
-		this->midiout.send_message(hello->note_on(message.channel, message.NORC, message.value));
-	} else if (message.message_type == "Note Off") {
-		this->midiout.send_message(hello->note_off(message.channel, message.NORC, message.value));
+	if (message != NULL) {
+
+		std::unique_ptr<rtmidi::message> hello = std::make_unique<rtmidi::message>();
+		if (message->message_type == "Control Change") {
+			this->midiout.send_message(hello->control_change(message->channel, message->NORC, message->value));
+		} else if (message->message_type == "Note On") {
+			this->midiout.send_message(hello->note_on(message->channel, message->NORC, message->value));
+		} else if (message->message_type == "Note Off") {
+			this->midiout.send_message(hello->note_off(message->channel, message->NORC, message->value));
+		}
 	}
 }

@@ -76,7 +76,7 @@ signals:
 	void do_obs_action(MidiHook *, int);
 
 private:
-	void send_message_to_midi_device(const MidiMessage &message);
+	void send_message_to_midi_device(MidiMessage *message);
 	rtmidi::midi_in midiin;
 	rtmidi::midi_out midiout;
 	QString midi_input_name;

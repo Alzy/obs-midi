@@ -1,7 +1,7 @@
 #ifndef VERSION_H
 #define VERSION_H
 
-#define GIT_BRANCH "release"
-#define GIT_COMMIT_HASH "eaeb0d9"
+#define GIT_BRANCH "master"
+#define GIT_COMMIT_HASH "b67d702"
 
 #endif

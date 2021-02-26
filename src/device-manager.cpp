@@ -41,6 +41,7 @@ void DeviceManager::Load(const OBSDataArray &data)
 		MidiAgent *device = new MidiAgent(std::move(obs_data_array_item(data, i)));
 		midiAgents.push_back(device);
 	}
+	obs_data_array_release(data);
 }
 
 void DeviceManager::Unload()

@@ -58,7 +58,7 @@ void MidiAgent::set_callbacks()
 }
 MidiAgent::~MidiAgent()
 {
-	disconnect(GetEventsSystem().get(), &Events::obsEvent, this, &MidiAgent::handle_obs_event);
+	
 	clear_MidiHooks();
 	close_both_midi_ports();
 	midiin.cancel_callback();
@@ -214,8 +214,9 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 	x->device_name = self->get_midi_input_name();
 	emit self->broadcast_midi_message((MidiMessage)*x);
 	/** check if hook exists for this note or cc norc and launch it **/
-	new OBSController(self->get_midi_hook_if_exists(x), x->value);
+	OBSController *obsc = new OBSController(self->get_midi_hook_if_exists(x), x->value);
 	delete x;
+	delete obsc;
 }
 void MidiAgent::HandleError(const rtmidi::midi_error &error_type, const std::string_view &error_message, void *userData)
 {
@@ -277,12 +278,12 @@ void MidiAgent::clear_MidiHooks()
  */
 obs_data_t *MidiAgent::GetData()
 {
-	obs_data_t *data = obs_data_create();
+	OBSDataAutoRelease data = obs_data_create();
 	obs_data_set_string(data, "name", midi_input_name.toStdString().c_str());
 	obs_data_set_string(data, "outname", midi_output_name.toStdString().c_str());
 	obs_data_set_bool(data, "enabled", enabled);
 	obs_data_set_bool(data, "bidirectional", bidirectional);
-	obs_data_array_t *arrayData = obs_data_array_create();
+	OBSDataArrayAutoRelease arrayData = obs_data_array_create();
 	for (int i = 0; i < midiHooks.size(); i++) {
 		obs_data_t *hookData = midiHooks.at(i)->GetData();
 		obs_data_array_push_back(arrayData, hookData);
@@ -446,6 +447,7 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 				}
 			}
 		} else if (event.updateType() == QString("Exiting")) {
+			disconnect(GetEventsSystem().get(), &Events::obsEvent, this, &MidiAgent::handle_obs_event);
 			closing = true;
 		} else if (event.updateType() == QString("SourceDestroyed")) {
 			if (!closing) {

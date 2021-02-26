@@ -58,6 +58,7 @@ void Config::Save()
 
 void Config::GetConfigStore()
 {
+	//delete (midiConfig);
 	const char *file = "obs-midi.json";
 	auto path = obs_module_config_path(NULL);
 	auto filepath = obs_module_config_path(file);

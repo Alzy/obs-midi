@@ -25,14 +25,20 @@ DeviceManager::~DeviceManager()
 /* Load the Device Manager from saved Config Store data.
  * This method is called from Config. Should only be called once on runtime
  */
-void DeviceManager::Load(const OBSDataArray &data)
+void DeviceManager::Load(QString datastring)
 {
+	obs_data_t *incoming_data = obs_data_create_from_json(datastring.toStdString().c_str());
+	obs_data_array_t *data = obs_data_get_array(incoming_data, "MidiDevices");
 	size_t deviceCount = obs_data_array_count(data);
 	for (size_t i = 0; i < deviceCount; i++) {
-		MidiAgent *device = new MidiAgent(std::move(obs_data_array_item(data, i)));
+		obs_data_t *madata = obs_data_array_item(data, i);
+		MidiAgent *device = new MidiAgent(madata);
+		obs_data_release(madata);
 		midiAgents.push_back(device);
 	}
+	datastring.~QString();
 	obs_data_array_release(data);
+	obs_data_release(incoming_data);
 }
 void DeviceManager::Unload()
 {

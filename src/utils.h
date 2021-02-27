@@ -380,20 +380,46 @@ public:
 		obs_data_set_string(data, "message_type", message_type.toStdString().c_str());
 		obs_data_set_int(data, "norc", norc);
 		obs_data_set_string(data, "action", action.toStdString().c_str());
-		obs_data_set_string(data, "scene", scene.toStdString().c_str());
-		obs_data_set_string(data, "source", source.toStdString().c_str());
-		obs_data_set_string(data, "filter", filter.toStdString().c_str());
-		obs_data_set_string(data, "transition", transition.toStdString().c_str());
-		obs_data_set_string(data, "item", item.toStdString().c_str());
-		obs_data_set_string(data, "audio_source", audio_source.toStdString().c_str());
-		obs_data_set_string(data, "media_source", media_source.toStdString().c_str());
-		obs_data_set_int(data, "duration", duration);
-		obs_data_set_string(data, "scene_collection", scene_collection.toStdString().c_str());
-		obs_data_set_string(data, "profile", profile.toStdString().c_str());
-		obs_data_set_string(data, "string_override", string_override.toStdString().c_str());
-		obs_data_set_bool(data, "bool_override", bool_override);
-		obs_data_set_int(data, "int_override", int_override);
-		return data;
+		if (!scene.isEmpty()) {
+			obs_data_set_string(data, "scene", scene.toStdString().c_str());
+		}
+		if (!source.isEmpty()) {
+			obs_data_set_string(data, "source", source.toStdString().c_str());
+		}
+		if (!filter.isEmpty()) {
+			obs_data_set_string(data, "filter", filter.toStdString().c_str());
+		}
+		if (!transition.isEmpty()) {
+			obs_data_set_string(data, "transition", transition.toStdString().c_str());
+		}
+		if (!item.isEmpty()) {
+			obs_data_set_string(data, "item", item.toStdString().c_str());
+		}
+		if (!audio_source.isEmpty()) {
+			obs_data_set_string(data, "audio_source", audio_source.toStdString().c_str());
+		}
+		if (!media_source.isEmpty()) {
+			obs_data_set_string(data, "media_source", media_source.toStdString().c_str());
+		}
+		if (duration != NULL) {
+			obs_data_set_int(data, "duration", duration);
+		}
+		if (!scene_collection.isEmpty()) {
+			obs_data_set_string(data, "scene_collection", scene_collection.toStdString().c_str());
+		}
+		if (!profile.isEmpty()) {
+			obs_data_set_string(data, "profile", profile.toStdString().c_str());
+		}
+		if (!string_override.isEmpty()) {
+			obs_data_set_string(data, "string_override", string_override.toStdString().c_str());
+		}
+		if (bool_override != NULL) {
+			obs_data_set_bool(data, "bool_override", bool_override);
+		}
+		if (int_override != NULL) {
+			obs_data_set_int(data, "int_override", int_override);
+		}
+		return std::move(data);
 	}
 	const char *ToJSON() { return obs_data_get_json(GetData()); }
 };

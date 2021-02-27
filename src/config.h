@@ -37,6 +37,6 @@ public slots:
 	
 
 private:
-	std::string get_file_name();
-	OBSData GetConfigStore();
+	QString get_file_name();
+	QString GetConfigStore();
 };

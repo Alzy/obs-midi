@@ -38,43 +38,46 @@ Config::~Config()
  */
 void Config::Load()
 {
-	OBSData saveddata = GetConfigStore();
 	auto deviceManager = GetDeviceManager();
-	deviceManager->Load(std::move(obs_data_get_array(saveddata, PARAM_DEVICES)));
-	obs_data_release(saveddata);
+	deviceManager->Load(GetConfigStore());
 }
 
 /* Save the configuration to the OBS Config Store
  */
 void Config::Save()
 {
-	OBSData newmidi = obs_data_create();
+	obs_data_t * newmidi = obs_data_create();
 	auto deviceManager = GetDeviceManager();
 	auto data = deviceManager->GetData();
 	obs_data_set_array(newmidi, PARAM_DEVICES, data);
-	auto path = obs_module_config_path(get_file_name().c_str());
+	auto path = obs_module_config_path(get_file_name().toStdString().c_str());
 	obs_data_save_json_safe(newmidi, path, ".tmp", ".bkp");
 	bfree(path);
 	obs_data_array_release(data);
 	obs_data_release(newmidi);
 }
-std::string Config::get_file_name()
+QString Config::get_file_name()
 {
-	std::string file("obs-midi_");
+	QString file("obs-midi_");
 	file += obs_frontend_get_current_profile();
 	file += "_";
 	file += obs_frontend_get_current_scene_collection();
 	file += ".json";
 	return file;
 }
-OBSData Config::GetConfigStore()
+QString Config::GetConfigStore()
 {
 	auto path = obs_module_config_path(NULL);
-	auto filepath = obs_module_config_path(get_file_name().c_str());
+	auto filepath = obs_module_config_path(get_file_name().toStdString().c_str());
 	os_mkdirs(path);
-	OBSData midiConfig = os_file_exists(filepath) ? obs_data_create_from_json_file(filepath) : obs_data_create();
-	obs_data_save_json_safe(midiConfig, filepath, ".tmp", ".bkp");
+	obs_data_t *midiConfig = os_file_exists(filepath) ? obs_data_create_from_json_file(filepath) : obs_data_create();
+	if (!os_file_exists(filepath)) {
+		obs_data_save_json_safe(midiConfig, filepath, ".tmp", ".bkp");
+	}
 	bfree(filepath);
 	bfree(path);
-	return std::move(midiConfig);
+	QString conf = QString(obs_data_get_json(midiConfig));
+	obs_data_release(midiConfig);
+
+	return std::move(conf);
 }

@@ -132,6 +132,7 @@ QVector<MidiHook *> DeviceManager::GetMidiHooksByDeviceName(const QString &devic
 			return {};
 		}
 	}
+	return {};
 }
 /* Registers a midi device.
  * Will create, store and enable a midi device.
@@ -147,13 +148,21 @@ MidiAgent *DeviceManager::RegisterMidiDevice(const int &port, const int &outport
  * This is needed to Serialize the state in the config.
  * https://obsproject.com/docs/reference-settings.html
  */
-OBSDataArray DeviceManager::GetData()
+QString DeviceManager::GetData()
 {
-	OBSDataArray data = obs_data_array_create();
+	blog(LOG_DEBUG, "DM::GetData");
+	obs_data_t *return_data = obs_data_create();
+	obs_data_array_t *data = obs_data_array_create();
 	for (auto midiAgent : midiAgents) {
-		obs_data_array_push_back(data, midiAgent->GetData());
+		obs_data_t* adata = obs_data_create_from_json(midiAgent->GetData().toStdString().c_str());
+		obs_data_array_push_back(data, adata);
+		obs_data_release(adata);
 	}
-	return std::move(data);
+	obs_data_set_array(return_data, "MidiDevices", data);
+	QString rdata(obs_data_get_json(return_data));
+	obs_data_array_release(data);
+	obs_data_release(return_data);
+	return std::move(rdata);
 } /**
    * Reload configuration -- for use with switching scene collecitons or profiles
    */

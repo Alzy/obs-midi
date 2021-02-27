@@ -280,22 +280,25 @@ void MidiAgent::clear_MidiHooks()
  * This is needed to Serialize the state in the config.
  * https://obsproject.com/docs/reference-settings.html
  */
-obs_data_t *MidiAgent::GetData()
+QString MidiAgent::GetData()
 {
-	obs_data_t* data = obs_data_create();
+	blog(LOG_DEBUG, "MA::GetData");
+	obs_data_t *data = obs_data_create();
 	obs_data_set_string(data, "name", midi_input_name.toStdString().c_str());
 	obs_data_set_string(data, "outname", midi_output_name.toStdString().c_str());
 	obs_data_set_bool(data, "enabled", enabled);
 	obs_data_set_bool(data, "bidirectional", bidirectional);
-	OBSDataArrayAutoRelease arrayData = obs_data_array_create();
+	obs_data_array_t *arrayData = obs_data_array_create();
 	for (int i = 0; i < midiHooks.size(); i++) {
-		obs_data_t* hookData = midiHooks.at(i)->GetData();
+		obs_data_t *hookData = obs_data_create_from_json(midiHooks.at(i)->GetData().toStdString().c_str());
 		obs_data_array_push_back(arrayData, hookData);
 		obs_data_release(hookData);
-		
 	}
 	obs_data_set_array(data, "hooks", arrayData);
-	return data;
+	QString return_data(obs_data_get_json(data));
+	obs_data_array_release(arrayData);
+	obs_data_release(data);
+	return return_data;
 }
 /**
  * Get Midi Hook, For use with events
@@ -338,17 +341,16 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 {
 	MidiHook *hook = get_midi_hook_if_exists(event);
 
-	
 	blog(LOG_DEBUG, "OBS Event : %s \n AD: %s", event.updateType().toStdString().c_str(), obs_data_get_json(event.additionalFields()));
 	if (!this->sending) {
 
 		// ON EVENT TYPE Find matching hook, pull data from that hook, and do thing.
 		if (hook != NULL) {
-			MidiMessage *message = 	hook->get_message_from_hook();
+			MidiMessage *message = hook->get_message_from_hook();
 			if (event.updateType() == QString("SourceVolumeChanged")) {
 				double vol = obs_data_get_double(event.additionalFields(), "volume");
 				uint8_t newvol = Utils::mapper2(cbrt(vol));
-				
+
 				message->value = newvol;
 				this->send_message_to_midi_device((MidiMessage)*message);
 			} else if (event.updateType() == QString("SwitchScenes")) {
@@ -473,11 +475,10 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 	} else {
 		this->sending = false;
 	}
-	
 }
 void MidiAgent::send_message_to_midi_device(const MidiMessage &message)
 {
-	if (message.message_type !="none") {
+	if (message.message_type != "none") {
 
 		std::unique_ptr<rtmidi::message> hello = std::make_unique<rtmidi::message>();
 		if (message.message_type == "Control Change") {

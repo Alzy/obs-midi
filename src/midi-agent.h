@@ -66,7 +66,7 @@ public:
 	void add_MidiHook(MidiHook *hook);
 	void remove_MidiHook(MidiHook *hook);
 	void clear_MidiHooks();
-	obs_data_t *GetData();
+	QString GetData();
 
 public slots:
 	void handle_obs_event(const RpcEvent &event);

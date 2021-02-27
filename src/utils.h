@@ -373,8 +373,10 @@ public:
 		bool_override = obs_data_get_bool(data, "bool_override");
 		int_override = obs_data_get_int(data, "int_override");
 	}
-	obs_data_t *GetData() const
+
+	QString GetData() 
 	{
+		blog(LOG_DEBUG, "MH::GetData");
 		obs_data_t *data = obs_data_create();
 		obs_data_set_int(data, "channel", channel);
 		obs_data_set_string(data, "message_type", message_type.toStdString().c_str());
@@ -401,7 +403,7 @@ public:
 		if (!media_source.isEmpty()) {
 			obs_data_set_string(data, "media_source", media_source.toStdString().c_str());
 		}
-		if (duration != NULL) {
+		if (duration != -1) {
 			obs_data_set_int(data, "duration", duration);
 		}
 		if (!scene_collection.isEmpty()) {
@@ -416,10 +418,15 @@ public:
 		if (bool_override != NULL) {
 			obs_data_set_bool(data, "bool_override", bool_override);
 		}
-		if (int_override != NULL) {
+		if (int_override != -1) {
 			obs_data_set_int(data, "int_override", int_override);
 		}
-		return std::move(data);
+		QString hookdata(obs_data_get_json(data));
+		blog(LOG_DEBUG, "Midi Hook JSON = %s", hookdata.toStdString().c_str());
+		obs_data_release(data);
+		blog(LOG_DEBUG, "Midi Hook JSON post release = %s", hookdata.toStdString().c_str());
+
+		return hookdata;
 	}
-	const char *ToJSON() { return obs_data_get_json(GetData()); }
+	
 };

@@ -62,7 +62,7 @@ public:
 	QVector<MidiHook *> GetMidiHooksByDeviceName(const QString &deviceName);
 	MidiAgent *RegisterMidiDevice(const int &port, const int &outport);
 
-	OBSDataArray GetData();
+	QString GetData();
 	void reload();
 signals:
 	void reload_config();

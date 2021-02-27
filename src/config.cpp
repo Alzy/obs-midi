@@ -46,14 +46,12 @@ void Config::Load()
  */
 void Config::Save()
 {
-	obs_data_t * newmidi = obs_data_create();
+	blog(LOG_DEBUG, "Config save");
 	auto deviceManager = GetDeviceManager();
-	auto data = deviceManager->GetData();
-	obs_data_set_array(newmidi, PARAM_DEVICES, data);
+	obs_data_t *newmidi = obs_data_create_from_json(deviceManager->GetData().toStdString().c_str());
 	auto path = obs_module_config_path(get_file_name().toStdString().c_str());
 	obs_data_save_json_safe(newmidi, path, ".tmp", ".bkp");
 	bfree(path);
-	obs_data_array_release(data);
 	obs_data_release(newmidi);
 }
 QString Config::get_file_name()

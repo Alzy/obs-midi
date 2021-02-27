@@ -33,18 +33,17 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "utils.h"
 #include "obs-controller.h"
 
-class MidiAgent : public QObject
-{
+class MidiAgent : public QObject {
 	Q_OBJECT
 public:
 	MidiAgent(const int &in_port, const int &out_port);
-	MidiAgent(obs_data_t *data);
+	MidiAgent(const char *data);
 	~MidiAgent();
-	void Load(obs_data_t *data);
+	void Load(const char *data);
 	// Open Actions
 	void open_midi_input_port();
 	void open_midi_output_port();
-	//Close Actions
+	// Close Actions
 	void close_both_midi_ports();
 	void close_midi_output_port();
 	void close_midi_input_port();
@@ -68,7 +67,7 @@ public:
 	void remove_MidiHook(MidiHook *hook);
 	void clear_MidiHooks();
 	obs_data_t *GetData();
-	
+
 public slots:
 	void handle_obs_event(const RpcEvent &event);
 signals:
@@ -76,7 +75,7 @@ signals:
 	void do_obs_action(MidiHook *, int);
 
 private:
-	void send_message_to_midi_device(MidiMessage *message);
+	void send_message_to_midi_device(const MidiMessage &message);
 	rtmidi::midi_in midiin;
 	rtmidi::midi_out midiout;
 	QString midi_input_name;

@@ -32,7 +32,7 @@ void DeviceManager::Load(QString datastring)
 	size_t deviceCount = obs_data_array_count(data);
 	for (size_t i = 0; i < deviceCount; i++) {
 		obs_data_t *madata = obs_data_array_item(data, i);
-		MidiAgent *device = new MidiAgent(madata);
+		MidiAgent *device = new MidiAgent(obs_data_get_json(madata));
 		obs_data_release(madata);
 		midiAgents.push_back(device);
 	}

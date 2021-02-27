@@ -311,7 +311,7 @@ typedef struct MidiMessage {
 		this->value = Utils::get_midi_value(message);
 	}
 	QString device_name;
-	QString message_type;
+	QString message_type="none";
 	int channel = 0;
 	int NORC = 0;
 	int value = 0;

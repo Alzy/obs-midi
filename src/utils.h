@@ -349,7 +349,7 @@ public:
 		message->channel = this->channel;
 		message->message_type = this->message_type;
 		message->NORC = this->norc;
-		return message;
+		return std::move(message);
 	}
 	MidiHook(){};
 	MidiHook(const QString &jsonString)

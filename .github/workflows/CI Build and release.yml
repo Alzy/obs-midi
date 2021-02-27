@@ -503,7 +503,7 @@ jobs:
         with:
           tag_name: tag-${{ env.GIT_HASH }}
           body_path: ${{ github.workspace }}/obs-midi/docs/releasehead.md
-           body: |
+          body: |
             ${{ steps.Changelog.outputs.changelog }}
           release_name: obs-midi ALPHA 2 ${{ env.GIT_HASH }}
           draft: false

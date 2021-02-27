@@ -148,4 +148,11 @@ OBSDataArray DeviceManager::GetData()
 		obs_data_array_push_back(data, midiAgent->GetData());
 	}
 	return std::move(data);
+} /**
+   * Reload configuration -- for use with switching scene collecitons or profiles
+   */
+void DeviceManager::reload()
+{
+	this->Unload();
+	emit reload_config();
 }

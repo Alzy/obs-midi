@@ -335,7 +335,7 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 	MidiHook *hook = get_midi_hook_if_exists(event);
 
 	
-
+	blog(LOG_DEBUG, "OBS Event : %s \n AD: %s", event.updateType().toStdString().c_str(), obs_data_get_json(event.additionalFields()));
 	if (!this->sending) {
 
 		// ON EVENT TYPE Find matching hook, pull data from that hook, and do thing.
@@ -461,6 +461,8 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 				}
 				GetConfig()->Save();
 			}
+		} else if (event.updateType() == QString("ProfileChanged") || event.updateType() == QString("SceneCollectionChanged")) {
+			GetDeviceManager().get()->reload();
 		}
 		delete (message);
 

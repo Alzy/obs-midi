@@ -51,7 +51,7 @@ public:
 
 	void Load(const OBSDataArray &data);
 	void Unload();
-
+	
 	QStringList GetPortsList();
 	int GetPortNumberByDeviceName(const QString &deviceName);
 	QStringList GetOutPortsList();
@@ -63,8 +63,10 @@ public:
 	MidiAgent *RegisterMidiDevice(const int &port, const int &outport);
 
 	OBSDataArray GetData();
+	void reload();
+signals:
+	void reload_config();
 
 private:
-	QMetaObject::Connection broadcast_connection;
 	QVector<MidiAgent *> midiAgents;
 };

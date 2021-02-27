@@ -26,11 +26,12 @@ using namespace std;
 
 Config::Config()
 {
+	connect(GetDeviceManager().get(), SIGNAL(reload_config()), this, SLOT(Load()));
 }
 
 Config::~Config()
 {
-	
+	this->disconnect();
 }
 
 /* Load the configuration from the OBS Config Store
@@ -59,7 +60,7 @@ void Config::Save()
 }
 std::string Config::get_file_name()
 {
-	std::string file = "obs-midi_";
+	std::string file("obs-midi_");
 	file += obs_frontend_get_current_profile();
 	file += "_";
 	file += obs_frontend_get_current_scene_collection();
@@ -68,16 +69,11 @@ std::string Config::get_file_name()
 }
 OBSData Config::GetConfigStore()
 {
-	OBSData midiConfig;
 	auto path = obs_module_config_path(NULL);
 	auto filepath = obs_module_config_path(get_file_name().c_str());
 	os_mkdirs(path);
-	if (os_file_exists(filepath)) {
-		midiConfig = obs_data_create_from_json_file(filepath);
-	} else {
-		midiConfig = obs_data_create();
-		obs_data_save_json_safe(midiConfig, filepath, ".tmp", ".bkp");
-	}
+	OBSData midiConfig = os_file_exists(filepath) ? obs_data_create_from_json_file(filepath) : obs_data_create();
+	obs_data_save_json_safe(midiConfig, filepath, ".tmp", ".bkp");
 	bfree(filepath);
 	bfree(path);
 	return std::move(midiConfig);

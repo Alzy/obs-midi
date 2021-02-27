@@ -69,9 +69,10 @@ bool obs_module_load(void)
 
 void obs_module_unload()
 {
-	_eventsSystem.reset();
-	_deviceManager.reset();
-	_config.reset();
+	
+	_eventsSystem.~shared_ptr();
+	_deviceManager.~shared_ptr();
+	_config.~shared_ptr();
 	
 	blog(LOG_DEBUG, "goodbye!");
 }

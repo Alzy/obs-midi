@@ -479,6 +479,9 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: ${{ github.workspace }}/obs-midi
+      - name: Changelog
+        uses: scottbrenner/generate-changelog-action@master
+        id: Changelog
       - name: 'Get obs-midi git info'
         shell: bash
         working-directory: ${{ github.workspace }}/obs-midi
@@ -500,6 +503,8 @@ jobs:
         with:
           tag_name: tag-${{ env.GIT_HASH }}
           body_path: ${{ github.workspace }}/obs-midi/docs/releasehead.md
+           body: |
+            ${{ steps.Changelog.outputs.changelog }}
           release_name: obs-midi ALPHA 2 ${{ env.GIT_HASH }}
           draft: false
           prerelease: false

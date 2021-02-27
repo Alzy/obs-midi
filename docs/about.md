@@ -10,8 +10,8 @@ permalink: /about/
 
 OBS MIDI came about because two guys complained about the same thing, within the same hour, and decided to try to take on the task
 
-Those two guys are 
-* [Alzy](https://github.com/Alzy) and 
+Those two guys are
+* [Alzy](https://github.com/Alzy) and
 * [Chris](http://github.com/cpyarger)
 
 ## Questions or Concerns
@@ -38,6 +38,7 @@ Anyone who wants to help out the project
 
 ## Special Thanks to our other contributors
 * [dtg01100](https://github.com/dtg01100)
+* [garbart](https://github.com/garbart)
 * [DDRBoxman](https://github.com/DDRBoxman)
 * [kernel-coder](https://github.com/kernel-coder)
 * [Luxcium](https://github.com/Luxcium)

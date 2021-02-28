@@ -388,7 +388,8 @@ void OBSController::StartStopReplayBuffer()
 void OBSController::StartReplayBuffer()
 {
 	if (!Utils::ReplayBufferEnabled()) {
-		blog(LOG_DEBUG, "replay buffer disabled in settings");
+		Utils::alert_popup("replay buffer disabled in settings");
+		return;
 	}
 	if (!obs_frontend_replay_buffer_active()) {
 		Utils::StartReplayBuffer();
@@ -411,7 +412,8 @@ void OBSController::StopReplayBuffer()
 void OBSController::SaveReplayBuffer()
 {
 	if (!obs_frontend_replay_buffer_active()) {
-		throw("replay buffer not active");
+		Utils::alert_popup("replay buffer not active");
+		return;
 	}
 	OBSOutputAutoRelease replayOutput = obs_frontend_get_replay_buffer_output();
 	calldata_t cd = {0};

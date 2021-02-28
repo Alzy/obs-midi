@@ -1007,11 +1007,23 @@ QString Utils::untranslate(const QString &tstring)
 {
 	return std::move(ActionsClass::action_to_string(AllActions_raw.at(TranslateActions().indexOf(tstring))));
 }
+QString mess;
 void Utils::alert_popup(const QString &message)
 {
-	QMessageBox msgBox;
-	msgBox.setText(message);
-	msgBox.exec();
+	mess = message;
+
+	obs_queue_task(
+		OBS_TASK_UI,
+		[](void *param)
+		{
+			QMessageBox msgBox;
+			msgBox.setText(mess);
+			msgBox.exec();
+
+			UNUSED_PARAMETER(param);
+		},
+		nullptr, true);
+	
 }
 QStringList Utils::get_scene_names()
 {

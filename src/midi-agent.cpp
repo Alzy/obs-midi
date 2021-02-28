@@ -42,8 +42,9 @@ MidiAgent::MidiAgent(const char *midiData)
 	// Sets the parent of this instance of MidiAgent to Device Manager
 	this->setParent(GetDeviceManager().get());
 	// Sets the Midi Callback function
+
+	this->Load(midiData);
 	if (is_device_attached(midiData)) {
-		this->Load(midiData);
 		set_callbacks();
 		if (enabled)
 			open_midi_input_port();
@@ -351,11 +352,9 @@ MidiHook *MidiAgent::get_midi_hook_if_exists(const RpcEvent &event)
 /*Handle OBS events*/
 void MidiAgent::handle_obs_event(const RpcEvent &event)
 {
-	MidiHook *hook = get_midi_hook_if_exists(event);
-
 	blog(LOG_DEBUG, "OBS Event : %s \n AD: %s", event.updateType().toStdString().c_str(), obs_data_get_json(event.additionalFields()));
+	MidiHook *hook = get_midi_hook_if_exists(event);
 	if (!this->sending) {
-
 		// ON EVENT TYPE Find matching hook, pull data from that hook, and do thing.
 		if (hook != NULL) {
 			MidiMessage *message = hook->get_message_from_hook();
@@ -460,10 +459,13 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 		} else if (event.updateType() == QString("SourceRenamed")) {
 			QString from = obs_data_get_string(event.additionalFields(), "previousName");
 			for (int i = 0; i < this->midiHooks.size(); i++) {
-				if (this->midiHooks.at(i)->source == from) {
+				if (this->midiHooks.at(i)->scene == from) {
+					this->midiHooks.at(i)->scene = obs_data_get_string(event.additionalFields(), "newName");
+					GetConfig().get()->Save();
+				} else if (this->midiHooks.at(i)->source == from) {
 					this->midiHooks.at(i)->source = obs_data_get_string(event.additionalFields(), "newName");
-					this->GetData();
-				}
+					GetConfig().get()->Save();
+				}	
 			}
 		} else if (event.updateType() == QString("Exiting")) {
 			disconnect(GetEventsSystem().get(), &Events::obsEvent, this, &MidiAgent::handle_obs_event);
@@ -474,7 +476,7 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 				for (int i = 0; i < this->midiHooks.size(); i++) {
 					if (this->midiHooks.at(i)->source == from) {
 						this->remove_MidiHook(this->midiHooks.at(i));
-						this->GetData();
+						GetConfig().get()->Save();
 					}
 				}
 				GetConfig()->Save();

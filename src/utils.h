@@ -270,9 +270,10 @@ const QList<ActionsClass::Actions> AllActions_raw = {ActionsClass::Actions::Disa
 						     ActionsClass::Actions::Resume_Recording,
 						     ActionsClass::Actions::Save_Replay_Buffer,
 						     ActionsClass::Actions::Reload_Browser_Source,
-						     ActionsClass::Actions::Move_T_Bar};
+						     ActionsClass::Actions::Move_T_Bar,
+						     ActionsClass::Actions::Studio_Mode
+};
 const QList<ActionsClass::Actions> not_ready_actions{
-	ActionsClass::Actions::Studio_Mode,
 	ActionsClass::Actions::Set_Current_Scene_Collection,
 	ActionsClass::Actions::Reset_Stats,
 	ActionsClass::Actions::Set_Current_Profile,

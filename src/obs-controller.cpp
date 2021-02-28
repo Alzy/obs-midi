@@ -521,11 +521,14 @@ void OBSController::play_pause_media_source()
 // TODO:: Fix this
 void OBSController::toggle_studio_mode()
 {
-	if (obs_frontend_preview_program_mode_active()) {
-		obs_frontend_set_preview_program_mode(false);
-	} else {
-		obs_frontend_set_preview_program_mode(true);
-	}
+	obs_queue_task(
+		OBS_TASK_UI,
+		[](void *param) {
+			obs_frontend_set_preview_program_mode(!obs_frontend_preview_program_mode_active());
+
+			UNUSED_PARAMETER(param);
+		},
+		nullptr, true);
 }
 void OBSController::reset_stats() {}
 void OBSController::restart_media()

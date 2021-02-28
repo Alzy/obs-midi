@@ -12,6 +12,7 @@ Those two guys are
 [![Open Source Helpers](https://www.codetriage.com/cpyarger/obs-midi/badges/users.svg)](https://www.codetriage.com/cpyarger/obs-midi)
 [![Crowdin](https://badges.crowdin.net/obs-midi/localized.svg)](https://crowdin.com/project/obs-midi)
 [![CodeFactor](https://www.codefactor.io/repository/github/cpyarger/obs-midi/badge/master)](https://www.codefactor.io/repository/github/cpyarger/obs-midi/overview/master)
+
 Currently runs on Windows and Linux, and MAC
 
 # Installing
@@ -38,7 +39,6 @@ Currently runs on Windows and Linux, and MAC
 sudo snap connect obs-studio:alsa
 ```
 
-Currently runs on Windows and Linux, and is partly tested on MAC
 
  # Special thanks to the following projects
  * [RTMidi17](https://github.com/jcelerier/RtMidi17) An amazing modernized RTMIDI library

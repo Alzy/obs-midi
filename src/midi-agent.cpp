@@ -235,6 +235,12 @@ void MidiAgent::HandleError(const rtmidi::midi_error &error_type, const std::str
 	UNUSED_PARAMETER(error_type);
 	UNUSED_PARAMETER(userData);
 }
+void MidiAgent::HandleError(const rtmidi::driver_error &error_type, const std::string_view &error_message, void *userData)
+{
+	blog(LOG_ERROR, "Driver Error: %s", error_message.data());
+	UNUSED_PARAMETER(error_type);
+	UNUSED_PARAMETER(userData);
+}
 /* Get the midi hooks for this device
  */
 QVector<MidiHook *> MidiAgent::GetMidiHooks()

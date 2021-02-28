@@ -61,6 +61,7 @@ public:
 	void set_enabled(const bool &state);
 	static void HandleInput(const rtmidi::message &message, void *userData);
 	static void HandleError(const rtmidi::midi_error &error, const std::string_view &error_message, void *userData);
+	void HandleError(const rtmidi::driver_error &error_type, const std::string_view &error_message, void *userData);
 	void set_callbacks();
 	QVector<MidiHook *> GetMidiHooks();
 	void set_midi_hooks(QVector<MidiHook *>);

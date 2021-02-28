@@ -17,34 +17,26 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 */
 
 #pragma once
-
-#if __has_include(<obs-frontend-api.h>)
-#include <obs-frontend-api.h>
-#else
-#include <obs-frontend-api/obs-frontend-api.h>
-#endif
+#include "obs-data.h"
 #include <util/config-file.h>
-#include <QtCore/QString>
-#include <QtCore/QSharedPointer>
-#include <vector>
+#include <util/util.hpp>
+#include <util/platform.h>
+#include <qobject.h>
+#include "device-manager.h"
 
-using namespace std;
-
-class Config :QObject{
+class Config : QObject {
 	Q_OBJECT
 public:
 	Config();
-	~Config();
+	~Config() override;
+
+public slots:
 	void Load();
 	void Save();
-	void SetDefaults();
-	config_t *GetConfigStore();
 
-	bool DebugEnabled;
-	bool AlertsEnabled;
-
-	bool SettingsLoaded;
+	
 
 private:
-	static void on_frontend_event(obs_frontend_event event, void *param);
+	QString get_file_name();
+	QString GetConfigStore();
 };

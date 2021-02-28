@@ -5,7 +5,7 @@
 #include "midi-agent.h"
 QString ActionsClass::action_to_string(const ActionsClass::Actions &enumval)
 {
-	return QVariant::fromValue(enumval).toString();
+	return std::move(QVariant::fromValue(enumval).toString());
 }
 
 ActionsClass::Actions ActionsClass::string_to_action(const QString &action)
@@ -15,7 +15,7 @@ ActionsClass::Actions ActionsClass::string_to_action(const QString &action)
 QString
 ActionsClass::event_to_string(const ActionsClass::obs_event_type &enumval)
 {
-	return QVariant::fromValue(enumval).toString();
+	return std::move(QVariant::fromValue(enumval).toString());
 }
 
 ActionsClass::obs_event_type
@@ -27,7 +27,7 @@ ActionsClass::string_to_event(const QString &action)
 /**
  * Sets the currently active scene
  */
-void ActionsClass::SetCurrentScene(QString sceneName)
+void ActionsClass::SetCurrentScene(const QString &sceneName)
 {
 	OBSSourceAutoRelease source =
 		obs_get_source_by_name(sceneName.toStdString().c_str());
@@ -42,7 +42,7 @@ void ActionsClass::SetCurrentScene(QString sceneName)
 /**
  * Sets the scene in preview. Must be in Studio mode or will throw error
  */
-void ActionsClass::SetPreviewScene(QString sceneName)
+void ActionsClass::SetPreviewScene(const QString &sceneName)
 {
 	if (!obs_frontend_preview_program_mode_active()) {
 		throw("studio mode not enabled");
@@ -58,7 +58,7 @@ void ActionsClass::SetPreviewScene(QString sceneName)
 /**
  * Change the active scene collection.
  */
-void ActionsClass::SetCurrentSceneCollection(QString sceneCollection)
+void ActionsClass::SetCurrentSceneCollection(const QString &sceneCollection)
 {
 	if (sceneCollection.isEmpty()) {
 		throw("Scene Collection name is empty");
@@ -71,7 +71,7 @@ void ActionsClass::SetCurrentSceneCollection(QString sceneCollection)
 /**
 * Reset a scene item.
 */
-void ActionsClass::ResetSceneItem(QString sceneName, QString itemName)
+void ActionsClass::ResetSceneItem(const QString &sceneName, const QString &itemName)
 {
 	OBSScene scene = Utils::GetSceneFromNameOrCurrent(sceneName);
 	if (!scene) {
@@ -107,7 +107,7 @@ void ActionsClass::TransitionToProgram()
  * Transitions the currently previewed scene to the main output using specified transition.
  * transitionDuration is optional. (milliseconds)
  */
-void ActionsClass::TransitionToProgram(QString transitionName,
+void ActionsClass::TransitionToProgram(const QString &transitionName,
 				       int transitionDuration)
 {
 	if (!obs_frontend_preview_program_mode_active()) {
@@ -129,7 +129,7 @@ void ActionsClass::TransitionToProgram(QString transitionName,
 /**
  * Set the active transition.
  */
-void ActionsClass::SetCurrentTransition(QString name)
+void ActionsClass::SetCurrentTransition(const QString &name)
 {
 	bool success = Utils::SetTransitionByName(name);
 	if (!success) {
@@ -152,7 +152,7 @@ void ActionsClass::ToggleSourceVisibility() {} //DOESNT EXIST
 /**
 * Inverts the mute status of a specified source.
 */
-void ActionsClass::ToggleMute(QString sourceName)
+void ActionsClass::ToggleMute(const QString &sourceName)
 {
 	if (sourceName.isEmpty()) {
 		throw("sourceName is empty");
@@ -170,7 +170,7 @@ void ActionsClass::ToggleMute(QString sourceName)
 /**
  * Sets the mute status of a specified source.
  */
-void ActionsClass::SetMute(QString sourceName, bool mute)
+void ActionsClass::SetMute(const QString &sourceName, bool mute)
 {
 	if (sourceName.isEmpty()) {
 		throw("sourceName is empty");
@@ -324,7 +324,7 @@ void ActionsClass::SaveReplayBuffer()
 	calldata_free(&cd);
 }
 
-void ActionsClass::SetCurrentProfile(QString profileName)
+void ActionsClass::SetCurrentProfile(const QString &profileName)
 {
 	if (profileName.isEmpty()) {
 		throw("profile name is empty");
@@ -334,13 +334,13 @@ void ActionsClass::SetCurrentProfile(QString profileName)
 	obs_frontend_set_current_profile(profileName.toUtf8());
 }
 
-void ActionsClass::SetTextGDIPlusText(QString text) {}
+void ActionsClass::SetTextGDIPlusText(const QString &text) {}
 
-void ActionsClass::SetBrowserSourceURL(QString url) {}
+void ActionsClass::SetBrowserSourceURL(const QString &url) {}
 
 void ActionsClass::ReloadBrowserSource() {}
 
-void ActionsClass::TakeSourceScreenshot(QString source)
+void ActionsClass::TakeSourceScreenshot(const QString &source)
 {
 	obs_frontend_take_source_screenshot(
 		obs_get_source_by_name(source.toStdString().c_str()));
@@ -356,7 +356,7 @@ void ActionsClass::ToggleSourceFilter() {}
 // CC ACTIONS //
 ////////////////
 
-void ActionsClass::SetVolume(QString source, float volume)
+void ActionsClass::SetVolume(const QString &source, float volume)
 {
 	OBSSourceAutoRelease obsSource =
 		obs_get_source_by_name(source.toUtf8());
@@ -370,7 +370,7 @@ void ActionsClass::SetVolume(QString source, float volume)
 /**
  * Set the audio sync offset of a specified source.
  */
-void ActionsClass::SetSyncOffset(QString sourceName, int64_t sourceSyncOffset)
+void ActionsClass::SetSyncOffset(const QString &sourceName, int64_t sourceSyncOffset)
 {
 	if (sourceName.isEmpty()) {
 		throw("source name is empty");

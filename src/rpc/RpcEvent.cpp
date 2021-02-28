@@ -18,17 +18,19 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #include "RpcEvent.h"
 
-RpcEvent::RpcEvent(const QString &updateType,
-		   std::optional<uint64_t> streamTime,
-		   std::optional<uint64_t> recordingTime,
-		   obs_data_t *additionalFields)
-	: _updateType(updateType),
-	  _streamTime(streamTime),
-	  _recordingTime(recordingTime),
-	  _additionalFields(nullptr)
+#include <utility>
+
+#include "obs-data.h"
+
+RpcEvent::RpcEvent(QString updateType, std::optional<uint64_t> streamTime, std::optional<uint64_t> recordingTime, obs_data_t *additionalFields)
+	: _updateType(std::move(updateType)), _streamTime(streamTime), _recordingTime(recordingTime), _additionalFields(nullptr)
 {
 	if (additionalFields) {
 		_additionalFields = obs_data_create();
 		obs_data_apply(_additionalFields, additionalFields);
 	}
+}
+RpcEvent::~RpcEvent()
+{
+	obs_data_release(_additionalFields);
 }

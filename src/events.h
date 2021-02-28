@@ -19,34 +19,37 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #pragma once
 
+#include <string>
+#include <vector>
+#include <map>
+#include <functional>
+#include <iostream>
+
+#include <QtWidgets/QListWidgetItem>
+#include <QtCore/QSharedPointer>
+#include <QtCore/QTimer>
+#include <QtCore/QObject>
+
+#include <util/platform.h>
 #include <obs.hpp>
 #if __has_include(<obs-frontend-api.h>)
 #include <obs-frontend-api.h>
 #else
 #include <obs-frontend-api/obs-frontend-api.h>
 #endif
-#include <util/platform.h>
+
 #include "obs-midi.h"
 #include "device-manager.h"
-
-#include <QtWidgets/QListWidgetItem>
-#include <QtCore/QSharedPointer>
-#include <QtCore/QTimer>
 #include "rpc/RpcEvent.h"
-#include <vector>
-#include <QObject>
-#include <functional>
-#include <map>
-#include <string>
-#include <iostream>
-//#include "WSServer.h"
 
-class events : public QObject {
+
+class Events : public QObject
+{
 	Q_OBJECT
 
 public:
-	explicit events(DeviceManagerPtr srv);
-	~events();
+	explicit Events(DeviceManagerPtr srv);
+	~Events() override;
 
 	void connectSourceSignals(obs_source_t *source);
 	void disconnectSourceSignals(obs_source_t *source);
@@ -65,11 +68,12 @@ public:
 
 	obs_data_t *GetStats();
 
-	void OnBroadcastCustomMessage(QString realm, obs_data_t *data);
+	void OnBroadcastCustomMessage(const QString &realm, obs_data_t *data);
 
 	bool HeartbeatIsActive;
 signals:
-	void obsEvent(RpcEvent event);
+	void obsEvent(const RpcEvent &event);
+
 private slots:
 	void StreamStatus();
 	void Heartbeat();
@@ -88,8 +92,7 @@ private:
 	uint64_t _lastBytesSent;
 	uint64_t _lastBytesSentTime;
 
-	void broadcastUpdate(const char *updateType,
-			     obs_data_t *additionalFields);
+	void broadcastUpdate(const char *updateType, obs_data_t *additionalFields);
 
 	void OnSceneChange();
 	void OnSceneListChange();
@@ -124,8 +127,7 @@ private:
 
 	void OnExit();
 
-	static void FrontendEventHandler(enum obs_frontend_event event,
-					 void *privateData);
+	static void FrontendEventHandler(enum obs_frontend_event event, void *privateData);
 
 	static void OnTransitionBegin(void *param, calldata_t *data);
 	static void OnTransitionEnd(void *param, calldata_t *data);
@@ -136,16 +138,14 @@ private:
 
 	static void OnSourceVolumeChange(void *param, calldata_t *data);
 	static void OnSourceMuteStateChange(void *param, calldata_t *data);
-	static void OnSourceAudioSyncOffsetChanged(void *param,
-						   calldata_t *data);
+	static void OnSourceAudioSyncOffsetChanged(void *param, calldata_t *data);
 	static void OnSourceAudioMixersChanged(void *param, calldata_t *data);
 
 	static void OnSourceRename(void *param, calldata_t *data);
 
 	static void OnSourceFilterAdded(void *param, calldata_t *data);
 	static void OnSourceFilterRemoved(void *param, calldata_t *data);
-	static void OnSourceFilterVisibilityChanged(void *param,
-						    calldata_t *data);
+	static void OnSourceFilterVisibilityChanged(void *param, calldata_t *data);
 	static void OnSourceFilterOrderChanged(void *param, calldata_t *data);
 
 	static void OnSceneReordered(void *param, calldata_t *data);

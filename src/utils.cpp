@@ -1,17 +1,19 @@
-#include <iostream>
 #include <map>
-#include <inttypes.h>
+#include <cinttypes>
+
 #include <QtWidgets/QMainWindow>
 #include <QtCore/QDir>
 #include <QtCore/QUrl>
+
+#include <util/platform.h>
 #if __has_include(<obs-frontend-api.h>)
 #include <obs-frontend-api.h>
 #else
 #include <obs-frontend-api/obs-frontend-api.h>
 #endif
-#include <obs.hpp>
-#include <util/platform.h>
+
 #include "utils.h"
+
 //***********************************UTILS*****************************************//
 const QHash<obs_bounds_type, QString> boundTypeNames = {
 	{OBS_BOUNDS_STRETCH, "OBS_BOUNDS_STRETCH"},
@@ -27,7 +29,7 @@ QString getBoundsNameFromType(obs_bounds_type type)
 	QString fallback = boundTypeNames.value(OBS_BOUNDS_NONE);
 	return boundTypeNames.value(type, fallback);
 }
-obs_bounds_type getBoundsTypeFromName(QString name)
+obs_bounds_type getBoundsTypeFromName(const QString &name)
 {
 	return boundTypeNames.key(name);
 }
@@ -45,8 +47,7 @@ int Utils::mapper2(double x)
 	double in_max = 1;
 	double out_min = 0;
 	double out_max = 127;
-	return ((x - in_min) * (out_max - out_min) / (in_max - in_min) +
-		out_min);
+	return ((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min);
 }
 int Utils::t_bar_mapper(int x)
 {
@@ -54,19 +55,14 @@ int Utils::t_bar_mapper(int x)
 	int in_max = 127;
 	int out_min = 0;
 	int out_max = 1024;
-	return ((x - in_min) * (out_max - out_min) / (in_max - in_min) +
-		out_min);
+	return ((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min);
 }
 bool Utils::is_number(const QString &s)
 {
 	QRegExp re("\\d*"); // a digit (\d), zero or more times (*)
-	if (re.exactMatch(s)) {
-		return true;
-	} else {
-		return false;
-	}
+	return re.exactMatch(s);
 }
-bool Utils::isJSon(QString val)
+bool Utils::isJSon(const QString &val)
 {
 	return (val.startsWith(QChar('[')) || val.startsWith(QChar('{')));
 }
@@ -102,13 +98,11 @@ obs_data_array_t *Utils::GetSceneItems(obs_source_t *source)
 	}
 	obs_scene_enum_items(
 		scene,
-		[](obs_scene_t *scene, obs_sceneitem_t *currentItem,
-		   void *param) {
-			obs_data_array_t *data =
-				reinterpret_cast<obs_data_array_t *>(param);
-			OBSDataAutoRelease itemData =
-				GetSceneItemData(currentItem);
+		[](obs_scene_t *scene, obs_sceneitem_t *currentItem, void *param) {
+			obs_data_array_t *data = reinterpret_cast<obs_data_array_t *>(param);
+			OBSDataAutoRelease itemData = GetSceneItemData(currentItem);
 			obs_data_array_insert(data, 0, itemData);
+			UNUSED_PARAMETER(scene);
 			return true;
 		},
 		items);
@@ -124,19 +118,16 @@ QStringList Utils::GetSceneItemsBySource(obs_source_t *source)
 	}
 	obs_scene_enum_items(
 		scene,
-		[](obs_scene_t *scene, obs_sceneitem_t *currentItem,
-		   void *param) {
-			obs_data_array_t *data =
-				reinterpret_cast<obs_data_array_t *>(param);
-			OBSDataAutoRelease itemData =
-				GetSceneItemData(currentItem);
+		[](obs_scene_t *scene, obs_sceneitem_t *currentItem, void *param) {
+			obs_data_array_t *data = reinterpret_cast<obs_data_array_t *>(param);
+			OBSDataAutoRelease itemData = GetSceneItemData(currentItem);
 			obs_data_array_insert(data, 0, itemData);
+			UNUSED_PARAMETER(scene);
 			return true;
 		},
 		items);
 	for (int i = 0; i < obs_data_array_count(items); i++) {
-		itemNames.append(obs_data_get_string(
-			obs_data_array_item(items, i), "sourceName"));
+		itemNames.append(obs_data_get_string(obs_data_array_item(items, i), "sourceName"));
 	}
 	obs_data_array_release(items);
 	return itemNames;
@@ -145,7 +136,8 @@ QStringList Utils::GetSceneItemsBySource(obs_source_t *source)
  * @typedef {Object} `SceneItem` An OBS Scene Item.
  * @property {Number} `cy`
  * @property {Number} `cx`
- * @property {Number} `alignment` The point on the source that the item is manipulated from. The sum of 1=Left or 2=Right, and 4=Top or 8=Bottom, or omit to center on that axis.
+ * @property {Number} `alignment` The point on the source that the item is manipulated from. The sum of 1=Left or 2=Right, and 4=Top or 8=Bottom, or omit to
+ * center on that axis.
  * @property {String} `name` The name of this Scene Item.
  * @property {int} `id` Scene item ID
  * @property {Boolean} `render` Whether or not this Scene Item is set to "visible".
@@ -183,8 +175,7 @@ obs_data_t *Utils::GetSceneItemData(obs_sceneitem_t *item)
 	obs_data_set_int(data, "source_cx", (int)item_width);
 	obs_data_set_int(data, "source_cy", (int)item_height);
 	obs_data_set_bool(data, "muted", obs_source_muted(itemSource));
-	obs_data_set_int(data, "alignment",
-			 (int)obs_sceneitem_get_alignment(item));
+	obs_data_set_int(data, "alignment", (int)obs_sceneitem_get_alignment(item));
 	obs_data_set_double(data, "cx", item_width * scale.x);
 	obs_data_set_double(data, "cy", item_height * scale.y);
 	obs_data_set_bool(data, "render", obs_sceneitem_visible(item));
@@ -194,21 +185,16 @@ obs_data_t *Utils::GetSceneItemData(obs_sceneitem_t *item)
 		OBSSource parentSource = obs_scene_get_source(parent);
 		QString parentKind = obs_source_get_id(parentSource);
 		if (parentKind == "group") {
-			obs_data_set_string(data, "parentGroupName",
-					    obs_source_get_name(parentSource));
+			obs_data_set_string(data, "parentGroupName", obs_source_get_name(parentSource));
 		}
 	}
 	if (obs_sceneitem_is_group(item)) {
 		OBSDataArrayAutoRelease children = obs_data_array_create();
 		obs_sceneitem_group_enum_items(
 			item,
-			[](obs_scene_t *, obs_sceneitem_t *currentItem,
-			   void *param) {
-				obs_data_array_t *items =
-					reinterpret_cast<obs_data_array_t *>(
-						param);
-				OBSDataAutoRelease itemData =
-					GetSceneItemData(currentItem);
+			[](obs_scene_t *, obs_sceneitem_t *currentItem, void *param) {
+				obs_data_array_t *items = reinterpret_cast<obs_data_array_t *>(param);
+				OBSDataAutoRelease itemData = GetSceneItemData(currentItem);
 				obs_data_array_push_back(items, itemData);
 				return true;
 			},
@@ -217,7 +203,7 @@ obs_data_t *Utils::GetSceneItemData(obs_sceneitem_t *item)
 	}
 	return data;
 }
-obs_sceneitem_t *Utils::GetSceneItemFromName(obs_scene_t *scene, QString name)
+obs_sceneitem_t *Utils::GetSceneItemFromName(obs_scene_t *scene, const QString &name)
 {
 	if (!scene) {
 		return nullptr;
@@ -230,24 +216,21 @@ obs_sceneitem_t *Utils::GetSceneItemFromName(obs_scene_t *scene, QString name)
 	current_search search;
 	search.query = name;
 	search.result = nullptr;
-	search.enumCallback = [](obs_scene_t *scene,
-				 obs_sceneitem_t *currentItem, void *param) {
-		current_search *search =
-			reinterpret_cast<current_search *>(param);
+	search.enumCallback = [](obs_scene_t *scene, obs_sceneitem_t *currentItem, void *param) {
+		current_search *search = reinterpret_cast<current_search *>(param);
 		if (obs_sceneitem_is_group(currentItem)) {
-			obs_sceneitem_group_enum_items(
-				currentItem, search->enumCallback, search);
+			obs_sceneitem_group_enum_items(currentItem, search->enumCallback, search);
 			if (search->result) {
 				return false;
 			}
 		}
-		QString currentItemName = obs_source_get_name(
-			obs_sceneitem_get_source(currentItem));
+		QString currentItemName = obs_source_get_name(obs_sceneitem_get_source(currentItem));
 		if (currentItemName == search->query) {
 			search->result = currentItem;
 			obs_sceneitem_addref(search->result);
 			return false;
 		}
+		UNUSED_PARAMETER(scene);
 		return true;
 	};
 	obs_scene_enum_items(scene, search.enumCallback, &search);
@@ -266,13 +249,10 @@ obs_sceneitem_t *Utils::GetSceneItemFromId(obs_scene_t *scene, int64_t id)
 	current_search search;
 	search.query = id;
 	search.result = nullptr;
-	search.enumCallback = [](obs_scene_t *scene,
-				 obs_sceneitem_t *currentItem, void *param) {
-		current_search *search =
-			reinterpret_cast<current_search *>(param);
+	search.enumCallback = [](obs_scene_t *scene, obs_sceneitem_t *currentItem, void *param) {
+		current_search *search = reinterpret_cast<current_search *>(param);
 		if (obs_sceneitem_is_group(currentItem)) {
-			obs_sceneitem_group_enum_items(
-				currentItem, search->enumCallback, search);
+			obs_sceneitem_group_enum_items(currentItem, search->enumCallback, search);
 			if (search->result) {
 				return false;
 			}
@@ -282,27 +262,24 @@ obs_sceneitem_t *Utils::GetSceneItemFromId(obs_scene_t *scene, int64_t id)
 			obs_sceneitem_addref(search->result);
 			return false;
 		}
+		UNUSED_PARAMETER(scene);
 		return true;
 	};
 	obs_scene_enum_items(scene, search.enumCallback, &search);
 	return search.result;
 }
-obs_sceneitem_t *Utils::GetSceneItemFromItem(obs_scene_t *scene,
-					     obs_data_t *itemInfo)
+obs_sceneitem_t *Utils::GetSceneItemFromItem(obs_scene_t *scene, obs_data_t *itemInfo)
 {
 	if (!scene) {
 		return nullptr;
 	}
-	OBSDataItemAutoRelease idInfoItem =
-		obs_data_item_byname(itemInfo, "id");
+	OBSDataItemAutoRelease idInfoItem = obs_data_item_byname(itemInfo, "id");
 	int id = obs_data_item_get_int(idInfoItem);
-	OBSDataItemAutoRelease nameInfoItem =
-		obs_data_item_byname(itemInfo, "name");
+	OBSDataItemAutoRelease nameInfoItem = obs_data_item_byname(itemInfo, "name");
 	const char *name = obs_data_item_get_string(nameInfoItem);
 	if (idInfoItem) {
 		obs_sceneitem_t *sceneItem = GetSceneItemFromId(scene, id);
-		obs_source_t *sceneItemSource =
-			obs_sceneitem_get_source(sceneItem);
+		obs_source_t *sceneItemSource = obs_sceneitem_get_source(sceneItem);
 		QString sceneItemName = obs_source_get_name(sceneItemSource);
 		if (nameInfoItem && (QString(name) != sceneItemName)) {
 			return nullptr;
@@ -313,8 +290,7 @@ obs_sceneitem_t *Utils::GetSceneItemFromItem(obs_scene_t *scene,
 	}
 	return nullptr;
 }
-obs_sceneitem_t *Utils::GetSceneItemFromRequestField(obs_scene_t *scene,
-						     obs_data_item_t *dataItem)
+obs_sceneitem_t *Utils::GetSceneItemFromRequestField(obs_scene_t *scene, obs_data_item_t *dataItem)
 {
 	enum obs_data_type dataType = obs_data_item_gettype(dataItem);
 	if (dataType == OBS_DATA_OBJECT) {
@@ -343,7 +319,7 @@ bool Utils::IsValidAlignment(const uint32_t alignment)
 	}
 	return false;
 }
-obs_source_t *Utils::GetTransitionFromName(QString searchName)
+obs_source_t *Utils::GetTransitionFromName(const QString &searchName)
 {
 	obs_source_t *foundTransition = nullptr;
 	obs_frontend_source_list transition_list = {};
@@ -360,7 +336,7 @@ obs_source_t *Utils::GetTransitionFromName(QString searchName)
 	obs_frontend_source_list_free(&transition_list);
 	return foundTransition;
 }
-obs_scene_t *Utils::GetSceneFromNameOrCurrent(QString sceneName)
+obs_scene_t *Utils::GetSceneFromNameOrCurrent(const QString &sceneName)
 {
 	// Both obs_frontend_get_current_scene() and obs_get_source_by_name()
 	// increase the returned source's refcount
@@ -385,40 +361,31 @@ obs_data_array_t *Utils::GetScenes()
 	obs_frontend_source_list_free(&sceneList);
 	return scenes;
 }
-OBSDataArrayAutoRelease Utils::GetSceneArray(QString name)
+OBSDataArrayAutoRelease Utils::GetSceneArray(const QString &name)
 {
 	OBSDataArrayAutoRelease sceneArray = obs_data_array_create();
-	auto sceneEnumProc = [](obs_scene_t *scene, obs_sceneitem_t *item,
-				void *privateData) -> bool {
+	auto sceneEnumProc = [](obs_scene_t *scene, obs_sceneitem_t *item, void *privateData) -> bool {
 		obs_data_array_t *sceneArray = (obs_data_array_t *)privateData;
 		OBSDataAutoRelease scdata = obs_data_create();
 		auto x = obs_sceneitem_get_source(item);
 		OBSDataAutoRelease sdata = GetSceneData(x);
-		obs_data_set_string(scdata, "name",
-				    obs_data_get_string(sdata, "name"));
+		obs_data_set_string(scdata, "name", obs_data_get_string(sdata, "name"));
 		obs_data_array_push_back(sceneArray, scdata);
+		UNUSED_PARAMETER(scene);
 		return true;
 	};
-	obs_scene_enum_items(GetSceneFromNameOrCurrent(name), sceneEnumProc,
-			     sceneArray);
+	obs_scene_enum_items(GetSceneFromNameOrCurrent(name), sceneEnumProc, sceneArray);
 	return sceneArray;
 }
 OBSDataArrayAutoRelease Utils::GetSourceArray()
 {
 	OBSDataArrayAutoRelease sourcesArray = obs_data_array_create();
-	auto sourceEnumProc = [](void *privateData,
-				 obs_source_t *source) -> bool {
-		obs_data_array_t *sourcesArray =
-			(obs_data_array_t *)privateData;
+	auto sourceEnumProc = [](void *privateData, obs_source_t *source) -> bool {
+		obs_data_array_t *sourcesArray = (obs_data_array_t *)privateData;
 		OBSDataAutoRelease sourceData = obs_data_create();
-		auto scene = obs_scene_from_source(source);
-		obs_data_set_string(sourceData, "name",
-				    obs_source_get_name(source));
-		obs_data_set_string(sourceData, "typeId",
-				    obs_source_get_id(source));
-		obs_data_set_string(sourceData, "dname",
-				    obs_source_get_display_name(
-					    obs_source_get_name(source)));
+		obs_data_set_string(sourceData, "name", obs_source_get_name(source));
+		obs_data_set_string(sourceData, "typeId", obs_source_get_id(source));
+		obs_data_set_string(sourceData, "dname", obs_source_get_display_name(obs_source_get_name(source)));
 		QString typeString = "";
 		enum obs_source_type sourceType = obs_source_get_type(source);
 		switch (sourceType) {
@@ -440,7 +407,7 @@ OBSDataArrayAutoRelease Utils::GetSourceArray()
 		}
 		obs_data_set_string(sourceData, "type", typeString.toUtf8());
 		obs_data_array_push_back(sourcesArray, sourceData);
-		//obs_scene_release(scene);
+
 		return true;
 	};
 	obs_enum_sources(sourceEnumProc, sourcesArray);
@@ -448,7 +415,7 @@ OBSDataArrayAutoRelease Utils::GetSourceArray()
 }
 obs_data_t *Utils::GetSceneData(obs_source_t *source)
 {
-	OBSDataArrayAutoRelease sceneItems = GetSceneItems(source);
+	obs_data_array_t *sceneItems = GetSceneItems(source);
 	obs_data_t *sceneData = obs_data_create();
 	obs_data_set_string(sceneData, "name", obs_source_get_name(source));
 	obs_data_set_array(sceneData, "sources", sceneItems);
@@ -456,8 +423,7 @@ obs_data_t *Utils::GetSceneData(obs_source_t *source)
 }
 int Utils::GetTransitionDuration(obs_source_t *transition)
 {
-	if (!transition ||
-	    obs_source_get_type(transition) != OBS_SOURCE_TYPE_TRANSITION) {
+	if (!transition || obs_source_get_type(transition) != OBS_SOURCE_TYPE_TRANSITION) {
 		return -1;
 	}
 	QString transitionKind = obs_source_get_id(transition);
@@ -471,20 +437,15 @@ int Utils::GetTransitionDuration(obs_source_t *transition)
 		// For now, return -1 to indicate that we don't know the actual duration.
 		return -1;
 	}
-	OBSSourceAutoRelease destinationScene =
-		obs_transition_get_active_source(transition);
-	OBSDataAutoRelease destinationSettings =
-		obs_source_get_private_settings(destinationScene);
+	OBSSourceAutoRelease destinationScene = obs_transition_get_active_source(transition);
+	OBSDataAutoRelease destinationSettings = obs_source_get_private_settings(destinationScene);
 	// Detect if transition is the global transition or a transition override.
 	// Fetching the duration is different depending on the case.
-	obs_data_item_t *transitionDurationItem = obs_data_item_byname(
-		destinationSettings, "transition_duration");
-	int duration = (transitionDurationItem
-				? obs_data_item_get_int(transitionDurationItem)
-				: obs_frontend_get_transition_duration());
+	obs_data_item_t *transitionDurationItem = obs_data_item_byname(destinationSettings, "transition_duration");
+	int duration = (transitionDurationItem ? obs_data_item_get_int(transitionDurationItem) : obs_frontend_get_transition_duration());
 	return duration;
 }
-bool Utils::SetTransitionByName(QString transitionName)
+bool Utils::SetTransitionByName(const QString &transitionName)
 {
 	OBSSourceAutoRelease transition = GetTransitionFromName(transitionName);
 	if (transition) {
@@ -500,15 +461,11 @@ obs_data_t *Utils::GetTransitionData(obs_source_t *transition)
 	if (duration < 0) {
 		blog(LOG_WARNING, "GetTransitionData: duration is negative !");
 	}
-	OBSSourceAutoRelease sourceScene =
-		obs_transition_get_source(transition, OBS_TRANSITION_SOURCE_A);
-	OBSSourceAutoRelease destinationScene =
-		obs_transition_get_active_source(transition);
+	OBSSourceAutoRelease sourceScene = obs_transition_get_source(transition, OBS_TRANSITION_SOURCE_A);
+	OBSSourceAutoRelease destinationScene = obs_transition_get_active_source(transition);
 	obs_data_t *transitionData = obs_data_create();
-	obs_data_set_string(transitionData, "name",
-			    obs_source_get_name(transition));
-	obs_data_set_string(transitionData, "type",
-			    obs_source_get_id(transition));
+	obs_data_set_string(transitionData, "name", obs_source_get_name(transition));
+	obs_data_set_string(transitionData, "type", obs_source_get_id(transition));
 	obs_data_set_int(transitionData, "duration", duration);
 	// When a transition starts and while it is running, SOURCE_A is the source scene
 	// and SOURCE_B is the destination scene.
@@ -518,11 +475,9 @@ obs_data_t *Utils::GetTransitionData(obs_source_t *transition)
 	// TODO fix this in libobs
 	bool isTransitionEndEvent = (sourceScene == destinationScene);
 	if (!isTransitionEndEvent) {
-		obs_data_set_string(transitionData, "from-scene",
-				    obs_source_get_name(sourceScene));
+		obs_data_set_string(transitionData, "from-scene", obs_source_get_name(sourceScene));
 	}
-	obs_data_set_string(transitionData, "to-scene",
-			    obs_source_get_name(destinationScene));
+	obs_data_set_string(transitionData, "to-scene", obs_source_get_name(destinationScene));
 	return transitionData;
 }
 QString Utils::OBSVersionString()
@@ -578,37 +533,32 @@ QString Utils::ParseDataToQueryString(obs_data_t *data)
 			query += (attrName + "=");
 			switch (obs_data_item_gettype(item)) {
 			case OBS_DATA_BOOLEAN:
-				query += (obs_data_item_get_bool(item)
-						  ? "true"
-						  : "false");
+				query += (obs_data_item_get_bool(item) ? "true" : "false");
 				break;
 			case OBS_DATA_NUMBER:
 				switch (obs_data_item_numtype(item)) {
 				case OBS_DATA_NUM_DOUBLE:
-					query += QString::number(
-						obs_data_item_get_double(item));
+					query += QString::number(obs_data_item_get_double(item));
 					break;
 				case OBS_DATA_NUM_INT:
-					query += QString::number(
-						obs_data_item_get_int(item));
+					query += QString::number(obs_data_item_get_int(item));
 					break;
 				case OBS_DATA_NUM_INVALID:
 					break;
 				}
 				break;
 			case OBS_DATA_STRING:
-				query += QUrl::toPercentEncoding(QString(
-					obs_data_item_get_string(item)));
+				query += QUrl::toPercentEncoding(QString(obs_data_item_get_string(item)));
 				break;
 			default:
-				//other types are not supported
+				// other types are not supported
 				break;
 			}
 		} while (obs_data_item_next(&item));
 	}
 	return query;
 }
-obs_hotkey_t *Utils::FindHotkeyByName(QString name)
+obs_hotkey_t *Utils::FindHotkeyByName(const QString &name)
 {
 	struct current_search {
 		QString query;
@@ -619,13 +569,13 @@ obs_hotkey_t *Utils::FindHotkeyByName(QString name)
 	search.result = nullptr;
 	obs_enum_hotkeys(
 		[](void *data, obs_hotkey_id id, obs_hotkey_t *hotkey) {
-			current_search *search =
-				reinterpret_cast<current_search *>(data);
+			current_search *search = reinterpret_cast<current_search *>(data);
 			const char *hk_name = obs_hotkey_get_name(hotkey);
 			if (hk_name == search->query) {
 				search->result = hotkey;
 				return false;
 			}
+			UNUSED_PARAMETER(id);
 			return true;
 		},
 		&search);
@@ -647,8 +597,7 @@ void Utils::StartReplayBuffer()
 	if (obs_frontend_replay_buffer_active())
 		return;
 	if (!IsRPHotkeySet()) {
-		obs_output_t *rpOutput =
-			obs_frontend_get_replay_buffer_output();
+		obs_output_t *rpOutput = obs_frontend_get_replay_buffer_output();
 		OBSData outputHotkeys = obs_hotkeys_save_output(rpOutput);
 		OBSDataAutoRelease dummyBinding = obs_data_create();
 		obs_data_set_bool(dummyBinding, "control", true);
@@ -656,8 +605,7 @@ void Utils::StartReplayBuffer()
 		obs_data_set_bool(dummyBinding, "shift", true);
 		obs_data_set_bool(dummyBinding, "command", true);
 		obs_data_set_string(dummyBinding, "key", "OBS_KEY_0");
-		OBSDataArray rpSaveHotkey =
-			obs_data_get_array(outputHotkeys, "ReplayBuffer.Save");
+		OBSDataArray rpSaveHotkey = obs_data_get_array(outputHotkeys, "ReplayBuffer.Save");
 		obs_data_array_push_back(rpSaveHotkey, dummyBinding);
 		obs_hotkeys_load_output(rpOutput, outputHotkeys);
 		obs_frontend_replay_buffer_start();
@@ -670,8 +618,7 @@ bool Utils::IsRPHotkeySet()
 {
 	OBSOutputAutoRelease rpOutput = obs_frontend_get_replay_buffer_output();
 	OBSDataAutoRelease hotkeys = obs_hotkeys_save_output(rpOutput);
-	OBSDataArrayAutoRelease bindings =
-		obs_data_get_array(hotkeys, "ReplayBuffer.Save");
+	OBSDataArrayAutoRelease bindings = obs_data_get_array(hotkeys, "ReplayBuffer.Save");
 	size_t count = obs_data_array_count(bindings);
 	return (count > 0);
 }
@@ -683,8 +630,7 @@ const char *Utils::GetFilenameFormatting()
 bool Utils::SetFilenameFormatting(const char *filenameFormatting)
 {
 	config_t *profile = obs_frontend_get_profile_config();
-	config_set_string(profile, "Output", "FilenameFormatting",
-			  filenameFormatting);
+	config_set_string(profile, "Output", "FilenameFormatting", filenameFormatting);
 	config_save(profile);
 	return true;
 }
@@ -703,7 +649,8 @@ bool Utils::SetFilenameFormatting(const char *filenameFormatting)
  * @property {int} `crop.left` The number of pixels cropped off the left of the scene item before scaling.
  * @property {bool} `visible` If the scene item is visible.
  * @property {bool} `locked` If the scene item is locked in position.
- * @property {String} `bounds.type` Type of bounding box. Can be "OBS_BOUNDS_STRETCH", "OBS_BOUNDS_SCALE_INNER", "OBS_BOUNDS_SCALE_OUTER", "OBS_BOUNDS_SCALE_TO_WIDTH", "OBS_BOUNDS_SCALE_TO_HEIGHT", "OBS_BOUNDS_MAX_ONLY" or "OBS_BOUNDS_NONE".
+ * @property {String} `bounds.type` Type of bounding box. Can be "OBS_BOUNDS_STRETCH", "OBS_BOUNDS_SCALE_INNER", "OBS_BOUNDS_SCALE_OUTER",
+ * "OBS_BOUNDS_SCALE_TO_WIDTH", "OBS_BOUNDS_SCALE_TO_HEIGHT", "OBS_BOUNDS_MAX_ONLY" or "OBS_BOUNDS_NONE".
  * @property {int} `bounds.alignment` Alignment of the bounding box.
  * @property {double} `bounds.x` Width of the bounding box.
  * @property {double} `bounds.y` Height of the bounding box.
@@ -733,8 +680,7 @@ obs_data_t *Utils::GetSceneItemPropertiesData(obs_sceneitem_t *sceneItem)
 	bool isVisible = obs_sceneitem_visible(sceneItem);
 	bool isLocked = obs_sceneitem_locked(sceneItem);
 	obs_bounds_type boundsType = obs_sceneitem_get_bounds_type(sceneItem);
-	uint32_t boundsAlignment =
-		obs_sceneitem_get_bounds_alignment(sceneItem);
+	uint32_t boundsAlignment = obs_sceneitem_get_bounds_alignment(sceneItem);
 	QString boundsTypeName = getBoundsNameFromType(boundsType);
 	OBSDataAutoRelease posData = obs_data_create();
 	obs_data_set_double(posData, "x", pos.x);
@@ -770,21 +716,16 @@ obs_data_t *Utils::GetSceneItemPropertiesData(obs_sceneitem_t *sceneItem)
 		OBSSource parentSource = obs_scene_get_source(parent);
 		QString parentKind = obs_source_get_id(parentSource);
 		if (parentKind == "group") {
-			obs_data_set_string(data, "parentGroupName",
-					    obs_source_get_name(parentSource));
+			obs_data_set_string(data, "parentGroupName", obs_source_get_name(parentSource));
 		}
 	}
 	if (obs_sceneitem_is_group(sceneItem)) {
 		OBSDataArrayAutoRelease children = obs_data_array_create();
 		obs_sceneitem_group_enum_items(
 			sceneItem,
-			[](obs_scene_t *, obs_sceneitem_t *subItem,
-			   void *param) {
-				obs_data_array_t *items =
-					reinterpret_cast<obs_data_array_t *>(
-						param);
-				OBSDataAutoRelease itemData =
-					GetSceneItemPropertiesData(subItem);
+			[](obs_scene_t *, obs_sceneitem_t *subItem, void *param) {
+				obs_data_array_t *items = reinterpret_cast<obs_data_array_t *>(param);
+				OBSDataAutoRelease itemData = GetSceneItemPropertiesData(subItem);
 				obs_data_array_push_back(items, itemData);
 				return true;
 			},
@@ -793,8 +734,7 @@ obs_data_t *Utils::GetSceneItemPropertiesData(obs_sceneitem_t *sceneItem)
 	}
 	return data;
 }
-obs_data_t *Utils::GetSourceFilterInfo(obs_source_t *filter,
-				       bool includeSettings)
+obs_data_t *Utils::GetSourceFilterInfo(obs_source_t *filter, bool includeSettings)
 {
 	obs_data_t *data = obs_data_create();
 	obs_data_set_bool(data, "enabled", obs_source_enabled(filter));
@@ -806,8 +746,7 @@ obs_data_t *Utils::GetSourceFilterInfo(obs_source_t *filter,
 	}
 	return data;
 }
-obs_data_array_t *Utils::GetSourceFiltersList(obs_source_t *source,
-					      bool includeSettings)
+obs_data_array_t *Utils::GetSourceFiltersList(obs_source_t *source, bool includeSettings)
 {
 	struct enum_params {
 		obs_data_array_t *filters;
@@ -822,28 +761,22 @@ obs_data_array_t *Utils::GetSourceFiltersList(obs_source_t *source,
 	obs_source_enum_filters(
 		source,
 		[](obs_source_t *parent, obs_source_t *child, void *param) {
-			auto enumParams =
-				reinterpret_cast<struct enum_params *>(param);
-			OBSDataAutoRelease filterData =
-				Utils::GetSourceFilterInfo(
-					child, enumParams->includeSettings);
-			obs_data_array_push_back(enumParams->filters,
-						 filterData);
+			auto enumParams = reinterpret_cast<struct enum_params *>(param);
+			OBSDataAutoRelease filterData = Utils::GetSourceFilterInfo(child, enumParams->includeSettings);
+			obs_data_array_push_back(enumParams->filters, filterData);
+			UNUSED_PARAMETER(parent);
 		},
 		&enumParams);
 	return enumParams.filters;
 }
-void getPauseRecordingFunctions(RecordingPausedFunction *recPausedFuncPtr,
-				PauseRecordingFunction *pauseRecFuncPtr)
+void getPauseRecordingFunctions(RecordingPausedFunction *recPausedFuncPtr, PauseRecordingFunction *pauseRecFuncPtr)
 {
 	void *frontendApi = os_dlopen("obs-frontend-api");
 	if (recPausedFuncPtr) {
-		*recPausedFuncPtr = (RecordingPausedFunction)os_dlsym(
-			frontendApi, "obs_frontend_recording_paused");
+		*recPausedFuncPtr = (RecordingPausedFunction)os_dlsym(frontendApi, "obs_frontend_recording_paused");
 	}
 	if (pauseRecFuncPtr) {
-		*pauseRecFuncPtr = (PauseRecordingFunction)os_dlsym(
-			frontendApi, "obs_frontend_recording_pause");
+		*pauseRecFuncPtr = (PauseRecordingFunction)os_dlsym(frontendApi, "obs_frontend_recording_pause");
 	}
 }
 QString Utils::nsToTimestamp(uint64_t ns)
@@ -855,20 +788,17 @@ QString Utils::nsToTimestamp(uint64_t ns)
 	uint64_t minutesPart = minutes % 60ULL;
 	uint64_t secsPart = secs % 60ULL;
 	uint64_t msPart = ms % 1000ULL;
-	return QString::asprintf("%02" PRIu64 ":%02" PRIu64 ":%02" PRIu64
-				 ".%03" PRIu64,
-				 hoursPart, minutesPart, secsPart, msPart);
+	return QString::asprintf("%02" PRIu64 ":%02" PRIu64 ":%02" PRIu64 ".%03" PRIu64, hoursPart, minutesPart, secsPart, msPart);
 }
 /* Returns a vector list of source names for sources with video
-*/
+ */
 QStringList Utils::GetMediaSourceNames()
 {
 	QStringList sourceNames;
 	obs_enum_sources(
 		[](void *data, obs_source_t *source) {
 			QStringList *sn = static_cast<QStringList *>(data);
-			bool isMedia = (obs_source_get_output_flags(source) &
-					OBS_SOURCE_CONTROLLABLE_MEDIA);
+			bool isMedia = (obs_source_get_output_flags(source) & OBS_SOURCE_CONTROLLABLE_MEDIA);
 			if (isMedia) {
 				sn->append(obs_source_get_name(source));
 			}
@@ -878,15 +808,14 @@ QStringList Utils::GetMediaSourceNames()
 	return sourceNames;
 }
 /* Returns a vector list of source names for sources with audio
-*/
+ */
 QStringList Utils::GetAudioSourceNames()
 {
 	QStringList sourceNames;
 	obs_enum_sources(
 		[](void *data, obs_source_t *source) {
 			QStringList *sn = static_cast<QStringList *>(data);
-			bool hasAudio = (obs_source_get_output_flags(source) &
-					 OBS_SOURCE_AUDIO);
+			bool hasAudio = (obs_source_get_output_flags(source) & OBS_SOURCE_AUDIO);
 			if (hasAudio) {
 				sn->append(obs_source_get_name(source));
 			}
@@ -898,8 +827,7 @@ QStringList Utils::GetAudioSourceNames()
 QStringList Utils::GetTransitionsList()
 {
 	QStringList names;
-	OBSSourceAutoRelease currentTransition =
-		obs_frontend_get_current_transition();
+	OBSSourceAutoRelease currentTransition = obs_frontend_get_current_transition();
 	obs_frontend_source_list transitionList = {};
 	obs_frontend_get_transitions(&transitionList);
 	OBSDataArrayAutoRelease transitions = obs_data_array_create();
@@ -910,33 +838,29 @@ QStringList Utils::GetTransitionsList()
 	obs_frontend_source_list_free(&transitionList);
 	return names;
 }
-QStringList Utils::GetSceneItemsList(QString scenename)
+QStringList Utils::GetSceneItemsList(const QString &scenename)
 {
 	QStringList SceneItemsList;
 	auto sceneName = scenename.toStdString().c_str();
 	OBSSourceAutoRelease sceneSource = obs_get_source_by_name(sceneName);
 	OBSScene scene = obs_scene_from_source(sceneSource);
 	OBSDataArrayAutoRelease sceneItemArray = obs_data_array_create();
-	auto sceneItemEnumProc = [](obs_scene_t *, obs_sceneitem_t *item,
-				    void *privateData) -> bool {
-		obs_data_array_t *sceneItemArray =
-			(obs_data_array_t *)privateData;
+	auto sceneItemEnumProc = [](obs_scene_t *, obs_sceneitem_t *item, void *privateData) -> bool {
+		obs_data_array_t *sceneItemArray = (obs_data_array_t *)privateData;
 		OBSDataAutoRelease sceneItemData = obs_data_create();
 		OBSSource source = obs_sceneitem_get_source(item);
-		obs_data_set_string(sceneItemData, "sourceName",
-				    obs_source_get_name(source));
+		obs_data_set_string(sceneItemData, "sourceName", obs_source_get_name(source));
 		obs_data_array_push_back(sceneItemArray, sceneItemData);
 		return true;
 	};
 	obs_scene_enum_items(scene, sceneItemEnumProc, sceneItemArray);
 	for (int i = 0; i < obs_data_array_count(sceneItemArray); i++) {
-		SceneItemsList.append(obs_data_get_string(
-			obs_data_array_item(sceneItemArray, i), "sourceName"));
+		SceneItemsList.append(obs_data_get_string(obs_data_array_item(sceneItemArray, i), "sourceName"));
 	}
 	obs_data_array_release(sceneItemArray);
 	return SceneItemsList;
 }
-int Utils::get_midi_note_or_control(rtmidi::message mess)
+int Utils::get_midi_note_or_control(const rtmidi::message &mess)
 {
 	int bytetopullfrom = -1;
 	switch (mess.get_message_type()) {
@@ -957,7 +881,7 @@ int Utils::get_midi_note_or_control(rtmidi::message mess)
 	}
 	return mess[bytetopullfrom];
 }
-int Utils::get_midi_value(rtmidi::message mess)
+int Utils::get_midi_value(const rtmidi::message &mess)
 {
 	int bytetopullfrom = -1;
 	switch (mess.get_message_type()) {
@@ -1038,7 +962,7 @@ QString Utils::mtype_to_string(rtmidi::message_type mess)
 	}
 	return "ERROR";
 }
-QString Utils::get_midi_message_type(rtmidi::message message)
+QString Utils::get_midi_message_type(const rtmidi::message &message)
 {
 	switch (message.get_message_type()) {
 	case rtmidi::message_type::CONTROL_CHANGE:
@@ -1052,6 +976,7 @@ QString Utils::get_midi_message_type(rtmidi::message message)
 	case rtmidi::message_type::PITCH_BEND:
 		return "Pitch Bend";
 	}
+	return "Unknown Message Type";
 }
 QSpinBox *Utils::GetTransitionDurationControl()
 {
@@ -1066,13 +991,11 @@ ActionsClass::Actions ActionsClass::string_to_action(const QString &action)
 {
 	return QVariant(action).value<ActionsClass::Actions>();
 }
-QString
-ActionsClass::event_to_string(const ActionsClass::obs_event_type &enumval)
+QString ActionsClass::event_to_string(const ActionsClass::obs_event_type &enumval)
 {
 	return QVariant::fromValue(enumval).toString();
 }
-ActionsClass::obs_event_type
-ActionsClass::string_to_event(const QString &action)
+ActionsClass::obs_event_type ActionsClass::string_to_event(const QString &action)
 {
 	return QVariant(action).value<ActionsClass::obs_event_type>();
 }
@@ -1080,28 +1003,33 @@ QStringList Utils::TranslateActions()
 {
 	QStringList temp;
 	for (int i = 0; i < AllActions_raw.size(); i++) {
-		temp.append(obs_module_text(
-			ActionsClass::action_to_string(AllActions_raw.at(i))
-				.toStdString()
-				.c_str()));
+		temp.append(obs_module_text(ActionsClass::action_to_string(AllActions_raw.at(i)).toStdString().c_str()));
 	}
 	return temp;
 }
 QString Utils::translate_action(ActionsClass::Actions action)
 {
-	return QString(obs_module_text(
-		ActionsClass::action_to_string(action).toStdString().c_str()));
+	return std::move(QString(obs_module_text(ActionsClass::action_to_string(action).toStdString().c_str())));
 }
-QString Utils::untranslate(QString tstring)
+QString Utils::untranslate(const QString &tstring)
 {
-	return ActionsClass::action_to_string(
-		AllActions_raw.at(TranslateActions().indexOf(tstring)));
+	return std::move(ActionsClass::action_to_string(AllActions_raw.at(TranslateActions().indexOf(tstring))));
 }
-void Utils::alert_popup(QString message)
+QString mess;
+void Utils::alert_popup(const QString &message)
 {
-	QMessageBox msgBox;
-	msgBox.setText(message);
-	msgBox.exec();
+	mess = message;
+
+	obs_queue_task(
+		OBS_TASK_UI,
+		[](void *param) {
+			QMessageBox msgBox;
+			msgBox.setText(mess);
+			msgBox.exec();
+
+			UNUSED_PARAMETER(param);
+		},
+		nullptr, true);
 }
 QStringList Utils::get_scene_names()
 {
@@ -1114,12 +1042,12 @@ QStringList Utils::get_scene_names()
 	obs_frontend_source_list_free(&sceneList);
 	return names;
 }
-QStringList Utils::get_source_names(QString scene)
+QStringList Utils::get_source_names(const QString &scene)
 {
 	QStringList names;
 	auto arrayref = Utils::GetSceneArray(scene);
-	int size = obs_data_array_count(arrayref);
-	for (int i = 0; i < size; i++) {
+	size_t size = obs_data_array_count(arrayref);
+	for (size_t i = 0; i < size; i++) {
 		obs_data *item = obs_data_array_item(arrayref, i);
 		names.append(QString(obs_data_get_string(item, "name")));
 		obs_data_release(item);
@@ -1127,7 +1055,7 @@ QStringList Utils::get_source_names(QString scene)
 	obs_data_array_release(arrayref);
 	return names;
 }
-QStringList Utils::get_filter_names(QString Source)
+QStringList Utils::get_filter_names(const QString &Source)
 {
 	QStringList names;
 	obs_source *x = obs_get_source_by_name(Source.toStdString().c_str());

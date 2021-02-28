@@ -18,51 +18,52 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #pragma once
 
+#include <set>
+#include <vector>
+
+#include <QtCore/QString>
+#include <QtCore/QObject>
+#include <QtCore/QMutex>
+#include <QtCore/QSharedPointer>
+#include <QtCore/QVariantHash>
+#include <QtCore/QThreadPool>
+
+#include <util/config-file.h>
 #if __has_include(<obs-frontend-api.h>)
 #include <obs-frontend-api.h>
 #else
 #include <obs-frontend-api/obs-frontend-api.h>
 #endif
 
-#include <util/config-file.h>
-#include <QtCore/QString>
-#include <set>
-#include <QtCore/QObject>
-#include <QtCore/QMutex>
-#include <QtCore/QSharedPointer>
-#include <QtCore/QVariantHash>
-#include <QtCore/QThreadPool>
-#include <vector>
-#include "midi-agent.h"
 #include "rpc/RpcEvent.h"
+#include "midi-agent.h"
 #include "obs-controller.h"
 
 class DeviceManager : public QObject {
 	Q_OBJECT
 public:
 	DeviceManager();
-	~DeviceManager();
-	void Load(obs_data_t *data);
+	~DeviceManager() override;
+
+	void Load(QString datastring);
 	void Unload();
 
 	QStringList GetPortsList();
-	int GetPortNumberByDeviceName(QString deviceName);
+	int GetPortNumberByDeviceName(const QString &deviceName);
 	QStringList GetOutPortsList();
-	int GetOutPortNumberByDeviceName(QString deviceName);
-	QStringList opl;
-	QVector<MidiAgent *> GetActiveMidiDevices();
-	MidiAgent *GetMidiDeviceByName(QString deviceName);
-	QVector<MidiHook *> GetMidiHooksByDeviceName(QString deviceName);
-	MidiAgent * RegisterMidiDevice(int port, int outport);
+	int GetOutPortNumberByDeviceName(const QString &deviceName);
 
-	obs_data_t *GetData();
-	void broadcast_obs_event(const RpcEvent &event);
+	QVector<MidiAgent *> GetActiveMidiDevices();
+	MidiAgent *GetMidiDeviceByName(const QString &deviceName);
+	QVector<MidiHook *> GetMidiHooksByDeviceName(const QString &deviceName);
+	MidiAgent *RegisterMidiDevice(const int &port, const int &outport);
+
+	QString GetData();
+	void reload();
 signals:
-	void bcast(QString updateType, QString eventData);
+	void reload_config();
+	void obsEvent(const RpcEvent &event);
 
 private:
-	rtmidi::midi_in rtMidi;
-	rtmidi::midi_out MO;
-
 	QVector<MidiAgent *> midiAgents;
 };

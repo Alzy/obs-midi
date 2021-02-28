@@ -16,110 +16,71 @@ You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>
 */
 
-#if __has_include(<obs-frontend-api.h>)
+#include "config.h"
 
-#include <obs-frontend-api.h>
-#else
-#include <obs-frontend-api/obs-frontend-api.h>
-#endif
-
-#include <QtCore/QCryptographicHash>
-#include <QtCore/QTime>
-#include <QtWidgets/QSystemTrayIcon>
-
-#define SECTION_NAME "MidiAPI"
-#define PARAM_DEBUG "DebugEnabled"
-#define PARAM_ALERT "AlertsEnabled"
 #define PARAM_DEVICES "MidiDevices"
 
-#define DEFUALT_DEVICES "{\"devices\": []}"
-
-#include "utils.h"
-#include "obs-midi.h"
-#include "config.h"
-#include "device-manager.h"
-#include "forms/settings-dialog.h"
 #define QT_TO_UTF8(str) str.toUtf8().constData()
 
+using namespace std;
+
 Config::Config()
-	: DebugEnabled(false), AlertsEnabled(true), SettingsLoaded(false)
 {
-	this->setParent(plugin_window);
-	qsrand(QTime::currentTime().msec());
-
-	SetDefaults();
-
-	obs_frontend_add_event_callback(on_frontend_event, this);
+	Load();
+	connect(GetDeviceManager().get(), SIGNAL(reload_config()), this, SLOT(Load()));
 }
 
-Config::~Config()
-{
-	obs_frontend_remove_event_callback(on_frontend_event, this);
-}
+Config::~Config() {}
 
 /* Load the configuration from the OBS Config Store
  */
 void Config::Load()
 {
-	SetDefaults();
-	config_t *obsConfig = GetConfigStore();
-
-	DebugEnabled = config_get_bool(obsConfig, SECTION_NAME, PARAM_DEBUG);
-	AlertsEnabled = config_get_bool(obsConfig, SECTION_NAME, PARAM_ALERT);
-
 	auto deviceManager = GetDeviceManager();
-	obs_data_t *deviceManagerData = obs_data_create_from_json(
-
-		config_get_string(obsConfig, SECTION_NAME, PARAM_DEVICES));
-	blog(LOG_INFO, "Loaded: \n %s",
-	     config_get_string(obsConfig, SECTION_NAME, PARAM_DEVICES));
-	deviceManager->Load(deviceManagerData);
-	SettingsLoaded = true;
+	deviceManager->Load(GetConfigStore());
+	blog(LOG_DEBUG, "Config::Load");
 }
 
 /* Save the configuration to the OBS Config Store
  */
 void Config::Save()
 {
-	config_t *obsConfig = GetConfigStore();
-
-	config_set_bool(obsConfig, SECTION_NAME, PARAM_DEBUG, DebugEnabled);
-	config_set_bool(obsConfig, SECTION_NAME, PARAM_ALERT, AlertsEnabled);
-
+	blog(LOG_DEBUG, "Config save");
 	auto deviceManager = GetDeviceManager();
-	auto data = deviceManager->GetData();
-	config_set_string(obsConfig, SECTION_NAME, PARAM_DEVICES,
-			  obs_data_get_json(data));
-	obs_data_release(data);
-	config_save(obsConfig);
-}
+	obs_data_t *newmidi = obs_data_create_from_json(deviceManager->GetData().toStdString().c_str());
+	auto path = obs_module_config_path(get_file_name().toStdString().c_str());
+	obs_data_save_json_safe(newmidi, path, ".tmp", ".bkp");
+	bfree(path);
 
-void Config::SetDefaults()
+	obs_data_release(newmidi);
+	blog(LOG_DEBUG, "Config::Save");
+}
+QString Config::get_file_name()
 {
-	// OBS Config defaults
-	config_t *obsConfig = GetConfigStore();
-	if (obsConfig) {
-		config_set_default_bool(obsConfig, SECTION_NAME, PARAM_DEBUG,
-					DebugEnabled);
-		config_set_default_bool(obsConfig, SECTION_NAME, PARAM_ALERT,
-					AlertsEnabled);
-		config_set_default_string(obsConfig, SECTION_NAME,
-					  PARAM_DEVICES, DEFUALT_DEVICES);
+	char *current_profile = obs_frontend_get_current_profile();
+	char *current_sc = obs_frontend_get_current_scene_collection();
+	QString file("obs-midi_");
+	file += current_profile;
+	file += "_";
+	file += current_sc;
+	file += ".json";
+	bfree(current_profile);
+	bfree(current_sc);
+	return file;
+}
+QString Config::GetConfigStore()
+{
+	auto path = obs_module_config_path(NULL);
+	os_mkdirs(path);
+	bfree(path);
+
+	auto filepath = obs_module_config_path(get_file_name().toStdString().c_str());
+	obs_data_t *midiConfig = os_file_exists(filepath) ? obs_data_create_from_json_file(filepath) : obs_data_create();
+	if (!os_file_exists(filepath)) {
+		obs_data_save_json_safe(midiConfig, filepath, ".tmp", ".bkp");
 	}
-}
-
-config_t *Config::GetConfigStore()
-{
-	return obs_frontend_get_profile_config();
-}
-
-void Config::on_frontend_event(obs_frontend_event event, void *param)
-{
-	if (event == OBS_FRONTEND_EVENT_PROFILE_CHANGED) {
-		auto deviceManager = GetDeviceManager();
-		deviceManager->Unload();
-		auto config = GetConfig();
-		config->SetDefaults();
-		config->Load();
-	}
+	bfree(filepath);
+	QString conf(obs_data_get_json(midiConfig));
+	obs_data_release(midiConfig);
+	return conf;
 }

@@ -12,20 +12,22 @@ You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>
 */
 #include "obs-controller.h"
+
 ////////////////////
 // BUTTON ACTIONS //
 ////////////////////
 OBSController::OBSController(MidiHook *incoming_hook, int incoming_midi_value)
 {
+	if (incoming_hook == nullptr)
+		return;
 	hook = incoming_hook;
 	midi_value = incoming_midi_value;
 	/*
-	*
-	* Connect All Actions to handle_obs_event on midi agent
-	*
-	*/
-	switch (ActionsClass::string_to_action(
-		Utils::untranslate(hook->action))) {
+	 *
+	 * Connect All Actions to handle_obs_event on midi agent
+	 *
+	 */
+	switch (ActionsClass::string_to_action(Utils::untranslate(hook->action))) {
 	case ActionsClass::Actions::Set_Current_Scene:
 		this->SetCurrentScene();
 		break;
@@ -161,17 +163,19 @@ OBSController::OBSController(MidiHook *incoming_hook, int incoming_midi_value)
 	case ActionsClass::Actions::Toggle_Source_Visibility:
 		this->ToggleSourceVisibility();
 		break;
+	default:
+		blog(LOG_DEBUG, "Action %s Does not exist", incoming_hook->action.toStdString().c_str());
+		break;
 	};
 	this->deleteLater();
 }
-OBSController::~OBSController() {}
+OBSController::~OBSController() = default;
 /**
  * Sets the currently active scene
  */
 void OBSController::SetCurrentScene()
 {
-	OBSSourceAutoRelease source =
-		obs_get_source_by_name(hook->scene.toUtf8());
+	OBSSourceAutoRelease source = obs_get_source_by_name(hook->scene.toUtf8());
 	obs_frontend_set_current_scene(source);
 }
 /**
@@ -196,29 +200,24 @@ void OBSController::SetCurrentSceneCollection()
 {
 	// TODO : Check if specified profile exists and if changing is allowed
 	// TODO : Check if specified profile exists and if changing is allowed
-	obs_frontend_set_current_scene_collection(
-		hook->scene_collection.toUtf8());
+	obs_frontend_set_current_scene_collection(hook->scene_collection.toUtf8());
 }
 /**
-* Reset a scene item.
-*/
+ * Reset a scene item.
+ */
 void OBSController::ResetSceneItem()
 {
 	OBSScene scene = Utils::GetSceneFromNameOrCurrent(hook->scene);
 	if (!scene) {
 		throw("requested scene doesn't exist");
 	}
-	OBSDataAutoRelease params = obs_data_create();
-	obs_data_set_string(params, "scene-name", hook->scene.toUtf8());
-	OBSDataItemAutoRelease itemField = obs_data_item_byname(params, "item");
-	OBSSceneItemAutoRelease sceneItem =
-		Utils::GetSceneItemFromRequestField(scene, itemField);
+	OBSSceneItemAutoRelease sceneItem = Utils::GetSceneItemFromName(scene, hook->source);
 	if (!sceneItem) {
 		throw("specified scene item doesn't exist");
 	}
-	OBSSourceAutoRelease sceneItemSource =
-		obs_sceneitem_get_source(sceneItem);
+	OBSSourceAutoRelease sceneItemSource = obs_sceneitem_get_source(sceneItem);
 	OBSDataAutoRelease settings = obs_source_get_settings(sceneItemSource);
+
 	obs_source_update(sceneItemSource, settings);
 }
 /**
@@ -259,32 +258,26 @@ void OBSController::SetTransitionDuration()
 }
 void OBSController::SetSourceVisibility()
 {
-	obs_sceneitem_set_visible(
-		Utils::GetSceneItemFromName(
-			Utils::GetSceneFromNameOrCurrent(hook->scene),
-			hook->item),
-		midi_value);
-} //DOESNT EXIST
+	obs_sceneitem_set_visible(Utils::GetSceneItemFromName(Utils::GetSceneFromNameOrCurrent(hook->scene), hook->source), midi_value);
+} // DOESNT EXIST
 void OBSController::ToggleSourceVisibility()
 {
-	auto scene = Utils::GetSceneItemFromName(
-		Utils::GetSceneFromNameOrCurrent(hook->scene), hook->item);
+	auto scene = Utils::GetSceneItemFromName(Utils::GetSceneFromNameOrCurrent(hook->scene), hook->source);
 	if (obs_sceneitem_visible(scene)) {
 		obs_sceneitem_set_visible(scene, false);
 	} else {
 		obs_sceneitem_set_visible(scene, true);
 	}
-} //DOESNT EXIST
+} // DOESNT EXIST
 /**
-* Inverts the mute status of a specified source.
-*/
+ * Inverts the mute status of a specified source.
+ */
 void OBSController::ToggleMute()
 {
-	if (hook->source.isEmpty()) {
+	if (hook->audio_source.isEmpty()) {
 		throw("sourceName is empty");
 	}
-	OBSSourceAutoRelease source =
-		obs_get_source_by_name(hook->source.toUtf8());
+	obs_source *source = obs_get_source_by_name(hook->audio_source.toStdString().c_str());
 	if (!source) {
 		throw("sourceName not found");
 	}
@@ -298,8 +291,7 @@ void OBSController::SetMute()
 	if (hook->source.isEmpty()) {
 		throw("sourceName is empty");
 	}
-	OBSSourceAutoRelease source =
-		obs_get_source_by_name(hook->source.toUtf8());
+	OBSSourceAutoRelease source = obs_get_source_by_name(hook->source.toUtf8());
 	if (!source) {
 		throw("specified source doesn't exist");
 	}
@@ -320,7 +312,7 @@ void OBSController::StartStopStreaming()
  */
 void OBSController::StartStreaming()
 {
-	if (obs_frontend_streaming_active() == false) {
+	if (!obs_frontend_streaming_active()) {
 		obs_frontend_streaming_start();
 	}
 }
@@ -329,7 +321,7 @@ void OBSController::StartStreaming()
  */
 void OBSController::StopStreaming()
 {
-	if (obs_frontend_streaming_active() == true) {
+	if (obs_frontend_streaming_active()) {
 		obs_frontend_streaming_stop();
 	}
 }
@@ -338,8 +330,7 @@ void OBSController::StopStreaming()
  */
 void OBSController::StartStopRecording()
 {
-	(obs_frontend_recording_active() ? obs_frontend_recording_stop()
-					 : obs_frontend_recording_start());
+	(obs_frontend_recording_active() ? obs_frontend_recording_stop() : obs_frontend_recording_start());
 }
 /**
  * Start recording.
@@ -360,8 +351,8 @@ void OBSController::StopRecording()
 	}
 }
 /**
-* Pause the current recording.
-*/
+ * Pause the current recording.
+ */
 void OBSController::PauseRecording()
 {
 	if (obs_frontend_recording_active()) {
@@ -369,8 +360,8 @@ void OBSController::PauseRecording()
 	}
 }
 /**
-* Resume/unpause the current recording (if paused).
-*/
+ * Resume/unpause the current recording (if paused).
+ */
 void OBSController::ResumeRecording()
 {
 	if (obs_frontend_recording_active()) {
@@ -378,8 +369,8 @@ void OBSController::ResumeRecording()
 	}
 }
 /**
-* Toggle the Replay Buffer on/off.
-*/
+ * Toggle the Replay Buffer on/off.
+ */
 void OBSController::StartStopReplayBuffer()
 {
 	if (obs_frontend_replay_buffer_active()) {
@@ -389,41 +380,42 @@ void OBSController::StartStopReplayBuffer()
 	}
 }
 /**
-* Start recording into the Replay Buffer.
-* Will throw an error if "Save Replay Buffer" hotkey is not set in OBS' settings.
-* Setting this hotkey is mandatory, even when triggering saves only
-* through obs-midi.
-*/
+ * Start recording into the Replay Buffer.
+ * Will throw an error if "Save Replay Buffer" hotkey is not set in OBS' settings.
+ * Setting this hotkey is mandatory, even when triggering saves only
+ * through obs-midi.
+ */
 void OBSController::StartReplayBuffer()
 {
 	if (!Utils::ReplayBufferEnabled()) {
-		blog(LOG_DEBUG, "replay buffer disabled in settings");
+		Utils::alert_popup("replay buffer disabled in settings");
+		return;
 	}
-	if (obs_frontend_replay_buffer_active() == false) {
+	if (!obs_frontend_replay_buffer_active()) {
 		Utils::StartReplayBuffer();
 	}
 }
 /**
-* Stop recording into the Replay Buffer.
-*/
+ * Stop recording into the Replay Buffer.
+ */
 void OBSController::StopReplayBuffer()
 {
-	if (obs_frontend_replay_buffer_active() == true) {
+	if (obs_frontend_replay_buffer_active()) {
 		obs_frontend_replay_buffer_stop();
 	}
 }
 /**
-* Flush and save the contents of the Replay Buffer to disk. This is
-* basically the same as triggering the "Save Replay Buffer" hotkey.
-* Will return an `error` if the Replay Buffer is not active.
-*/
+ * Flush and save the contents of the Replay Buffer to disk. This is
+ * basically the same as triggering the "Save Replay Buffer" hotkey.
+ * Will return an `error` if the Replay Buffer is not active.
+ */
 void OBSController::SaveReplayBuffer()
 {
 	if (!obs_frontend_replay_buffer_active()) {
-		throw("replay buffer not active");
+		Utils::alert_popup("replay buffer not active");
+		return;
 	}
-	OBSOutputAutoRelease replayOutput =
-		obs_frontend_get_replay_buffer_output();
+	OBSOutputAutoRelease replayOutput = obs_frontend_get_replay_buffer_output();
 	calldata_t cd = {0};
 	proc_handler_t *ph = obs_output_get_proc_handler(replayOutput);
 	proc_handler_call(ph, "save", &cd);
@@ -440,8 +432,7 @@ void OBSController::SetCurrentProfile()
 void OBSController::SetTextGDIPlusText() {}
 void OBSController::SetBrowserSourceURL()
 {
-	OBSSourceAutoRelease source =
-		obs_get_source_by_name(hook->source.toUtf8());
+	OBSSourceAutoRelease source = obs_get_source_by_name(hook->source.toUtf8());
 	QString sourceId = obs_source_get_id(source);
 	if (sourceId != "browser_source" && sourceId != "linuxbrowser-source") {
 		return blog(LOG_DEBUG, "Not a browser Source");
@@ -452,35 +443,29 @@ void OBSController::SetBrowserSourceURL()
 }
 void OBSController::ReloadBrowserSource()
 {
-	OBSSourceAutoRelease source =
-		obs_get_source_by_name(hook->source.toUtf8());
+	OBSSourceAutoRelease source = obs_get_source_by_name(hook->source.toUtf8());
 	obs_properties_t *sourceProperties = obs_source_properties(source);
-	obs_property_t *property =
-		obs_properties_get(sourceProperties, "refreshnocache");
-	obs_property_button_clicked(
-		property,
-		source); // This returns a boolean but we ignore it because the browser plugin always returns `false`.
+	obs_property_t *property = obs_properties_get(sourceProperties, "refreshnocache");
+	obs_property_button_clicked(property, source); // This returns a boolean but we ignore it because the browser plugin always returns `false`.
 	obs_properties_destroy(sourceProperties);
 }
 void OBSController::TakeSourceScreenshot() {}
 void OBSController::EnableSourceFilter()
 {
-	OBSSourceAutoRelease source =
-		obs_get_source_by_name(hook->source.toUtf8());
-	obs_source_set_enabled(source, true);
+	OBSSourceAutoRelease source = obs_get_source_by_name(hook->source.toUtf8());
+	OBSSourceAutoRelease filter = obs_source_get_filter_by_name(source, hook->filter.toUtf8());
+	obs_source_set_enabled(filter, true);
 }
 void OBSController::DisableSourceFilter()
 {
-	OBSSourceAutoRelease source =
-		obs_get_source_by_name(hook->source.toUtf8());
-	obs_source_set_enabled(source, false);
+	OBSSourceAutoRelease source = obs_get_source_by_name(hook->source.toUtf8());
+	OBSSourceAutoRelease filter = obs_source_get_filter_by_name(source, hook->filter.toUtf8());
+	obs_source_set_enabled(filter, false);
 }
 void OBSController::ToggleSourceFilter()
 {
-	OBSSourceAutoRelease source =
-		obs_get_source_by_name(hook->source.toUtf8());
-	OBSSourceAutoRelease filter =
-		obs_source_get_filter_by_name(source, hook->filter.toUtf8());
+	OBSSourceAutoRelease source = obs_get_source_by_name(hook->source.toUtf8());
+	OBSSourceAutoRelease filter = obs_source_get_filter_by_name(source, hook->filter.toUtf8());
 	if (obs_source_enabled(filter)) {
 		obs_source_set_enabled(filter, false);
 	} else {
@@ -492,8 +477,7 @@ void OBSController::ToggleSourceFilter()
 ////////////////
 void OBSController::SetVolume()
 {
-	OBSSourceAutoRelease obsSource =
-		obs_get_source_by_name(hook->audio_source.toUtf8());
+	OBSSourceAutoRelease obsSource = obs_get_source_by_name(hook->audio_source.toUtf8());
 	obs_source_set_volume(obsSource, pow(Utils::mapper(midi_value), 3.0));
 }
 /**
@@ -501,8 +485,7 @@ void OBSController::SetVolume()
  */
 void OBSController::SetSyncOffset()
 {
-	OBSSourceAutoRelease source =
-		obs_get_source_by_name(hook->source.toUtf8());
+	OBSSourceAutoRelease source = obs_get_source_by_name(hook->source.toUtf8());
 	obs_source_set_sync_offset(source, midi_value);
 }
 void OBSController::SetSourcePosition() {}
@@ -519,8 +502,7 @@ void OBSController::move_t_bar()
 }
 void OBSController::play_pause_media_source()
 {
-	OBSSourceAutoRelease source =
-		obs_get_source_by_name(hook->media_source.toUtf8());
+	OBSSourceAutoRelease source = obs_get_source_by_name(hook->media_source.toUtf8());
 	switch (obs_source_media_get_state(source)) {
 	case obs_media_state::OBS_MEDIA_STATE_PAUSED:
 		obs_source_media_play_pause(source, false);
@@ -536,40 +518,38 @@ void OBSController::play_pause_media_source()
 // TODO:: Fix this
 void OBSController::toggle_studio_mode()
 {
-	if (obs_frontend_preview_program_mode_active()) {
-		obs_frontend_set_preview_program_mode(false);
-	} else {
-		obs_frontend_set_preview_program_mode(true);
-	}
+	obs_queue_task(
+		OBS_TASK_UI,
+		[](void *param) {
+			obs_frontend_set_preview_program_mode(!obs_frontend_preview_program_mode_active());
+
+			UNUSED_PARAMETER(param);
+		},
+		nullptr, true);
 }
 void OBSController::reset_stats() {}
 void OBSController::restart_media()
 {
-	OBSSourceAutoRelease source =
-		obs_get_source_by_name(hook->media_source.toUtf8());
+	OBSSourceAutoRelease source = obs_get_source_by_name(hook->media_source.toUtf8());
 	obs_source_media_restart(source);
 }
 void OBSController::play_media()
 {
-	OBSSourceAutoRelease source =
-		obs_get_source_by_name(hook->media_source.toUtf8());
+	OBSSourceAutoRelease source = obs_get_source_by_name(hook->media_source.toUtf8());
 	obs_source_media_play_pause(source, false);
 }
 void OBSController::stop_media()
 {
-	OBSSourceAutoRelease source =
-		obs_get_source_by_name(hook->media_source.toUtf8());
+	OBSSourceAutoRelease source = obs_get_source_by_name(hook->media_source.toUtf8());
 	obs_source_media_stop(source);
 }
 void OBSController::next_media()
 {
-	OBSSourceAutoRelease source =
-		obs_get_source_by_name(hook->media_source.toUtf8());
+	OBSSourceAutoRelease source = obs_get_source_by_name(hook->media_source.toUtf8());
 	obs_source_media_next(source);
 }
 void OBSController::prev_media()
 {
-	OBSSourceAutoRelease source =
-		obs_get_source_by_name(hook->media_source.toUtf8());
+	OBSSourceAutoRelease source = obs_get_source_by_name(hook->media_source.toUtf8());
 	obs_source_media_previous(source);
 }

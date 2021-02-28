@@ -31,8 +31,11 @@ Those two guys are
 - https://jackaudio.org/downloads/
 
 # Ubuntu specifics - SNAP Release
-Due to specific ALSA permissions not being set on the ubuntu snap craft package, OBS-MIDI will not work on the snap version of obs-studio
+- If you install OBS Studio via snap you will need to run the following command to give permissions for OBS to access the raw MIDI devices through ALSA
 
+```bash
+sudo snap connect obs-studio:alsa
+```
 
 Currently runs on Windows and Linux, and is partly tested on MAC
 

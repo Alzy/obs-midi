@@ -26,13 +26,11 @@ using namespace std;
 
 Config::Config()
 {
+	Load();
 	connect(GetDeviceManager().get(), SIGNAL(reload_config()), this, SLOT(Load()));
 }
 
-Config::~Config()
-{
-	
-}
+Config::~Config() {}
 
 /* Load the configuration from the OBS Config Store
  */
@@ -59,26 +57,30 @@ void Config::Save()
 }
 QString Config::get_file_name()
 {
+	char *current_profile = obs_frontend_get_current_profile();
+	char *current_sc = obs_frontend_get_current_scene_collection();
 	QString file("obs-midi_");
-	file += obs_frontend_get_current_profile();
+	file += current_profile;
 	file += "_";
-	file += obs_frontend_get_current_scene_collection();
+	file += current_sc;
 	file += ".json";
+	bfree(current_profile);
+	bfree(current_sc);
 	return file;
 }
 QString Config::GetConfigStore()
 {
 	auto path = obs_module_config_path(NULL);
-	auto filepath = obs_module_config_path(get_file_name().toStdString().c_str());
 	os_mkdirs(path);
+	bfree(path);
+
+	auto filepath = obs_module_config_path(get_file_name().toStdString().c_str());
 	obs_data_t *midiConfig = os_file_exists(filepath) ? obs_data_create_from_json_file(filepath) : obs_data_create();
 	if (!os_file_exists(filepath)) {
 		obs_data_save_json_safe(midiConfig, filepath, ".tmp", ".bkp");
 	}
 	bfree(filepath);
-	bfree(path);
 	QString conf(obs_data_get_json(midiConfig));
 	obs_data_release(midiConfig);
-	blog(LOG_DEBUG, "getconfigstore return");
 	return conf;
 }

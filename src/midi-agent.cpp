@@ -42,16 +42,18 @@ MidiAgent::MidiAgent(const char *midiData)
 	// Sets the parent of this instance of MidiAgent to Device Manager
 	this->setParent(GetDeviceManager().get());
 	// Sets the Midi Callback function
-	this->Load(midiData);
-	set_callbacks();
-	if (enabled)
-		open_midi_input_port();
-	if (bidirectional)
-		open_midi_output_port();
+	if (is_device_attached(midiData)) {
+		this->Load(midiData);
+		set_callbacks();
+		if (enabled)
+			open_midi_input_port();
+		if (bidirectional)
+			open_midi_output_port();
+	}
 }
 void MidiAgent::set_callbacks()
 {
-	connect(GetEventsSystem().get(), &Events::obsEvent, this, &MidiAgent::handle_obs_event);
+	connect(GetDeviceManager().get(), &DeviceManager::obsEvent, this, &MidiAgent::handle_obs_event);
 	midiin.set_callback([this](const auto &message) { HandleInput(message, this); });
 	midiin.set_error_callback([this](const auto &error_type, const auto &error_message) { HandleError(error_type, error_message, this); });
 	midiout.set_error_callback([this](const auto &error_type, const auto &error_message) { HandleError(error_type, error_message, this); });
@@ -62,6 +64,14 @@ MidiAgent::~MidiAgent()
 	clear_MidiHooks();
 	close_both_midi_ports();
 	midiin.cancel_callback();
+}
+
+bool MidiAgent::is_device_attached(const char *incoming_data)
+{
+	obs_data_t *data = obs_data_create_from_json(incoming_data);
+	int minput_port = DeviceManager().GetPortNumberByDeviceName(obs_data_get_string(data, "name"));
+	obs_data_release(data);
+	return (minput_port != -1);
 }
 /* Loads information from OBS data. (recalled from Config)
  * This will not enable the MidiAgent or open the port. (and shouldn't)
@@ -225,6 +235,8 @@ void MidiAgent::HandleInput(const rtmidi::message &message, void *userData)
 void MidiAgent::HandleError(const rtmidi::midi_error &error_type, const std::string_view &error_message, void *userData)
 {
 	blog(LOG_ERROR, "Midi Error: %s", error_message.data());
+	UNUSED_PARAMETER(error_type);
+	UNUSED_PARAMETER(userData);
 }
 /* Get the midi hooks for this device
  */

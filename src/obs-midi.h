@@ -31,6 +31,6 @@ typedef std::shared_ptr<DeviceManager> DeviceManagerPtr;
 ConfigPtr GetConfig();
 DeviceManagerPtr GetDeviceManager();
 eventsPtr GetEventsSystem();
-
+static PluginWindow *plugin_window;
 #define OBS_MIDI_VERSION "0.1"
 #define blog(level, msg, ...) blog(level, "[obs-midi] " msg, ##__VA_ARGS__)

@@ -36,24 +36,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #include "obs-midi.h"
 
-
 typedef void (*PauseRecordingFunction)(bool);
 typedef bool (*RecordingPausedFunction)();
 
-enum class Pairs {
-	Scene,
-	Source,
-	Item,
-	Transition,
-	Audio,
-	Media,
-	Filter,
-	String,
-	Integer,
-	Boolean
-};
-class ActionsClass : public QObject
-{
+enum class Pairs { Scene, Source, Item, Transition, Audio, Media, Filter, String, Integer, Boolean };
+class ActionsClass : public QObject {
 	Q_OBJECT
 public:
 	enum class Actions {
@@ -202,8 +189,7 @@ obs_sceneitem_t *GetSceneItemFromRequestField(obs_scene_t *scene, obs_data_item_
 obs_scene_t *GetSceneFromNameOrCurrent(const QString &sceneName);
 obs_data_t *GetSceneItemPropertiesData(obs_sceneitem_t *item);
 obs_data_t *GetSourceFilterInfo(obs_source_t *filter, bool includeSettings);
-obs_data_array_t *GetSourceFiltersList(obs_source_t *source,
-				       bool includeSettings);
+obs_data_array_t *GetSourceFiltersList(obs_source_t *source, bool includeSettings);
 bool IsValidAlignment(uint32_t alignment);
 obs_data_array_t *GetScenes();
 obs_data_t *GetSceneData(obs_source_t *source);
@@ -270,9 +256,9 @@ const QList<ActionsClass::Actions> AllActions_raw = {ActionsClass::Actions::Disa
 						     ActionsClass::Actions::Resume_Recording,
 						     ActionsClass::Actions::Save_Replay_Buffer,
 						     ActionsClass::Actions::Reload_Browser_Source,
-						     ActionsClass::Actions::Move_T_Bar};
+						     ActionsClass::Actions::Move_T_Bar,
+						     ActionsClass::Actions::Studio_Mode};
 const QList<ActionsClass::Actions> not_ready_actions{
-	ActionsClass::Actions::Studio_Mode,
 	ActionsClass::Actions::Set_Current_Scene_Collection,
 	ActionsClass::Actions::Reset_Stats,
 	ActionsClass::Actions::Set_Current_Profile,
@@ -294,7 +280,7 @@ const QList<ActionsClass::Actions> not_ready_actions{
 	ActionsClass::Actions::Set_Scene_Item_Render,
 	ActionsClass::Actions::Set_Scene_Item_Transform,
 	ActionsClass::Actions::Set_Text_GDIPlus_Text,
-	//ActionsClass::Actions::Set_Opacity,
+	// ActionsClass::Actions::Set_Opacity,
 	ActionsClass::Actions::Set_Browser_Source_URL,
 };
 void alert_popup(const QString &message);
@@ -311,7 +297,7 @@ typedef struct MidiMessage {
 		this->value = Utils::get_midi_value(message);
 	}
 	QString device_name;
-	QString message_type="none";
+	QString message_type = "none";
 	int channel = 0;
 	int NORC = 0;
 	int value = 0;
@@ -321,11 +307,11 @@ Q_DECLARE_METATYPE(MidiMessage);
 
 /*
  * Midi Hook Class
-*/
+ */
 class MidiHook : public QObject {
 	Q_OBJECT
 public:
-	int channel = -1;     //midi channel
+	int channel = -1;     // midi channel
 	QString message_type; // Message Type
 	int norc = -1;        // Note or Control
 	QString action;
@@ -374,7 +360,7 @@ public:
 		int_override = obs_data_get_int(data, "int_override");
 	}
 
-	QString GetData() 
+	QString GetData()
 	{
 		blog(LOG_DEBUG, "MH::GetData");
 		obs_data_t *data = obs_data_create();
@@ -428,5 +414,4 @@ public:
 
 		return hookdata;
 	}
-	
 };

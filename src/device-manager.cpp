@@ -15,11 +15,11 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "forms/settings-dialog.h"
 DeviceManager::DeviceManager()
 {
+	this->setParent(plugin_window);
 }
 DeviceManager::~DeviceManager()
 {
 	Unload();
-	
 }
 /* Load the Device Manager from saved Config Store data.
  * This method is called from Config. Should only be called once on runtime
@@ -150,11 +150,10 @@ MidiAgent *DeviceManager::RegisterMidiDevice(const int &port, const int &outport
  */
 QString DeviceManager::GetData()
 {
-	blog(LOG_DEBUG, "DM::GetData");
 	obs_data_t *return_data = obs_data_create();
 	obs_data_array_t *data = obs_data_array_create();
 	for (auto midiAgent : midiAgents) {
-		obs_data_t* adata = obs_data_create_from_json(midiAgent->GetData().toStdString().c_str());
+		obs_data_t *adata = obs_data_create_from_json(midiAgent->GetData().toStdString().c_str());
 		obs_data_array_push_back(data, adata);
 		obs_data_release(adata);
 	}
@@ -163,10 +162,10 @@ QString DeviceManager::GetData()
 	obs_data_array_release(data);
 	obs_data_release(return_data);
 	return std::move(rdata);
-	blog(LOG_DEBUG, "DM::GetData");
-} /**
-   * Reload configuration -- for use with switching scene collecitons or profiles
-   */
+}
+/**
+ * Reload configuration -- for use with switching scene collecitons or profiles
+ */
 void DeviceManager::reload()
 {
 	this->Unload();

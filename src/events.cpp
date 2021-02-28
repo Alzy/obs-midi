@@ -66,7 +66,7 @@ Events::Events(DeviceManagerPtr srv)
 	  HeartbeatIsActive(false),
 	  pulse(false)
 {
-	this->setParent(_srv.get());
+	this->setParent(GetDeviceManager().get());
 	//_srv = GetDeviceManager();
 	cpuUsageInfo = os_cpu_usage_info_start();
 	obs_frontend_add_event_callback(Events::FrontendEventHandler, this);

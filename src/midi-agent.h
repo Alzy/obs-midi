@@ -39,7 +39,6 @@ public:
 	MidiAgent(const int &in_port, const int &out_port);
 	MidiAgent(const char *data);
 	~MidiAgent();
-	bool is_device_attached(const char *idata);
 	void Load(const char *data);
 	// Open Actions
 	void open_midi_input_port();

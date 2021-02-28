@@ -179,8 +179,8 @@ obs_data_array_t *StringListToArray(char **strings, const char *key);
 obs_data_array_t *GetSceneItems(obs_source_t *source);
 QStringList GetSceneItemsBySource(obs_source_t *source);
 obs_data_t *GetSceneItemData(obs_sceneitem_t *item);
-OBSDataArrayAutoRelease GetSourceArray();
-OBSDataArrayAutoRelease GetSceneArray(const QString &name = "");
+QString GetSourceArray();
+QString GetSceneArray(const QString &name = "");
 // These functions support nested lookup into groups
 obs_sceneitem_t *GetSceneItemFromName(obs_scene_t *scene, const QString &name);
 obs_sceneitem_t *GetSceneItemFromId(obs_scene_t *scene, int64_t id);
@@ -192,7 +192,7 @@ obs_data_t *GetSourceFilterInfo(obs_source_t *filter, bool includeSettings);
 obs_data_array_t *GetSourceFiltersList(obs_source_t *source, bool includeSettings);
 bool IsValidAlignment(uint32_t alignment);
 obs_data_array_t *GetScenes();
-obs_data_t *GetSceneData(obs_source_t *source);
+QString GetSceneData(obs_source_t *source);
 // TODO contribute a proper frontend API method for this to OBS and remove this hack
 int GetTransitionDuration(obs_source_t *transition);
 obs_source_t *GetTransitionFromName(const QString &transitionName);

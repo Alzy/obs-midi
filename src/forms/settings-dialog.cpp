@@ -25,11 +25,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "settings-dialog.h"
 #include "../device-manager.h"
 #include "../config.h"
+#include "Macros.h"
 
 PluginWindow::PluginWindow(QWidget *parent) : QDialog(parent, Qt::Dialog), ui(new Ui::PluginWindow)
 {
 	ui->setupUi(this);
-
+	Macros *macros = new Macros(ui);
+	macros->setParent(this);
 	// Set Window Title
 	setup_actions();
 	set_title_window();

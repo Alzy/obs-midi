@@ -1,4 +1,3 @@
-
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMainWindow>
 
@@ -73,7 +72,6 @@ bool obs_module_load(void)
 
 void obs_module_unload()
 {
-
 	_eventsSystem.reset();
 	_deviceManager.reset();
 	_config.reset();

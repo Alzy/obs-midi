@@ -355,29 +355,39 @@ obs_data_array_t *Utils::GetScenes()
 	obs_data_array_t *scenes = obs_data_array_create();
 	for (size_t i = 0; i < sceneList.sources.num; i++) {
 		obs_source_t *scene = sceneList.sources.array[i];
-		OBSDataAutoRelease sceneData = GetSceneData(scene);
+		obs_data_t *sceneData = obs_data_create_from_json(GetSceneData(scene).toStdString().c_str());
 		obs_data_array_push_back(scenes, sceneData);
+		obs_data_release(sceneData);
+		obs_source_release(scene);
 	}
 	obs_frontend_source_list_free(&sceneList);
 	return scenes;
 }
-OBSDataArrayAutoRelease Utils::GetSceneArray(const QString &name)
+QString Utils::GetSceneArray(const QString &name)
 {
-	OBSDataArrayAutoRelease sceneArray = obs_data_array_create();
+	obs_data_array_t *sceneArray = obs_data_array_create();
 	auto sceneEnumProc = [](obs_scene_t *scene, obs_sceneitem_t *item, void *privateData) -> bool {
 		obs_data_array_t *sceneArray = (obs_data_array_t *)privateData;
-		OBSDataAutoRelease scdata = obs_data_create();
+		obs_data_t *scdata = obs_data_create();
 		auto x = obs_sceneitem_get_source(item);
-		OBSDataAutoRelease sdata = GetSceneData(x);
+		obs_data_t *sdata = obs_data_create_from_json(GetSceneData(x).toStdString().c_str());
 		obs_data_set_string(scdata, "name", obs_data_get_string(sdata, "name"));
 		obs_data_array_push_back(sceneArray, scdata);
+		obs_data_release(scdata);
+		obs_data_release(sdata);
+
 		UNUSED_PARAMETER(scene);
 		return true;
 	};
 	obs_scene_enum_items(GetSceneFromNameOrCurrent(name), sceneEnumProc, sceneArray);
-	return sceneArray;
+	obs_data_t *data = obs_data_create();
+	obs_data_set_array(data, "array", sceneArray);
+	QString rdata(obs_data_get_json(data));
+	obs_data_array_release(sceneArray);
+	obs_data_release(data);
+	return rdata;
 }
-OBSDataArrayAutoRelease Utils::GetSourceArray()
+QString Utils::GetSourceArray()
 {
 	OBSDataArrayAutoRelease sourcesArray = obs_data_array_create();
 	auto sourceEnumProc = [](void *privateData, obs_source_t *source) -> bool {
@@ -411,15 +421,22 @@ OBSDataArrayAutoRelease Utils::GetSourceArray()
 		return true;
 	};
 	obs_enum_sources(sourceEnumProc, sourcesArray);
-	return sourcesArray;
+	obs_data_t *data = obs_data_create();
+	obs_data_set_array(data, "array", sourcesArray);
+	QString rdata(obs_data_get_json(data));
+	obs_data_release(data);
+	return rdata;
 }
-obs_data_t *Utils::GetSceneData(obs_source_t *source)
+QString Utils::GetSceneData(obs_source_t *source)
 {
 	obs_data_array_t *sceneItems = GetSceneItems(source);
 	obs_data_t *sceneData = obs_data_create();
 	obs_data_set_string(sceneData, "name", obs_source_get_name(source));
 	obs_data_set_array(sceneData, "sources", sceneItems);
-	return sceneData;
+	QString rdata(obs_data_get_json(sceneData));
+	obs_data_array_release(sceneItems);
+	obs_data_release(sceneData);
+	return rdata;
 }
 int Utils::GetTransitionDuration(obs_source_t *transition)
 {
@@ -767,7 +784,7 @@ obs_data_array_t *Utils::GetSourceFiltersList(obs_source_t *source, bool include
 			UNUSED_PARAMETER(parent);
 		},
 		&enumParams);
-	return enumParams.filters;
+	return std::move(enumParams.filters);
 }
 void getPauseRecordingFunctions(RecordingPausedFunction *recPausedFuncPtr, PauseRecordingFunction *pauseRecFuncPtr)
 {
@@ -1045,7 +1062,8 @@ QStringList Utils::get_scene_names()
 QStringList Utils::get_source_names(const QString &scene)
 {
 	QStringList names;
-	auto arrayref = Utils::GetSceneArray(scene);
+	auto data = obs_data_create_from_json(Utils::GetSceneArray(scene).toStdString().c_str());
+	obs_data_array_t *arrayref = obs_data_get_array(data, "array");
 	size_t size = obs_data_array_count(arrayref);
 	for (size_t i = 0; i < size; i++) {
 		obs_data *item = obs_data_array_item(arrayref, i);
@@ -1053,19 +1071,26 @@ QStringList Utils::get_source_names(const QString &scene)
 		obs_data_release(item);
 	}
 	obs_data_array_release(arrayref);
+	obs_data_release(data);
 	return names;
 }
 QStringList Utils::get_filter_names(const QString &Source)
 {
-	QStringList names;
 	obs_source *x = obs_get_source_by_name(Source.toStdString().c_str());
-	OBSDataArrayAutoRelease y = Utils::GetSourceFiltersList(x, false);
-	for (int i = 0; i < obs_data_array_count(y); i++) {
-		obs_data_t *z = obs_data_array_item(y, i);
-		names.append(QString(obs_data_get_string(z, "name")));
-		obs_data_release(z);
-	}
-	obs_data_array_release(y);
+	struct enum_params {
+		QStringList names;
+	};
+	struct enum_params enumParams;
+	obs_source_enum_filters(
+		x,
+		[](obs_source_t *parent, obs_source_t *child, void *param) {
+			auto enumParams = reinterpret_cast<struct enum_params *>(param);
+			const char *name = obs_source_get_name(child);
+			enumParams->names.append(QString(name));
+			UNUSED_PARAMETER(parent);
+		},
+		&enumParams);
+
 	obs_source_release(x);
-	return names;
+	return enumParams.names;
 }

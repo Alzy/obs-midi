@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>1022</width>
-    <height>606</height>
+    <height>769</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -641,7 +641,7 @@
          </layout>
         </widget>
        </item>
-       <item row="5" column="1">
+       <item row="5" column="1" alignment="Qt::AlignTop">
         <widget class="QFrame" name="wid_Action">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -1408,7 +1408,7 @@
      </widget>
      <widget class="QWidget" name="tab_Macros">
       <property name="enabled">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <attribute name="title">
        <string>Macros</string>

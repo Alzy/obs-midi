@@ -458,7 +458,7 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 				} else if (this->midiHooks.at(i)->source == from) {
 					this->midiHooks.at(i)->source = obs_data_get_string(event.additionalFields(), "newName");
 					GetConfig().get()->Save();
-				}	
+				}
 			}
 		} else if (event.updateType() == QString("Exiting")) {
 			disconnect(GetEventsSystem().get(), &Events::obsEvent, this, &MidiAgent::handle_obs_event);

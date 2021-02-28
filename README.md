@@ -1,14 +1,18 @@
 # OBS-MIDI
-
-
 Use MIDI devices to trigger events in OBS and visa versa.
 
+OBS MIDI came about because two guys complained about the same thing, within the same hour, and decided to try to take on the task
+
+Those two guys are
+* [Alzy](https://github.com/Alzy) and
+* [Chris](http://github.com/cpyarger)
 
 
 # Status -- ![CI Multiplatform Build and release](https://github.com/cpyarger/obs-midi/workflows/CI%20Multiplatform%20Build%20and%20release/badge.svg?branch=master)
 [![Open Source Helpers](https://www.codetriage.com/cpyarger/obs-midi/badges/users.svg)](https://www.codetriage.com/cpyarger/obs-midi)
 [![Crowdin](https://badges.crowdin.net/obs-midi/localized.svg)](https://crowdin.com/project/obs-midi)
 [![CodeFactor](https://www.codefactor.io/repository/github/cpyarger/obs-midi/badge/master)](https://www.codefactor.io/repository/github/cpyarger/obs-midi/overview/master)
+Currently runs on Windows and Linux, and MAC
 
 # Installing
 
@@ -27,9 +31,12 @@ Use MIDI devices to trigger events in OBS and visa versa.
 - If you are unable to see obs-midi in the tools you will need to install jack
 - https://jackaudio.org/downloads/
 
-# Ubuntu specifics - SNAP Release
-Due to specific ALSA permissions not being set on the ubuntu snap craft package, OBS-MIDI will not work on the snap version of obs-studio
+# Installing Extra Steps - Ubuntu SNAP
+- If you install OBS Studio via snap you will need to run the following command to give permissions for OBS to access the raw MIDI devices through ALSA
 
+```bash
+sudo snap connect obs-studio:alsa
+```
 
 Currently runs on Windows and Linux, and is partly tested on MAC
 
@@ -40,6 +47,13 @@ Currently runs on Windows and Linux, and is partly tested on MAC
 
 # Build Instructions
 [Build instructions can be found here](build.md)
+
+## Special Thanks to our other contributors
+* [dtg01100](https://github.com/dtg01100)
+* [garbart](https://github.com/garbart)
+* [DDRBoxman](https://github.com/DDRBoxman)
+* [kernel-coder](https://github.com/kernel-coder)
+* [Luxcium](https://github.com/Luxcium)
 
 # Contributing
 

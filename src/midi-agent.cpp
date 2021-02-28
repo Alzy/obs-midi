@@ -128,6 +128,8 @@ void MidiAgent::open_midi_input_port()
 			midiin.open_port(input_port);
 		} catch (const rtmidi::midi_exception &error) {
 			blog(LOG_DEBUG, "Midi Error %s", error.what());
+		} catch (const rtmidi::driver_error &error) {
+			blog(LOG_DEBUG, "Midi Driver Error %s", error.what());
 		}
 		blog(LOG_INFO, "MIDI device connected In: [%d] %s", input_port, midi_input_name.toStdString().c_str());
 	}
@@ -139,6 +141,8 @@ void MidiAgent::open_midi_output_port()
 			midiout.open_port(output_port);
 		} catch (const rtmidi::midi_exception &error) {
 			blog(LOG_DEBUG, "Midi Error %s", error.what());
+		} catch (const rtmidi::driver_error &error) {
+			blog(LOG_DEBUG, "Midi Driver Error %s", error.what());
 		}
 		blog(LOG_INFO, "MIDI device connected Out: [%d] %s", output_port, midi_output_name.toStdString().c_str());
 	}

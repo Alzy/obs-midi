@@ -12,6 +12,7 @@ Those two guys are
 [![Open Source Helpers](https://www.codetriage.com/cpyarger/obs-midi/badges/users.svg)](https://www.codetriage.com/cpyarger/obs-midi)
 [![Crowdin](https://badges.crowdin.net/obs-midi/localized.svg)](https://crowdin.com/project/obs-midi)
 [![CodeFactor](https://www.codefactor.io/repository/github/cpyarger/obs-midi/badge/master)](https://www.codefactor.io/repository/github/cpyarger/obs-midi/overview/master)
+Currently runs on Windows and Linux, and MAC
 
 # Installing
 
@@ -30,7 +31,7 @@ Those two guys are
 - If you are unable to see obs-midi in the tools you will need to install jack
 - https://jackaudio.org/downloads/
 
-# Ubuntu specifics - SNAP Release
+# Installing Extra Steps - Ubuntu SNAP
 - If you install OBS Studio via snap you will need to run the following command to give permissions for OBS to access the raw MIDI devices through ALSA
 
 ```bash

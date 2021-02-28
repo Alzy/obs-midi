@@ -31,7 +31,7 @@ Config::Config()
 
 Config::~Config()
 {
-	this->disconnect();
+	
 }
 
 /* Load the configuration from the OBS Config Store
@@ -40,6 +40,7 @@ void Config::Load()
 {
 	auto deviceManager = GetDeviceManager();
 	deviceManager->Load(GetConfigStore());
+	blog(LOG_DEBUG, "Config::Load");
 }
 
 /* Save the configuration to the OBS Config Store
@@ -52,7 +53,9 @@ void Config::Save()
 	auto path = obs_module_config_path(get_file_name().toStdString().c_str());
 	obs_data_save_json_safe(newmidi, path, ".tmp", ".bkp");
 	bfree(path);
+
 	obs_data_release(newmidi);
+	blog(LOG_DEBUG, "Config::Save");
 }
 QString Config::get_file_name()
 {
@@ -76,6 +79,6 @@ QString Config::GetConfigStore()
 	bfree(path);
 	QString conf = QString(obs_data_get_json(midiConfig));
 	obs_data_release(midiConfig);
-
+	blog(LOG_DEBUG, "getconfigstore return");
 	return conf;
 }

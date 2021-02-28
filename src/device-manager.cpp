@@ -20,7 +20,7 @@ DeviceManager::DeviceManager()
 DeviceManager::~DeviceManager()
 {
 	Unload();
-	this->deleteLater();
+	
 }
 /* Load the Device Manager from saved Config Store data.
  * This method is called from Config. Should only be called once on runtime
@@ -39,6 +39,7 @@ void DeviceManager::Load(QString datastring)
 	datastring.~QString();
 	obs_data_array_release(data);
 	obs_data_release(incoming_data);
+	blog(LOG_DEBUG, "DM::Load");
 }
 void DeviceManager::Unload()
 {
@@ -49,6 +50,7 @@ void DeviceManager::Unload()
 		delete midiAgent;
 	}
 	midiAgents.clear();
+	blog(LOG_DEBUG, "DM::Unload");
 }
 /*
  * Returns QStringList of Port Names
@@ -163,6 +165,7 @@ QString DeviceManager::GetData()
 	obs_data_array_release(data);
 	obs_data_release(return_data);
 	return std::move(rdata);
+	blog(LOG_DEBUG, "DM::GetData");
 } /**
    * Reload configuration -- for use with switching scene collecitons or profiles
    */

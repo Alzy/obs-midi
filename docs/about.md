@@ -10,8 +10,8 @@ permalink: /about/
 
 OBS MIDI came about because two guys complained about the same thing, within the same hour, and decided to try to take on the task
 
-Those two guys are 
-* [Alzy](https://github.com/Alzy) and 
+Those two guys are
+* [Alzy](https://github.com/Alzy) and
 * [Chris](http://github.com/cpyarger)
 
 ## Questions or Concerns
@@ -22,12 +22,12 @@ If you have any suggestions Please start a thread in the Ideas section of the [G
 
 ## Contributing
 
-Anyone who wants to help out the project
+Anyone who wants to help out the project;
 
 - Drop any ideas or suggestions or bugs in the issues
-- Leave an honest review on the [obs forum](https://obsproject.com/forum/resources/obs-midi.1023/)
+- Leave an honest review on the [OBS Forum](https://obsproject.com/forum/resources/obs-midi.1023/)
 - If you know anyone who would be willing to help with the programming let them know about the project
-- If you or anyone you know makes youtube videos, we are always looking for reviews, and tutorial videos �
+- If you or anyone you know makes YouTube videos, we are always looking for reviews, and tutorial videos
 - Contribute to translations on [crowdin](https://crowdin.com/project/obs-midi)
 - If you know C++ we can always use help with cleaning up the code base and especially hunting and fixing memory leaks.
 
@@ -38,6 +38,7 @@ Anyone who wants to help out the project
 
 ## Special Thanks to our other contributors
 * [dtg01100](https://github.com/dtg01100)
+* [garbart](https://github.com/garbart)
 * [DDRBoxman](https://github.com/DDRBoxman)
 * [kernel-coder](https://github.com/kernel-coder)
 * [Luxcium](https://github.com/Luxcium)

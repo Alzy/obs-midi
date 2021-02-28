@@ -28,7 +28,6 @@ class PluginWindow;
 typedef std::shared_ptr<Events> eventsPtr;
 typedef std::shared_ptr<Config> ConfigPtr;
 typedef std::shared_ptr<DeviceManager> DeviceManagerPtr;
-static PluginWindow *plugin_window;
 ConfigPtr GetConfig();
 DeviceManagerPtr GetDeviceManager();
 eventsPtr GetEventsSystem();

@@ -77,5 +77,5 @@ QString Config::GetConfigStore()
 	QString conf = QString(obs_data_get_json(midiConfig));
 	obs_data_release(midiConfig);
 
-	return std::move(conf);
+	return conf;
 }

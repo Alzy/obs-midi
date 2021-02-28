@@ -35,7 +35,6 @@ void DeviceManager::Load(QString datastring)
 		obs_data_release(madata);
 		midiAgents.push_back(device);
 	}
-	datastring.~QString();
 	obs_data_array_release(data);
 	obs_data_release(incoming_data);
 	blog(LOG_DEBUG, "DM::Load");

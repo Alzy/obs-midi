@@ -162,8 +162,6 @@ jobs:
           NAME: "Christopher P Yarger"
           DOMAIN: https://obs-midi.org
           BINARY: ${{ github.workspace }}/obs-midi/package/*.exe
-          WINDOWS_CERT: ${{WINDOWS_CERT }}
-          WINDOWS_KEY: ${{ WINDOWS_KEY }}
       - name: 'Publish ${{ env.WIN_FILENAME }}.zip'
         if: success()
         uses: actions/upload-artifact@v2-preview

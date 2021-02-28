@@ -15,7 +15,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "forms/settings-dialog.h"
 DeviceManager::DeviceManager()
 {
-	this->setParent(plugin_window);
 }
 DeviceManager::~DeviceManager()
 {

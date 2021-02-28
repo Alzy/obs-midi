@@ -77,7 +77,7 @@ QString Config::GetConfigStore()
 	}
 	bfree(filepath);
 	bfree(path);
-	QString conf = QString(obs_data_get_json(midiConfig));
+	QString conf(obs_data_get_json(midiConfig));
 	obs_data_release(midiConfig);
 	blog(LOG_DEBUG, "getconfigstore return");
 	return conf;

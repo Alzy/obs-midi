@@ -13,7 +13,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 */
 #include "obs-controller.h"
 
-
 ////////////////////
 // BUTTON ACTIONS //
 ////////////////////
@@ -24,10 +23,10 @@ OBSController::OBSController(MidiHook *incoming_hook, int incoming_midi_value)
 	hook = incoming_hook;
 	midi_value = incoming_midi_value;
 	/*
-	*
-	* Connect All Actions to handle_obs_event on midi agent
-	*
-	*/
+	 *
+	 * Connect All Actions to handle_obs_event on midi agent
+	 *
+	 */
 	switch (ActionsClass::string_to_action(Utils::untranslate(hook->action))) {
 	case ActionsClass::Actions::Set_Current_Scene:
 		this->SetCurrentScene();
@@ -204,24 +203,21 @@ void OBSController::SetCurrentSceneCollection()
 	obs_frontend_set_current_scene_collection(hook->scene_collection.toUtf8());
 }
 /**
-* Reset a scene item.
-*/
+ * Reset a scene item.
+ */
 void OBSController::ResetSceneItem()
 {
 	OBSScene scene = Utils::GetSceneFromNameOrCurrent(hook->scene);
 	if (!scene) {
 		throw("requested scene doesn't exist");
 	}
-	OBSDataAutoRelease params = obs_data_create();
-	obs_data_set_string(params, "scene-name", hook->scene.toUtf8());
-	OBSDataItemAutoRelease itemField = obs_data_item_byname(params, "item");
-	OBSSceneItemAutoRelease sceneItem = Utils::GetSceneItemFromRequestField(scene, itemField);
+	OBSSceneItemAutoRelease sceneItem = Utils::GetSceneItemFromName(scene, hook->source);
 	if (!sceneItem) {
-		obs_data_release(params);
 		throw("specified scene item doesn't exist");
 	}
 	OBSSourceAutoRelease sceneItemSource = obs_sceneitem_get_source(sceneItem);
 	OBSDataAutoRelease settings = obs_source_get_settings(sceneItemSource);
+
 	obs_source_update(sceneItemSource, settings);
 }
 /**
@@ -263,7 +259,7 @@ void OBSController::SetTransitionDuration()
 void OBSController::SetSourceVisibility()
 {
 	obs_sceneitem_set_visible(Utils::GetSceneItemFromName(Utils::GetSceneFromNameOrCurrent(hook->scene), hook->source), midi_value);
-} //DOESNT EXIST
+} // DOESNT EXIST
 void OBSController::ToggleSourceVisibility()
 {
 	auto scene = Utils::GetSceneItemFromName(Utils::GetSceneFromNameOrCurrent(hook->scene), hook->source);
@@ -272,16 +268,16 @@ void OBSController::ToggleSourceVisibility()
 	} else {
 		obs_sceneitem_set_visible(scene, true);
 	}
-} //DOESNT EXIST
+} // DOESNT EXIST
 /**
-* Inverts the mute status of a specified source.
-*/
+ * Inverts the mute status of a specified source.
+ */
 void OBSController::ToggleMute()
 {
 	if (hook->audio_source.isEmpty()) {
 		throw("sourceName is empty");
 	}
-	obs_source * source = obs_get_source_by_name(hook->audio_source.toStdString().c_str());
+	obs_source *source = obs_get_source_by_name(hook->audio_source.toStdString().c_str());
 	if (!source) {
 		throw("sourceName not found");
 	}
@@ -355,8 +351,8 @@ void OBSController::StopRecording()
 	}
 }
 /**
-* Pause the current recording.
-*/
+ * Pause the current recording.
+ */
 void OBSController::PauseRecording()
 {
 	if (obs_frontend_recording_active()) {
@@ -364,8 +360,8 @@ void OBSController::PauseRecording()
 	}
 }
 /**
-* Resume/unpause the current recording (if paused).
-*/
+ * Resume/unpause the current recording (if paused).
+ */
 void OBSController::ResumeRecording()
 {
 	if (obs_frontend_recording_active()) {
@@ -373,8 +369,8 @@ void OBSController::ResumeRecording()
 	}
 }
 /**
-* Toggle the Replay Buffer on/off.
-*/
+ * Toggle the Replay Buffer on/off.
+ */
 void OBSController::StartStopReplayBuffer()
 {
 	if (obs_frontend_replay_buffer_active()) {
@@ -384,11 +380,11 @@ void OBSController::StartStopReplayBuffer()
 	}
 }
 /**
-* Start recording into the Replay Buffer.
-* Will throw an error if "Save Replay Buffer" hotkey is not set in OBS' settings.
-* Setting this hotkey is mandatory, even when triggering saves only
-* through obs-midi.
-*/
+ * Start recording into the Replay Buffer.
+ * Will throw an error if "Save Replay Buffer" hotkey is not set in OBS' settings.
+ * Setting this hotkey is mandatory, even when triggering saves only
+ * through obs-midi.
+ */
 void OBSController::StartReplayBuffer()
 {
 	if (!Utils::ReplayBufferEnabled()) {
@@ -399,8 +395,8 @@ void OBSController::StartReplayBuffer()
 	}
 }
 /**
-* Stop recording into the Replay Buffer.
-*/
+ * Stop recording into the Replay Buffer.
+ */
 void OBSController::StopReplayBuffer()
 {
 	if (obs_frontend_replay_buffer_active()) {
@@ -408,10 +404,10 @@ void OBSController::StopReplayBuffer()
 	}
 }
 /**
-* Flush and save the contents of the Replay Buffer to disk. This is
-* basically the same as triggering the "Save Replay Buffer" hotkey.
-* Will return an `error` if the Replay Buffer is not active.
-*/
+ * Flush and save the contents of the Replay Buffer to disk. This is
+ * basically the same as triggering the "Save Replay Buffer" hotkey.
+ * Will return an `error` if the Replay Buffer is not active.
+ */
 void OBSController::SaveReplayBuffer()
 {
 	if (!obs_frontend_replay_buffer_active()) {
@@ -448,8 +444,7 @@ void OBSController::ReloadBrowserSource()
 	OBSSourceAutoRelease source = obs_get_source_by_name(hook->source.toUtf8());
 	obs_properties_t *sourceProperties = obs_source_properties(source);
 	obs_property_t *property = obs_properties_get(sourceProperties, "refreshnocache");
-	obs_property_button_clicked(property,
-				    source); // This returns a boolean but we ignore it because the browser plugin always returns `false`.
+	obs_property_button_clicked(property, source); // This returns a boolean but we ignore it because the browser plugin always returns `false`.
 	obs_properties_destroy(sourceProperties);
 }
 void OBSController::TakeSourceScreenshot() {}

@@ -61,11 +61,7 @@ int Utils::t_bar_mapper(int x)
 bool Utils::is_number(const QString &s)
 {
 	QRegExp re("\\d*"); // a digit (\d), zero or more times (*)
-	if (re.exactMatch(s)) {
-		return true;
-	} else {
-		return false;
-	}
+	return re.exactMatch(s);
 }
 bool Utils::isJSon(const QString &val)
 {

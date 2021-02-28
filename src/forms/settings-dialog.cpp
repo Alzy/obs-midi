@@ -87,6 +87,7 @@ void PluginWindow::ToggleShowHide()
 		ui->btn_Listen_many->setChecked(false);
 		ui->btn_Listen_one->setChecked(false);
 		hide_all_pairs();
+		reset_to_defaults();
 	}
 }
 
@@ -203,8 +204,8 @@ void PluginWindow::handle_midi_message(const MidiMessage &mess)
 			ui->cb_mtype->setCurrentText(mess.message_type);
 			ui->btn_Listen_one->setChecked(false);
 		} else {
-			if (map_location(mess) != -1) {
-				ui->table_mapping->selectRow(map_location(mess));
+			if (find_mapping_location(mess) != -1) {
+				ui->table_mapping->selectRow(find_mapping_location(mess));
 			}
 		}
 	}
@@ -411,52 +412,11 @@ void PluginWindow::reset_to_defaults()
 	ui->slider_value->setValue(0);
 	ui->btn_add->setText("Add Mapping");
 }
-void PluginWindow::ShowOnly(const QList<ActionsClass::Actions> &shows)
-{
-	ui->cb_obs_output_action->clear();
-	for (int i = 0; i < shows.size(); i++) {
-		ui->cb_obs_output_action->addItem(obs_module_text(ActionsClass::action_to_string(shows.at(i)).toStdString().c_str()));
-	}
-}
-void PluginWindow::ShowEntry(ActionsClass::Actions Entry)
-{
-	if (ui->cb_obs_output_action->findText(ActionsClass::action_to_string(Entry)) == -1) {
-		ui->cb_obs_output_action->addItem(obs_module_text(ActionsClass::action_to_string(Entry).toStdString().c_str()));
-	}
-}
-void PluginWindow::HideEntry(ActionsClass::Actions Entry)
-{
-	if (ui->cb_obs_output_action->findText(ActionsClass::action_to_string(Entry)) > 0) {
-		ui->cb_obs_output_action->removeItem(ui->cb_obs_output_action->findText(ActionsClass::action_to_string(Entry)));
-	}
-}
-void PluginWindow::ShowAllActions()
-{
-	for (int i = 0; i < Utils::AllActions_raw.count(); i++) {
-		ShowEntry(Utils::AllActions_raw.at(i));
-	}
-}
-void PluginWindow::HideEntries(const QList<ActionsClass::Actions> &entrys)
-{
-	for (int i = 0; i < ui->cb_obs_output_action->count(); i++) {
-		if (entrys.contains(Utils::AllActions_raw.at(i))) {
-			HideEntry(Utils::AllActions_raw.at(i));
-		}
-	}
-}
-void PluginWindow::ShowEntries(const QList<ActionsClass::Actions> &entrys)
-{
-	for (int i = 0; i < ui->cb_obs_output_action->count(); i++) {
-		if (entrys.contains(Utils::AllActions_raw.at(i))) {
-			ShowEntry(Utils::AllActions_raw.at(i));
-		}
-	}
-}
 void PluginWindow::obs_actions_select(const QString &action)
 {
 	if (!switching) {
 		hide_all_pairs();
-		switch (ActionsClass::string_to_action(untranslate(action))) {
+		switch (ActionsClass::string_to_action(Utils::untranslate(action))) {
 		case ActionsClass::Actions::Set_Current_Scene:
 			show_pair(Pairs::Scene);
 			break;
@@ -486,7 +446,6 @@ void PluginWindow::obs_actions_select(const QString &action)
 		case ActionsClass::Actions::Reset_Scene_Item:
 			show_pair(Pairs::Scene);
 			show_pair(Pairs::Source);
-			show_pair(Pairs::Item);
 			break;
 		case ActionsClass::Actions::Set_Scene_Item_Render:
 			show_pair(Pairs::Scene);
@@ -561,12 +520,10 @@ void PluginWindow::obs_actions_select(const QString &action)
 		}
 	}
 }
-void PluginWindow::set_edit_mode() {}
-void PluginWindow::save_edit() {}
-QString PluginWindow::untranslate(QString tstring)
-{
-	return ActionsClass::action_to_string(Utils::AllActions_raw.at(Utils::TranslateActions().indexOf(tstring)));
+void PluginWindow::set_edit_mode() {
 }
+void PluginWindow::save_edit() {}
+
 bool PluginWindow::map_exists()
 {
 	auto devicemanager = GetDeviceManager();
@@ -579,7 +536,7 @@ bool PluginWindow::map_exists()
 	}
 	return false;
 }
-int PluginWindow::map_location(const MidiMessage &message)
+int PluginWindow::find_mapping_location(const MidiMessage &message)
 {
 	auto devicemanager = GetDeviceManager();
 	auto hooks = devicemanager->GetMidiHooksByDeviceName(ui->mapping_lbl_device_name->text());
@@ -653,6 +610,7 @@ void PluginWindow::add_new_mapping()
 		dev->add_MidiHook(newmh);
 		auto conf = GetConfig();
 		conf->Save();
+		ui->table_mapping->selectRow(row);
 	} else {
 		if (ui->sb_channel->value()) {
 			Utils::alert_popup("Can Not Map Channel 0. \nPlease Click Listen One or Listen Many to listen for MIDI Event to map");
@@ -723,11 +681,12 @@ void PluginWindow::set_cell_colors(const QColor &color, QTableWidgetItem *item)
 {
 	QColor txcolor;
 	txcolor.black();
-	item->setBackgroundColor(txcolor);
+	item->setBackground(txcolor);
 	item->setForeground(color);
 }
 void PluginWindow::tab_changed(int tab)
 {
+	reset_to_defaults();
 	if (tab == 1)
 		ui->mapping_lbl_device_name->setText(ui->list_midi_dev->currentItem()->text());
 	clear_table();

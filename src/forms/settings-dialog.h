@@ -25,12 +25,9 @@ class PluginWindow : public QDialog {
 public:
 	explicit PluginWindow(QWidget *parent);
 	~PluginWindow() override;
-
-signals:
-	void changed(obs_data_t *change);
-private Q_SLOTS:
+public  slots:
 	void ToggleShowHide();
-public slots:
+private slots:
 	void on_check_enabled_state_changed(int state);
 	void on_bid_enabled_state_changed(int state);
 	void on_device_select(const QString &curitem);
@@ -68,20 +65,13 @@ private:
 	void hide_all_pairs();
 	void add_midi_device(const QString &Name);
 	void set_headers();
-
 	void set_configure_title(const QString &title);
 	void connect_midi_message_handler();
 	bool map_exists();
-	int map_location(const MidiMessage &message);
+	int find_mapping_location(const MidiMessage &message);
 	bool verify_mapping();
 
 private:
 	bool switching = false;
-	void ShowOnly(const QList<ActionsClass::Actions> &shows);
-	void ShowEntry(ActionsClass::Actions Entry);
-	void HideEntry(ActionsClass::Actions Entry);
-	void ShowAllActions();
-	void HideEntries(const QList<ActionsClass::Actions> &entrys);
-	void ShowEntries(const QList<ActionsClass::Actions> &entrys);
-	QString untranslate(QString translation);
+
 };

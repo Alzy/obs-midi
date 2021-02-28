@@ -62,7 +62,7 @@ bool obs_module_load(void)
 	// UI SETUP
 	blog(LOG_DEBUG, "Setup UI");
 	QMainWindow *mainWindow = (QMainWindow *)obs_frontend_get_main_window();
-	PluginWindow *plugin_window = new PluginWindow(mainWindow);
+	plugin_window = new PluginWindow(mainWindow);
 	const char *menuActionText = obs_module_text("OBS MIDI Settings");
 	QAction *menuAction = (QAction *)obs_frontend_add_tools_menu_qaction(menuActionText);
 	QObject::connect(menuAction, SIGNAL(triggered()), plugin_window, SLOT(ToggleShowHide()));
@@ -72,11 +72,11 @@ bool obs_module_load(void)
 
 void obs_module_unload()
 {
-	
+
 	_eventsSystem.reset();
 	_deviceManager.reset();
 	_config.reset();
-	
+
 	blog(LOG_DEBUG, "goodbye!");
 }
 

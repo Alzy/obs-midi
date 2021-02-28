@@ -30,7 +30,7 @@ PluginWindow::PluginWindow(QWidget *parent) : QDialog(parent, Qt::Dialog), ui(ne
 {
 	ui->setupUi(this);
 
-	//Set Window Title
+	// Set Window Title
 	setup_actions();
 	set_title_window();
 	configure_table();
@@ -58,7 +58,7 @@ void PluginWindow::connect_ui_signals()
 	connect(ui->list_midi_dev, SIGNAL(currentTextChanged(QString)), this, SLOT(on_device_select(QString)));
 	connect(ui->check_enabled, SIGNAL(stateChanged(int)), this, SLOT(on_check_enabled_state_changed(int)));
 	connect(ui->bidirectional, SIGNAL(stateChanged(int)), this, SLOT(on_bid_enabled_state_changed(int)));
-	//Connections for Configure Tab
+	// Connections for Configure Tab
 	connect(ui->cb_obs_output_scene, SIGNAL(currentTextChanged(QString)), this, SLOT(get_sources(QString)));
 	connect(ui->cb_obs_output_action, SIGNAL(currentTextChanged(QString)), this, SLOT(obs_actions_select(QString)));
 	connect(ui->cb_obs_output_source, SIGNAL(currentTextChanged(QString)), this, SLOT(on_source_change(QString)));
@@ -181,7 +181,7 @@ void PluginWindow::on_device_select(const QString &curitem)
 				ui->outbox->setEnabled(false);
 				ui->bidirectional->setEnabled(false);
 			}
-			///HOOK up the Message Handler
+			/// HOOK up the Message Handler
 			ui->mapping_lbl_device_name->setText(curitem);
 		} catch (...) {
 		}
@@ -240,7 +240,7 @@ void PluginWindow::add_midi_device(const QString &name)
 	device_name->setText(name);
 	device_enabled->setCheckState(Qt::Unchecked);
 	device_status->setText(QString("Disconnected"));
-	//device_status->setForeground("grey");
+	// device_status->setForeground("grey");
 	feedback_name->setText("");
 	feedback_enabled->setCheckState(Qt::Unchecked);
 	feedback_status->setText(QString("unset"));
@@ -520,8 +520,7 @@ void PluginWindow::obs_actions_select(const QString &action)
 		}
 	}
 }
-void PluginWindow::set_edit_mode() {
-}
+void PluginWindow::set_edit_mode() {}
 void PluginWindow::save_edit() {}
 
 bool PluginWindow::map_exists()
@@ -732,11 +731,11 @@ void PluginWindow::edit_mapping()
 {
 	if (ui->table_mapping->rowCount() != 0) {
 		auto sitems = ui->table_mapping->selectedItems();
-		//rebuild midi
+		// rebuild midi
 		ui->sb_channel->setValue(sitems.at(0)->text().toInt());
 		ui->cb_mtype->setCurrentText(sitems.at(1)->text());
 		ui->sb_norc->setValue(sitems.at(2)->text().toInt());
-		//rebuild actions
+		// rebuild actions
 		ui->cb_obs_output_action->setCurrentText(sitems.at(3)->text());
 		ui->cb_obs_output_scene->setCurrentText(sitems.at(4)->text());
 		ui->cb_obs_output_source->setCurrentText(sitems.at(5)->text());

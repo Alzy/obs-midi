@@ -18,8 +18,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #pragma once
 
-
-
 #include <set>
 #include <vector>
 
@@ -41,9 +39,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "midi-agent.h"
 #include "obs-controller.h"
 
-
-class DeviceManager : public QObject
-{
+class DeviceManager : public QObject {
 	Q_OBJECT
 public:
 	DeviceManager();
@@ -51,7 +47,7 @@ public:
 
 	void Load(QString datastring);
 	void Unload();
-	
+
 	QStringList GetPortsList();
 	int GetPortNumberByDeviceName(const QString &deviceName);
 	QStringList GetOutPortsList();
@@ -66,6 +62,7 @@ public:
 	void reload();
 signals:
 	void reload_config();
+	void obsEvent(const RpcEvent &event);
 
 private:
 	QVector<MidiAgent *> midiAgents;

@@ -25,7 +25,7 @@ class PluginWindow : public QDialog {
 public:
 	explicit PluginWindow(QWidget *parent);
 	~PluginWindow() override;
-public  slots:
+public slots:
 	void ToggleShowHide();
 private slots:
 	void on_check_enabled_state_changed(int state);
@@ -73,5 +73,4 @@ private:
 
 private:
 	bool switching = false;
-
 };

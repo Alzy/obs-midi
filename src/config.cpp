@@ -30,10 +30,7 @@ Config::Config()
 	connect(GetDeviceManager().get(), SIGNAL(reload_config()), this, SLOT(Load()));
 }
 
-Config::~Config()
-{
-	
-}
+Config::~Config() {}
 
 /* Load the configuration from the OBS Config Store
  */

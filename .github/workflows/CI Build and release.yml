@@ -48,16 +48,6 @@ jobs:
           echo ::set-env name=OBS_GIT_BRANCH::$(git rev-parse --abbrev-ref HEAD)
           echo ::set-env name=OBS_GIT_HASH::$(git rev-parse --short HEAD)
           echo ::set-env name=OBS_GIT_TAG::$(git describe --tags --abbrev=0)
-      - name: 'Create SSL Key'
-        shell: bash
-        working-directory: ${{ github.workspace }}/obs-studio
-        run: |
-              openssl req \
-              -newkey rsa:2048 -nodes -keyout codesign.key \
-              -x509 -days 365 -out bundle.crt
-              # and put them in a local environment var with
-              export WINDOWS_CERT=$(bundle.crt)
-              export WINDOWS_KEY=$(codesign.key)
       - name: 'Checkout last OBS-Studio release (${{ env.OBS_GIT_TAG }})'
         shell: bash
         working-directory: ${{ github.workspace }}/obs-studio
@@ -156,12 +146,6 @@ jobs:
           cd package
           7z a "${{ env.WIN_FILENAME }}.zip"  "..\release\*"
           iscc ..\installer\installer.iss /O. /F"${{ env.WIN_FILENAME }}-Installer"
-      - name: Sign Windows Binary
-        uses: jonfriesen/windows-signer-action@v1.0.0
-        env:
-          NAME: "Christopher P Yarger"
-          DOMAIN: https://obs-midi.org
-          BINARY: ${{ github.workspace }}/obs-midi/package/*.exe
       - name: 'Publish ${{ env.WIN_FILENAME }}.zip'
         if: success()
         uses: actions/upload-artifact@v2-preview

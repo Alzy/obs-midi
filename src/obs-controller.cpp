@@ -373,6 +373,10 @@ void OBSController::ResumeRecording()
  */
 void OBSController::StartStopReplayBuffer()
 {
+	if (!Utils::ReplayBufferEnabled()) {
+		Utils::alert_popup("replay buffer disabled in settings");
+		return;
+	}
 	if (obs_frontend_replay_buffer_active()) {
 		obs_frontend_replay_buffer_stop();
 	} else {

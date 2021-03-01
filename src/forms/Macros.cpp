@@ -144,7 +144,6 @@ void Macros::hide_all_pairs()
 	hide_pair(Pairs::Integer);
 	hide_pair(Pairs::Boolean);
 }
-
 void Macros::slot_action_changed(const QString &action)
 {
 	hide_all_pairs();

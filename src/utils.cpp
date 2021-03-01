@@ -497,7 +497,8 @@ obs_data_t *Utils::GetTransitionData(obs_source_t *transition)
 	obs_data_set_string(transitionData, "to-scene", obs_source_get_name(destinationScene));
 	return transitionData;
 }
-QStringList Utils::get_transition_names() {
+QStringList Utils::get_transition_names()
+{
 	QStringList transitionslist;
 	OBSSourceAutoRelease currentTransition = obs_frontend_get_current_transition();
 	obs_frontend_source_list transitionList = {};
@@ -1048,7 +1049,8 @@ QString Utils::untranslate(const QString &tstring)
 {
 	return std::move(ActionsClass::action_to_string(AllActions_raw.at(TranslateActions().indexOf(tstring))));
 }
-QStringList Utils::get_browser_sources() {
+QStringList Utils::get_browser_sources()
+{
 
 	QStringList sourceNames;
 	obs_enum_sources(

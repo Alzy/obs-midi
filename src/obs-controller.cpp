@@ -484,12 +484,11 @@ void OBSController::SetBrowserSourceURL()
 }
 void OBSController::ReloadBrowserSource()
 {
-	obs_source_t* source = obs_get_source_by_name(hook->source.toUtf8());
+	OBSSourceAutoRelease source = obs_get_source_by_name(hook->source.toUtf8());
 	obs_properties_t *sourceProperties = obs_source_properties(source);
 	obs_property_t *property = obs_properties_get(sourceProperties, "refreshnocache");
 	obs_property_button_clicked(property, source); // This returns a boolean but we ignore it because the browser plugin always returns `false`.
 	obs_properties_destroy(sourceProperties);
-	obs_source_release(source);
 }
 void OBSController::TakeScreenshot()
 {

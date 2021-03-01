@@ -488,7 +488,6 @@ void PluginWindow::obs_actions_select(const QString &action)
 			show_pair(Pairs::Filter);
 			break;
 		case ActionsClass::Actions::Take_Source_Screenshot:
-			show_pair(Pairs::Source);
 			show_pair(Pairs::Scene);
 			break;
 		case ActionsClass::Actions::Play_Pause_Media:

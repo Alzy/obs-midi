@@ -497,6 +497,22 @@ obs_data_t *Utils::GetTransitionData(obs_source_t *transition)
 	obs_data_set_string(transitionData, "to-scene", obs_source_get_name(destinationScene));
 	return transitionData;
 }
+QStringList Utils::get_transition_names() {
+	QStringList transitionslist;
+	OBSSourceAutoRelease currentTransition = obs_frontend_get_current_transition();
+	obs_frontend_source_list transitionList = {};
+	obs_frontend_get_transitions(&transitionList);
+
+	OBSDataArrayAutoRelease transitions = obs_data_array_create();
+	for (size_t i = 0; i < transitionList.sources.num; i++) {
+		OBSSource transition = transitionList.sources.array[i];
+
+		transitionslist.append(obs_source_get_name(transition));
+	}
+	obs_frontend_source_list_free(&transitionList);
+
+	return transitionslist;
+}
 QString Utils::OBSVersionString()
 {
 	uint32_t version = obs_get_version();

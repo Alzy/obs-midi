@@ -163,6 +163,9 @@ OBSController::OBSController(MidiHook *incoming_hook, int incoming_midi_value)
 	case ActionsClass::Actions::Toggle_Source_Visibility:
 		this->ToggleSourceVisibility();
 		break;
+	case ActionsClass::Actions::Take_Screenshot:
+		this->TakeScreenshot();
+		break;
 	default:
 		blog(LOG_DEBUG, "Action %s Does not exist", incoming_hook->action.toStdString().c_str());
 		break;
@@ -404,6 +407,10 @@ void OBSController::StartReplayBuffer()
  */
 void OBSController::StopReplayBuffer()
 {
+	if (!Utils::ReplayBufferEnabled()) {
+		Utils::alert_popup("replay buffer disabled in settings");
+		return;
+	}
 	if (obs_frontend_replay_buffer_active()) {
 		obs_frontend_replay_buffer_stop();
 	}
@@ -415,6 +422,10 @@ void OBSController::StopReplayBuffer()
  */
 void OBSController::SaveReplayBuffer()
 {
+	if (!Utils::ReplayBufferEnabled()) {
+		Utils::alert_popup("replay buffer disabled in settings");
+		return;
+	}
 	if (!obs_frontend_replay_buffer_active()) {
 		Utils::alert_popup("replay buffer not active");
 		return;
@@ -453,7 +464,14 @@ void OBSController::ReloadBrowserSource()
 	obs_property_button_clicked(property, source); // This returns a boolean but we ignore it because the browser plugin always returns `false`.
 	obs_properties_destroy(sourceProperties);
 }
-void OBSController::TakeSourceScreenshot() {}
+void OBSController::TakeScreenshot()
+{
+	obs_frontend_take_screenshot();
+}
+	void OBSController::TakeSourceScreenshot() {
+	OBSSourceAutoRelease source = obs_get_source_by_name(hook->scene.toUtf8());
+	obs_frontend_take_source_screenshot(source);
+}
 void OBSController::EnableSourceFilter()
 {
 	OBSSourceAutoRelease source = obs_get_source_by_name(hook->source.toUtf8());

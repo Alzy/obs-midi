@@ -39,6 +39,7 @@ void Config::Load()
 	auto deviceManager = GetDeviceManager();
 	deviceManager->Load(GetConfigStore());
 	blog(LOG_DEBUG, "Config::Load");
+
 }
 
 /* Save the configuration to the OBS Config Store
@@ -48,6 +49,7 @@ void Config::Save()
 	blog(LOG_DEBUG, "Config save");
 	auto deviceManager = GetDeviceManager();
 	obs_data_t *newmidi = obs_data_create_from_json(deviceManager->GetData().toStdString().c_str());
+	obs_data_set_bool(newmidi, "debug_mode", DebugMode);
 	auto path = obs_module_config_path(get_file_name().toStdString().c_str());
 	obs_data_save_json_safe(newmidi, path, ".tmp", ".bkp");
 	bfree(path);
@@ -79,6 +81,7 @@ QString Config::GetConfigStore()
 	if (!os_file_exists(filepath)) {
 		obs_data_save_json_safe(midiConfig, filepath, ".tmp", ".bkp");
 	}
+	DebugMode= obs_data_get_bool(midiConfig, "debug_mode");
 	bfree(filepath);
 	QString conf(obs_data_get_json(midiConfig));
 	obs_data_release(midiConfig);

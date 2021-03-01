@@ -81,7 +81,7 @@
        <item row="0" column="0">
         <widget class="QSplitter" name="splitter_3">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -111,7 +111,7 @@
          </widget>
          <widget class="QListWidget" name="list_midi_dev">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -226,6 +226,19 @@
               </property>
              </widget>
             </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </widget>
@@ -1261,14 +1274,14 @@
        <item row="0" column="0" colspan="3">
         <widget class="QTableWidget" name="table_mapping">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
            <verstretch>3</verstretch>
           </sizepolicy>
          </property>
          <property name="minimumSize">
           <size>
-           <width>0</width>
+           <width>400</width>
            <height>200</height>
           </size>
          </property>
@@ -1276,7 +1289,7 @@
           <enum>Qt::ScrollBarAlwaysOn</enum>
          </property>
          <property name="sizeAdjustPolicy">
-          <enum>QAbstractScrollArea::AdjustToContentsOnFirstShow</enum>
+          <enum>QAbstractScrollArea::AdjustIgnored</enum>
          </property>
          <property name="editTriggers">
           <set>QAbstractItemView::NoEditTriggers</set>

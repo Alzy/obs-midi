@@ -166,6 +166,12 @@ OBSController::OBSController(MidiHook *incoming_hook, int incoming_midi_value)
 	case ActionsClass::Actions::Take_Screenshot:
 		this->TakeScreenshot();
 		break;
+	case ActionsClass::Actions::Disable_Preview:
+		this->DisablePreview();
+		break;
+	case ActionsClass::Actions::Enable_Preview:
+		this->EnablePreview();
+		break;
 	default:
 		blog(LOG_DEBUG, "Action %s Does not exist", incoming_hook->action.toStdString().c_str());
 		break;
@@ -195,6 +201,26 @@ void OBSController::SetPreviewScene()
 	}
 	OBSSourceAutoRelease source = obs_scene_get_source(scene);
 	obs_frontend_set_current_preview_scene(source);
+}
+void OBSController::DisablePreview()
+{
+	obs_queue_task(
+		OBS_TASK_UI,
+		[](void *param) {
+			if (obs_frontend_preview_enabled()) {
+				obs_frontend_set_preview_enabled(false);
+			}
+		},
+		nullptr, true);
+}
+void OBSController::EnablePreview()
+{
+	obs_queue_task(
+		OBS_TASK_UI,
+		[](void *param) {
+			obs_frontend_set_preview_enabled(true);
+		},
+		nullptr, true);
 }
 /**
  * Change the active scene collection.
@@ -468,7 +494,8 @@ void OBSController::TakeScreenshot()
 {
 	obs_frontend_take_screenshot();
 }
-	void OBSController::TakeSourceScreenshot() {
+void OBSController::TakeSourceScreenshot()
+{
 	OBSSourceAutoRelease source = obs_get_source_by_name(hook->scene.toUtf8());
 	obs_frontend_take_source_screenshot(source);
 }

@@ -53,6 +53,8 @@ private:
 	*/
 	void SetCurrentScene();
 	void SetPreviewScene();
+	void DisablePreview();
+	void EnablePreview();
 	void SetCurrentSceneCollection();
 	void ResetSceneItem();
 	void TransitionToProgram();

@@ -1054,12 +1054,12 @@ QStringList Utils::get_browser_sources() {
 	obs_enum_sources(
 		[](void *data, obs_source_t *source) {
 			QStringList *sn = static_cast<QStringList *>(data);
-			QString sourceId = obs_source_get_id(source);
-			if (sourceId != "browser_source" && sourceId != "linuxbrowser-source") {
-			
-			} else {
+			const char *id = obs_source_get_id(source);
+			QString sourceId(id);
+			if (sourceId == "browser_source" || sourceId == "linuxbrowser-source") {
 				sn->append(obs_source_get_name(source));
 			}
+			obs_source_release(source);
 			return true;
 		},
 		static_cast<void *>(&sourceNames));

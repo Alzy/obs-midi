@@ -223,6 +223,7 @@ QStringList get_source_names(const QString &scene);
 QStringList get_filter_names(const QString &Source);
 QStringList get_transition_names();
 QString untranslate(const QString &tstring);
+QStringList get_browser_sources();
 const QList<ActionsClass::Actions> AllActions_raw = {ActionsClass::Actions::Disable_Preview,
 						     ActionsClass::Actions::Disable_Source_Filter,
 						     ActionsClass::Actions::Do_Transition,

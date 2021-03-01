@@ -511,10 +511,15 @@ void PluginWindow::obs_actions_select(const QString &action)
 		case ActionsClass::Actions::Scrub_Media:
 			show_pair(Pairs::Media);
 			break;
-		case ActionsClass::Actions::Toggle_Source_Visibility: {
+		case ActionsClass::Actions::Toggle_Source_Visibility:
 			show_pair(Pairs::Scene);
 			show_pair(Pairs::Source);
-		} break;
+			break;
+		case ActionsClass::Actions::Reload_Browser_Source:
+			show_pair(Pairs::Source);
+			ui->cb_obs_output_source->clear();
+			ui->cb_obs_output_source->addItems(Utils::get_browser_sources());
+			break;
 		default:
 			hide_all_pairs();
 			break;

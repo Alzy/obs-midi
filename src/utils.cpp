@@ -1048,6 +1048,23 @@ QString Utils::untranslate(const QString &tstring)
 {
 	return std::move(ActionsClass::action_to_string(AllActions_raw.at(TranslateActions().indexOf(tstring))));
 }
+QStringList Utils::get_browser_sources() {
+
+	QStringList sourceNames;
+	obs_enum_sources(
+		[](void *data, obs_source_t *source) {
+			QStringList *sn = static_cast<QStringList *>(data);
+			QString sourceId = obs_source_get_id(source);
+			if (sourceId != "browser_source" && sourceId != "linuxbrowser-source") {
+			
+			} else {
+				sn->append(obs_source_get_name(source));
+			}
+			return true;
+		},
+		static_cast<void *>(&sourceNames));
+	return sourceNames;
+}
 QString mess;
 void Utils::alert_popup(const QString &message)
 {

@@ -350,7 +350,9 @@ QString Events::getRecordingTimecode()
 void Events::OnSceneChange()
 {
 	OBSSourceAutoRelease currentScene = obs_frontend_get_current_scene();
-	OBSDataArrayAutoRelease sceneItems = Utils::GetSceneItems(currentScene);
+	obs_data_t *idata = obs_data_create_from_json(Utils::GetSceneItems(currentScene).toStdString().c_str());
+	OBSDataArrayAutoRelease sceneItems = obs_data_get_array(idata, "array");
+	obs_data_release(idata);
 	obs_data_t *data = obs_data_create();
 	obs_data_set_string(data, "scene-name", obs_source_get_name(currentScene));
 	obs_data_set_array(data, "sources", sceneItems);
@@ -1478,7 +1480,9 @@ void Events::OnPreviewSceneChanged()
 		OBSSourceAutoRelease scene = obs_frontend_get_current_preview_scene();
 		if (!scene)
 			return;
-		OBSDataArrayAutoRelease sceneItems = Utils::GetSceneItems(scene);
+		obs_data_t *idata = obs_data_create_from_json(Utils::GetSceneItems(scene).toStdString().c_str());
+		OBSDataArrayAutoRelease sceneItems = obs_data_get_array(idata, "array");
+		obs_data_release(idata);
 		obs_data_t *data = obs_data_create();
 		obs_data_set_string(data, "scene-name", obs_source_get_name(scene));
 		obs_data_set_array(data, "sources", sceneItems);

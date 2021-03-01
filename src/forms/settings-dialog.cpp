@@ -283,7 +283,7 @@ void PluginWindow::show_pair(Pairs Pair)
 	case Pairs::Source:
 		ui->label_obs_output_source->show();
 		ui->cb_obs_output_source->show();
-		Utils::get_source_names(ui->cb_obs_output_scene->currentText());
+		ui->cb_obs_output_source->addItems(Utils::get_source_names(ui->cb_obs_output_scene->currentText()));
 		ui->w_source->show();
 		break;
 	case Pairs::Filter:

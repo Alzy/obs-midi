@@ -177,7 +177,7 @@ QStringList GetMediaSourceNames();
 QStringList GetAudioSourceNames();
 QString nsToTimestamp(uint64_t ns);
 obs_data_array_t *StringListToArray(char **strings, const char *key);
-obs_data_array_t *GetSceneItems(obs_source_t *source);
+QString GetSceneItems(obs_source_t *source);
 QStringList GetSceneItemsBySource(obs_source_t *source);
 obs_data_t *GetSceneItemData(obs_sceneitem_t *item);
 QString GetSourceArray();

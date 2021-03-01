@@ -216,11 +216,7 @@ void OBSController::DisablePreview()
 void OBSController::EnablePreview()
 {
 	obs_queue_task(
-		OBS_TASK_UI,
-		[](void *param) {
-			obs_frontend_set_preview_enabled(true);
-		},
-		nullptr, true);
+		OBS_TASK_UI, [](void *param) { obs_frontend_set_preview_enabled(true); }, nullptr, true);
 }
 /**
  * Change the active scene collection.

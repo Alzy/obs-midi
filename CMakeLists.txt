@@ -199,7 +199,7 @@ if(APPLE)
 	target_link_libraries(obs-midi "${OBS_FRONTEND_LIB}")
 endif()
 # -- End of section --
-if (DEFINED $ENV{isCI})
+if (COMMAND install_obs_plugin_with_data)
 install_obs_plugin_with_data(obs-midi data)
 endif()
 set_target_properties(obs-midi PROPERTIES FOLDER "plugins/obs-midi")

@@ -527,7 +527,7 @@ void PluginWindow::obs_actions_select(const QString &action)
 		case ActionsClass::Actions::Do_Transition:
 			show_pair(Pairs::Integer);
 			ui->label_Int_override->setText("Duration * ");
-			ui->sb_int_override->setValue(0);
+			ui->sb_int_override->setValue(300);
 			ui->sb_int_override->setMaximum(100000);
 			ui->sb_int_override->setMinimum(0);
 			ui->sb_int_override->setSuffix(" ms");

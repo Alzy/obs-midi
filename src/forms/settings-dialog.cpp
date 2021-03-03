@@ -323,6 +323,8 @@ void PluginWindow::show_pair(Pairs Pair)
 	case Pairs::Boolean:
 		break;
 	case Pairs::Integer:
+		ui->sb_int_override->show();
+		ui->label_Int_override->show();
 		break;
 	}
 }
@@ -383,6 +385,8 @@ void PluginWindow::hide_pair(Pairs Pair)
 	case Pairs::Boolean:
 		break;
 	case Pairs::Integer:
+		ui->sb_int_override->hide();
+		ui->label_Int_override->hide();
 		break;
 	}
 }
@@ -520,6 +524,13 @@ void PluginWindow::obs_actions_select(const QString &action)
 			ui->cb_obs_output_source->clear();
 			ui->cb_obs_output_source->addItems(Utils::get_browser_sources());
 			break;
+		case ActionsClass::Actions::Do_Transition:
+			show_pair(Pairs::Integer);
+			ui->label_Int_override->setText("* Duration(ms)");
+			ui->sb_int_override->setValue(0);
+			ui->sb_int_override->setMaximum(100000);
+			ui->sb_int_override->setMinimum(0);
+			break;
 		default:
 			hide_all_pairs();
 			break;
@@ -576,6 +587,8 @@ void PluginWindow::add_new_mapping()
 		QTableWidgetItem *itemitem = new QTableWidgetItem(ui->cb_obs_output_item->currentText());
 		QTableWidgetItem *audioitem = new QTableWidgetItem(ui->cb_obs_output_audio_source->currentText());
 		QTableWidgetItem *mediaitem = new QTableWidgetItem(ui->cb_obs_output_media_source->currentText());
+		QTableWidgetItem *int_override = new QTableWidgetItem(QString::number(ui->sb_int_override->value()));
+
 		set_cell_colors(midic, channelitem);
 		set_cell_colors(midic, mtypeitem);
 		set_cell_colors(midic, norcitem);
@@ -587,6 +600,7 @@ void PluginWindow::add_new_mapping()
 		set_cell_colors(actc, itemitem);
 		set_cell_colors(actc, audioitem);
 		set_cell_colors(actc, mediaitem);
+		set_cell_colors(actc, int_override);
 		ui->table_mapping->setItem(row, 0, channelitem);
 		ui->table_mapping->setItem(row, 1, mtypeitem);
 		ui->table_mapping->setItem(row, 2, norcitem);
@@ -598,6 +612,7 @@ void PluginWindow::add_new_mapping()
 		ui->table_mapping->setItem(row, 8, itemitem);
 		ui->table_mapping->setItem(row, 9, audioitem);
 		ui->table_mapping->setItem(row, 10, mediaitem);
+		ui->table_mapping->setItem(row, 11, int_override);
 		MidiHook *newmh = new MidiHook();
 		newmh->channel = ui->sb_channel->value();
 		newmh->message_type = ui->cb_mtype->currentText();
@@ -610,6 +625,7 @@ void PluginWindow::add_new_mapping()
 		newmh->item = ui->cb_obs_output_item->currentText();
 		newmh->audio_source = ui->cb_obs_output_audio_source->currentText();
 		newmh->media_source = ui->cb_obs_output_media_source->currentText();
+		newmh->int_override = ui->sb_int_override->value();
 		auto dm = GetDeviceManager();
 		auto dev = dm->GetMidiDeviceByName(ui->mapping_lbl_device_name->text());
 		dev->add_MidiHook(newmh);
@@ -659,6 +675,8 @@ void PluginWindow::add_row_from_hook(MidiHook *hook)
 	QTableWidgetItem *itemitem = new QTableWidgetItem(hook->item);
 	QTableWidgetItem *audioitem = new QTableWidgetItem(hook->audio_source);
 	QTableWidgetItem *mediaitem = new QTableWidgetItem(hook->media_source);
+	QTableWidgetItem *ioveritem = new QTableWidgetItem(QString::number(hook->int_override));
+
 	set_cell_colors(midic, channelitem);
 	set_cell_colors(midic, mtypeitem);
 	set_cell_colors(midic, norcitem);
@@ -670,6 +688,8 @@ void PluginWindow::add_row_from_hook(MidiHook *hook)
 	set_cell_colors(actc, itemitem);
 	set_cell_colors(actc, audioitem);
 	set_cell_colors(actc, mediaitem);
+	set_cell_colors(actc, ioveritem);
+
 	ui->table_mapping->setItem(row, 0, channelitem);
 	ui->table_mapping->setItem(row, 1, mtypeitem);
 	ui->table_mapping->setItem(row, 2, norcitem);
@@ -681,6 +701,8 @@ void PluginWindow::add_row_from_hook(MidiHook *hook)
 	ui->table_mapping->setItem(row, 8, itemitem);
 	ui->table_mapping->setItem(row, 9, audioitem);
 	ui->table_mapping->setItem(row, 10, mediaitem);
+	ui->table_mapping->setItem(row, 11, ioveritem);
+
 }
 void PluginWindow::set_cell_colors(const QColor &color, QTableWidgetItem *item)
 {

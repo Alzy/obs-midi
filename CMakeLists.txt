@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
 project(obs-midi VERSION 0.9.0)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}" external)
+set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
+
+include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/UI/obs-frontend-api")
 set(CMAKE_PREFIX_PATH "${QTDIR}")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
@@ -10,6 +14,7 @@ add_definitions(-DASIO_STANDALONE)
 if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
     set(CMAKE_CXX_FLAGS "-mfpu=neon")
 endif()
+include_directories(${CMAKE_PACKAGE_PREFIX})
 if (WIN32 OR APPLE)
 	include(external/FindLibObs.cmake)
 endif()
@@ -174,7 +179,9 @@ if(UNIX AND NOT APPLE)
 	OUTPUT_VARIABLE LSB_RELEASE_ID_SHORT
 	OUTPUT_STRIP_TRAILING_WHITESPACE
 	)
-	if(${LSB_RELEASE_ID_SHORT} STREQUAL "Ubuntu")
+	if(COMMAND install_obs_plugin_with_data)
+	message(STATUS "in tree mode")
+	elseif(${LSB_RELEASE_ID_SHORT} STREQUAL "Ubuntu")
 		install(TARGETS obs-midi LIBRARY
 			DESTINATION "/usr/lib/obs-plugins"
 			PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
@@ -194,7 +201,7 @@ if(APPLE)
 	target_link_libraries(obs-midi "${OBS_FRONTEND_LIB}")
 endif()
 # -- End of section --
-if (DEFINED $ENV{isCI})
+if (COMMAND install_obs_plugin_with_data)
 install_obs_plugin_with_data(obs-midi data)
 endif()
 set_target_properties(obs-midi PROPERTIES FOLDER "plugins/obs-midi")

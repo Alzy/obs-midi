@@ -106,7 +106,7 @@ QString Utils::GetSceneItems(obs_source_t *source)
 	obs_scene_enum_items(
 		scene,
 		[](obs_scene_t *scene, obs_sceneitem_t *currentItem, void *param) {
-			Pass *search = reinterpret_cast<Pass*>(param);
+			Pass *search = reinterpret_cast<Pass *>(param);
 			OBSDataAutoRelease itemData = GetSceneItemData(currentItem);
 			obs_data_array_insert(search->items, search->iterator, itemData);
 			UNUSED_PARAMETER(scene);
@@ -440,7 +440,6 @@ QString Utils::GetSourceArray()
 }
 QString Utils::GetSceneData(obs_source_t *source)
 {
-
 	obs_data_t *data = obs_data_create_from_json(GetSceneItems(source).toStdString().c_str());
 	obs_data_array_t *sceneItems = obs_data_get_array(data, "array");
 	obs_data_release(data);
@@ -1082,21 +1081,24 @@ QStringList Utils::get_browser_sources()
 		static_cast<void *>(&sourceNames));
 	return std::move(sourceNames);
 }
-QString mess;
 void Utils::alert_popup(const QString &message)
 {
-	mess = message;
+	struct Mess {
+		QString message;
+	};
+	Mess mess;
+	mess.message = message;
 
 	obs_queue_task(
 		OBS_TASK_UI,
 		[](void *param) {
+			Mess *message = reinterpret_cast<Mess *>(param);
 			QMessageBox msgBox;
-			msgBox.setText(mess);
+			msgBox.setText(message->message);
 			msgBox.exec();
-
 			UNUSED_PARAMETER(param);
 		},
-		nullptr, true);
+		&mess, true);
 }
 QStringList Utils::get_scene_names()
 {

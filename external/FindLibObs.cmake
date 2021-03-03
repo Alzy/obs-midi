@@ -53,7 +53,7 @@ function(find_obs_lib base_name repo_build_path lib_name)
 			${obsPath}
 			${_${base_name_u}_LIBRARY_DIRS}
 		PATHS
-			/usr/lib /usr/local/lib /opt/local/lib /sw/lib
+			/usr/lib /usr/local/lib /opt/local/lib /sw/lib 
 		PATH_SUFFIXES
 			lib${_lib_suffix} lib
 			libs${_lib_suffix} libs

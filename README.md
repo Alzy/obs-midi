@@ -44,7 +44,8 @@ sudo snap connect obs-studio:alsa
  * [RTMidi17](https://github.com/jcelerier/RtMidi17) An amazing modernized RTMIDI library
  * [OBSWebsocket](https://github.com/Palakis/obs-websocket/) from which much code was borrowed for interfacing with OBS
  * [Midi2OBS](https://github.com/lebaston100/MIDItoOBS) Where I got my start playing with this
-
+ * [Deleaker](https://www.deleaker.com/) Without which, finding memory leaks would have been near impossible. 
+ 
 # Build Instructions
 [Build instructions can be found here](build.md)
 

@@ -216,11 +216,7 @@ void OBSController::DisablePreview()
 void OBSController::EnablePreview()
 {
 	obs_queue_task(
-		OBS_TASK_UI,
-		[](void *param) {
-			obs_frontend_set_preview_enabled(true);
-		},
-		nullptr, true);
+		OBS_TASK_UI, [](void *param) { obs_frontend_set_preview_enabled(true); }, nullptr, true);
 }
 /**
  * Change the active scene collection.
@@ -258,9 +254,6 @@ void OBSController::ResetSceneItem()
  */
 void OBSController::TransitionToProgram()
 {
-	if (!obs_frontend_preview_program_mode_active()) {
-		blog(LOG_DEBUG, "studio mode not enabled");
-	}
 	if (hook->transition.isEmpty()) {
 		blog(LOG_DEBUG, "transition name can not be empty");
 	}
@@ -268,7 +261,9 @@ void OBSController::TransitionToProgram()
 	if (!success) {
 		blog(LOG_DEBUG, "specified transition doesn't exist");
 	}
-	obs_frontend_set_transition_duration(hook->duration);
+	if (hook->int_override > 0 ){
+		obs_frontend_set_transition_duration(hook->int_override);
+	}
 	obs_frontend_preview_program_trigger_transition();
 }
 /**

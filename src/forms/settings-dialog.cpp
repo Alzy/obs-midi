@@ -526,10 +526,13 @@ void PluginWindow::obs_actions_select(const QString &action)
 			break;
 		case ActionsClass::Actions::Do_Transition:
 			show_pair(Pairs::Integer);
-			ui->label_Int_override->setText("* Duration(ms)");
+			ui->label_Int_override->setText("Duration * ");
 			ui->sb_int_override->setValue(0);
 			ui->sb_int_override->setMaximum(100000);
 			ui->sb_int_override->setMinimum(0);
+			ui->sb_int_override->setSuffix(" ms");
+			ui->sb_int_override->setReadOnly(false);
+		
 			break;
 		default:
 			hide_all_pairs();

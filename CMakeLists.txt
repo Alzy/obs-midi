@@ -179,8 +179,8 @@ if(UNIX AND NOT APPLE)
 	OUTPUT_VARIABLE LSB_RELEASE_ID_SHORT
 	OUTPUT_STRIP_TRAILING_WHITESPACE
 	)
-	if(${CMAKE_INSTALL_PREFIX} STREQUAL "${HOME}/obs-studio-portable")
-	message(STATUS "in portable mode")
+	if(COMMAND install_obs_plugin_with_data)
+	message(STATUS "in tree mode")
 	elseif(${LSB_RELEASE_ID_SHORT} STREQUAL "Ubuntu")
 		install(TARGETS obs-midi LIBRARY
 			DESTINATION "/usr/lib/obs-plugins"

@@ -1058,11 +1058,11 @@ QStringList Utils::TranslateActions()
 }
 QString Utils::translate_action(ActionsClass::Actions action)
 {
-	return std::move(QString(obs_module_text(ActionsClass::action_to_string(action).toStdString().c_str())));
+	return QString(obs_module_text(ActionsClass::action_to_string(action).toStdString().c_str()));
 }
 QString Utils::untranslate(const QString &tstring)
 {
-	return std::move(ActionsClass::action_to_string(AllActions_raw.at(TranslateActions().indexOf(tstring))));
+	return ActionsClass::action_to_string(AllActions_raw.at(TranslateActions().indexOf(tstring)));
 }
 QStringList Utils::get_browser_sources()
 {

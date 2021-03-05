@@ -926,62 +926,62 @@ int Utils::get_midi_note_or_control(const rtmidi::message &mess)
 	case rtmidi::message_type::CONTROL_CHANGE:
 		bytetopullfrom = 1;
 		break;
-        case rtmidi::message_type::POLY_PRESSURE:
-            
-            break;
-        case rtmidi::message_type::PROGRAM_CHANGE:
-            
-            break;
-        case rtmidi::message_type::AFTERTOUCH:
-            
-            break;
-        case rtmidi::message_type::SYSTEM_EXCLUSIVE:
-            
-            break;
-        case rtmidi::message_type::TIME_CODE:
-            
-            break;
-        case rtmidi::message_type::SONG_POS_POINTER:
-            
-            break;
-        case rtmidi::message_type::SONG_SELECT:
-            
-            break;
-        case rtmidi::message_type::RESERVED1:
-            
-            break;
-        case rtmidi::message_type::RESERVED2:
-            
-            break;
-        case rtmidi::message_type::TUNE_REQUEST:
-            
-            break;
-        case rtmidi::message_type::EOX:
-            
-            break;
-        case rtmidi::message_type::TIME_CLOCK:
-            
-            break;
-        case rtmidi::message_type::RESERVED3:
-            break;
-        case rtmidi::message_type::START:
-            
-            break;
-        case rtmidi::message_type::CONTINUE:
-            
-            break;
-        case rtmidi::message_type::STOP:
-            
-            break;
-        case rtmidi::message_type::RESERVED4:
-            
-            break;
-        case rtmidi::message_type::ACTIVE_SENSING:
-            
-            break;
-        case rtmidi::message_type::SYSTEM_RESET:
-            
-            break;
+    case rtmidi::message_type::POLY_PRESSURE:
+        
+        break;
+    case rtmidi::message_type::PROGRAM_CHANGE:
+        
+        break;
+    case rtmidi::message_type::AFTERTOUCH:
+        
+        break;
+    case rtmidi::message_type::SYSTEM_EXCLUSIVE:
+        
+        break;
+    case rtmidi::message_type::TIME_CODE:
+        
+        break;
+    case rtmidi::message_type::SONG_POS_POINTER:
+        
+        break;
+    case rtmidi::message_type::SONG_SELECT:
+        
+        break;
+    case rtmidi::message_type::RESERVED1:
+        
+        break;
+    case rtmidi::message_type::RESERVED2:
+        
+        break;
+    case rtmidi::message_type::TUNE_REQUEST:
+        
+        break;
+    case rtmidi::message_type::EOX:
+        
+        break;
+    case rtmidi::message_type::TIME_CLOCK:
+        
+        break;
+    case rtmidi::message_type::RESERVED3:
+        break;
+    case rtmidi::message_type::START:
+        
+        break;
+    case rtmidi::message_type::CONTINUE:
+        
+        break;
+    case rtmidi::message_type::STOP:
+        
+        break;
+    case rtmidi::message_type::RESERVED4:
+        
+        break;
+    case rtmidi::message_type::ACTIVE_SENSING:
+        
+        break;
+    case rtmidi::message_type::SYSTEM_RESET:
+        
+        break;
     }
 	return mess[bytetopullfrom];
 }

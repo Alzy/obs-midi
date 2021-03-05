@@ -515,25 +515,25 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 			} else if (event.updateType() == QString("SwitchScenes")) {
 				message->message_type = "Note Off";
 				message->channel = hook->channel;
-				message->NORC = lastscenebtn;
+				message->NORC = state::previous_scene_norc;
 				message->value = 0;
 				this->send_message_to_midi_device((MidiMessage)*message);
 				message->NORC = hook->norc;
 				message->message_type = "Note On";
 				message->value = 1;
 				this->send_message_to_midi_device((MidiMessage)*message);
-				lastscenebtn = hook->norc;
+				state::previous_scene_norc = hook->norc;
 			} else if (event.updateType() == QString("PreviewSceneChanged")) {
 				message->message_type = "Note Off";
 				message->channel = hook->channel;
-				message->NORC = last_preview_scene_norc;
+				message->NORC = state::previous_preview_scene_norc;
 				message->value = 0;
 				this->send_message_to_midi_device((MidiMessage)*message);
 				message->NORC = hook->norc;
 				message->message_type = "Note On";
 				message->value = 1;
 				this->send_message_to_midi_device((MidiMessage)*message);
-				last_preview_scene_norc = hook->norc;
+				state::previous_preview_scene_norc = hook->norc;
 			} else if (event.updateType() == QString("SourceMuteStateChanged")) {
 				bool muted = obs_data_get_bool(event.additionalFields(), "muted");
 				if (muted) {

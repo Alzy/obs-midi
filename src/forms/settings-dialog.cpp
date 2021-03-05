@@ -22,6 +22,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #include <obs-module.h>
 
+#include "ui_settings-dialog.h"
 #include "settings-dialog.h"
 #include "../device-manager.h"
 #include "../config.h"
@@ -44,6 +45,7 @@ void PluginWindow::configure_table()
 {
 	ui->table_mapping->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
 	ui->table_mapping->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
+	ui->table_mapping->insertColumn(10);
 }
 void PluginWindow::set_title_window()
 {
@@ -325,6 +327,7 @@ void PluginWindow::show_pair(Pairs Pair)
 	case Pairs::Integer:
 		ui->sb_int_override->show();
 		ui->label_Int_override->show();
+		ui->check_int_override->show();
 		break;
 	}
 }
@@ -357,6 +360,7 @@ void PluginWindow::hide_pair(Pairs Pair)
 		ui->cb_obs_output_transition->hide();
 		ui->cb_obs_output_transition->clear();
 		ui->w_transition->hide();
+		ui->check_int_override->hide();
 		blog(LOG_DEBUG, "Hide Transition");
 		break;
 	case Pairs::Item:
@@ -526,6 +530,9 @@ void PluginWindow::obs_actions_select(const QString &action)
 			break;
 		case ActionsClass::Actions::Do_Transition:
 			show_pair(Pairs::Integer);
+			show_pair(Pairs::Transition);
+			ui->cb_obs_output_transition->insertItem(0, "Current Transition");
+			ui->cb_obs_output_transition->setCurrentIndex(0);
 			ui->label_Int_override->setText("Duration * ");
 			ui->sb_int_override->setValue(300);
 			ui->sb_int_override->setMaximum(100000);
@@ -628,7 +635,7 @@ void PluginWindow::add_new_mapping()
 		newmh->item = ui->cb_obs_output_item->currentText();
 		newmh->audio_source = ui->cb_obs_output_audio_source->currentText();
 		newmh->media_source = ui->cb_obs_output_media_source->currentText();
-		newmh->int_override = ui->sb_int_override->value();
+		(ui->check_int_override->isChecked()) ? newmh->int_override.emplace(ui->sb_int_override->value()): NULL;
 		auto dm = GetDeviceManager();
 		auto dev = dm->GetMidiDeviceByName(ui->mapping_lbl_device_name->text());
 		dev->add_MidiHook(newmh);
@@ -678,7 +685,7 @@ void PluginWindow::add_row_from_hook(MidiHook *hook)
 	QTableWidgetItem *itemitem = new QTableWidgetItem(hook->item);
 	QTableWidgetItem *audioitem = new QTableWidgetItem(hook->audio_source);
 	QTableWidgetItem *mediaitem = new QTableWidgetItem(hook->media_source);
-	QTableWidgetItem *ioveritem = new QTableWidgetItem(QString::number(hook->int_override));
+	QTableWidgetItem *ioveritem = (hook->int_override) ? new QTableWidgetItem(QString::number(*hook->int_override)) : new QTableWidgetItem();
 
 	set_cell_colors(midic, channelitem);
 	set_cell_colors(midic, mtypeitem);
@@ -761,7 +768,12 @@ void PluginWindow::delete_mapping()
 void PluginWindow::edit_mapping()
 {
 	if (ui->table_mapping->rowCount() != 0) {
+		auto dv = GetDeviceManager().get()->GetMidiHooksByDeviceName(ui->mapping_lbl_device_name->text());
+		blog(LOG_DEBUG, "hooknumners: name %s = %i",ui->mapping_lbl_device_name->text().toStdString().c_str(), dv.count());
 		auto sitems = ui->table_mapping->selectedItems();
+		int row = sitems.at(0)->row();
+		blog(LOG_DEBUG, "hookin row= %i",row);
+		
 		// rebuild midi
 		ui->sb_channel->setValue(sitems.at(0)->text().toInt());
 		ui->cb_mtype->setCurrentText(sitems.at(1)->text());
@@ -775,6 +787,9 @@ void PluginWindow::edit_mapping()
 		ui->cb_obs_output_item->setCurrentText(sitems.at(8)->text());
 		ui->cb_obs_output_audio_source->setCurrentText(sitems.at(9)->text());
 		ui->cb_obs_output_media_source->setCurrentText(sitems.at(10)->text());
+		bool check = (sitems.at(11)->text().toInt() > 0) ? true : false;
+		ui->check_int_override->setChecked(check);
+		ui->sb_int_override->setValue(sitems.at(11)->text().toInt());
 	}
 }
 bool PluginWindow::verify_mapping()

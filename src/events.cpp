@@ -212,6 +212,7 @@ void Events::FrontendEventHandler(enum obs_frontend_event event, void *private_d
     case OBS_FRONTEND_EVENT_REPLAY_BUFFER_SAVED:
         
         break;
+
 }
     }
 }
@@ -868,7 +869,15 @@ void Events::OnTransitionEnd(void *param, calldata_t *data)
 	if (!transition) {
 		return;
 	}
+	if (state()._TransitionWasCalled) {
+		obs_frontend_set_transition_duration(state()._CurrentTransitionDuration);
+		auto t =Utils::GetTransitionFromName(state()._CurrentTransition);
+		obs_frontend_set_current_transition(t);
+		obs_source_release(t);
+		state()._TransitionWasCalled = false;
+	}
 	obs_data_t *fields = Utils::GetTransitionData(transition);
+	blog(LOG_DEBUG, "transition %s ended - to scene %s", obs_data_get_string(fields, "name"), obs_data_get_string(fields, "to-scene"));
 	instance->broadcastUpdate("TransitionEnd", fields);
 	obs_data_release(fields);
 }

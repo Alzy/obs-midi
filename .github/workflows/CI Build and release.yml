@@ -369,7 +369,7 @@ jobs:
         if: success() &&  github.ref == 'refs/heads/release'
         shell: bash
         run: |
-          tap akeru-inc/tap
+          #tap akeru-inc/tap
           brew install akeru-inc/tap/xcnotary
 
 

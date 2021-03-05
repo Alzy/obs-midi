@@ -125,7 +125,7 @@ if(WIN32)
 		obs-frontend-api)
 	else()
 		target_link_libraries(obs-midi
-		"{$OBS_FRONTEND_LIB}")
+		"${OBS_FRONTEND_LIB}")
 	endif()
 
 	# --- Release package helper ---
@@ -183,7 +183,7 @@ if(UNIX AND NOT APPLE)
 		obs-frontend-api)
 	else()
 		target_link_libraries(obs-midi
-		"{$OBS_FRONTEND_LIB}")
+		"${OBS_FRONTEND_LIB}")
 	endif()
 	file(GLOB locale_files data/locale/*.ini)
         set(CMAKE_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
@@ -217,7 +217,7 @@ if(APPLE)
 		obs-frontend-api)
 	else()
 		target_link_libraries(obs-midi
-		"{$OBS_FRONTEND_LIB}")
+		"${OBS_FRONTEND_LIB}")
 	endif()
 endif()
 # -- End of section --

@@ -361,7 +361,13 @@ jobs:
         id: homebrew-cache
         with:
           path: |
-            /usr/local/Cellar/
+            /usr/local/Cellar/libsamplerate
+            /usr/local/Cellar/aften
+            /usr/local/Cellar/jack
+            /usr/local/Cellar/speexdsp
+            /usr/local/Cellar/fdk-aac
+            /usr/local/Cellar/xcnotary
+            
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.hbc }}
       - name: 'Install prerequisites (Homebrew)'
         if: steps.homebrew-cache.outputs.cache-hit != 'true'
@@ -371,10 +377,6 @@ jobs:
           brew install speexdsp
           brew install fdk-aac
           brew install akeru-inc/tap/xcnotary
-          echo "starting brew cleanup"
-          brew cleanup 
-          echo "starting brew scrub"
-          brew cleanup -s
       - name: 'Restore /tmp/obsdeps Cache'
         uses: actions/cache@v2
         env: 

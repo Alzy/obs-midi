@@ -363,6 +363,7 @@ jobs:
           brew install freetype
           brew install fdk-aac
           brew install swig
+          brew unlink swig
           brew install /Users/runner/work/obs-midi/obs-midi/obs-midi/CI/macos/qt.rb
           brew install /Users/runner/work/obs-midi/obs-midi/obs-midi/CI/macos/swig.rb
 

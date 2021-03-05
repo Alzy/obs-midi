@@ -200,25 +200,19 @@ void Events::FrontendEventHandler(enum obs_frontend_event event, void *private_d
 		owner->unhookTransitionPlaybackEvents();
 		owner->OnExit();
 		break;
-        case OBS_FRONTEND_EVENT_TRANSITION_STOPPED:
+    case OBS_FRONTEND_EVENT_TRANSITION_STOPPED:
             
-            break;
-        case OBS_FRONTEND_EVENT_SCENE_COLLECTION_CLEANUP:
-            
-            break;
-        case OBS_FRONTEND_EVENT_TRANSITION_DURATION_CHANGED:
-            
-            break;
-        case OBS_FRONTEND_EVENT_REPLAY_BUFFER_SAVED:
-            
-            break;
-        case OBS_FRONTEND_EVENT_VIRTUALCAM_STARTED:
-            
-            break;
-        case OBS_FRONTEND_EVENT_VIRTUALCAM_STOPPED:
-            
-            break;
-    }
+        break;
+    case OBS_FRONTEND_EVENT_SCENE_COLLECTION_CLEANUP:
+        
+        break;
+    case OBS_FRONTEND_EVENT_TRANSITION_DURATION_CHANGED:
+        
+        break;
+    case OBS_FRONTEND_EVENT_REPLAY_BUFFER_SAVED:
+        
+        break;
+}
     }
 }
 void Events::broadcastUpdate(const char *updateType, obs_data_t *additionalFields = nullptr)

@@ -385,8 +385,8 @@ jobs:
       - name: 'Install prerequisite: Pre-built OBS dependencies'
         shell: bash
         run: |
-          curl -L -O https://github.com/obsproject/obs-deps/releases/download/${{ env.MACOS_DEPS_VERSION }}/osx-deps-${{ env.MACOS_DEPS_VERSION }}.tar.gz
-          tar -xf ${{ github.workspace }}/osx-deps-${{ env.MACOS_DEPS_VERSION }}.tar.gz -C "/tmp"
+          curl -L -O https://github.com/obsproject/obs-deps/releases/download/${{ env.MACOS_DEPS_VERSION }}/macos-deps-${{ env.MACOS_DEPS_VERSION }}.tar.gz
+          tar -xf ${{ github.workspace }}/macos-deps-${{ env.MACOS_DEPS_VERSION }}.tar.gz -C "/tmp"
           curl -L -C - -O https://github.com/obsproject/obs-deps/releases/download/${{ env.MACOS_DEPS_VERSION }}/macos-qt-${{ env.QT_VERSION }}-${{ env.MACOS_DEPS_VERSION }}.tar.gz
           tar -xf ./macos-qt-${{ env.QT_VERSION }}-${{ env.MACOS_DEPS_VERSION }}.tar.gz -C /tmp
       - name: 'Configure OBS Studio'

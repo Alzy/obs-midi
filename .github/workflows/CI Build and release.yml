@@ -72,7 +72,7 @@ jobs:
         shell: bash
         working-directory: ${{ github.workspace }}/obs-midi
         run: |
-          git fetch --prune --unshallow
+          git fetch --prune
           echo ::set-env name=GIT_BRANCH::${{ github.event.pull_request.head.ref }}
           echo ::set-env name=GIT_HASH::$(git rev-parse --short HEAD)
           echo ::set-env name=GIT_TAG::$(git describe --tags --abbrev=0)
@@ -356,6 +356,7 @@ jobs:
         shell: bash
         working-directory: ${{ github.workspace }}/obs-studio
         run: |
+          git fetch --prune
           echo ::set-env name=OBS_GIT_BRANCH::$(git rev-parse --abbrev-ref HEAD)
           echo ::set-env name=OBS_GIT_HASH::$(git rev-parse --short HEAD)
           echo ::set-env name=OBS_GIT_TAG::$(git describe --tags --abbrev=0)

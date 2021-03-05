@@ -350,7 +350,7 @@ jobs:
         id: macos-obs-studio
         with:
           path: |
-            ${{ github.workspace }}/obs-studio
+               ${{ github.workspace }}/obs-studio
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.OBS_GIT_TAG }}
       - name: 'Checkout OBS'
         if: steps.macos-obs-studio.outputs.cache-hit != 'true'
@@ -410,23 +410,23 @@ jobs:
           brew install speexdsp
           brew install fdk-aac
           brew install akeru-inc/tap/xcnotary
+          chmod 777 /tmp/obsdeps
       - name: 'Restore /tmp/obsdeps Cache'
         uses: actions/cache@v2
         env: 
           CACHE_NAME: 'macos-obs-deps-cache'
         id: macos-deps
         with:
-          path: |
-            /tmp/obsdeps
+          path: /tmp/obsdeps
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.MACOS_DEPS_VERSION }}-qt-${{ env.QT_VERSION }}
       - name: 'Install prerequisite: Pre-built OBS dependencies'
         if: steps.macos-deps.outputs.cache-hit != 'true'
         shell: bash
         run: |
           curl -L -O https://github.com/obsproject/obs-deps/releases/download/${{ env.MACOS_DEPS_VERSION }}/macos-deps-${{ env.MACOS_DEPS_VERSION }}.tar.gz
-          tar -xf ${{ github.workspace }}/macos-deps-${{ env.MACOS_DEPS_VERSION }}.tar.gz -C ${{ github.workspace }}/
+          tar -xf ${{ github.workspace }}/macos-deps-${{ env.MACOS_DEPS_VERSION }}.tar.gz -C /tmp
           curl -L -C - -O https://github.com/obsproject/obs-deps/releases/download/${{ env.MACOS_DEPS_VERSION }}/macos-qt-${{ env.QT_VERSION }}-${{ env.MACOS_DEPS_VERSION }}.tar.gz
-          tar -xf ./macos-qt-${{ env.QT_VERSION }}-${{ env.MACOS_DEPS_VERSION }}.tar.gz -C ${{ github.workspace }}/
+          tar -xf ./macos-qt-${{ env.QT_VERSION }}-${{ env.MACOS_DEPS_VERSION }}.tar.gz -C /tmp
       - name: 'Configure OBS Studio'
         shell: bash
         working-directory: ${{ github.workspace }}/obs-studio

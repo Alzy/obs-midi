@@ -316,10 +316,10 @@ jobs:
     name: "macOS 64-bit"
     runs-on: [macos-latest]
     env:
-      MACOS_DEPS_VERSION: '2020-04-18'
-      QT_VERSION: '5.14.1'
+      MACOS_DEPS_VERSION: '2021-02-28'
+      QT_VERSION: '5.15.2'
       isCI: true
-      hbc: '1'
+      hbc: '2'
     if: contains(github.event.head_commit.message, '[skip ci]') != true
     steps:
       - name: 'Checkout'
@@ -373,7 +373,6 @@ jobs:
           brew install fdk-aac
           brew install swig
           brew unlink swig
-          brew install /Users/runner/work/obs-midi/obs-midi/obs-midi/CI/macos/qt.rb
           brew install /Users/runner/work/obs-midi/obs-midi/obs-midi/CI/macos/swig.rb
 
       - name: 'install Notary package only if in release mode'
@@ -388,13 +387,15 @@ jobs:
         run: |
           curl -L -O https://github.com/obsproject/obs-deps/releases/download/${{ env.MACOS_DEPS_VERSION }}/osx-deps-${{ env.MACOS_DEPS_VERSION }}.tar.gz
           tar -xf ${{ github.workspace }}/osx-deps-${{ env.MACOS_DEPS_VERSION }}.tar.gz -C "/tmp"
+          curl -L -C - -O https://github.com/obsproject/obs-deps/releases/download/${{ env.MACOS_DEPS_VERSION }}/macos-qt-${{ env.QT_VERSION }}-${{ env.MACOS_DEPS_VERSION }}.tar.gz
+          tar -xf ./macos-qt-${{ env.QT_VERSION }}-${{ env.MACOS_DEPS_VERSION }}.tar.gz -C /tmp
       - name: 'Configure OBS Studio'
         shell: bash
         working-directory: ${{ github.workspace }}/obs-studio
         run: |
           mkdir build
           cd build
-          cmake -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11 -DENABLE_SCRIPTING=NO -DDepsPath=/tmp/obsdeps -DCMAKE_PREFIX_PATH=/usr/local/Cellar/qt/${{ env.QT_VERSION }}/lib/cmake ..
+          cmake -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11 -DENABLE_SCRIPTING=NO -DDepsPath=/tmp/obsdeps -DQTDIR=/tmp/obsdeps ..
       - name: 'Build OBS Studio libraries'
         working-directory: ${{ github.workspace }}/obs-studio
         shell: bash
@@ -408,7 +409,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -DQTDIR=/usr/local/Cellar/qt/${{ env.QT_VERSION }} -DLIBOBS_INCLUDE_DIR=${{ github.workspace }}/obs-studio/libobs -DLIBOBS_LIB=${{ github.workspace }}/obs-studio/libobs -DOBS_FRONTEND_LIB="${{ github.workspace }}/obs-studio/build/UI/obs-frontend-api/libobs-frontend-api.dylib" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr ..
+          cmake -DQTDIR=/tmp/obsdeps -DLIBOBS_INCLUDE_DIR=${{ github.workspace }}/obs-studio/libobs -DLIBOBS_LIB=${{ github.workspace }}/obs-studio/libobs -DOBS_FRONTEND_LIB="${{ github.workspace }}/obs-studio/build/UI/obs-frontend-api/libobs-frontend-api.dylib" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr ..
       - name: 'Build obs-midi'
         working-directory: ${{ github.workspace }}/obs-midi
         shell: bash

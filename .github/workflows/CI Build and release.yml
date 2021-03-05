@@ -353,6 +353,14 @@ jobs:
           echo ::set-env name=GIT_BRANCH::${{ github.event.pull_request.head.ref }}
           echo ::set-env name=GIT_HASH::$(git rev-parse --short HEAD)
           echo ::set-env name=GIT_TAG::$(git describe --tags --abbrev=0)
+      - name: 'Restore Homebrew Cellar Cache'
+        uses: actions/cache@v2
+        env: 
+          CACHE_NAME: 'obs-homebrew-cache'
+        id: homebrew-cache
+        with:
+          path: /usr/local/Cellar/
+          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.hbc }}
       - name: 'Install prerequisites (Homebrew)'
         if: steps.homebrew-cache.outputs.cache-hit != 'true'
         shell: bash

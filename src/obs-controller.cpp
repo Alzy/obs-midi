@@ -293,7 +293,13 @@ void OBSController::SetTransitionDuration()
 void OBSController::SetSourceVisibility()
 {
 	obs_sceneitem_set_visible(Utils::GetSceneItemFromName(Utils::GetSceneFromNameOrCurrent(hook->scene), hook->source), midi_value);
-} // DOESNT EXIST
+}
+/**
+*
+* Toggles the source's visibility
+* seems to stop audio from playing as well
+* 
+*/
 void OBSController::ToggleSourceVisibility()
 {
 	auto scene = Utils::GetSceneItemFromName(Utils::GetSceneFromNameOrCurrent(hook->scene), hook->source);
@@ -302,7 +308,7 @@ void OBSController::ToggleSourceVisibility()
 	} else {
 		obs_sceneitem_set_visible(scene, true);
 	}
-} // DOESNT EXIST
+} 
 /**
  * Inverts the mute status of a specified source.
  */

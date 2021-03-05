@@ -432,7 +432,7 @@ jobs:
         working-directory: ${{ github.workspace }}/obs-studio
         run: |
           
-          mkdir build
+          [ -d build ] ||mkdir build
           cd build
           rm -rf ./*
           cmake -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DENABLE_SCRIPTING=NO -DDepsPath=${{ github.workspace }}/obsdeps -DQTDIR=${{ github.workspace }}/obsdeps ..

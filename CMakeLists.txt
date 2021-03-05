@@ -3,7 +3,6 @@ project(obs-midi VERSION 0.9.0)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}" external)
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 
-include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/UI/obs-frontend-api")
 set(CMAKE_PREFIX_PATH "${QTDIR}")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
@@ -11,9 +10,18 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DASIO_STANDALONE)
+
 if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
     set(CMAKE_CXX_FLAGS "-mfpu=neon")
 endif()
+##################
+# THE GOOD STUFF #
+##################
+# RTMIDI
+add_subdirectory(src/RtMidi17)
+set(obs-midi_DEPS RtMidi17)
+include_directories(src/RtMidi17)
+include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/UI/obs-frontend-api")
 include_directories(${CMAKE_PACKAGE_PREFIX})
 
 if (((WIN32) AND (NOT COMMAND install_obs_plugin_with_data)) OR APPLE)
@@ -42,13 +50,7 @@ configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/include/version.h.in
   ${CMAKE_CURRENT_SOURCE_DIR}/src/version.h
 )
-##################
-# THE GOOD STUFF #
-##################
-# RTMIDI
-add_subdirectory(src/RtMidi17)
-set(obs-midi_DEPS RtMidi17)
-include_directories(src/RtMidi17)
+
 include_directories(
 	"${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api"
         SYSTEM
@@ -66,6 +68,7 @@ set(obs-midi_SOURCES
 	src/events.cpp
 	src/rpc/RpcEvent.cpp
 	src/forms/Macros.cpp)
+
 list(APPEND obs-midi_HEADERS
 	src/utils.h
 	src/config.h
@@ -77,6 +80,7 @@ list(APPEND obs-midi_HEADERS
 	src/events.h
 	src/rpc/RpcEvent.h
 	src/forms/Macros.h)
+
 add_library(obs-midi MODULE
 	${obs-midi_SOURCES}
 	${obs-midi_HEADERS})

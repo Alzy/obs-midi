@@ -259,21 +259,24 @@ void OBSController::ResetSceneItem()
  * transitionDuration is optional. (milliseconds)
  */
 void OBSController::TransitionToProgram()
-{
-	int currentDuration = obs_frontend_get_transition_duration();
+{	
+	state()._CurrentTransitionDuration=obs_frontend_get_transition_duration();
 	obs_source_t *transition = obs_frontend_get_current_transition();
 	/**
 	 * If Transition from hook is not Current Transition, and if it is not an empty Value, then set current transition
 	 */
 	if ((hook->transition != "Current Transition")) {
 		Utils::SetTransitionByName(hook->transition);
+		state()._TransitionWasCalled=true;
 	}
-	if (hook->int_override) {
+	if (hook->int_override && *hook->int_override >0) {
 		obs_frontend_set_transition_duration(*hook->int_override);
+		state()._TransitionWasCalled=true;
 	}
 	obs_frontend_preview_program_trigger_transition();
-	obs_frontend_set_current_transition(transition);
-	obs_frontend_set_transition_duration(currentDuration);
+	
+	state()._CurrentTransition=QString(obs_source_get_name(transition));
+	
 	obs_source_release(transition);
 }
 /**

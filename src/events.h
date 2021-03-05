@@ -72,6 +72,7 @@ public:
 	void OnBroadcastCustomMessage(const QString &realm, obs_data_t *data);
 
 	bool HeartbeatIsActive;
+
 signals:
 	void obsEvent(const RpcEvent &event);
 

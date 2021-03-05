@@ -94,7 +94,7 @@ if(LINUX)
 		Qt5::Core
 		Qt5::Widgets
 		libobs.so)
-elseif(NOT COMMAND install_obs_plugin_with_data)
+elseif(NOT DEFINED OBS_FRONTEND_LIB)
 	target_link_libraries(obs-midi
 		obs-frontend-api
 		${obs-midi_DEPS}
@@ -127,7 +127,7 @@ if(WIN32)
 	include_directories(
 		"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/UI"
 	)
-	if (COMMAND install_obs_plugin_with_data)
+	if(NOT DEFINED OBS_FRONTEND_LIB)
 		target_link_libraries(obs-midi
 		obs-frontend-api)
 	else()
@@ -214,7 +214,7 @@ if(APPLE)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -fvisibility=default")
 	set(CMAKE_SKIP_RPATH TRUE)
 	set_target_properties(obs-midi PROPERTIES PREFIX "")
-	if (COMMAND install_obs_plugin_with_data)
+	if(NOT DEFINED OBS_FRONTEND_LIB)
 		target_link_libraries(obs-midi
 		obs-frontend-api)
 	else()

@@ -507,7 +507,7 @@ jobs:
         shell: bash
         run: |
           set -e
-          brew install akeru-inc/tap/xcnotary
+          brew link xcnotary
 
           xcrun altool  --store-password-in-keychain-item "AC_PASSWORD" -u "${{ secrets.MACOS_IDENT_USER }}" -p "${{ secrets.MACOS_AC_PASS  }}"
           echo "xcnotary precheck"

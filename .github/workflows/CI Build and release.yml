@@ -428,13 +428,12 @@ jobs:
           curl -L -C - -O https://github.com/obsproject/obs-deps/releases/download/${{ env.MACOS_DEPS_VERSION }}/macos-qt-${{ env.QT_VERSION }}-${{ env.MACOS_DEPS_VERSION }}.tar.gz
           tar -xf ./macos-qt-${{ env.QT_VERSION }}-${{ env.MACOS_DEPS_VERSION }}.tar.gz -C ${{ github.workspace }}/
       - name: 'Configure OBS Studio'
-        if: steps.macos-obs-studio.outputs.cache-hit != 'true'
         shell: bash
         working-directory: ${{ github.workspace }}/obs-studio
         run: |
           mkdir build
           cd build
-          cmake -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11 -DENABLE_SCRIPTING=NO -DDepsPath=${{ github.workspace }}/obsdeps -DQTDIR=${{ github.workspace }}/obsdeps ..
+          cmake -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DENABLE_SCRIPTING=NO -DDepsPath=${{ github.workspace }}/obsdeps -DQTDIR=${{ github.workspace }}/obsdeps ..
       - name: 'Build OBS Studio libraries'
         if: steps.macos-obs-studio.outputs.cache-hit != 'true'
         working-directory: ${{ github.workspace }}/obs-studio
@@ -442,7 +441,7 @@ jobs:
         run: |
           set -e
           cd ./build
-          make -j4 libobs obs-frontend-api
+          make -j12 libobs obs-frontend-api
       - name: 'Configure obs-midi'
         working-directory: ${{ github.workspace }}/obs-midi
         shell: bash
@@ -456,7 +455,7 @@ jobs:
         run: |
           set -e
           cd ./build
-          make -j4
+          make -j12
       - name: 'Install prerequisite: Packages app'
         if: success()
         shell: bash

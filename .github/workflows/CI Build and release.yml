@@ -356,16 +356,23 @@ jobs:
       - name: 'Install prerequisites (Homebrew)'
         shell: bash
         run: |
-          tap akeru-inc/tap
           brew install jack
           brew install speexdsp
           brew install cmake
           brew install freetype
           brew install fdk-aac
           brew install swig, link: false
+          brew install /Users/runner/work/obs-midi/obs-midi/obs-midi/CI/macos/qt.rb
+          brew install /Users/runner/work/obs-midi/obs-midi/obs-midi/CI/macos/swig.rb
+
+      - name: 'install Notary package only if in release mode'
+        if: success() &&  github.ref == 'refs/heads/release'
+        shell: bash
+        run: |
+          tap akeru-inc/tap
           brew install akeru-inc/tap/xcnotary
-          brew /Users/runner/work/obs-midi/obs-midi/obs-midi/CI/macos/qt.rb
-          brew /Users/runner/work/obs-midi/obs-midi/obs-midi/CI/macos/swig.rb
+
+
       - name: 'Install prerequisite: Pre-built OBS dependencies'
         shell: bash
         run: |

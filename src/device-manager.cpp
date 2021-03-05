@@ -15,7 +15,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "forms/settings-dialog.h"
 DeviceManager::DeviceManager()
 {
-	this->setParent(plugin_window);
 }
 DeviceManager::~DeviceManager()
 {
@@ -60,7 +59,7 @@ QStringList DeviceManager::GetPortsList()
 	for (unsigned int i = 0; i < portCount; ++i) {
 		ports.append(QString::fromStdString(rtmidi::midi_in().get_port_name(i)));
 	}
-	return std::move(ports);
+	return ports;
 }
 /*
  * Returns QStringList of Output  Port Names
@@ -72,7 +71,7 @@ QStringList DeviceManager::GetOutPortsList()
 	for (unsigned int i = 0; i < portCount; ++i) {
 		outports.append(QString::fromStdString(rtmidi::midi_out().get_port_name(i)));
 	}
-	return std::move(outports);
+	return outports;
 }
 /*
  * Returns the port number of the specified device.
@@ -127,7 +126,7 @@ QVector<MidiHook *> DeviceManager::GetMidiHooksByDeviceName(const QString &devic
 	if (deviceName != QString("No Devices Available")) {
 		auto device = GetMidiDeviceByName(deviceName);
 		if (device != nullptr) {
-			return std::move(device->GetMidiHooks());
+			return device->GetMidiHooks();
 		} else {
 			return {};
 		}
@@ -161,7 +160,7 @@ QString DeviceManager::GetData()
 	QString rdata(obs_data_get_json(return_data));
 	obs_data_array_release(data);
 	obs_data_release(return_data);
-	return std::move(rdata);
+	return rdata;
 }
 /**
  * Reload configuration -- for use with switching scene collecitons or profiles

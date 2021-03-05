@@ -50,7 +50,8 @@ class Events : public QObject
 public:
 	explicit Events(DeviceManagerPtr srv);
 	~Events() override;
-
+    void startup();
+    void shutdown();
 	void connectSourceSignals(obs_source_t *source);
 	void disconnectSourceSignals(obs_source_t *source);
 
@@ -81,16 +82,16 @@ private slots:
 
 private:
 	DeviceManagerPtr _srv;
+    uint64_t _streamStarttime;
+
+    uint64_t _lastBytesSent;
+    uint64_t _lastBytesSentTime;
 	QTimer streamStatusTimer;
 	QTimer heartbeatTimer;
-	os_cpu_usage_info_t *cpuUsageInfo;
 
 	bool pulse;
 
-	uint64_t _streamStarttime;
-
-	uint64_t _lastBytesSent;
-	uint64_t _lastBytesSentTime;
+    bool started=false;
 
 	void broadcastUpdate(const char *updateType, obs_data_t *additionalFields);
 

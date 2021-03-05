@@ -342,7 +342,157 @@ MidiHook *MidiAgent::get_midi_hook_if_exists(const RpcEvent &event)
 			found = ((event.updateType() == "StreamStarted") || (event.updateType() == "StreamStopped") ||
 				 (event.updateType() == "StreamStopping"));
 			break;
-		}
+            case ActionsClass::Actions::Disable_Preview:
+                
+                break;
+            case ActionsClass::Actions::Disable_Source_Filter:
+                
+                break;
+            case ActionsClass::Actions::Do_Transition:
+                
+                break;
+            case ActionsClass::Actions::Enable_Preview:
+                
+                break;
+            case ActionsClass::Actions::Enable_Source_Filter:
+                
+                break;
+            case ActionsClass::Actions::Move_T_Bar:
+                
+                break;
+            case ActionsClass::Actions::Next_Media:
+                
+                break;
+            case ActionsClass::Actions::Pause_Recording:
+                
+                break;
+            case ActionsClass::Actions::Play_Pause_Media:
+                
+                break;
+            case ActionsClass::Actions::Previous_Media:
+                
+                break;
+            case ActionsClass::Actions::Reload_Browser_Source:
+                
+                break;
+            case ActionsClass::Actions::Reset_Scene_Item:
+                
+                break;
+            case ActionsClass::Actions::Reset_Stats:
+                
+                break;
+            case ActionsClass::Actions::Restart_Media:
+                
+                break;
+            case ActionsClass::Actions::Resume_Recording:
+                
+                break;
+            case ActionsClass::Actions::Save_Replay_Buffer:
+                
+                break;
+            case ActionsClass::Actions::Scrub_Media:
+                
+                break;
+            case ActionsClass::Actions::Set_Audio_Monitor_Type:
+                
+                break;
+            case ActionsClass::Actions::Set_Browser_Source_URL:
+                
+                break;
+            case ActionsClass::Actions::Set_Current_Profile:
+                
+                break;
+            case ActionsClass::Actions::Set_Current_Scene_Collection:
+                
+                break;
+            case ActionsClass::Actions::Set_Current_Transition:
+                
+                break;
+            case ActionsClass::Actions::Set_Gain_Filter:
+                
+                break;
+            case ActionsClass::Actions::Set_Media_Time:
+                
+                break;
+            case ActionsClass::Actions::Set_Mute:
+                
+                break;
+            case ActionsClass::Actions::Set_Opacity:
+                
+                break;
+            case ActionsClass::Actions::Set_Scene_Item_Crop:
+                
+                break;
+            case ActionsClass::Actions::Set_Scene_Item_Position:
+                
+                break;
+            case ActionsClass::Actions::Set_Scene_Item_Render:
+                
+                break;
+            case ActionsClass::Actions::Set_Scene_Item_Transform:
+                
+                break;
+            case ActionsClass::Actions::Set_Scene_Transition_Override:
+                
+                break;
+            case ActionsClass::Actions::Set_Source_Filter_Visibility:
+                
+                break;
+            case ActionsClass::Actions::Set_Source_Name:
+                
+                break;
+            case ActionsClass::Actions::Set_Source_Position:
+                
+                break;
+            case ActionsClass::Actions::Set_Source_Rotation:
+                
+                break;
+            case ActionsClass::Actions::Set_Source_Scale:
+                
+                break;
+            case ActionsClass::Actions::Set_Source_Settings:
+                
+                break;
+            case ActionsClass::Actions::Set_Sync_Offset:
+                
+                break;
+            case ActionsClass::Actions::Set_Text_GDIPlus_Text:
+                
+                break;
+            case ActionsClass::Actions::Set_Transition_Duration:
+                
+                break;
+            case ActionsClass::Actions::Start_Replay_Buffer:
+                
+                break;
+            case ActionsClass::Actions::Stop_Media:
+                
+                break;
+            case ActionsClass::Actions::Stop_Replay_Buffer:
+                
+                break;
+            case ActionsClass::Actions::Studio_Mode:
+                
+                break;
+            case ActionsClass::Actions::Take_Screenshot:
+                
+                break;
+            case ActionsClass::Actions::Take_Source_Screenshot:
+                
+                break;
+            case ActionsClass::Actions::Toggle_Source_Filter:
+                
+                break;
+            case ActionsClass::Actions::Toggle_Source_Visibility:
+                
+                break;
+            case ActionsClass::Actions::Toggle_Start_Stop_Replay_Buffer:
+                
+                break;
+            case ActionsClass::Actions::Unpause_Recording:
+                
+                break;
+        }
 		if (found)
 			return midiHooks.at(i);
 	}

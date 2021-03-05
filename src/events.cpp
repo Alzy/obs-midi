@@ -58,44 +58,47 @@ const char *calldata_get_string(const calldata_t *data, const char *name)
 	return value;
 }
 Events::Events(DeviceManagerPtr srv)
-	: _srv(std::move(srv)), _streamStarttime(0), _lastBytesSent(0), _lastBytesSentTime(0), HeartbeatIsActive(false), pulse(false)
+	: _srv(srv), _streamStarttime(0), _lastBytesSent(0), _lastBytesSentTime(0), HeartbeatIsActive(false), pulse(false)
 {
-	this->setParent(GetDeviceManager().get());
+	this->setParent(plugin_window);
 	//_srv = GetDeviceManager();
-	cpuUsageInfo = os_cpu_usage_info_start();
-	obs_frontend_add_event_callback(Events::FrontendEventHandler, this);
-	// Connect to signals of all existing sources
-	obs_enum_sources(
-		[](void *param, obs_source_t *source) {
-			auto self = reinterpret_cast<Events *>(param);
-			self->connectSourceSignals(source);
-			return true;
-		},
-		this);
-	signal_handler_t *coreSignalHandler = obs_get_signal_handler();
-	if (coreSignalHandler) {
-		signal_handler_connect(coreSignalHandler, "source_create", OnSourceCreate, this);
-		signal_handler_connect(coreSignalHandler, "source_destroy", OnSourceDestroy, this);
-	}
-	connect(this, &Events::obsEvent, _srv.get(), &DeviceManager::obsEvent);
+    obs_frontend_add_event_callback(Events::FrontendEventHandler, this);
+
 }
 Events::~Events()
 {
-	signal_handler_t *coreSignalHandler = obs_get_signal_handler();
-	if (coreSignalHandler) {
-		signal_handler_disconnect(coreSignalHandler, "source_destroy", OnSourceDestroy, this);
-		signal_handler_disconnect(coreSignalHandler, "source_create", OnSourceCreate, this);
-	}
-	// Disconnect from signals of all existing sources
-	obs_enum_sources(
-		[](void *param, obs_source_t *source) {
-			auto self = reinterpret_cast<Events *>(param);
-			self->disconnectSourceSignals(source);
-			return true;
-		},
-		this);
-	obs_frontend_remove_event_callback(Events::FrontendEventHandler, this);
-	os_cpu_usage_info_destroy(cpuUsageInfo);
+}
+void Events::startup(){
+    // Connect to signals of all existing sources
+    obs_enum_sources(
+        [](void *param, obs_source_t *source) {
+            auto self = reinterpret_cast<Events *>(param);
+            self->connectSourceSignals(source);
+            return true;
+        },
+        this);
+    signal_handler_t *coreSignalHandler = obs_get_signal_handler();
+    if (coreSignalHandler) {
+        signal_handler_connect(coreSignalHandler, "source_create", OnSourceCreate, this);
+        signal_handler_connect(coreSignalHandler, "source_destroy", OnSourceDestroy, this);
+    }
+    connect(this, &Events::obsEvent, _srv.get(), &DeviceManager::obsEvent);
+}
+void Events::shutdown(){
+    signal_handler_t *coreSignalHandler = obs_get_signal_handler();
+    if (coreSignalHandler) {
+        signal_handler_disconnect(coreSignalHandler, "source_destroy", OnSourceDestroy, this);
+        signal_handler_disconnect(coreSignalHandler, "source_create", OnSourceCreate, this);
+    }
+    // Disconnect from signals of all existing sources
+    obs_enum_sources(
+        [](void *param, obs_source_t *source) {
+            auto self = reinterpret_cast<Events *>(param);
+            self->disconnectSourceSignals(source);
+            return true;
+        },
+        this);
+    obs_frontend_remove_event_callback(Events::FrontendEventHandler, this);
 }
 void Events::FrontendEventHandler(enum obs_frontend_event event, void *private_data)
 {
@@ -103,9 +106,15 @@ void Events::FrontendEventHandler(enum obs_frontend_event event, void *private_d
 	if (!owner->_srv) {
 		return;
 	}
+    if (event == OBS_FRONTEND_EVENT_FINISHED_LOADING){
+        owner->hookTransitionPlaybackEvents();
+        owner->startup();
+        owner->started=true;
+    }
+    if (owner->started){
 	switch (event) {
 	case OBS_FRONTEND_EVENT_FINISHED_LOADING:
-		owner->hookTransitionPlaybackEvents();
+
 		break;
 	case OBS_FRONTEND_EVENT_SCENE_CHANGED:
 		owner->OnSceneChange();
@@ -191,7 +200,26 @@ void Events::FrontendEventHandler(enum obs_frontend_event event, void *private_d
 		owner->unhookTransitionPlaybackEvents();
 		owner->OnExit();
 		break;
-	}
+        case OBS_FRONTEND_EVENT_TRANSITION_STOPPED:
+            
+            break;
+        case OBS_FRONTEND_EVENT_SCENE_COLLECTION_CLEANUP:
+            
+            break;
+        case OBS_FRONTEND_EVENT_TRANSITION_DURATION_CHANGED:
+            
+            break;
+        case OBS_FRONTEND_EVENT_REPLAY_BUFFER_SAVED:
+            
+            break;
+        case OBS_FRONTEND_EVENT_VIRTUALCAM_STARTED:
+            
+            break;
+        case OBS_FRONTEND_EVENT_VIRTUALCAM_STOPPED:
+            
+            break;
+    }
+    }
 }
 void Events::broadcastUpdate(const char *updateType, obs_data_t *additionalFields = nullptr)
 {
@@ -205,7 +233,7 @@ void Events::broadcastUpdate(const char *updateType, obs_data_t *additionalField
 	}
 	{
 		RpcEvent *event = new RpcEvent(QString(updateType), streamTime, recordingTime, additionalFields);
-		emit obsEvent((RpcEvent)*event);
+		emit this->obsEvent((RpcEvent)*event);
 		delete (event);
 	}
 }
@@ -330,11 +358,11 @@ uint64_t Events::getRecordingTime()
 }
 QString Events::getStreamingTimecode()
 {
-	return std::move(Utils::nsToTimestamp(getStreamingTime()));
+	return Utils::nsToTimestamp(getStreamingTime());
 }
 QString Events::getRecordingTimecode()
 {
-	return std::move(Utils::nsToTimestamp(getRecordingTime()));
+	return Utils::nsToTimestamp(getRecordingTime());
 }
 /**
  * Indicates a scene change.
@@ -1541,7 +1569,6 @@ void Events::OnBroadcastCustomMessage(const QString &realm, obs_data_t *data)
 obs_data_t *Events::GetStats()
 {
 	obs_data_t *stats = obs_data_create();
-	double cpuUsage = os_cpu_usage_info_query(cpuUsageInfo);
 	double memoryUsage = (double)os_get_proc_resident_size() / (1024.0 * 1024.0);
 	video_t *mainVideo = obs_get_video();
 	uint32_t outputTotalFrames = video_output_get_total_frames(mainVideo);
@@ -1558,7 +1585,6 @@ obs_data_t *Events::GetStats()
 	obs_data_set_int(stats, "output-total-frames", outputTotalFrames);
 	obs_data_set_int(stats, "output-skipped-frames", outputSkippedFrames);
 	obs_data_set_double(stats, "average-frame-time", averageFrameTime);
-	obs_data_set_double(stats, "cpu-usage", cpuUsage);
 	obs_data_set_double(stats, "memory-usage", memoryUsage);
 	obs_data_set_double(stats, "free-disk-space", freeDiskSpace);
 	return stats;

@@ -139,7 +139,7 @@ QStringList Utils::GetSceneItemsBySource(obs_source_t *source)
 			return true;
 		},
 		items);
-	for (int i = 0; i < obs_data_array_count(items); i++) {
+	for (size_t i = 0; i < obs_data_array_count(items); i++) {
 		itemNames.append(obs_data_get_string(obs_data_array_item(items, i), "sourceName"));
 	}
 	obs_data_array_release(items);
@@ -888,8 +888,7 @@ QStringList Utils::GetTransitionsList()
 QStringList Utils::GetSceneItemsList(const QString &scenename)
 {
 	QStringList SceneItemsList;
-	auto sceneName = scenename.toStdString().c_str();
-	OBSSourceAutoRelease sceneSource = obs_get_source_by_name(sceneName);
+	OBSSourceAutoRelease sceneSource = obs_get_source_by_name(scenename.toStdString().c_str());
 	OBSScene scene = obs_scene_from_source(sceneSource);
 	OBSDataArrayAutoRelease sceneItemArray = obs_data_array_create();
 	auto sceneItemEnumProc = [](obs_scene_t *, obs_sceneitem_t *item, void *privateData) -> bool {
@@ -901,7 +900,7 @@ QStringList Utils::GetSceneItemsList(const QString &scenename)
 		return true;
 	};
 	obs_scene_enum_items(scene, sceneItemEnumProc, sceneItemArray);
-	for (int i = 0; i < obs_data_array_count(sceneItemArray); i++) {
+	for (size_t i = 0; i < obs_data_array_count(sceneItemArray); i++) {
 		obs_data_t *data = obs_data_array_item(sceneItemArray, i);
 		SceneItemsList.append(obs_data_get_string(data, "sourceName"));
 		obs_data_release(data);
@@ -927,7 +926,63 @@ int Utils::get_midi_note_or_control(const rtmidi::message &mess)
 	case rtmidi::message_type::CONTROL_CHANGE:
 		bytetopullfrom = 1;
 		break;
-	}
+        case rtmidi::message_type::POLY_PRESSURE:
+            
+            break;
+        case rtmidi::message_type::PROGRAM_CHANGE:
+            
+            break;
+        case rtmidi::message_type::AFTERTOUCH:
+            
+            break;
+        case rtmidi::message_type::SYSTEM_EXCLUSIVE:
+            
+            break;
+        case rtmidi::message_type::TIME_CODE:
+            
+            break;
+        case rtmidi::message_type::SONG_POS_POINTER:
+            
+            break;
+        case rtmidi::message_type::SONG_SELECT:
+            
+            break;
+        case rtmidi::message_type::RESERVED1:
+            
+            break;
+        case rtmidi::message_type::RESERVED2:
+            
+            break;
+        case rtmidi::message_type::TUNE_REQUEST:
+            
+            break;
+        case rtmidi::message_type::EOX:
+            
+            break;
+        case rtmidi::message_type::TIME_CLOCK:
+            
+            break;
+        case rtmidi::message_type::RESERVED3:
+            break;
+        case rtmidi::message_type::START:
+            
+            break;
+        case rtmidi::message_type::CONTINUE:
+            
+            break;
+        case rtmidi::message_type::STOP:
+            
+            break;
+        case rtmidi::message_type::RESERVED4:
+            
+            break;
+        case rtmidi::message_type::ACTIVE_SENSING:
+            
+            break;
+        case rtmidi::message_type::SYSTEM_RESET:
+            
+            break;
+    }
 	return mess[bytetopullfrom];
 }
 int Utils::get_midi_value(const rtmidi::message &mess)
@@ -951,7 +1006,61 @@ int Utils::get_midi_value(const rtmidi::message &mess)
 	case rtmidi::message_type::PROGRAM_CHANGE:
 		bytetopullfrom = 1;
 		break;
-	}
+        case rtmidi::message_type::POLY_PRESSURE:
+            
+            break;
+        case rtmidi::message_type::AFTERTOUCH:
+            
+            break;
+        case rtmidi::message_type::SYSTEM_EXCLUSIVE:
+            
+            break;
+        case rtmidi::message_type::TIME_CODE:
+            
+            break;
+        case rtmidi::message_type::SONG_POS_POINTER:
+            
+            break;
+        case rtmidi::message_type::SONG_SELECT:
+            
+            break;
+        case rtmidi::message_type::RESERVED1:
+            
+            break;
+        case rtmidi::message_type::RESERVED2:
+            
+            break;
+        case rtmidi::message_type::TUNE_REQUEST:
+            
+            break;
+        case rtmidi::message_type::EOX:
+            
+            break;
+        case rtmidi::message_type::TIME_CLOCK:
+            
+            break;
+        case rtmidi::message_type::RESERVED3:
+            
+            break;
+        case rtmidi::message_type::START:
+            
+            break;
+        case rtmidi::message_type::CONTINUE:
+            
+            break;
+        case rtmidi::message_type::STOP:
+            
+            break;
+        case rtmidi::message_type::RESERVED4:
+            
+            break;
+        case rtmidi::message_type::ACTIVE_SENSING:
+            
+            break;
+        case rtmidi::message_type::SYSTEM_RESET:
+            
+            break;
+    }
 	return mess[bytetopullfrom];
 }
 QString Utils::mtype_to_string(rtmidi::message_type mess)
@@ -1024,7 +1133,64 @@ QString Utils::get_midi_message_type(const rtmidi::message &message)
 		return "Program Change";
 	case rtmidi::message_type::PITCH_BEND:
 		return "Pitch Bend";
-	}
+        case rtmidi::message_type::INVALID:
+            
+            break;
+        case rtmidi::message_type::POLY_PRESSURE:
+            
+            break;
+        case rtmidi::message_type::AFTERTOUCH:
+            
+            break;
+        case rtmidi::message_type::SYSTEM_EXCLUSIVE:
+            
+            break;
+        case rtmidi::message_type::TIME_CODE:
+            
+            break;
+        case rtmidi::message_type::SONG_POS_POINTER:
+            
+            break;
+        case rtmidi::message_type::SONG_SELECT:
+            
+            break;
+        case rtmidi::message_type::RESERVED1:
+            
+            break;
+        case rtmidi::message_type::RESERVED2:
+            
+            break;
+        case rtmidi::message_type::TUNE_REQUEST:
+            
+            break;
+        case rtmidi::message_type::EOX:
+            
+            break;
+        case rtmidi::message_type::TIME_CLOCK:
+            
+            break;
+        case rtmidi::message_type::RESERVED3:
+            
+            break;
+        case rtmidi::message_type::START:
+            
+            break;
+        case rtmidi::message_type::CONTINUE:
+            
+            break;
+        case rtmidi::message_type::STOP:
+            
+            break;
+        case rtmidi::message_type::RESERVED4:
+            
+            break;
+        case rtmidi::message_type::ACTIVE_SENSING:
+            
+            break;
+        case rtmidi::message_type::SYSTEM_RESET:
+            
+            break;
+    }
 	return "Unknown Message Type";
 }
 QSpinBox *Utils::GetTransitionDurationControl()
@@ -1079,7 +1245,7 @@ QStringList Utils::get_browser_sources()
 			return true;
 		},
 		static_cast<void *>(&sourceNames));
-	return std::move(sourceNames);
+	return sourceNames;
 }
 void Utils::alert_popup(const QString &message)
 {

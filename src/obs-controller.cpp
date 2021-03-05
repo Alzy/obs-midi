@@ -260,6 +260,7 @@ void OBSController::ResetSceneItem()
  */
 void OBSController::TransitionToProgram()
 {
+	int currentDuration = obs_frontend_get_transition_duration();
 	if (hook->transition.isEmpty()) {
 		blog(LOG_DEBUG, "transition name can not be empty");
 	}
@@ -267,10 +268,11 @@ void OBSController::TransitionToProgram()
 	if (!success) {
 		blog(LOG_DEBUG, "specified transition doesn't exist");
 	}
-	if (hook->int_override > 0 ){
+	if (hook->int_override){
 		obs_frontend_set_transition_duration(*hook->int_override);
 	}
 	obs_frontend_preview_program_trigger_transition();
+	obs_frontend_set_transition_duration(currentDuration);
 }
 /**
  * Set the active transition.

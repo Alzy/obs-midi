@@ -23,7 +23,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <cstdio>
 #include <iostream>
 #include <vector>
-
 #include <obs.hpp>
 #include <obs-module.h>
 #include <util/config-file.h>
@@ -329,7 +328,7 @@ public:
 	QString scene_collection;
 	QString profile;
 	QString string_override;
-    std::optional<bool> bool_override;
+	std::optional<bool> bool_override;
 	std::optional<int> int_override;
     int value=-1;
 	MidiMessage *get_message_from_hook() const

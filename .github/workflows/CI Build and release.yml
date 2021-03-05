@@ -44,7 +44,7 @@ jobs:
         env:
           CACHE_NAME: 'build-cache-obs-64'
         with:
-          path: ${{ github.workspace }}/obs-studio/build64
+          path: ${{ github.workspace }}/obs-studio
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.OBS_GIT_TAG }}
       - name: 'Checkout OBS'
         if: steps.build-cache-obs-64.outputs.cache-hit != 'true'
@@ -337,7 +337,7 @@ jobs:
       - name: 'Restore obs-studio Cache'
         uses: actions/cache@v2
         env: 
-          CACHE_NAME: 'macos-obs-studio'
+          CACHE_NAME: 'macos-obs-studio v${{ env.OBS_GIT_TAG }}'
         id: macos-obs-studio
         with:
           path: |

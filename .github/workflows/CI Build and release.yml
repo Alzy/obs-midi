@@ -334,10 +334,10 @@ jobs:
         shell: bash
         run: |
           echo ::set-env name=OBS_GIT_TAG::$(git -c 'versionsort.suffix=-' ls-remote --exit-code --refs --tags --sort='v:refname' https://github.com/obsproject/obs-studio.git '*.*.*'|tail -n 1|cut -d /  -f 3)
-      - name: 'Restore obs-studio Cache'
+      - name: 'Restore obs-studio Cache v ${{ env.OBS_GIT_TAG }}'
         uses: actions/cache@v2
         env: 
-          CACHE_NAME: 'macos-obs-studio v${{ env.OBS_GIT_TAG }}'
+          CACHE_NAME: 'macos-obs-studio'
         id: macos-obs-studio
         with:
           path: |

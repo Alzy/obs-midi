@@ -210,13 +210,17 @@ void OBSController::DisablePreview()
 			if (obs_frontend_preview_enabled()) {
 				obs_frontend_set_preview_enabled(false);
 			}
-		},
+        
+    },
 		nullptr, true);
+    
 }
 void OBSController::EnablePreview()
 {
 	obs_queue_task(
-		OBS_TASK_UI, [](void *param) { obs_frontend_set_preview_enabled(true); }, nullptr, true);
+                   OBS_TASK_UI, [](void *param) {
+        obs_frontend_set_preview_enabled(true);
+     }, nullptr, true);
 }
 /**
  * Change the active scene collection.
@@ -557,7 +561,17 @@ void OBSController::play_pause_media_source()
 	case obs_media_state::OBS_MEDIA_STATE_ENDED:
 		obs_source_media_restart(source);
 		break;
-	}
+        case OBS_MEDIA_STATE_NONE:
+            break;
+        case OBS_MEDIA_STATE_OPENING:
+            break;
+        case OBS_MEDIA_STATE_BUFFERING:
+            break;
+        case OBS_MEDIA_STATE_STOPPED:
+            break;
+        case OBS_MEDIA_STATE_ERROR:
+            break;
+    }
 }
 // TODO:: Fix this
 void OBSController::toggle_studio_mode()

@@ -70,8 +70,6 @@ jobs:
         with:
           path: ${{ github.workspace }}\cmbuild\QT
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.QT_VERSION }}
-          restore-keys: |
-            ${{ runner.os }}-${{ env.CACHE_NAME }}-
       - name: 'Set QT to Cache: QT'
         if: steps.deps-cache-qt.outputs.cache-hit != 'true'
         run: |
@@ -85,8 +83,6 @@ jobs:
         with:
           path: ${{ github.workspace }}\cmbuild\deps
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.WINDOWS_DEPS_VERSION }}
-          restore-keys: |
-            ${{ runner.os }}-${{ env.CACHE_NAME }}-
       - name: 'Install prerequisite: Pre-built OBS dependencies'
         if: steps.deps-cache-deps.outputs.cache-hit != 'true'
         run: |

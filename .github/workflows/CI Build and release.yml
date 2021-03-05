@@ -404,7 +404,7 @@ jobs:
           tar -xf ${{ github.workspace }}/macos-deps-${{ env.MACOS_DEPS_VERSION }}.tar.gz -C "/tmp"
           curl -L -C - -O https://github.com/obsproject/obs-deps/releases/download/${{ env.MACOS_DEPS_VERSION }}/macos-qt-${{ env.QT_VERSION }}-${{ env.MACOS_DEPS_VERSION }}.tar.gz
           tar -xf ./macos-qt-${{ env.QT_VERSION }}-${{ env.MACOS_DEPS_VERSION }}.tar.gz -C /tmp
-       - name: 'Restore obs-studio Cache'
+      - name: 'Restore obs-studio Cache'
         uses: actions/cache@v2
         env: 
           CACHE_NAME: 'macos-obs-studio'

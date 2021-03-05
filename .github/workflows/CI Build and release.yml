@@ -319,7 +319,7 @@ jobs:
       MACOS_DEPS_VERSION: '2021-02-28'
       QT_VERSION: '5.15.2'
       isCI: true
-      hbc: '4'
+      hbc: '5'
     if: contains(github.event.head_commit.message, '[skip ci]') != true
     steps:
       - name: 'Checkout'
@@ -371,7 +371,9 @@ jobs:
           brew install speexdsp
           brew install fdk-aac
           brew install akeru-inc/tap/xcnotary
+          echo "starting brew cleanup"
           brew cleanup 
+          echo "starting brew scrub"
           brew cleanup -s
       - name: 'Restore /tmp/obsdeps Cache'
         uses: actions/cache@v2

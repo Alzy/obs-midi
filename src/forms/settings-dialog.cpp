@@ -44,6 +44,7 @@ void PluginWindow::configure_table()
 {
 	ui->table_mapping->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
 	ui->table_mapping->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
+    ui->table_mapping->insertColumn(10);
 }
 void PluginWindow::set_title_window()
 {
@@ -678,7 +679,7 @@ void PluginWindow::add_row_from_hook(MidiHook *hook)
 	QTableWidgetItem *itemitem = new QTableWidgetItem(hook->item);
 	QTableWidgetItem *audioitem = new QTableWidgetItem(hook->audio_source);
 	QTableWidgetItem *mediaitem = new QTableWidgetItem(hook->media_source);
-	QTableWidgetItem *ioveritem = new QTableWidgetItem(QString::number(hook->int_override));
+	QTableWidgetItem *ioveritem = new QTableWidgetItem(QString::number(*hook->int_override));
 
 	set_cell_colors(midic, channelitem);
 	set_cell_colors(midic, mtypeitem);
@@ -775,6 +776,7 @@ void PluginWindow::edit_mapping()
 		ui->cb_obs_output_item->setCurrentText(sitems.at(8)->text());
 		ui->cb_obs_output_audio_source->setCurrentText(sitems.at(9)->text());
 		ui->cb_obs_output_media_source->setCurrentText(sitems.at(10)->text());
+        ui->sb_int_override->setValue(sitems.at(11)->text().toInt());
 	}
 }
 bool PluginWindow::verify_mapping()

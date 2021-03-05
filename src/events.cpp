@@ -212,6 +212,7 @@ void Events::FrontendEventHandler(enum obs_frontend_event event, void *private_d
     case OBS_FRONTEND_EVENT_REPLAY_BUFFER_SAVED:
         
         break;
+
 }
     }
 }

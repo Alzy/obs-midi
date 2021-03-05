@@ -329,9 +329,9 @@ public:
 	QString scene_collection;
 	QString profile;
 	QString string_override;
-	bool bool_override = false;
-	int int_override = -1;
-	int value = -1;
+    std::optional<bool> bool_override;
+	std::optional<int> int_override;
+    int value=-1;
 	MidiMessage *get_message_from_hook() const
 	{
 		MidiMessage *message = new MidiMessage();
@@ -359,8 +359,8 @@ public:
 		scene_collection = obs_data_get_string(data, "scene_collection");
 		profile = obs_data_get_string(data, "profile");
 		string_override = obs_data_get_string(data, "string_override");
-		bool_override = obs_data_get_bool(data, "bool_override");
-		int_override = obs_data_get_int(data, "int_override");
+		bool_override.emplace(obs_data_get_bool(data, "bool_override"));
+		int_override.emplace(obs_data_get_int(data, "int_override"));
 	}
 
 	QString GetData()
@@ -404,11 +404,11 @@ public:
 		if (!string_override.isEmpty()) {
 			obs_data_set_string(data, "string_override", string_override.toStdString().c_str());
 		}
-		if (bool_override != NULL) {
-			obs_data_set_bool(data, "bool_override", bool_override);
+		if (bool_override) {
+			obs_data_set_bool(data, "bool_override", *bool_override);
 		}
-		if (int_override != -1) {
-			obs_data_set_int(data, "int_override", int_override);
+		if (int_override) {
+			obs_data_set_int(data, "int_override", *int_override);
 		}
 		QString hookdata(obs_data_get_json(data));
 		blog(LOG_DEBUG, "Midi Hook JSON = %s", hookdata.toStdString().c_str());

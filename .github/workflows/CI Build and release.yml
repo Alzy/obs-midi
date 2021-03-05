@@ -352,7 +352,6 @@ jobs:
         shell: bash
         working-directory: ${{ github.workspace }}/obs-studio
         run: |
-          git fetch --prune --unshallow
           echo ::set-env name=OBS_GIT_BRANCH::$(git rev-parse --abbrev-ref HEAD)
           echo ::set-env name=OBS_GIT_HASH::$(git rev-parse --short HEAD)
           echo ::set-env name=OBS_GIT_TAG::$(git describe --tags --abbrev=0)

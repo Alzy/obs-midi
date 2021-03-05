@@ -16,7 +16,7 @@ if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
 endif()
 include_directories(${CMAKE_PACKAGE_PREFIX})
 
-if ((WIN32 AND NOT COMMAND install_obs_plugin_with_data) OR APPLE)
+if (((WIN32) AND (NOT COMMAND install_obs_plugin_with_data)) OR APPLE)
 	include(external/FindLibObs.cmake)
 	find_package(LibObs REQUIRED)
 else()
@@ -94,9 +94,16 @@ if(LINUX)
 		Qt5::Core
 		Qt5::Widgets
 		libobs.so)
-else()
+elseif(NOT COMMAND install_obs_plugin_with_data)
 	target_link_libraries(obs-midi
 		obs-frontend-api
+		${obs-midi_DEPS}
+		Qt5::Core
+		Qt5::Widgets
+		libobs)
+else()
+target_link_libraries(obs-midi
+		"${OBS_FRONTEND_LIB}"
 		${obs-midi_DEPS}
 		Qt5::Core
 		Qt5::Widgets
@@ -178,13 +185,8 @@ endif()
 if(UNIX AND NOT APPLE)
 	include(GNUInstallDirs)
 	set_target_properties(obs-midi PROPERTIES PREFIX "")
-		if (COMMAND install_obs_plugin_with_data)
-		target_link_libraries(obs-midi
-		obs-frontend-api)
-	else()
-		target_link_libraries(obs-midi
-		"${OBS_FRONTEND_LIB}")
-	endif()
+	target_link_libraries(obs-midi obs-frontend-api)
+
 	file(GLOB locale_files data/locale/*.ini)
         set(CMAKE_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
 		OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
@@ -212,7 +214,7 @@ if(APPLE)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -fvisibility=default")
 	set(CMAKE_SKIP_RPATH TRUE)
 	set_target_properties(obs-midi PROPERTIES PREFIX "")
-		if (COMMAND install_obs_plugin_with_data)
+	if (COMMAND install_obs_plugin_with_data)
 		target_link_libraries(obs-midi
 		obs-frontend-api)
 	else()

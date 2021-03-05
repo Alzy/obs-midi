@@ -354,6 +354,7 @@ jobs:
           echo ::set-env name=GIT_HASH::$(git rev-parse --short HEAD)
           echo ::set-env name=GIT_TAG::$(git describe --tags --abbrev=0)
       - name: 'Install prerequisites (Homebrew)'
+        if: steps.homebrew-cache.outputs.cache-hit != 'true'
         shell: bash
         run: |
           brew install jack

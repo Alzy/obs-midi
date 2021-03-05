@@ -379,9 +379,17 @@ jobs:
         shell: bash
         run: |
           brew install akeru-inc/tap/xcnotary
-
-
+      - name: 'Restore /tmp/obsdeps Cache'
+        uses: actions/cache@v2
+        env: 
+          CACHE_NAME: 'macos-obs-deps-cache'
+        id: macos-deps
+        with:
+          path: |
+            /tmp/obsdeps
+          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.MACOS_DEPS_VERSION }}-qt-${{ env.QT_VERSION }}
       - name: 'Install prerequisite: Pre-built OBS dependencies'
+        if: steps.macos-deps.outputs.cache-hit != 'true'
         shell: bash
         run: |
           curl -L -O https://github.com/obsproject/obs-deps/releases/download/${{ env.MACOS_DEPS_VERSION }}/macos-deps-${{ env.MACOS_DEPS_VERSION }}.tar.gz

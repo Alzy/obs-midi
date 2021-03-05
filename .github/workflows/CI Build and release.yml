@@ -319,6 +319,7 @@ jobs:
       MACOS_DEPS_VERSION: '2020-04-18'
       QT_VERSION: '5.14.1'
       isCI: true
+      hbc: '1'
     if: contains(github.event.head_commit.message, '[skip ci]') != true
     steps:
       - name: 'Checkout'
@@ -359,7 +360,9 @@ jobs:
           CACHE_NAME: 'obs-homebrew-cache'
         id: homebrew-cache
         with:
-          path: /usr/local/Cellar/
+          path: |
+            /usr/local/Cellar/
+            /usr/local/opt/qt/
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.hbc }}
       - name: 'Install prerequisites (Homebrew)'
         if: steps.homebrew-cache.outputs.cache-hit != 'true'

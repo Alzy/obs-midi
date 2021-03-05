@@ -34,7 +34,20 @@ jobs:
         with:
           path: ${{ github.workspace }}/obs-midi
           submodules: 'recursive'
+      - name: 'Get OBS-Studio latest tag'
+        shell: bash
+        run: |
+          echo ::set-env name=OBS_GIT_TAG::$(git -c 'versionsort.suffix=-' ls-remote --exit-code --refs --tags --sort='v:refname' https://github.com/obsproject/obs-studio.git '*.*.*'|tail -n=1|cut --d='/' --f=3)
+      - name: 'Restore OBS 64-bit build v${{ env.OBS_GIT_TAG }} from cache'
+        id: build-cache-obs-64
+        uses: actions/cache@v2
+        env:
+          CACHE_NAME: 'build-cache-obs-64'
+        with:
+          path: ${{ github.workspace }}/obs-studio/build64
+          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.OBS_GIT_TAG }}
       - name: 'Checkout OBS'
+        if: steps.build-cache-obs-64.outputs.cache-hit != 'true'
         uses: actions/checkout@v2
         with:
           repository: obsproject/obs-studio
@@ -49,6 +62,7 @@ jobs:
           echo ::set-env name=OBS_GIT_HASH::$(git rev-parse --short HEAD)
           echo ::set-env name=OBS_GIT_TAG::$(git describe --tags --abbrev=0)
       - name: 'Checkout last OBS-Studio release (${{ env.OBS_GIT_TAG }})'
+        if: steps.build-cache-obs-64.outputs.cache-hit != 'true'
         shell: bash
         working-directory: ${{ github.workspace }}/obs-studio
         run: |
@@ -88,16 +102,6 @@ jobs:
         run: |
           curl -kLO https://cdn-fastly.obsproject.com/downloads/dependencies${{ env.WINDOWS_DEPS_VERSION }}.zip -f --retry 5 -C -
           7z x dependencies${{ env.WINDOWS_DEPS_VERSION }}.zip -o"${{ github.workspace }}\cmbuild\deps"
-      - name: 'Restore OBS 64-bit build v${{ env.OBS_GIT_TAG }} from cache'
-        id: build-cache-obs-64
-        uses: actions/cache@v2
-        env:
-          CACHE_NAME: 'build-cache-obs-64'
-        with:
-          path: ${{ github.workspace }}/obs-studio/build64
-          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.OBS_GIT_TAG }}
-          restore-keys: |
-            ${{ runner.os }}-${{ env.CACHE_NAME }}-
       - name: 'Configure OBS 64-bit'
         if: steps.build-cache-obs-64.outputs.cache-hit != 'true'
         working-directory: ${{ github.workspace }}/obs-studio

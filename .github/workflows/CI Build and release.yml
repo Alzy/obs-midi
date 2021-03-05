@@ -356,7 +356,16 @@ jobs:
       - name: 'Install prerequisites (Homebrew)'
         shell: bash
         run: |
-          brew bundle --file ${{ github.workspace }}/obs-midi/CI/macos/Brewfile
+          tap akeru-inc/tap
+          brew install jack
+          brew install speexdsp
+          brew install cmake
+          brew install freetype
+          brew install fdk-aac
+          brew install swig, link: false
+          brew install akeru-inc/tap/xcnotary
+          brew /Users/runner/work/obs-midi/obs-midi/obs-midi/CI/macos/qt.rb
+          brew /Users/runner/work/obs-midi/obs-midi/obs-midi/CI/macos/swig.rb
       - name: 'Install prerequisite: Pre-built OBS dependencies'
         shell: bash
         run: |

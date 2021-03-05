@@ -330,7 +330,7 @@ jobs:
       - name: 'Get OBS-Studio latest tag'
         shell: bash
         run: |
-          echo ::set-env name=OBS_GIT_TAG::$(git -c 'versionsort.suffix=-' ls-remote --exit-code --refs --tags --sort='v:refname' https://github.com/obsproject/obs-studio.git '*.*.*'|tail --lines=1|cut --delimiter='/' --fields=3)
+          echo ::set-env name=OBS_GIT_TAG::$(git -c 'versionsort.suffix=-' ls-remote --exit-code --refs --tags --sort='v:refname' https://github.com/obsproject/obs-studio.git '*.*.*'|tail -n=1|cut --d='/' --f=3)
       - name: 'Restore obs-studio Cache'
         uses: actions/cache@v2
         env: 

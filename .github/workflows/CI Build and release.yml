@@ -66,6 +66,7 @@ jobs:
         uses: actions/cache@v2
         env: 
           CACHE_NAME: 'deps-cache-qt'
+        id: deps-cache-qt
         with:
           path: ${{ github.workspace }}\cmbuild\QT
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.QT_VERSION }}
@@ -78,6 +79,7 @@ jobs:
           7z x Qt_${{ env.QT_VERSION }}.7z -o"${{ github.workspace }}\cmbuild\QT"
       - name: 'Restore OBSDeps from Cache:'
         uses: actions/cache@v2
+        id: deps-cache-deps
         env: 
           CACHE_NAME: 'deps-cache-deps'
         with:

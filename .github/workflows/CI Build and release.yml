@@ -93,7 +93,7 @@ jobs:
          
       - name: 'Restore OBS 32-bit build v${{ env.OBS_GIT_TAG }} from cache'
         id: build-cache-obs-32
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         env:
           CACHE_NAME: 'build-cache-obs-32'
         with:
@@ -116,7 +116,7 @@ jobs:
           msbuild /m /p:Configuration=RelWithDebInfo .\build32\UI\obs-frontend-api\obs-frontend-api.vcxproj
       - name: 'Restore OBS 64-bit build v${{ env.OBS_GIT_TAG }} from cache'
         id: build-cache-obs-64
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         env:
           CACHE_NAME: 'build-cache-obs-64'
         with:

@@ -370,11 +370,9 @@ jobs:
           brew install jack
           brew install speexdsp
           brew install fdk-aac
-          brew install swig
-          brew unlink swig
-          brew install /Users/runner/work/obs-midi/obs-midi/obs-midi/CI/macos/swig.rb
           brew install akeru-inc/tap/xcnotary
-          brew cleanup
+          brew cleanup 
+          brew cleanup -s
       - name: 'Restore /tmp/obsdeps Cache'
         uses: actions/cache@v2
         env: 

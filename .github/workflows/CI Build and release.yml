@@ -362,7 +362,6 @@ jobs:
         with:
           path: |
             /usr/local/Cellar/
-            /usr/local/opt/qt/
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.hbc }}
       - name: 'Install prerequisites (Homebrew)'
         if: steps.homebrew-cache.outputs.cache-hit != 'true'

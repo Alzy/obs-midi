@@ -232,5 +232,4 @@ install_obs_plugin_with_data(obs-midi data)
 endif()
 set_target_properties(obs-midi PROPERTIES FOLDER "plugins/obs-midi")
 #set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/external" ${CMAKE_MODULE_PATH})
-# Documentation Generation
 

@@ -530,6 +530,9 @@ void PluginWindow::obs_actions_select(const QString &action)
 			break;
 		case ActionsClass::Actions::Do_Transition:
 			show_pair(Pairs::Integer);
+			show_pair(Pairs::Transition);
+			ui->cb_obs_output_transition->insertItem(0, "Current Transition");
+			ui->cb_obs_output_transition->setCurrentIndex(0);
 			ui->label_Int_override->setText("Duration * ");
 			ui->sb_int_override->setValue(300);
 			ui->sb_int_override->setMaximum(100000);

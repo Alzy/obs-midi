@@ -15,13 +15,14 @@ if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
     set(CMAKE_CXX_FLAGS "-mfpu=neon")
 endif()
 include_directories(${CMAKE_PACKAGE_PREFIX})
-if (WIN32 AND NOT COMMAND install_obs_plugin_with_data)
+
+if ((WIN32 AND NOT COMMAND install_obs_plugin_with_data) OR APPLE)
 	include(external/FindLibObs.cmake)
+	find_package(LibObs REQUIRED)
+else()
+	find_package(LibObs)
 endif()
-if (APPLE)
-	include(external/FindLibObs.cmake)
-endif()
-find_package(LibObs)
+
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
 # Version bits
 execute_process(
@@ -81,6 +82,7 @@ add_library(obs-midi MODULE
 	${obs-midi_HEADERS})
 include_directories(
 	"${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api"
+
 	${Qt5Core_INCLUDES}
 	${Qt5Widgets_INCLUDES}
 	"${CMAKE_SOURCE_DIR}/deps/asio/asio/include")
@@ -118,8 +120,14 @@ if(WIN32)
 	include_directories(
 		"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/UI"
 	)
-	target_link_libraries(obs-midi
+	if (COMMAND install_obs_plugin_with_data)
+		target_link_libraries(obs-midi
 		obs-frontend-api)
+	else()
+		target_link_libraries(obs-midi
+		"{$OBS_FRONTEND_LIB}")
+	endif()
+
 	# --- Release package helper ---
 	# The "release" folder has a structure similar OBS' one on Windows
 	set(RELEASE_DIR "${PROJECT_SOURCE_DIR}/release")
@@ -170,7 +178,13 @@ endif()
 if(UNIX AND NOT APPLE)
 	include(GNUInstallDirs)
 	set_target_properties(obs-midi PROPERTIES PREFIX "")
-	target_link_libraries(obs-midi obs-frontend-api)
+		if (COMMAND install_obs_plugin_with_data)
+		target_link_libraries(obs-midi
+		obs-frontend-api)
+	else()
+		target_link_libraries(obs-midi
+		"{$OBS_FRONTEND_LIB}")
+	endif()
 	file(GLOB locale_files data/locale/*.ini)
         set(CMAKE_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
 		OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
@@ -198,7 +212,13 @@ if(APPLE)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -fvisibility=default")
 	set(CMAKE_SKIP_RPATH TRUE)
 	set_target_properties(obs-midi PROPERTIES PREFIX "")
-	target_link_libraries(obs-midi obs-frontend-api)
+		if (COMMAND install_obs_plugin_with_data)
+		target_link_libraries(obs-midi
+		obs-frontend-api)
+	else()
+		target_link_libraries(obs-midi
+		"{$OBS_FRONTEND_LIB}")
+	endif()
 endif()
 # -- End of section --
 if (COMMAND install_obs_plugin_with_data)

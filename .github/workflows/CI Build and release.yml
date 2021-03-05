@@ -361,7 +361,7 @@ jobs:
           brew install cmake
           brew install freetype
           brew install fdk-aac
-          brew install swig, link: false
+          brew install swig
           brew install /Users/runner/work/obs-midi/obs-midi/obs-midi/CI/macos/qt.rb
           brew install /Users/runner/work/obs-midi/obs-midi/obs-midi/CI/macos/swig.rb
 
@@ -369,7 +369,6 @@ jobs:
         if: success() &&  github.ref == 'refs/heads/release'
         shell: bash
         run: |
-          #tap akeru-inc/tap
           brew install akeru-inc/tap/xcnotary
 
 

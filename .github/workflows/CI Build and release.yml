@@ -334,7 +334,7 @@ jobs:
       hbc: '6'
     if: contains(github.event.head_commit.message, '[skip ci]') != true
     steps:
-      - name: 'Checkout'
+      - name: 'Checkout OBS-MIDI'
         uses: actions/checkout@v2
         with:
           path: ${{ github.workspace }}/obs-midi
@@ -387,23 +387,7 @@ jobs:
           echo ::set-env name=GIT_BRANCH::${{ github.event.pull_request.head.ref }}
           echo ::set-env name=GIT_HASH::$(git rev-parse --short HEAD)
           echo ::set-env name=GIT_TAG::$(git describe --tags --abbrev=0)
-      - name: 'Restore Homebrew Cellar Cache'
-        uses: actions/cache@v2
-        env: 
-          CACHE_NAME: 'obs-homebrew-cache'
-        id: homebrew-cache
-        with:
-          path: |
-            /usr/local/Cellar/libsamplerate
-            /usr/local/Cellar/aften
-            /usr/local/Cellar/jack
-            /usr/local/Cellar/speexdsp
-            /usr/local/Cellar/fdk-aac
-            /usr/local/Cellar/xcnotary
-            
-          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.hbc }}
       - name: 'Install prerequisites (Homebrew)'
-        if: steps.homebrew-cache.outputs.cache-hit != 'true'
         shell: bash
         run: |
           brew install jack
@@ -411,16 +395,7 @@ jobs:
           brew install fdk-aac
           brew install akeru-inc/tap/xcnotary
           chmod 777 /tmp/obsdeps
-      - name: 'Restore /tmp/obsdeps Cache'
-        uses: actions/cache@v2
-        env: 
-          CACHE_NAME: 'macos-obs-deps-cache'
-        id: macos-deps
-        with:
-          path: /tmp/obsdeps
-          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.MACOS_DEPS_VERSION }}-qt-${{ env.QT_VERSION }}
       - name: 'Install prerequisite: Pre-built OBS dependencies'
-        if: steps.macos-deps.outputs.cache-hit != 'true'
         shell: bash
         run: |
           curl -L -O https://github.com/obsproject/obs-deps/releases/download/${{ env.MACOS_DEPS_VERSION }}/macos-deps-${{ env.MACOS_DEPS_VERSION }}.tar.gz
@@ -431,7 +406,6 @@ jobs:
         shell: bash
         working-directory: ${{ github.workspace }}/obs-studio
         run: |
-          
           [ -d build ] ||mkdir build
           cd build
           rm -rf ./*

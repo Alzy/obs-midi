@@ -671,9 +671,9 @@ void Events::OnReplayStopped()
  * @since 0.3
  */
 void Events::OnExit()
-{
-	this->disconnect();
+{	
 	broadcastUpdate("Exiting");
+	this->disconnect();
 }
 /**
  * Emit every 2 seconds.

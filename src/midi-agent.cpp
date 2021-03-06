@@ -164,6 +164,7 @@ void MidiAgent::close_midi_input_port()
 void MidiAgent::close_midi_output_port()
 {
 	if (midiout.is_port_open()) {
+		Macro::reset_midi(this);
 		midiout.close_port();
 	}
 }
@@ -553,34 +554,38 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 		}
 
 		delete (message);
-	}
-	if (event.updateType() == QString("SourceRenamed")) {
-		QString from = obs_data_get_string(event.additionalFields(), "previousName");
-		for (int i = 0; i < this->midiHooks.size(); i++) {
-			if (this->midiHooks.at(i)->scene == from) {
-				this->midiHooks.at(i)->scene = obs_data_get_string(event.additionalFields(), "newName");
-				GetConfig().get()->Save();
-			} else if (this->midiHooks.at(i)->source == from) {
-				this->midiHooks.at(i)->source = obs_data_get_string(event.additionalFields(), "newName");
-				GetConfig().get()->Save();
-			}
-		}
-	} else if (event.updateType() == QString("Exiting")) {
-		disconnect(GetEventsSystem().get(), &Events::obsEvent, this, &MidiAgent::handle_obs_event);
-		closing = true;
-	} else if (event.updateType() == QString("SourceDestroyed")) {
-		if (!closing) {
-			QString from = obs_data_get_string(event.additionalFields(), "sourceName");
+	} else {
+
+		if (event.updateType() == QString("SourceRenamed")) {
+			QString from = obs_data_get_string(event.additionalFields(), "previousName");
 			for (int i = 0; i < this->midiHooks.size(); i++) {
-				if (this->midiHooks.at(i)->source == from) {
-					this->remove_MidiHook(this->midiHooks.at(i));
+				if (this->midiHooks.at(i)->scene == from) {
+					this->midiHooks.at(i)->scene = obs_data_get_string(event.additionalFields(), "newName");
+					GetConfig().get()->Save();
+				} else if (this->midiHooks.at(i)->source == from) {
+					this->midiHooks.at(i)->source = obs_data_get_string(event.additionalFields(), "newName");
 					GetConfig().get()->Save();
 				}
 			}
-			GetConfig()->Save();
+		} else if (event.updateType() == QString("Exiting")) {
+			unsigned char bytes[1] = {0xFF};
+
+			this->midiout.send_message(bytes, sizeof(bytes));
+			closing = true;
+		} else if (event.updateType() == QString("SourceDestroyed")) {
+			if (!closing) {
+				QString from = obs_data_get_string(event.additionalFields(), "sourceName");
+				for (int i = 0; i < this->midiHooks.size(); i++) {
+					if (this->midiHooks.at(i)->source == from) {
+						this->remove_MidiHook(this->midiHooks.at(i));
+						GetConfig().get()->Save();
+					}
+				}
+				GetConfig()->Save();
+			}
+		} else if (event.updateType() == QString("ProfileChanged") || event.updateType() == QString("SceneCollectionChanged")) {
+			GetDeviceManager().get()->reload();
 		}
-	} else if (event.updateType() == QString("ProfileChanged") || event.updateType() == QString("SceneCollectionChanged")) {
-		GetDeviceManager().get()->reload();
 	}
 }
 void MidiAgent::send_message_to_midi_device(const MidiMessage &message)
@@ -595,4 +600,8 @@ void MidiAgent::send_message_to_midi_device(const MidiMessage &message)
 			this->midiout.send_message(hello->note_off(message.channel, message.NORC, message.value));
 		}
 	}
+}
+void MidiAgent::send_bytes(unsigned char bytes) {
+
+	midiout.send_message((unsigned char*)bytes, sizeof(bytes));
 }

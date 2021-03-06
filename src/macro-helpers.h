@@ -68,4 +68,16 @@ inline static void set_volume(MidiAgent* agent, MidiMessage *message, double vol
 	message->value = newvol;
 	agent->send_message_to_midi_device((MidiMessage)*message);
 }
+inline static void reset_midi(MidiAgent* agent) {
+	MidiMessage message;
+	for (int  i = 0; i < 255; i++) {
+		message.NORC = i;
+		message.message_type = "Control Change";
+		agent->send_message_to_midi_device(message);
+		message.message_type = "Note Off";
+		agent->send_message_to_midi_device(message);
+	}
+
+
+}
 }; // End Macro

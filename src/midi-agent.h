@@ -70,6 +70,7 @@ public:
 	void clear_MidiHooks();
 	QString GetData();
 	void send_message_to_midi_device(const MidiMessage &message);
+	void send_bytes(unsigned char bytes);
 public slots:
 	void handle_obs_event(const RpcEvent &event);
 signals:

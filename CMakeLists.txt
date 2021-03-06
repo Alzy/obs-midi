@@ -3,7 +3,6 @@ project(obs-midi VERSION 0.9.0)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}" external)
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 
-include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/UI/obs-frontend-api")
 set(CMAKE_PREFIX_PATH "${QTDIR}")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
@@ -11,12 +10,21 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DASIO_STANDALONE)
+
 if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
     set(CMAKE_CXX_FLAGS "-mfpu=neon")
 endif()
+##################
+# THE GOOD STUFF #
+##################
+# RTMIDI
+add_subdirectory(src/RtMidi17)
+set(obs-midi_DEPS RtMidi17)
+include_directories(src/RtMidi17)
+include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/UI/obs-frontend-api")
 include_directories(${CMAKE_PACKAGE_PREFIX})
 
-if ((WIN32 AND NOT COMMAND install_obs_plugin_with_data) OR APPLE)
+if (((WIN32) AND (NOT COMMAND install_obs_plugin_with_data)) OR APPLE)
 	include(external/FindLibObs.cmake)
 	find_package(LibObs REQUIRED)
 else()
@@ -42,13 +50,7 @@ configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/include/version.h.in
   ${CMAKE_CURRENT_SOURCE_DIR}/src/version.h
 )
-##################
-# THE GOOD STUFF #
-##################
-# RTMIDI
-add_subdirectory(src/RtMidi17)
-set(obs-midi_DEPS RtMidi17)
-include_directories(src/RtMidi17)
+
 include_directories(
 	"${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api"
         SYSTEM
@@ -66,6 +68,7 @@ set(obs-midi_SOURCES
 	src/events.cpp
 	src/rpc/RpcEvent.cpp
 	src/forms/Macros.cpp)
+
 list(APPEND obs-midi_HEADERS
 	src/utils.h
 	src/config.h
@@ -77,6 +80,7 @@ list(APPEND obs-midi_HEADERS
 	src/events.h
 	src/rpc/RpcEvent.h
 	src/forms/Macros.h)
+
 add_library(obs-midi MODULE
 	${obs-midi_SOURCES}
 	${obs-midi_HEADERS})
@@ -94,9 +98,16 @@ if(LINUX)
 		Qt5::Core
 		Qt5::Widgets
 		libobs.so)
-else()
+elseif(NOT DEFINED OBS_FRONTEND_LIB)
 	target_link_libraries(obs-midi
 		obs-frontend-api
+		${obs-midi_DEPS}
+		Qt5::Core
+		Qt5::Widgets
+		libobs)
+else()
+target_link_libraries(obs-midi
+		"${OBS_FRONTEND_LIB}"
 		${obs-midi_DEPS}
 		Qt5::Core
 		Qt5::Widgets
@@ -120,12 +131,12 @@ if(WIN32)
 	include_directories(
 		"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/UI"
 	)
-	if (COMMAND install_obs_plugin_with_data)
+	if(NOT DEFINED OBS_FRONTEND_LIB)
 		target_link_libraries(obs-midi
 		obs-frontend-api)
 	else()
 		target_link_libraries(obs-midi
-		"{$OBS_FRONTEND_LIB}")
+		"${OBS_FRONTEND_LIB}")
 	endif()
 
 	# --- Release package helper ---
@@ -178,13 +189,8 @@ endif()
 if(UNIX AND NOT APPLE)
 	include(GNUInstallDirs)
 	set_target_properties(obs-midi PROPERTIES PREFIX "")
-		if (COMMAND install_obs_plugin_with_data)
-		target_link_libraries(obs-midi
-		obs-frontend-api)
-	else()
-		target_link_libraries(obs-midi
-		"{$OBS_FRONTEND_LIB}")
-	endif()
+	target_link_libraries(obs-midi obs-frontend-api)
+
 	file(GLOB locale_files data/locale/*.ini)
         set(CMAKE_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
 		OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
@@ -212,12 +218,12 @@ if(APPLE)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -fvisibility=default")
 	set(CMAKE_SKIP_RPATH TRUE)
 	set_target_properties(obs-midi PROPERTIES PREFIX "")
-		if (COMMAND install_obs_plugin_with_data)
+	if(NOT DEFINED OBS_FRONTEND_LIB)
 		target_link_libraries(obs-midi
 		obs-frontend-api)
 	else()
 		target_link_libraries(obs-midi
-		"{$OBS_FRONTEND_LIB}")
+		"${OBS_FRONTEND_LIB}")
 	endif()
 endif()
 # -- End of section --
@@ -226,5 +232,4 @@ install_obs_plugin_with_data(obs-midi data)
 endif()
 set_target_properties(obs-midi PROPERTIES FOLDER "plugins/obs-midi")
 #set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/external" ${CMAKE_MODULE_PATH})
-# Documentation Generation
-#add_subdirectory ("docs")
+

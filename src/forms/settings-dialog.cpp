@@ -685,7 +685,7 @@ void PluginWindow::add_row_from_hook(MidiHook *hook)
 	QTableWidgetItem *itemitem = new QTableWidgetItem(hook->item);
 	QTableWidgetItem *audioitem = new QTableWidgetItem(hook->audio_source);
 	QTableWidgetItem *mediaitem = new QTableWidgetItem(hook->media_source);
-	QTableWidgetItem *ioveritem = new QTableWidgetItem(QString::number(*hook->int_override));
+	QTableWidgetItem *ioveritem = (hook->int_override) ? new QTableWidgetItem(QString::number(*hook->int_override)) : new QTableWidgetItem();
 
 	set_cell_colors(midic, channelitem);
 	set_cell_colors(midic, mtypeitem);

@@ -209,20 +209,20 @@ void OBSController::DisablePreview()
 		[](void *param) {
 			if (obs_frontend_preview_enabled()) {
 				obs_frontend_set_preview_enabled(false);
-            }
-        (void)param;
-        
-    },
+			}
+			(void)param;
+		},
 		nullptr, true);
-    
 }
 void OBSController::EnablePreview()
 {
 	obs_queue_task(
-                   OBS_TASK_UI, [](void *param) {
-        obs_frontend_set_preview_enabled(true);
-        (void)param;
-     }, nullptr, true);
+		OBS_TASK_UI,
+		[](void *param) {
+			obs_frontend_set_preview_enabled(true);
+			(void)param;
+		},
+		nullptr, true);
 }
 /**
  * Change the active scene collection.
@@ -259,21 +259,24 @@ void OBSController::ResetSceneItem()
  * transitionDuration is optional. (milliseconds)
  */
 void OBSController::TransitionToProgram()
-{
-	int currentDuration = obs_frontend_get_transition_duration();
+{	
+	state()._CurrentTransitionDuration=obs_frontend_get_transition_duration();
 	obs_source_t *transition = obs_frontend_get_current_transition();
 	/**
-	* If Transition from hook is not Current Transition, and if it is not an empty Value, then set current transition
-	*/
+	 * If Transition from hook is not Current Transition, and if it is not an empty Value, then set current transition
+	 */
 	if ((hook->transition != "Current Transition")) {
 		Utils::SetTransitionByName(hook->transition);
+		state()._TransitionWasCalled=true;
 	}
-	if (hook->int_override){
+	if (hook->int_override && *hook->int_override >0) {
 		obs_frontend_set_transition_duration(*hook->int_override);
+		state()._TransitionWasCalled=true;
 	}
 	obs_frontend_preview_program_trigger_transition();
-	obs_frontend_set_current_transition(transition);
-	obs_frontend_set_transition_duration(currentDuration);
+	
+	state()._CurrentTransition=QString(obs_source_get_name(transition));
+	
 	obs_source_release(transition);
 }
 /**
@@ -293,7 +296,13 @@ void OBSController::SetTransitionDuration()
 void OBSController::SetSourceVisibility()
 {
 	obs_sceneitem_set_visible(Utils::GetSceneItemFromName(Utils::GetSceneFromNameOrCurrent(hook->scene), hook->source), midi_value);
-} // DOESNT EXIST
+}
+/**
+*
+* Toggles the source's visibility
+* seems to stop audio from playing as well
+* 
+*/
 void OBSController::ToggleSourceVisibility()
 {
 	auto scene = Utils::GetSceneItemFromName(Utils::GetSceneFromNameOrCurrent(hook->scene), hook->source);
@@ -302,7 +311,7 @@ void OBSController::ToggleSourceVisibility()
 	} else {
 		obs_sceneitem_set_visible(scene, true);
 	}
-} // DOESNT EXIST
+} 
 /**
  * Inverts the mute status of a specified source.
  */
@@ -567,17 +576,17 @@ void OBSController::play_pause_media_source()
 	case obs_media_state::OBS_MEDIA_STATE_ENDED:
 		obs_source_media_restart(source);
 		break;
-        case OBS_MEDIA_STATE_NONE:
-            break;
-        case OBS_MEDIA_STATE_OPENING:
-            break;
-        case OBS_MEDIA_STATE_BUFFERING:
-            break;
-        case OBS_MEDIA_STATE_STOPPED:
-            break;
-        case OBS_MEDIA_STATE_ERROR:
-            break;
-    }
+	case OBS_MEDIA_STATE_NONE:
+		break;
+	case OBS_MEDIA_STATE_OPENING:
+		break;
+	case OBS_MEDIA_STATE_BUFFERING:
+		break;
+	case OBS_MEDIA_STATE_STOPPED:
+		break;
+	case OBS_MEDIA_STATE_ERROR:
+		break;
+	}
 }
 // TODO:: Fix this
 void OBSController::toggle_studio_mode()

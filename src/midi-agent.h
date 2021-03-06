@@ -69,8 +69,13 @@ public:
 	void remove_MidiHook(MidiHook *hook);
 	void clear_MidiHooks();
 	QString GetData();
+	void remove_source(const RpcEvent &event);
+	void rename_source(const RpcEvent &event);
 	void send_message_to_midi_device(const MidiMessage &message);
 	void send_bytes(unsigned char bytes);
+	void set_current_scene();
+	void set_current_volumes();
+	void startup();
 public slots:
 	void handle_obs_event(const RpcEvent &event);
 signals:

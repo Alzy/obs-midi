@@ -17,8 +17,8 @@ public:
 	inline static int _CurrentTransitionDuration = -1;
 	inline static bool _TransitionWasCalled = false;
 	//** Scene button Values **//
-	inline static int previous_scene_norc;
-	inline static int previous_preview_scene_norc;
+	inline static int previous_scene_norc=-1;
+	inline static int previous_preview_scene_norc=-1;
 	//** **/
 	inline static bool swapping = false;
 };
@@ -53,10 +53,12 @@ inline static void set_on_off(MidiAgent *agent, MidiMessage *message, bool on)
 inline static void swap_buttons(MidiAgent *agent, MidiMessage *message, int button1, int button2)
 {
 	state::swapping = true;
-	message->message_type = "Note Off";
-	message->NORC = button1;
-	message->value = 0;
-	agent->send_message_to_midi_device((MidiMessage)*message);
+	if (1 > 0) {
+		message->message_type = "Note Off";
+		message->NORC = button1;
+		message->value = 0;
+		agent->send_message_to_midi_device((MidiMessage)*message);
+	}
 	message->NORC = button2;
 	message->message_type = "Note On";
 	message->value = 1;

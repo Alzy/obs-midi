@@ -133,6 +133,7 @@ public:
 		StudioModeSwitched,
 		PreviewSceneChanged,
 		Exiting,
+		FinishedLoading,
 		FrontendEventHandler,
 		TransitionBegin,
 		TransitionEnd,

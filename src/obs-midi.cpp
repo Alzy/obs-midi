@@ -48,19 +48,9 @@ bool obs_module_load(void)
 	blog(LOG_INFO, "MIDI LOADED! :)");
 	blog(LOG_INFO, "obs-midi version %s", GIT_COMMIT_HASH);
 	qRegisterMetaType<MidiMessage>();
-
-	blog(LOG_DEBUG, "Setup DM Ptr");
-	// Device Manager Setup
+	_eventsSystem = eventsPtr(new Events());
 	_deviceManager = DeviceManagerPtr(new DeviceManager());
-	blog(LOG_DEBUG, "Setup Config Ptr");
-	// Config Setup
 	_config = ConfigPtr(new Config());
-	blog(LOG_DEBUG, "Setup Event Ptr");
-	// Signal Router Setup
-	_eventsSystem = eventsPtr(new Events(_deviceManager));
-	blog(LOG_DEBUG, "load Config");
-	//_config->Load();
-	// UI SETUP
 	blog(LOG_DEBUG, "Setup UI");
 	QMainWindow *mainWindow = (QMainWindow *)obs_frontend_get_main_window();
 	plugin_window = new PluginWindow(mainWindow);

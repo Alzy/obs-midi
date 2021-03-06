@@ -394,7 +394,6 @@ jobs:
           brew install speexdsp
           brew install fdk-aac
           brew install akeru-inc/tap/xcnotary
-          chmod 777 /tmp/obsdeps
       - name: 'Install prerequisite: Pre-built OBS dependencies'
         shell: bash
         run: |

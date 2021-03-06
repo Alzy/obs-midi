@@ -48,6 +48,7 @@ bool obs_module_load(void)
 	blog(LOG_INFO, "MIDI LOADED! :)");
 	blog(LOG_INFO, "obs-midi version %s", GIT_COMMIT_HASH);
 	qRegisterMetaType<MidiMessage>();
+
 	blog(LOG_DEBUG, "Setup DM Ptr");
 	// Device Manager Setup
 	_deviceManager = DeviceManagerPtr(new DeviceManager());

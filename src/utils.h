@@ -39,22 +39,7 @@ typedef void (*PauseRecordingFunction)(bool);
 typedef bool (*RecordingPausedFunction)();
 
 enum class Pairs { Scene, Source, Item, Transition, Audio, Media, Filter, String, Integer, Boolean };
-/**
-*
-* Class: State
-* Stores values needed between functions
-* 
-*/
-class state {
-public:
-	// Do Transition Values
-	inline static QString _CurrentTransition="";
-	inline static int _CurrentTransitionDuration=-1;
-	inline static bool _TransitionWasCalled=false;
-	// Scene button Values
-	inline static int previous_scene_norc;
-	inline static int previous_preview_scene_norc;
-};
+enum class Speed {Slow, Medium, Fast};
 class ActionsClass : public QObject {
 	Q_OBJECT
 public:
@@ -170,7 +155,8 @@ public:
 		SceneItemLockChanged,
 		SceneItemTransform,
 		SceneItemSelected,
-		SceneItemDeselected
+		SceneItemDeselected,
+		SwitchScenes
 	};
 	Q_ENUM(obs_event_type)
 	static QString action_to_string(const Actions &enumval);
@@ -306,6 +292,7 @@ QString translate_action(ActionsClass::Actions action);
 };
 /*Midi Message Structure*/
 typedef struct MidiMessage {
+public:
 	MidiMessage() = default;
 	void set_message(const rtmidi::message &message)
 	{
@@ -319,6 +306,7 @@ typedef struct MidiMessage {
 	int channel = 0;
 	int NORC = 0;
 	int value = 0;
+	inline bool isNote() { return (message_type == "Note On" || message_type == "Note Off") ? true : false; };
 	MidiMessage get() { return (MidiMessage) * this; }
 } MidiMessage;
 Q_DECLARE_METATYPE(MidiMessage);

@@ -21,6 +21,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "events.h"
 #include "config.h"
 #include "device-manager.h"
+#include "macro-helpers.h"
 using namespace std;
 ////////////////
 // MIDI AGENT //
@@ -323,8 +324,12 @@ MidiHook *MidiAgent::get_midi_hook_if_exists(const RpcEvent &event)
 		bool found = false;
 		switch (ActionsClass::string_to_action(Utils::untranslate(midiHooks.at(i)->action))) {
 		case ActionsClass::Actions::Set_Volume:
+			found = (midiHooks.at(i)->audio_source == QString(obs_data_get_string(event.additionalFields(), "sourceName")) &&
+				 event.updateType() == "SourceVolumeChanged");
+			break;
 		case ActionsClass::Actions::Toggle_Mute:
-			found = (midiHooks.at(i)->audio_source == QString(obs_data_get_string(event.additionalFields(), "sourceName")));
+			found = (midiHooks.at(i)->audio_source == QString(obs_data_get_string(event.additionalFields(), "sourceName")) &&
+				 event.updateType() == "SourceMuteStateChanged");
 			break;
 		case ActionsClass::Actions::Set_Preview_Scene:
 		case ActionsClass::Actions::Set_Current_Scene:
@@ -342,157 +347,157 @@ MidiHook *MidiAgent::get_midi_hook_if_exists(const RpcEvent &event)
 			found = ((event.updateType() == "StreamStarted") || (event.updateType() == "StreamStopped") ||
 				 (event.updateType() == "StreamStopping"));
 			break;
-            case ActionsClass::Actions::Disable_Preview:
-                
-                break;
-            case ActionsClass::Actions::Disable_Source_Filter:
-                
-                break;
-            case ActionsClass::Actions::Do_Transition:
-                
-                break;
-            case ActionsClass::Actions::Enable_Preview:
-                
-                break;
-            case ActionsClass::Actions::Enable_Source_Filter:
-                
-                break;
-            case ActionsClass::Actions::Move_T_Bar:
-                
-                break;
-            case ActionsClass::Actions::Next_Media:
-                
-                break;
-            case ActionsClass::Actions::Pause_Recording:
-                
-                break;
-            case ActionsClass::Actions::Play_Pause_Media:
-                
-                break;
-            case ActionsClass::Actions::Previous_Media:
-                
-                break;
-            case ActionsClass::Actions::Reload_Browser_Source:
-                
-                break;
-            case ActionsClass::Actions::Reset_Scene_Item:
-                
-                break;
-            case ActionsClass::Actions::Reset_Stats:
-                
-                break;
-            case ActionsClass::Actions::Restart_Media:
-                
-                break;
-            case ActionsClass::Actions::Resume_Recording:
-                
-                break;
-            case ActionsClass::Actions::Save_Replay_Buffer:
-                
-                break;
-            case ActionsClass::Actions::Scrub_Media:
-                
-                break;
-            case ActionsClass::Actions::Set_Audio_Monitor_Type:
-                
-                break;
-            case ActionsClass::Actions::Set_Browser_Source_URL:
-                
-                break;
-            case ActionsClass::Actions::Set_Current_Profile:
-                
-                break;
-            case ActionsClass::Actions::Set_Current_Scene_Collection:
-                
-                break;
-            case ActionsClass::Actions::Set_Current_Transition:
-                
-                break;
-            case ActionsClass::Actions::Set_Gain_Filter:
-                
-                break;
-            case ActionsClass::Actions::Set_Media_Time:
-                
-                break;
-            case ActionsClass::Actions::Set_Mute:
-                
-                break;
-            case ActionsClass::Actions::Set_Opacity:
-                
-                break;
-            case ActionsClass::Actions::Set_Scene_Item_Crop:
-                
-                break;
-            case ActionsClass::Actions::Set_Scene_Item_Position:
-                
-                break;
-            case ActionsClass::Actions::Set_Scene_Item_Render:
-                
-                break;
-            case ActionsClass::Actions::Set_Scene_Item_Transform:
-                
-                break;
-            case ActionsClass::Actions::Set_Scene_Transition_Override:
-                
-                break;
-            case ActionsClass::Actions::Set_Source_Filter_Visibility:
-                
-                break;
-            case ActionsClass::Actions::Set_Source_Name:
-                
-                break;
-            case ActionsClass::Actions::Set_Source_Position:
-                
-                break;
-            case ActionsClass::Actions::Set_Source_Rotation:
-                
-                break;
-            case ActionsClass::Actions::Set_Source_Scale:
-                
-                break;
-            case ActionsClass::Actions::Set_Source_Settings:
-                
-                break;
-            case ActionsClass::Actions::Set_Sync_Offset:
-                
-                break;
-            case ActionsClass::Actions::Set_Text_GDIPlus_Text:
-                
-                break;
-            case ActionsClass::Actions::Set_Transition_Duration:
-                
-                break;
-            case ActionsClass::Actions::Start_Replay_Buffer:
-                
-                break;
-            case ActionsClass::Actions::Stop_Media:
-                
-                break;
-            case ActionsClass::Actions::Stop_Replay_Buffer:
-                
-                break;
-            case ActionsClass::Actions::Studio_Mode:
-                
-                break;
-            case ActionsClass::Actions::Take_Screenshot:
-                
-                break;
-            case ActionsClass::Actions::Take_Source_Screenshot:
-                
-                break;
-            case ActionsClass::Actions::Toggle_Source_Filter:
-                
-                break;
-            case ActionsClass::Actions::Toggle_Source_Visibility:
-                
-                break;
-            case ActionsClass::Actions::Toggle_Start_Stop_Replay_Buffer:
-                
-                break;
-            case ActionsClass::Actions::Unpause_Recording:
-                
-                break;
-        }
+		case ActionsClass::Actions::Disable_Preview:
+
+			break;
+		case ActionsClass::Actions::Disable_Source_Filter:
+
+			break;
+		case ActionsClass::Actions::Do_Transition:
+
+			break;
+		case ActionsClass::Actions::Enable_Preview:
+
+			break;
+		case ActionsClass::Actions::Enable_Source_Filter:
+
+			break;
+		case ActionsClass::Actions::Move_T_Bar:
+
+			break;
+		case ActionsClass::Actions::Next_Media:
+
+			break;
+		case ActionsClass::Actions::Pause_Recording:
+
+			break;
+		case ActionsClass::Actions::Play_Pause_Media:
+
+			break;
+		case ActionsClass::Actions::Previous_Media:
+
+			break;
+		case ActionsClass::Actions::Reload_Browser_Source:
+
+			break;
+		case ActionsClass::Actions::Reset_Scene_Item:
+
+			break;
+		case ActionsClass::Actions::Reset_Stats:
+
+			break;
+		case ActionsClass::Actions::Restart_Media:
+
+			break;
+		case ActionsClass::Actions::Resume_Recording:
+
+			break;
+		case ActionsClass::Actions::Save_Replay_Buffer:
+
+			break;
+		case ActionsClass::Actions::Scrub_Media:
+
+			break;
+		case ActionsClass::Actions::Set_Audio_Monitor_Type:
+
+			break;
+		case ActionsClass::Actions::Set_Browser_Source_URL:
+
+			break;
+		case ActionsClass::Actions::Set_Current_Profile:
+
+			break;
+		case ActionsClass::Actions::Set_Current_Scene_Collection:
+
+			break;
+		case ActionsClass::Actions::Set_Current_Transition:
+
+			break;
+		case ActionsClass::Actions::Set_Gain_Filter:
+
+			break;
+		case ActionsClass::Actions::Set_Media_Time:
+
+			break;
+		case ActionsClass::Actions::Set_Mute:
+
+			break;
+		case ActionsClass::Actions::Set_Opacity:
+
+			break;
+		case ActionsClass::Actions::Set_Scene_Item_Crop:
+
+			break;
+		case ActionsClass::Actions::Set_Scene_Item_Position:
+
+			break;
+		case ActionsClass::Actions::Set_Scene_Item_Render:
+
+			break;
+		case ActionsClass::Actions::Set_Scene_Item_Transform:
+
+			break;
+		case ActionsClass::Actions::Set_Scene_Transition_Override:
+
+			break;
+		case ActionsClass::Actions::Set_Source_Filter_Visibility:
+
+			break;
+		case ActionsClass::Actions::Set_Source_Name:
+
+			break;
+		case ActionsClass::Actions::Set_Source_Position:
+
+			break;
+		case ActionsClass::Actions::Set_Source_Rotation:
+
+			break;
+		case ActionsClass::Actions::Set_Source_Scale:
+
+			break;
+		case ActionsClass::Actions::Set_Source_Settings:
+
+			break;
+		case ActionsClass::Actions::Set_Sync_Offset:
+
+			break;
+		case ActionsClass::Actions::Set_Text_GDIPlus_Text:
+
+			break;
+		case ActionsClass::Actions::Set_Transition_Duration:
+
+			break;
+		case ActionsClass::Actions::Start_Replay_Buffer:
+
+			break;
+		case ActionsClass::Actions::Stop_Media:
+
+			break;
+		case ActionsClass::Actions::Stop_Replay_Buffer:
+
+			break;
+		case ActionsClass::Actions::Studio_Mode:
+
+			break;
+		case ActionsClass::Actions::Take_Screenshot:
+
+			break;
+		case ActionsClass::Actions::Take_Source_Screenshot:
+
+			break;
+		case ActionsClass::Actions::Toggle_Source_Filter:
+
+			break;
+		case ActionsClass::Actions::Toggle_Source_Visibility:
+
+			break;
+		case ActionsClass::Actions::Toggle_Start_Stop_Replay_Buffer:
+
+			break;
+		case ActionsClass::Actions::Unpause_Recording:
+
+			break;
+		}
 		if (found)
 			return midiHooks.at(i);
 	}
@@ -503,133 +508,79 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 {
 	blog(LOG_DEBUG, "OBS Event : %s \n AD: %s", event.updateType().toStdString().c_str(), obs_data_get_json(event.additionalFields()));
 	MidiHook *hook = get_midi_hook_if_exists(event);
-	if (!this->sending) {
-		// ON EVENT TYPE Find matching hook, pull data from that hook, and do thing.
-		if (hook != NULL) {
-			MidiMessage *message = hook->get_message_from_hook();
-			if (event.updateType() == QString("SourceVolumeChanged")) {
-				double vol = obs_data_get_double(event.additionalFields(), "volume");
-				uint8_t newvol = Utils::mapper2(cbrt(vol));
-				message->value = newvol;
-				this->send_message_to_midi_device((MidiMessage)*message);
-			} else if (event.updateType() == QString("SwitchScenes")) {
-				message->message_type = "Note Off";
-				message->channel = hook->channel;
-				message->NORC = state::previous_scene_norc;
-				message->value = 0;
-				this->send_message_to_midi_device((MidiMessage)*message);
-				message->NORC = hook->norc;
-				message->message_type = "Note On";
-				message->value = 1;
-				this->send_message_to_midi_device((MidiMessage)*message);
-				state::previous_scene_norc = hook->norc;
-			} else if (event.updateType() == QString("PreviewSceneChanged")) {
-				message->message_type = "Note Off";
-				message->channel = hook->channel;
-				message->NORC = state::previous_preview_scene_norc;
-				message->value = 0;
-				this->send_message_to_midi_device((MidiMessage)*message);
-				message->NORC = hook->norc;
-				message->message_type = "Note On";
-				message->value = 1;
-				this->send_message_to_midi_device((MidiMessage)*message);
-				state::previous_preview_scene_norc = hook->norc;
-			} else if (event.updateType() == QString("SourceMuteStateChanged")) {
-				bool muted = obs_data_get_bool(event.additionalFields(), "muted");
-				if (muted) {
-					message->value = 2;
-				} else {
-					message->value = muted;
-				}
-				message->message_type = "Note On";
-				message->channel = hook->channel;
-				message->NORC = hook->norc;
-				this->send_message_to_midi_device((MidiMessage)*message);
-			} else if (event.updateType() == QString("StreamStarted")) {
-				message->message_type = "Note On";
-				message->channel = hook->channel;
-				message->NORC = hook->norc;
-				message->value = 2;
-				this->send_message_to_midi_device((MidiMessage)*message);
-			} else if (event.updateType() == QString("StreamStopped")) {
-				message->message_type = "Note Off";
-				message->channel = hook->channel;
-				message->NORC = hook->norc;
-				message->value = 0;
-				this->send_message_to_midi_device((MidiMessage)*message);
-			} else if (event.updateType() == QString("StreamStopping")) {
-				message->message_type = "Note On";
-				message->channel = hook->channel;
-				message->NORC = hook->norc;
-				message->value = 2;
-				this->send_message_to_midi_device((MidiMessage)*message);
-			} else if (event.updateType() == QString("RecordingStarted")) {
-				message->message_type = "Note On";
-				message->channel = hook->channel;
-				message->NORC = hook->norc;
-				message->value = 2;
-				this->send_message_to_midi_device((MidiMessage)*message);
-			} else if (event.updateType() == QString("RecordingStopped")) {
-				message->message_type = "Note Off";
-				message->channel = hook->channel;
-				message->NORC = hook->norc;
-				message->value = 0;
-				this->send_message_to_midi_device((MidiMessage)*message);
-			} else if (event.updateType() == QString("RecordingStopping")) {
-				message->message_type = "Note On";
-				message->channel = hook->channel;
-				message->NORC = hook->norc;
-				message->value = 2;
-				this->send_message_to_midi_device((MidiMessage)*message);
-			}
-			delete (message);
+	// ON EVENT TYPE Find matching hook, pull data from that hook, and do thing.
+	if (hook != NULL) {
+		MidiMessage *message = hook->get_message_from_hook();
+		switch (ActionsClass::string_to_event(event.updateType())) {
+		case ActionsClass::obs_event_type::SourceVolumeChanged:
+			Macro::set_volume(this, message, obs_data_get_double(event.additionalFields(), "volume"));
+			break;
+		case ActionsClass::obs_event_type::SwitchScenes:
+			Macro::swap_buttons(this, message, state::previous_scene_norc, hook->norc);
+			state::previous_scene_norc = hook->norc;
+			break;
+		case ActionsClass::obs_event_type::PreviewSceneChanged:
+			Macro::swap_buttons(this, message, state::previous_preview_scene_norc, hook->norc);
+			state::previous_preview_scene_norc = hook->norc;
+			break;
+		case ActionsClass::obs_event_type::SourceMuteStateChanged:
+			Macro::set_on_off(this, message, !obs_data_get_bool(event.additionalFields(), "muted"));
+			break;
+		case ActionsClass::obs_event_type::StreamStarted:
+			Macro::set_on_off(this, message, true);
+			break;
+		case ActionsClass::obs_event_type::StreamStarting:
+			Macro::set_on_off(this, message, false);
+			break;
+		case ActionsClass::obs_event_type::StreamStopped:
+			Macro::set_on_off(this, message, false);
+			break;
+		case ActionsClass::obs_event_type::StreamStopping:
+			Macro::set_on_off(this, message, false);
+			break;
+		case ActionsClass::obs_event_type::RecordingStarted:
+			Macro::set_on_off(this, message, true);
+			break;
+		case ActionsClass::obs_event_type::RecordingStarting:
+			Macro::set_on_off(this, message, false);
+			break;
+		case ActionsClass::obs_event_type::RecordingStopping:
+			Macro::set_on_off(this, message, true);
+			break;
+		case ActionsClass::obs_event_type::RecordingStopped:
+			Macro::set_on_off(this, message, false);
+			break;
 		}
-		MidiMessage *message = new MidiMessage();
-		if (event.updateType() == QString("TransitionBegin")) {
-			QString from = obs_data_get_string(event.additionalFields(), "from-scene");
-			for (int i = 0; i < this->midiHooks.size(); i++) {
-				if (this->midiHooks.at(i)->action == Utils::translate_action(ActionsClass::Actions::Set_Current_Scene) &&
-				    this->midiHooks.at(i)->scene == from) {
-					message->channel = this->midiHooks.at(i)->channel;
-					message->message_type = "Note On";
-					message->NORC = this->midiHooks.at(i)->norc;
-					message->value = 0;
-					this->send_message_to_midi_device((MidiMessage)*message);
-					message->message_type = "Note Off";
-					this->send_message_to_midi_device((MidiMessage)*message);
-				}
-			}
-		} else if (event.updateType() == QString("SourceRenamed")) {
-			QString from = obs_data_get_string(event.additionalFields(), "previousName");
-			for (int i = 0; i < this->midiHooks.size(); i++) {
-				if (this->midiHooks.at(i)->scene == from) {
-					this->midiHooks.at(i)->scene = obs_data_get_string(event.additionalFields(), "newName");
-					GetConfig().get()->Save();
-				} else if (this->midiHooks.at(i)->source == from) {
-					this->midiHooks.at(i)->source = obs_data_get_string(event.additionalFields(), "newName");
-					GetConfig().get()->Save();
-				}
-			}
-		} else if (event.updateType() == QString("Exiting")) {
-			disconnect(GetEventsSystem().get(), &Events::obsEvent, this, &MidiAgent::handle_obs_event);
-			closing = true;
-		} else if (event.updateType() == QString("SourceDestroyed")) {
-			if (!closing) {
-				QString from = obs_data_get_string(event.additionalFields(), "sourceName");
-				for (int i = 0; i < this->midiHooks.size(); i++) {
-					if (this->midiHooks.at(i)->source == from) {
-						this->remove_MidiHook(this->midiHooks.at(i));
-						GetConfig().get()->Save();
-					}
-				}
-				GetConfig()->Save();
-			}
-		} else if (event.updateType() == QString("ProfileChanged") || event.updateType() == QString("SceneCollectionChanged")) {
-			GetDeviceManager().get()->reload();
-		}
+
 		delete (message);
-	} else {
-		this->sending = false;
+	}
+	if (event.updateType() == QString("SourceRenamed")) {
+		QString from = obs_data_get_string(event.additionalFields(), "previousName");
+		for (int i = 0; i < this->midiHooks.size(); i++) {
+			if (this->midiHooks.at(i)->scene == from) {
+				this->midiHooks.at(i)->scene = obs_data_get_string(event.additionalFields(), "newName");
+				GetConfig().get()->Save();
+			} else if (this->midiHooks.at(i)->source == from) {
+				this->midiHooks.at(i)->source = obs_data_get_string(event.additionalFields(), "newName");
+				GetConfig().get()->Save();
+			}
+		}
+	} else if (event.updateType() == QString("Exiting")) {
+		disconnect(GetEventsSystem().get(), &Events::obsEvent, this, &MidiAgent::handle_obs_event);
+		closing = true;
+	} else if (event.updateType() == QString("SourceDestroyed")) {
+		if (!closing) {
+			QString from = obs_data_get_string(event.additionalFields(), "sourceName");
+			for (int i = 0; i < this->midiHooks.size(); i++) {
+				if (this->midiHooks.at(i)->source == from) {
+					this->remove_MidiHook(this->midiHooks.at(i));
+					GetConfig().get()->Save();
+				}
+			}
+			GetConfig()->Save();
+		}
+	} else if (event.updateType() == QString("ProfileChanged") || event.updateType() == QString("SceneCollectionChanged")) {
+		GetDeviceManager().get()->reload();
 	}
 }
 void MidiAgent::send_message_to_midi_device(const MidiMessage &message)

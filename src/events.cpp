@@ -27,7 +27,7 @@
 #include "config.h"
 #include "utils.h"
 #include "forms/settings-dialog.h"
-
+#include "macro-helpers.h"
 #define STATUS_INTERVAL 2000
 
 const char *sourceTypeToString(obs_source_type type)

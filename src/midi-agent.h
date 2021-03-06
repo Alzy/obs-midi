@@ -69,7 +69,7 @@ public:
 	void remove_MidiHook(MidiHook *hook);
 	void clear_MidiHooks();
 	QString GetData();
-
+	void send_message_to_midi_device(const MidiMessage &message);
 public slots:
 	void handle_obs_event(const RpcEvent &event);
 signals:
@@ -77,7 +77,7 @@ signals:
 	void do_obs_action(MidiHook *, int);
 
 private:
-	void send_message_to_midi_device(const MidiMessage &message);
+	
 	rtmidi::midi_in midiin;
 	rtmidi::midi_out midiout;
 	QString midi_input_name;

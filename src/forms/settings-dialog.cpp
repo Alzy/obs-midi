@@ -565,7 +565,14 @@ int PluginWindow::find_mapping_location(const MidiMessage &message)
 	auto hooks = devicemanager->get_midi_hooks(ui->mapping_lbl_device_name->text());
 	for (int i = 0; i < hooks.size(); i++) {
 		if ((hooks.at(i)->channel == message.channel) && (hooks.at(i)->norc == message.NORC) && (hooks.at(i)->message_type == message.message_type)) {
-			return i;
+			if (hooks.at(i)->value_as_filter) {
+				if (hooks.at(i)->value == message.value) {
+					return i;
+				}
+			} else {
+				return i;
+			}
+			
 		}
 	}
 	return -1;
@@ -574,7 +581,9 @@ void PluginWindow::add_new_mapping()
 {
 	ui->btn_Listen_many->setChecked(false);
 	ui->btn_Listen_one->setChecked(false);
-	if (!map_exists() && verify_mapping() && ui->sb_channel->value() != 0) {
+	if ((!map_exists() && verify_mapping() && ui->sb_channel->value() != 0)
+		||( (map_exists() && ui->check_use_value->isChecked())))
+		{
 		int row = ui->table_mapping->rowCount();
 		ui->table_mapping->insertRow(row);
 		// don't delete it, because the table takes ownership of the items
@@ -607,6 +616,8 @@ void PluginWindow::add_new_mapping()
 		newmh->channel = ui->sb_channel->value();
 		newmh->message_type = ui->cb_mtype->currentText();
 		newmh->norc = ui->sb_norc->value();
+		newmh->value_as_filter = ui->check_use_value->isChecked();
+		newmh->value = (ui->check_use_value->isChecked()) ? ui->slider_value->value() : -1;
 		newmh->action = ui->cb_obs_output_action->currentText();
 		newmh->scene = ui->cb_obs_output_scene->currentText();
 		newmh->source = ui->cb_obs_output_source->currentText();
@@ -716,7 +727,17 @@ void PluginWindow::load_table()
 		}
 	}
 }
-
+void PluginWindow::removeHook(MidiHook *hook) {
+	int row = ui->table_mapping->selectedItems().at(0)->row();
+	auto devicemanager = GetDeviceManager();
+	auto dev = devicemanager->get_midi_device(ui->mapping_lbl_device_name->text());
+	auto hooks = dev->GetMidiHooks();
+	auto conf = GetConfig();
+	dev->remove_MidiHook(hook);
+	conf->Save();
+	ui->table_mapping->removeRow(row);
+	ui->table_mapping->clearSelection();
+}
 void PluginWindow::delete_mapping()
 {
 	if (ui->table_mapping->rowCount() > 0) {
@@ -728,10 +749,14 @@ void PluginWindow::delete_mapping()
 		for (int i = 0; i < hooks.size(); i++) {
 			if ((hooks.at(i)->channel == ui->sb_channel->value()) && (hooks.at(i)->norc == ui->sb_norc->value()) &&
 			    (hooks.at(i)->message_type == ui->cb_mtype->currentText())) {
-				dev->remove_MidiHook(hooks.at(i));
-				conf->Save();
-				ui->table_mapping->removeRow(row);
-				ui->table_mapping->clearSelection();
+				if (hooks.at(i)->value_as_filter) {
+					if (hooks.at(i)->value == ui->slider_value->value()){
+						removeHook(hooks.at(i));
+					}
+				} else {
+					removeHook(hooks.at(i));
+				}
+				
 			}
 		}
 	}
@@ -748,6 +773,8 @@ void PluginWindow::edit_mapping()
 		ui->sb_channel->setValue(sitems.at(0)->text().toInt());
 		ui->cb_mtype->setCurrentText(sitems.at(1)->text());
 		ui->sb_norc->setValue(sitems.at(2)->text().toInt());
+		ui->check_use_value->setChecked(dv.at(row)->value_as_filter);
+		ui->slider_value->setValue((dv.at(row)->value_as_filter) ? dv.at(row)->value : 0);
 		// rebuild actions
 		ui->cb_obs_output_action->setCurrentText(sitems.at(3)->text());
 		ui->cb_obs_output_scene->setCurrentText(sitems.at(4)->text());

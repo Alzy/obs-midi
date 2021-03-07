@@ -45,6 +45,7 @@ private slots:
 	void tab_changed(int i);
 	void clear_table();
 	void load_table();
+	void removeHook(MidiHook *hook);
 	void delete_mapping();
 	void edit_mapping();
 	void set_cell_colors(const QColor &color, QTableWidgetItem *item);

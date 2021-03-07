@@ -117,6 +117,8 @@ void MidiAgent::Load(const char *incoming_data)
 		mh->norc = obs_data_get_int(hookData, "norc");
 		mh->channel = obs_data_get_int(hookData, "channel");
 		mh->action = obs_data_get_string(hookData, "action");
+		mh->value_as_filter = obs_data_get_bool(hookData, "value_as_filter");
+		mh->value = obs_data_get_int(hookData, "value");
 		mh->scene = obs_data_get_string(hookData, "scene");
 		mh->source = obs_data_get_string(hookData, "source");
 		mh->filter = obs_data_get_string(hookData, "filter");
@@ -342,7 +344,12 @@ MidiHook *MidiAgent::get_midi_hook_if_exists(MidiMessage *message)
 {
 	for (auto midiHook : this->midiHooks) {
 		if (midiHook->message_type == message->message_type && midiHook->norc == message->NORC && midiHook->channel == message->channel) {
-			return midiHook;
+			if (midiHook->value_as_filter && message->value == midiHook->value) {
+					return midiHook;
+			} 
+			if(!midiHook->value_as_filter) {
+				return midiHook;
+			}
 		}
 	}
 	return nullptr;

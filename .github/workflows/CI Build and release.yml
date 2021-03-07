@@ -28,11 +28,7 @@ jobs:
         with:
           path: ${{ github.workspace }}/
       - run: |
-          
           echo "${{ steps.version.outputs.version }}"
-      - uses: avakar/tag-and-release@v1
-        with:
-          tag_name: ${{ steps.version.outputs.version }}
   windows:
     name: 'Windows 64-bit'
     runs-on: [windows-latest]
@@ -46,6 +42,14 @@ jobs:
       ACTIONS_ALLOW_UNSECURE_COMMANDS: true
       isCI: true
     steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+        with:
+          path: ${{ github.workspace }}/
+      - uses: avakar/derive-version@v1
+        id: version
+        with:
+          path: ${{ github.workspace }}/
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.0.0
       - name: 'Checkout'
@@ -184,6 +188,14 @@ jobs:
       isCI: true
     if: contains(github.event.head_commit.message, '[skip ci]') != true
     steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+        with:
+          path: ${{ github.workspace }}/
+      - uses: avakar/derive-version@v1
+        id: version
+        with:
+          path: ${{ github.workspace }}/
       - name: 'Checkout'
         uses: actions/checkout@v2
         with:
@@ -356,6 +368,14 @@ jobs:
       hbc: '6'
     if: contains(github.event.head_commit.message, '[skip ci]') != true
     steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+        with:
+          path: ${{ github.workspace }}/
+      - uses: avakar/derive-version@v1
+        id: version
+        with:
+          path: ${{ github.workspace }}/
       - name: 'Checkout OBS-MIDI'
         uses: actions/checkout@v2
         with:

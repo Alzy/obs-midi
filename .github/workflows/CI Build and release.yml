@@ -22,12 +22,14 @@ jobs:
       - name: 'Checkout'
         uses: actions/checkout@v2
         with:
-          path: ${{ github.workspace }}/obs-midi
+          path: ${{ github.workspace }}/
       - uses: avakar/derive-version@v1
         id: version
+        with:
+          path: ${{ github.workspace }}/
       - run: |
-          mkdir ${{ github.workspace }}/obs-midi/_build
-          cd ${{ github.workspace }}/obs-midi/_build
+          mkdir ${{ github.workspace }}/_build
+          cd ${{ github.workspace }}/_build
           cmake .. -DVERSION="${{ steps.version.outputs.version }}"
       - uses: avakar/tag-and-release@v1
         with:

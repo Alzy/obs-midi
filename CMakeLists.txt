@@ -34,16 +34,9 @@ endif()
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
 # Version bits
 execute_process(
-  COMMAND git rev-parse --abbrev-ref HEAD
+  COMMAND git describe --abbrev=0 --tags 
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  OUTPUT_VARIABLE GIT_BRANCH
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-# Get the latest abbreviated commit hash of the working branch
-execute_process(
-  COMMAND git log -1 --format=%h
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  OUTPUT_VARIABLE GIT_COMMIT_HASH
+  OUTPUT_VARIABLE GIT_TAG
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 configure_file(

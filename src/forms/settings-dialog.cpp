@@ -321,6 +321,7 @@ void PluginWindow::show_pair(Pairs Pair)
 		ui->sb_int_override->show();
 		ui->label_Int_override->show();
 		ui->check_int_override->show();
+		ui->check_int_override->setEnabled(false);
 		break;
 	}
 }
@@ -522,16 +523,21 @@ void PluginWindow::obs_actions_select(const QString &action)
 			ui->cb_obs_output_source->addItems(Utils::get_browser_sources());
 			break;
 		case ActionsClass::Actions::Do_Transition:
+			show_pair(Pairs::Scene);
 			show_pair(Pairs::Integer);
 			show_pair(Pairs::Transition);
+			ui->cb_obs_output_scene->insertItem(0, "Preview Scene");
+			ui->cb_obs_output_scene->setCurrentIndex(0);
 			ui->cb_obs_output_transition->insertItem(0, "Current Transition");
 			ui->cb_obs_output_transition->setCurrentIndex(0);
 			ui->label_Int_override->setText("Duration * ");
+			ui->label_obs_output_scene->setText("Scene*");
+			ui->label_obs_output_transition->setText("Transition*");
 			ui->sb_int_override->setValue(300);
 			ui->sb_int_override->setMaximum(100000);
 			ui->sb_int_override->setMinimum(0);
 			ui->sb_int_override->setSuffix(" ms");
-			ui->sb_int_override->setReadOnly(false);
+			ui->sb_int_override->setEnabled(false);
 
 			break;
 		default:
@@ -573,7 +579,6 @@ void PluginWindow::add_new_mapping()
 	if (!map_exists() && verify_mapping() && ui->sb_channel->value() != 0) {
 		int row = ui->table_mapping->rowCount();
 		ui->table_mapping->insertRow(row);
-
 		// don't delete it, because the table takes ownership of the items
 		QTableWidgetItem *channelitem = new QTableWidgetItem(QString::number(ui->sb_channel->value()));
 		QTableWidgetItem *mtypeitem = new QTableWidgetItem(ui->cb_mtype->currentText());
@@ -612,12 +617,9 @@ void PluginWindow::add_new_mapping()
 		newmh->item = ui->cb_obs_output_item->currentText();
 		newmh->audio_source = ui->cb_obs_output_audio_source->currentText();
 		newmh->media_source = ui->cb_obs_output_media_source->currentText();
-		(ui->check_int_override->isChecked()) ? newmh->int_override.emplace(ui->sb_int_override->value()) : NULL;
-		auto dm = GetDeviceManager();
-		auto dev = dm->get_midi_device(ui->mapping_lbl_device_name->text());
-		dev->add_MidiHook(newmh);
-		auto conf = GetConfig();
-		conf->Save();
+		newmh->int_override.emplace() << (ui->check_int_override->isChecked()) ? ui->sb_int_override->value() : -1;
+		GetDeviceManager().get()->get_midi_device(ui->mapping_lbl_device_name->text())->add_MidiHook(newmh);
+		GetConfig().get()->Save();
 		ui->table_mapping->selectRow(row);
 	} else {
 		if (ui->sb_channel->value()) {
@@ -678,10 +680,10 @@ void PluginWindow::set_all_cell_colors(int row)
 {
 	QColor midic(0, 170, 255);
 	QColor actc(170, 0, 255);
-	
+
 	for (int col = 0; col <= 11; col++) {
 		auto rc = ui->table_mapping->item(row, col);
-		(col < 3)?set_cell_colors(midic, rc):set_cell_colors(actc, rc);
+		(col < 3) ? set_cell_colors(midic, rc) : set_cell_colors(actc, rc);
 	}
 }
 

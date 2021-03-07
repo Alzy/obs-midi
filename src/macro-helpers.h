@@ -22,6 +22,8 @@ public:
 	inline static int previous_preview_scene_norc=-1;
 	//** **/
 	inline static bool swapping = false;
+	inline static bool closing = false;
+	inline static bool transitioning = false;
 };
 namespace Macro {
 /**

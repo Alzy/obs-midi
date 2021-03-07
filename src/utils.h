@@ -108,6 +108,7 @@ public:
 	Q_ENUM(Actions)
 	enum class obs_event_type {
 		SourceDestroyed,
+		SourceRemoved, 
 		SceneChanged,
 		SceneListChanged,
 		SceneCollectionChanged,

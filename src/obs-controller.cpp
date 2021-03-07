@@ -259,7 +259,9 @@ void OBSController::ResetSceneItem()
  * transitionDuration is optional. (milliseconds)
  */
 void OBSController::TransitionToProgram()
-{	
+{
+	if (state::transitioning)
+		return;
 	state()._CurrentTransitionDuration=obs_frontend_get_transition_duration();
 	obs_source_t *transition = obs_frontend_get_current_transition();
 	QString scenename;
@@ -276,6 +278,8 @@ void OBSController::TransitionToProgram()
 	if (hook->scene == "Preview Scene") {
 		obs_source_t *source = obs_frontend_get_current_scene();
 		hook->scene = QString(obs_source_get_name(source));
+		state()._TransitionWasCalled = true;
+
 	}
 	if (hook->int_override && *hook->int_override >0) {
 		obs_frontend_set_transition_duration(*hook->int_override);

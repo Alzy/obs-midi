@@ -59,11 +59,14 @@ const char *calldata_get_string(const calldata_t *data, const char *name)
 }
 Events::Events() : _streamStarttime(0), _lastBytesSent(0), _lastBytesSentTime(0), HeartbeatIsActive(false), pulse(false)
 {
+	obs_frontend_add_event_callback(Events::FrontendEventHandler, this);
 	this->setParent(plugin_window);
 }
 Events::~Events() {}
 void Events::startup()
 {
+	
+
 	// Connect to signals of all existing sources
 	obs_enum_sources(
 		[](void *param, obs_source_t *source) {
@@ -99,11 +102,13 @@ void Events::shutdown()
 void Events::FrontendEventHandler(enum obs_frontend_event event, void *private_data)
 {
 	auto owner = reinterpret_cast<Events *>(private_data);
-
-	switch (event) {
-	case OBS_FRONTEND_EVENT_FINISHED_LOADING:
+	if (event == OBS_FRONTEND_EVENT_FINISHED_LOADING) {
+		owner->started = true;
 		owner->FinishedLoading();
-		break;
+	}
+	if (!owner->started)
+		return;
+	switch (event) {
 	case OBS_FRONTEND_EVENT_SCENE_CHANGED:
 		owner->OnSceneChange();
 		break;
@@ -227,6 +232,7 @@ void Events::connectSourceSignals(obs_source_t *source)
 	disconnectSourceSignals(source);
 	obs_source_type sourceType = obs_source_get_type(source);
 	signal_handler_t *sh = obs_source_get_signal_handler(source);
+	signal_handler_connect(sh, "remove", OnSourceRemoved, this);
 	signal_handler_connect(sh, "rename", OnSourceRename, this);
 	signal_handler_connect(sh, "mute", OnSourceMuteStateChange, this);
 	signal_handler_connect(sh, "volume", OnSourceVolumeChange, this);
@@ -252,6 +258,7 @@ void Events::disconnectSourceSignals(obs_source_t *source)
 		return;
 	}
 	signal_handler_t *sh = obs_source_get_signal_handler(source);
+	signal_handler_disconnect(sh, "remove", OnSourceRemoved, this);
 	signal_handler_disconnect(sh, "rename", OnSourceRename, this);
 	signal_handler_disconnect(sh, "mute", OnSourceMuteStateChange, this);
 	signal_handler_disconnect(sh, "volume", OnSourceVolumeChange, this);
@@ -665,6 +672,7 @@ void Events::OnReplayStopped()
  */
 void Events::OnExit()
 {
+	state::closing = true;
 	broadcastUpdate("Exiting");
 	this->disconnect();
 }
@@ -857,8 +865,10 @@ void Events::OnTransitionBegin(void *param, calldata_t *data)
  */
 void Events::OnTransitionEnd(void *param, calldata_t *data)
 {
+	state::transitioning = false;
 	auto instance = reinterpret_cast<Events *>(param);
 	OBSSource transition = calldata_get_pointer<obs_source_t>(data, "source");
+	
 	if (!transition) {
 		return;
 	}
@@ -873,6 +883,7 @@ void Events::OnTransitionEnd(void *param, calldata_t *data)
 	blog(LOG_DEBUG, "transition %s ended - to scene %s", obs_data_get_string(fields, "name"), obs_data_get_string(fields, "to-scene"));
 	instance->broadcastUpdate("TransitionEnd", fields);
 	obs_data_release(fields);
+	
 }
 /**
  * A stinger transition has finished playing its video.
@@ -890,6 +901,7 @@ void Events::OnTransitionEnd(void *param, calldata_t *data)
  */
 void Events::OnTransitionVideoEnd(void *param, calldata_t *data)
 {
+
 	auto instance = reinterpret_cast<Events *>(param);
 	OBSSource transition = calldata_get_pointer<obs_source_t>(data, "source");
 	if (!transition) {
@@ -1157,6 +1169,18 @@ void Events::OnSourceFilterAdded(void *param, calldata_t *data)
  * @category sources
  * @since 4.6.0
  */
+void Events::OnSourceRemoved(void *param, calldata_t *data) {
+	auto self = reinterpret_cast<Events *>(param);
+
+	obs_source_t *source = calldata_get_pointer<obs_source_t>(data, "source");
+	if (!source) {
+		return;
+	}
+	obs_data_t *fields = obs_data_create();
+	obs_data_set_string(fields, "sourceName", obs_source_get_name(source));
+	self->broadcastUpdate("SourceRemoved", fields);
+	obs_data_release(fields);
+}
 void Events::OnSourceFilterRemoved(void *param, calldata_t *data)
 {
 	auto self = reinterpret_cast<Events *>(param);

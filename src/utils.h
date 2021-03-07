@@ -39,7 +39,7 @@ typedef void (*PauseRecordingFunction)(bool);
 typedef bool (*RecordingPausedFunction)();
 
 enum class Pairs { Scene, Source, Item, Transition, Audio, Media, Filter, String, Integer, Boolean };
-enum class Speed {Slow, Medium, Fast};
+enum class Speed { Slow, Medium, Fast };
 class ActionsClass : public QObject {
 	Q_OBJECT
 public:
@@ -108,7 +108,7 @@ public:
 	Q_ENUM(Actions)
 	enum class obs_event_type {
 		SourceDestroyed,
-		SourceRemoved, 
+		SourceRemoved,
 		SceneChanged,
 		SceneListChanged,
 		SceneCollectionChanged,
@@ -227,8 +227,7 @@ QStringList get_filter_names(const QString &Source);
 QStringList get_transition_names();
 QString untranslate(const QString &tstring);
 QStringList get_browser_sources();
-const QList<ActionsClass::Actions> AllActions_raw = {
-						     ActionsClass::Actions::Disable_Source_Filter,
+const QList<ActionsClass::Actions> AllActions_raw = {ActionsClass::Actions::Disable_Source_Filter,
 						     ActionsClass::Actions::Do_Transition,
 						     ActionsClass::Actions::Enable_Source_Filter,
 						     ActionsClass::Actions::Move_T_Bar,
@@ -333,6 +332,7 @@ public:
 	QString string_override;
 	std::optional<bool> bool_override;
 	std::optional<int> int_override;
+	bool value_as_filter = false;
 	int value = -1;
 	MidiMessage *get_message_from_hook() const
 	{
@@ -363,6 +363,8 @@ public:
 		string_override = obs_data_get_string(data, "string_override");
 		bool_override.emplace(obs_data_get_bool(data, "bool_override"));
 		int_override.emplace(obs_data_get_int(data, "int_override"));
+		value_as_filter = obs_data_get_bool(data, "value_as_filter");
+		value = obs_data_get_int(data, "value");
 	}
 
 	QString GetData()
@@ -412,6 +414,10 @@ public:
 		if (int_override) {
 			obs_data_set_int(data, "int_override", *int_override);
 		}
+		if (value_as_filter) {
+			obs_data_set_int(data, "value", value);
+		}
+		obs_data_set_bool(data, "value_as_filter", value_as_filter);
 		QString hookdata(obs_data_get_json(data));
 		blog(LOG_DEBUG, "Midi Hook JSON = %s", hookdata.toStdString().c_str());
 		obs_data_release(data);

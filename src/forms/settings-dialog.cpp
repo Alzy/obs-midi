@@ -748,6 +748,7 @@ void PluginWindow::edit_mapping()
 		ui->sb_channel->setValue(sitems.at(0)->text().toInt());
 		ui->cb_mtype->setCurrentText(sitems.at(1)->text());
 		ui->sb_norc->setValue(sitems.at(2)->text().toInt());
+		
 		// rebuild actions
 		ui->cb_obs_output_action->setCurrentText(sitems.at(3)->text());
 		ui->cb_obs_output_scene->setCurrentText(sitems.at(4)->text());

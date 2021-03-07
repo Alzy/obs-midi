@@ -140,7 +140,7 @@ void PluginWindow::on_check_enabled_state_changed(int state)
 		int devicePort = GetDeviceManager()->get_input_port_number(selectedDeviceName.c_str());
 		int deviceOutPort = GetDeviceManager()->get_output_port_number(selectedOutDeviceName.c_str());
 		if (device == NULL) {
-			device = GetDeviceManager()->register_midi_devicedevicePort, deviceOutPort);
+			device = GetDeviceManager()->register_midi_device(devicePort, deviceOutPort);
 		}
 		device->open_midi_input_port();
 		device->open_midi_output_port();
@@ -257,21 +257,14 @@ void PluginWindow::add_midi_device(const QString &name)
 }
 void PluginWindow::set_headers()
 {
-	ui->table_mapping->setHorizontalHeaderLabels(
-		{"Channel", "Message Type", "Note or Control", "Action", "Scene", "Source", "Filter", "Transition", "Item", "Audio Source", "Media Source"});
+	ui->table_mapping->setHorizontalHeaderLabels({"Channel", "Message Type", "Note or Control", "Action", "Scene", "Source", "Filter", "Transition", "Item",
+						      "Audio Source", "Media Source", "Duration"});
 	QColor midicolor("#00aaff");
 	QColor actioncolor("#aa00ff");
-	ui->table_mapping->horizontalHeaderItem(0)->setForeground(midicolor);
-	ui->table_mapping->horizontalHeaderItem(1)->setForeground(midicolor);
-	ui->table_mapping->horizontalHeaderItem(2)->setForeground(midicolor);
-	ui->table_mapping->horizontalHeaderItem(3)->setForeground(actioncolor);
-	ui->table_mapping->horizontalHeaderItem(4)->setForeground(actioncolor);
-	ui->table_mapping->horizontalHeaderItem(5)->setForeground(actioncolor);
-	ui->table_mapping->horizontalHeaderItem(6)->setForeground(actioncolor);
-	ui->table_mapping->horizontalHeaderItem(7)->setForeground(actioncolor);
-	ui->table_mapping->horizontalHeaderItem(8)->setForeground(actioncolor);
-	ui->table_mapping->horizontalHeaderItem(9)->setForeground(actioncolor);
-	ui->table_mapping->horizontalHeaderItem(10)->setForeground(actioncolor);
+	for (int i = 0; i <= 11; i++) {
+		(i <= 2) ? ui->table_mapping->horizontalHeaderItem(i)->setForeground(midicolor)
+			 : ui->table_mapping->horizontalHeaderItem(i)->setForeground(actioncolor);
+	}
 }
 void PluginWindow::show_pair(Pairs Pair)
 {
@@ -539,7 +532,7 @@ void PluginWindow::obs_actions_select(const QString &action)
 			ui->sb_int_override->setMinimum(0);
 			ui->sb_int_override->setSuffix(" ms");
 			ui->sb_int_override->setReadOnly(false);
-		
+
 			break;
 		default:
 			hide_all_pairs();
@@ -553,7 +546,7 @@ void PluginWindow::save_edit() {}
 bool PluginWindow::map_exists()
 {
 	auto devicemanager = GetDeviceManager();
-	auto hooks = devicemanager->get_midi_hooksui->mapping_lbl_device_name->text());
+	auto hooks = devicemanager->get_midi_hooks(ui->mapping_lbl_device_name->text());
 	for (int i = 0; i < hooks.size(); i++) {
 		if ((hooks.at(i)->channel == ui->sb_channel->value()) && (hooks.at(i)->norc == ui->sb_norc->value()) &&
 		    (hooks.at(i)->message_type == ui->cb_mtype->currentText())) {
@@ -565,7 +558,7 @@ bool PluginWindow::map_exists()
 int PluginWindow::find_mapping_location(const MidiMessage &message)
 {
 	auto devicemanager = GetDeviceManager();
-	auto hooks = devicemanager->get_midi_hooksui->mapping_lbl_device_name->text());
+	auto hooks = devicemanager->get_midi_hooks(ui->mapping_lbl_device_name->text());
 	for (int i = 0; i < hooks.size(); i++) {
 		if ((hooks.at(i)->channel == message.channel) && (hooks.at(i)->norc == message.NORC) && (hooks.at(i)->message_type == message.message_type)) {
 			return i;
@@ -577,10 +570,6 @@ void PluginWindow::add_new_mapping()
 {
 	ui->btn_Listen_many->setChecked(false);
 	ui->btn_Listen_one->setChecked(false);
-	QColor midic;
-	midic.setRgb(0, 170, 255);
-	QColor actc;
-	actc.setRgb(170, 0, 255);
 	if (!map_exists() && verify_mapping() && ui->sb_channel->value() != 0) {
 		int row = ui->table_mapping->rowCount();
 		ui->table_mapping->insertRow(row);
@@ -598,19 +587,6 @@ void PluginWindow::add_new_mapping()
 		QTableWidgetItem *audioitem = new QTableWidgetItem(ui->cb_obs_output_audio_source->currentText());
 		QTableWidgetItem *mediaitem = new QTableWidgetItem(ui->cb_obs_output_media_source->currentText());
 		QTableWidgetItem *int_override = new QTableWidgetItem(QString::number(ui->sb_int_override->value()));
-
-		set_cell_colors(midic, channelitem);
-		set_cell_colors(midic, mtypeitem);
-		set_cell_colors(midic, norcitem);
-		set_cell_colors(actc, actionitem);
-		set_cell_colors(actc, sceneitem);
-		set_cell_colors(actc, sourceitem);
-		set_cell_colors(actc, filteritem);
-		set_cell_colors(actc, transitionitem);
-		set_cell_colors(actc, itemitem);
-		set_cell_colors(actc, audioitem);
-		set_cell_colors(actc, mediaitem);
-		set_cell_colors(actc, int_override);
 		ui->table_mapping->setItem(row, 0, channelitem);
 		ui->table_mapping->setItem(row, 1, mtypeitem);
 		ui->table_mapping->setItem(row, 2, norcitem);
@@ -623,6 +599,7 @@ void PluginWindow::add_new_mapping()
 		ui->table_mapping->setItem(row, 9, audioitem);
 		ui->table_mapping->setItem(row, 10, mediaitem);
 		ui->table_mapping->setItem(row, 11, int_override);
+		set_all_cell_colors(row);
 		MidiHook *newmh = new MidiHook();
 		newmh->channel = ui->sb_channel->value();
 		newmh->message_type = ui->cb_mtype->currentText();
@@ -635,7 +612,7 @@ void PluginWindow::add_new_mapping()
 		newmh->item = ui->cb_obs_output_item->currentText();
 		newmh->audio_source = ui->cb_obs_output_audio_source->currentText();
 		newmh->media_source = ui->cb_obs_output_media_source->currentText();
-		(ui->check_int_override->isChecked()) ? newmh->int_override.emplace(ui->sb_int_override->value()): NULL;
+		(ui->check_int_override->isChecked()) ? newmh->int_override.emplace(ui->sb_int_override->value()) : NULL;
 		auto dm = GetDeviceManager();
 		auto dev = dm->get_midi_device(ui->mapping_lbl_device_name->text());
 		dev->add_MidiHook(newmh);
@@ -668,10 +645,6 @@ void PluginWindow::add_row_from_hook(MidiHook *hook)
 {
 	int row = ui->table_mapping->rowCount();
 	ui->table_mapping->insertRow(row);
-	QColor midic;
-	midic.setRgb(0, 170, 255);
-	QColor actc;
-	actc.setRgb(170, 0, 255);
 
 	// don't delete it, because the table takes ownership of the items
 	QTableWidgetItem *channelitem = new QTableWidgetItem(QString::number(hook->channel));
@@ -687,19 +660,6 @@ void PluginWindow::add_row_from_hook(MidiHook *hook)
 	QTableWidgetItem *mediaitem = new QTableWidgetItem(hook->media_source);
 	QTableWidgetItem *ioveritem = (hook->int_override) ? new QTableWidgetItem(QString::number(*hook->int_override)) : new QTableWidgetItem();
 
-	set_cell_colors(midic, channelitem);
-	set_cell_colors(midic, mtypeitem);
-	set_cell_colors(midic, norcitem);
-	set_cell_colors(actc, actionitem);
-	set_cell_colors(actc, sceneitem);
-	set_cell_colors(actc, sourceitem);
-	set_cell_colors(actc, filteritem);
-	set_cell_colors(actc, transitionitem);
-	set_cell_colors(actc, itemitem);
-	set_cell_colors(actc, audioitem);
-	set_cell_colors(actc, mediaitem);
-	set_cell_colors(actc, ioveritem);
-
 	ui->table_mapping->setItem(row, 0, channelitem);
 	ui->table_mapping->setItem(row, 1, mtypeitem);
 	ui->table_mapping->setItem(row, 2, norcitem);
@@ -712,8 +672,19 @@ void PluginWindow::add_row_from_hook(MidiHook *hook)
 	ui->table_mapping->setItem(row, 9, audioitem);
 	ui->table_mapping->setItem(row, 10, mediaitem);
 	ui->table_mapping->setItem(row, 11, ioveritem);
-
+	set_all_cell_colors(row);
 }
+void PluginWindow::set_all_cell_colors(int row)
+{
+	QColor midic(0, 170, 255);
+	QColor actc(170, 0, 255);
+	
+	for (int col = 0; col <= 11; col++) {
+		auto rc = ui->table_mapping->item(row, col);
+		(col < 3)?set_cell_colors(midic, rc):set_cell_colors(actc, rc);
+	}
+}
+
 void PluginWindow::set_cell_colors(const QColor &color, QTableWidgetItem *item)
 {
 	QColor txcolor;
@@ -738,7 +709,7 @@ void PluginWindow::clear_table()
 void PluginWindow::load_table()
 {
 	auto devicemanager = GetDeviceManager();
-	auto hooks = devicemanager->get_midi_hooksui->mapping_lbl_device_name->text());
+	auto hooks = devicemanager->get_midi_hooks(ui->mapping_lbl_device_name->text());
 	if (hooks.count() > 0) {
 		for (int i = 0; i < hooks.size(); i++) {
 			add_row_from_hook(hooks.at(i));
@@ -768,12 +739,11 @@ void PluginWindow::delete_mapping()
 void PluginWindow::edit_mapping()
 {
 	if (ui->table_mapping->rowCount() != 0) {
-		auto dv = GetDeviceManager().get()->get_midi_hooksui->mapping_lbl_device_name->text());
-		blog(LOG_DEBUG, "hooknumners: name %s = %i",ui->mapping_lbl_device_name->text().toStdString().c_str(), dv.count());
+		auto dv = GetDeviceManager().get()->get_midi_hooks(ui->mapping_lbl_device_name->text());
+		blog(LOG_DEBUG, "hook numners: name %s = %i", ui->mapping_lbl_device_name->text().toStdString().c_str(), dv.count());
 		auto sitems = ui->table_mapping->selectedItems();
 		int row = sitems.at(0)->row();
-		blog(LOG_DEBUG, "hookin row= %i",row);
-		
+		blog(LOG_DEBUG, "hook in row= %i", row);
 		// rebuild midi
 		ui->sb_channel->setValue(sitems.at(0)->text().toInt());
 		ui->cb_mtype->setCurrentText(sitems.at(1)->text());

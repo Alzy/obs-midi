@@ -66,6 +66,12 @@ inline static void swap_buttons(MidiAgent *agent, MidiMessage *message, int butt
 	agent->send_message_to_midi_device((MidiMessage)*message);
 	state::swapping = false;
 }
+/// <summary>
+/// 
+/// </summary>
+/// <param name="agent">MidiAgent</param>
+/// <param name="message"></param>
+/// <param name="vol"></param>
 inline static void set_volume(MidiAgent* agent, MidiMessage *message, double vol) {
 	uint8_t newvol = Utils::mapper2(cbrt(vol));
 	message->value = newvol;

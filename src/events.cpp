@@ -60,7 +60,6 @@ const char *calldata_get_string(const calldata_t *data, const char *name)
 Events::Events() : _streamStarttime(0), _lastBytesSent(0), _lastBytesSentTime(0), HeartbeatIsActive(false), pulse(false)
 {
 	this->setParent(plugin_window);
-	//_srv = GetDeviceManager();
 }
 Events::~Events() {}
 void Events::startup()

@@ -621,7 +621,7 @@ jobs:
             * [MIDItoOBS](https://github.com/lebaston100/MIDItoOBS) Where I got my start playing with this
             # Changes
             ${{ steps.Changelog.outputs.changelog }}
-          release_name: obs-midi ALPHA 2 ${{ steps.version.outputs.version }}
+          release_name: obs-midi ${{ steps.version.outputs.version }}
           draft: false
           prerelease: false
       - name: 'Download release artifacts'

@@ -12,6 +12,7 @@
  */
 class state {
 public:
+	inline static bool startup = true;
 	//** Do Transition Values **//
 	inline static QString _CurrentTransition = "";
 	inline static int _CurrentTransitionDuration = -1;

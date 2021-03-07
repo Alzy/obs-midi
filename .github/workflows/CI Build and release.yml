@@ -28,7 +28,7 @@ jobs:
         with:
           path: ${{ github.workspace }}/
       - run: |
-          echo "${{ steps.version.outputs.version }}" > version.txt &git add version.txt&&git commit -m "update version file"
+          echo "${{ steps.version.outputs.version }}" 
   windows:
     name: 'Windows 64-bit'
     runs-on: [windows-latest]

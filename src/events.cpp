@@ -874,7 +874,7 @@ void Events::OnTransitionEnd(void *param, calldata_t *data)
 	}
 	if (state()._TransitionWasCalled) {
 		obs_frontend_set_transition_duration(state()._CurrentTransitionDuration);
-		auto t = Utils::GetTransitionFromName(state()._CurrentTransition);
+		auto t =Utils::GetTransitionFromName(state()._CurrentTransition);
 		obs_frontend_set_current_transition(t);
 		obs_source_release(t);
 		state()._TransitionWasCalled = false;

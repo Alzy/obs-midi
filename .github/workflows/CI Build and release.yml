@@ -28,7 +28,7 @@ jobs:
         with:
           path: ${{ github.workspace }}/
       - run: |
-          echo "${{ steps.version.outputs.version }}"
+          echo "${{ steps.version.outputs.version }}" 
   windows:
     name: 'Windows 64-bit'
     runs-on: [windows-latest]
@@ -178,7 +178,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
-          name: '${{ steps.version.outputs.version }}}-Windows-Installer'
+          name: '${{ steps.version.outputs.version }}-Windows-Installer'
           path: ${{ github.workspace }}/obs-midi/package/*.exe
   ubuntu64:
     name: "Linux/Ubuntu 64-bit"
@@ -429,14 +429,40 @@ jobs:
           echo ::set-env name=GIT_BRANCH::${{ github.event.pull_request.head.ref }}
           echo ::set-env name=GIT_HASH::$(git rev-parse --short HEAD)
           echo ::set-env name=GIT_TAG::$(git describe --tags --abbrev=0)
+      - name: 'Restore Homebrew Cellar Cache'
+        uses: actions/cache@v2
+        env: 
+          CACHE_NAME: 'obs-homebrew-cache'
+        id: homebrew-cache
+        with:
+          path: |
+            /usr/local/Cellar/libsamplerate
+            /usr/local/Cellar/aften
+            /usr/local/Cellar/jack
+            /usr/local/Cellar/speexdsp
+            /usr/local/Cellar/fdk-aac
+            /usr/local/Cellar/xcnotary
+            
+          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.hbc }}
       - name: 'Install prerequisites (Homebrew)'
+        if: steps.homebrew-cache.outputs.cache-hit != 'true'
         shell: bash
         run: |
           brew install jack
           brew install speexdsp
           brew install fdk-aac
           brew install akeru-inc/tap/xcnotary
+          chmod 777 /tmp/obsdeps
+      - name: 'Restore /tmp/obsdeps Cache'
+        uses: actions/cache@v2
+        env: 
+          CACHE_NAME: 'macos-obs-deps-cache'
+        id: macos-deps
+        with:
+          path: /tmp/obsdeps
+          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.MACOS_DEPS_VERSION }}-qt-${{ env.QT_VERSION }}
       - name: 'Install prerequisite: Pre-built OBS dependencies'
+        if: steps.macos-deps.outputs.cache-hit != 'true'
         shell: bash
         run: |
           curl -L -O https://github.com/obsproject/obs-deps/releases/download/${{ env.MACOS_DEPS_VERSION }}/macos-deps-${{ env.MACOS_DEPS_VERSION }}.tar.gz
@@ -447,6 +473,7 @@ jobs:
         shell: bash
         working-directory: ${{ github.workspace }}/obs-studio
         run: |
+          
           [ -d build ] ||mkdir build
           cd build
           rm -rf ./*
@@ -522,7 +549,7 @@ jobs:
         shell: bash
         run: |
           set -e
-          echo "store password"
+          brew link xcnotary
 
           xcrun altool  --store-password-in-keychain-item "AC_PASSWORD" -u "${{ secrets.MACOS_IDENT_USER }}" -p "${{ secrets.MACOS_AC_PASS  }}"
           echo "xcnotary precheck"
@@ -534,7 +561,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
-          name: '${{ env.GIT_HASH }}-macOS'
+          name: '${{ steps.version.outputs.version }}-macOS'
           path: ${{ github.workspace }}/obs-midi/release/*.pkg
 
   make-release:
@@ -594,7 +621,7 @@ jobs:
             * [MIDItoOBS](https://github.com/lebaston100/MIDItoOBS) Where I got my start playing with this
             # Changes
             ${{ steps.Changelog.outputs.changelog }}
-          release_name: obs-midi ALPHA 2 ${{ steps.version.outputs.version }}
+          release_name: obs-midi ${{ steps.version.outputs.version }}
           draft: false
           prerelease: false
       - name: 'Download release artifacts'
@@ -643,7 +670,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/$${{ steps.version.outputs.version }}-linux/obs-midi-${{ steps.version.outputs.version }}-1_amd64.deb
+          asset_path: ${{ github.workspace }}/${{ steps.version.outputs.version }}-linux/obs-midi-${{ steps.version.outputs.version }}-1_amd64.deb
           asset_name: obs-midi-${{ steps.version.outputs.version }}-1_amd64.deb
           asset_content_type: application/octet-stream
       - name: 'Upload Linux tar artifact to release'

@@ -50,11 +50,9 @@ void PluginWindow::configure_table()
 void PluginWindow::set_title_window()
 {
 	QString title;
-	title.append(GIT_BRANCH);
-	title.append(" -- Commit: ");
-	title.append(GIT_COMMIT_HASH);
-	blog(LOG_DEBUG, "OBS-MIDI Version -- Branch: %s", title.toStdString().c_str());
-	title.prepend("OBS MIDI Settings -- Branch: ");
+	title.append(GIT_TAG);
+	blog(LOG_DEBUG, "OBS-MIDI Version: %s", title.toStdString().c_str());
+	title.prepend("OBS MIDI Settings:  ");
 	this->setWindowTitle(title);
 }
 void PluginWindow::connect_ui_signals()

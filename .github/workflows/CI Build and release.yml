@@ -561,7 +561,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
-          name: '${{ env.GIT_HASH }}-macOS'
+          name: '${{ steps.version.outputs.version }}-macOS'
           path: ${{ github.workspace }}/obs-midi/release/*.pkg
 
   make-release:

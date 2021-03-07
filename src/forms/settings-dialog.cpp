@@ -98,8 +98,8 @@ void PluginWindow::ToggleShowHide()
 void PluginWindow::load_devices()
 {
 	loadingdevices = true;
-	auto midiOutDevices = GetDeviceManager()->GetOutPortsList();
-	auto midiDevices = GetDeviceManager()->GetPortsList();
+	auto midiOutDevices = GetDeviceManager()->get_output_ports_list();
+	auto midiDevices = GetDeviceManager()->get_input_ports_list();
 	this->ui->list_midi_dev->clear();
 	if (midiDevices.size() == 0) {
 		this->ui->list_midi_dev->addItem("No Devices Available");
@@ -125,7 +125,7 @@ void PluginWindow::select_output_device(const QString &selectedDeviceName)
 {
 	if (!loadingdevices) {
 		auto selectedDevice = ui->list_midi_dev->currentItem()->text().toStdString();
-		auto device = GetDeviceManager()->GetMidiDeviceByName(selectedDevice.c_str());
+		auto device = GetDeviceManager()->get_midi_device(selectedDevice.c_str());
 		device->set_midi_output_name(selectedDeviceName);
 		GetConfig()->Save();
 	}
@@ -135,12 +135,12 @@ void PluginWindow::on_check_enabled_state_changed(int state)
 	if (state == Qt::CheckState::Checked) {
 		auto selectedDeviceName = ui->list_midi_dev->currentItem()->text().toStdString();
 		auto selectedOutDeviceName = ui->outbox->currentText().toStdString();
-		auto device = GetDeviceManager()->GetMidiDeviceByName(selectedDeviceName.c_str());
+		auto device = GetDeviceManager()->get_midi_device(selectedDeviceName.c_str());
 		blog(LOG_INFO, "Item enabled: %s", selectedDeviceName.c_str());
-		int devicePort = GetDeviceManager()->GetPortNumberByDeviceName(selectedDeviceName.c_str());
-		int deviceOutPort = GetDeviceManager()->GetOutPortNumberByDeviceName(selectedOutDeviceName.c_str());
+		int devicePort = GetDeviceManager()->get_input_port_number(selectedDeviceName.c_str());
+		int deviceOutPort = GetDeviceManager()->get_output_port_number(selectedOutDeviceName.c_str());
 		if (device == NULL) {
-			device = GetDeviceManager()->RegisterMidiDevice(devicePort, deviceOutPort);
+			device = GetDeviceManager()->register_midi_devicedevicePort, deviceOutPort);
 		}
 		device->open_midi_input_port();
 		device->open_midi_output_port();
@@ -156,7 +156,7 @@ void PluginWindow::on_check_enabled_state_changed(int state)
 void PluginWindow::connect_midi_message_handler()
 {
 	auto devicemanager = GetDeviceManager();
-	auto MAdevice = devicemanager->GetMidiDeviceByName(ui->list_midi_dev->currentItem()->text());
+	auto MAdevice = devicemanager->get_midi_device(ui->list_midi_dev->currentItem()->text());
 	connect(MAdevice, SIGNAL(broadcast_midi_message(MidiMessage)), this,
 		SLOT(handle_midi_message(MidiMessage))); /// name, mtype, norc, channel
 }
@@ -166,7 +166,7 @@ void PluginWindow::on_device_select(const QString &curitem)
 		blog(LOG_DEBUG, "on_device_select %s", curitem.toStdString().c_str());
 		auto devicemanager = GetDeviceManager();
 		auto config = GetConfig();
-		MidiAgent *MAdevice = devicemanager->GetMidiDeviceByName(curitem);
+		MidiAgent *MAdevice = devicemanager->get_midi_device(curitem);
 		set_configure_title(curitem);
 		// Pull info on if device is enabled, if so set true if not set false
 		try {
@@ -216,7 +216,7 @@ void PluginWindow::handle_midi_message(const MidiMessage &mess)
 }
 void PluginWindow::on_bid_enabled_state_changed(int state)
 {
-	auto device = GetDeviceManager()->GetMidiDeviceByName(ui->list_midi_dev->currentItem()->text().toStdString().c_str());
+	auto device = GetDeviceManager()->get_midi_device(ui->list_midi_dev->currentItem()->text().toStdString().c_str());
 	ui->outbox->setEnabled(state);
 	if (state) {
 		device->set_bidirectional(state);
@@ -553,7 +553,7 @@ void PluginWindow::save_edit() {}
 bool PluginWindow::map_exists()
 {
 	auto devicemanager = GetDeviceManager();
-	auto hooks = devicemanager->GetMidiHooksByDeviceName(ui->mapping_lbl_device_name->text());
+	auto hooks = devicemanager->get_midi_hooksui->mapping_lbl_device_name->text());
 	for (int i = 0; i < hooks.size(); i++) {
 		if ((hooks.at(i)->channel == ui->sb_channel->value()) && (hooks.at(i)->norc == ui->sb_norc->value()) &&
 		    (hooks.at(i)->message_type == ui->cb_mtype->currentText())) {
@@ -565,7 +565,7 @@ bool PluginWindow::map_exists()
 int PluginWindow::find_mapping_location(const MidiMessage &message)
 {
 	auto devicemanager = GetDeviceManager();
-	auto hooks = devicemanager->GetMidiHooksByDeviceName(ui->mapping_lbl_device_name->text());
+	auto hooks = devicemanager->get_midi_hooksui->mapping_lbl_device_name->text());
 	for (int i = 0; i < hooks.size(); i++) {
 		if ((hooks.at(i)->channel == message.channel) && (hooks.at(i)->norc == message.NORC) && (hooks.at(i)->message_type == message.message_type)) {
 			return i;
@@ -637,7 +637,7 @@ void PluginWindow::add_new_mapping()
 		newmh->media_source = ui->cb_obs_output_media_source->currentText();
 		(ui->check_int_override->isChecked()) ? newmh->int_override.emplace(ui->sb_int_override->value()): NULL;
 		auto dm = GetDeviceManager();
-		auto dev = dm->GetMidiDeviceByName(ui->mapping_lbl_device_name->text());
+		auto dev = dm->get_midi_device(ui->mapping_lbl_device_name->text());
 		dev->add_MidiHook(newmh);
 		auto conf = GetConfig();
 		conf->Save();
@@ -738,7 +738,7 @@ void PluginWindow::clear_table()
 void PluginWindow::load_table()
 {
 	auto devicemanager = GetDeviceManager();
-	auto hooks = devicemanager->GetMidiHooksByDeviceName(ui->mapping_lbl_device_name->text());
+	auto hooks = devicemanager->get_midi_hooksui->mapping_lbl_device_name->text());
 	if (hooks.count() > 0) {
 		for (int i = 0; i < hooks.size(); i++) {
 			add_row_from_hook(hooks.at(i));
@@ -751,7 +751,7 @@ void PluginWindow::delete_mapping()
 	if (ui->table_mapping->rowCount() > 0) {
 		int row = ui->table_mapping->selectedItems().at(0)->row();
 		auto devicemanager = GetDeviceManager();
-		auto dev = devicemanager->GetMidiDeviceByName(ui->mapping_lbl_device_name->text());
+		auto dev = devicemanager->get_midi_device(ui->mapping_lbl_device_name->text());
 		auto hooks = dev->GetMidiHooks();
 		auto conf = GetConfig();
 		for (int i = 0; i < hooks.size(); i++) {
@@ -768,7 +768,7 @@ void PluginWindow::delete_mapping()
 void PluginWindow::edit_mapping()
 {
 	if (ui->table_mapping->rowCount() != 0) {
-		auto dv = GetDeviceManager().get()->GetMidiHooksByDeviceName(ui->mapping_lbl_device_name->text());
+		auto dv = GetDeviceManager().get()->get_midi_hooksui->mapping_lbl_device_name->text());
 		blog(LOG_DEBUG, "hooknumners: name %s = %i",ui->mapping_lbl_device_name->text().toStdString().c_str(), dv.count());
 		auto sitems = ui->table_mapping->selectedItems();
 		int row = sitems.at(0)->row();

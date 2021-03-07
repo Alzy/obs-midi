@@ -88,7 +88,7 @@ MidiAgent::~MidiAgent()
 bool MidiAgent::is_device_attached(const char *incoming_data)
 {
 	obs_data_t *data = obs_data_create_from_json(incoming_data);
-	int minput_port = DeviceManager().GetPortNumberByDeviceName(obs_data_get_string(data, "name"));
+	int minput_port = DeviceManager().get_input_port_number(obs_data_get_string(data, "name"));
 	obs_data_release(data);
 	return (minput_port != -1);
 }
@@ -104,8 +104,8 @@ void MidiAgent::Load(const char *incoming_data)
 	obs_data_set_default_bool(data, "bidirectional", false);
 	midi_input_name = QString(obs_data_get_string(data, "name"));
 	midi_output_name = QString(obs_data_get_string(data, "outname"));
-	input_port = DeviceManager().GetPortNumberByDeviceName(midi_input_name);
-	output_port = DeviceManager().GetOutPortNumberByDeviceName(midi_output_name);
+	input_port = DeviceManager().get_input_port_number(midi_input_name);
+	output_port = DeviceManager().get_output_port_number(midi_output_name);
 	enabled = obs_data_get_bool(data, "enabled");
 	bidirectional = obs_data_get_bool(data, "bidirectional");
 	obs_data_array_t *hooksData = obs_data_get_array(data, "hooks");

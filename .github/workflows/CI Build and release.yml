@@ -19,11 +19,15 @@ jobs:
     name: 'Generate Filename'
     runs-on: ubuntu-latest
     steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+        with:
+          path: ${{ github.workspace }}/obs-midi
       - uses: avakar/derive-version@v1
         id: version
       - run: |
-          mkdir _build
-          cd _build
+          mkdir ${{ github.workspace }}/obs-midi/_build
+          cd ${{ github.workspace }}/obs-midi/_build
           cmake .. -DVERSION="${{ steps.version.outputs.version }}"
       - uses: avakar/tag-and-release@v1
         with:

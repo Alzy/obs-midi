@@ -617,6 +617,11 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 {
 	blog(LOG_DEBUG, "OBS Event : %s \n AD: %s", event.updateType().toStdString().c_str(), obs_data_get_json(event.additionalFields()));
 	MidiHook *hook = get_midi_hook_if_exists(event);
+	if (event.updateType() == "FinishedLoading") {
+		loading = false;
+	}
+	if (loading)
+		return;
 	/// <summary>
 	/// 	ON EVENT TYPE Find matching hook, pull data from that hook, and do thing.
 	/// </summary>

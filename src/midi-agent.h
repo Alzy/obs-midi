@@ -83,7 +83,7 @@ signals:
 	void do_obs_action(MidiHook *, int);
 
 private:
-	
+	bool loading = true;
 	rtmidi::midi_in midiin;
 	rtmidi::midi_out midiout;
 	QString midi_input_name;

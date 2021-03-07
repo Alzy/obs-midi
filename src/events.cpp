@@ -61,7 +61,6 @@ Events::Events() : _streamStarttime(0), _lastBytesSent(0), _lastBytesSentTime(0)
 {
 	this->setParent(plugin_window);
 	//_srv = GetDeviceManager();
-	obs_frontend_add_event_callback(Events::FrontendEventHandler, this);
 }
 Events::~Events() {}
 void Events::startup()
@@ -375,6 +374,9 @@ void Events::OnSceneChange()
 }
 void Events::FinishedLoading()
 {
+    hookTransitionPlaybackEvents();
+    startup();
+    started=true;
 	broadcastUpdate("FinishedLoading");
 }
 /**

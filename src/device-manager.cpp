@@ -52,7 +52,7 @@ void DeviceManager::Unload()
 /*
  * Returns QStringList of Port Names
  */
-QStringList DeviceManager::GetPortsList()
+QStringList DeviceManager::get_input_ports_list()
 {
 	QStringList ports;
 	unsigned int portCount = rtmidi::midi_in().get_port_count();
@@ -64,7 +64,7 @@ QStringList DeviceManager::GetPortsList()
 /*
  * Returns QStringList of Output  Port Names
  */
-QStringList DeviceManager::GetOutPortsList()
+QStringList DeviceManager::get_output_ports_list()
 {
 	QStringList outports;
 	unsigned int portCount = rtmidi::midi_out().get_port_count();
@@ -77,9 +77,9 @@ QStringList DeviceManager::GetOutPortsList()
  * Returns the port number of the specified device.
  * If the device isn't found (possibly due to being disconnected), returns -1
  */
-int DeviceManager::GetPortNumberByDeviceName(const QString &deviceName)
+int DeviceManager::get_input_port_number(const QString &deviceName)
 {
-	QStringList portsList = GetPortsList();
+	QStringList portsList = get_input_ports_list();
 	if (portsList.contains(deviceName)) {
 		return portsList.indexOf(deviceName);
 	} else {
@@ -97,20 +97,20 @@ int DeviceManager::GetPortNumberByDeviceName(const QString &deviceName)
  * @returns  Device Output Port
  * @rtype int
  */
-int DeviceManager::GetOutPortNumberByDeviceName(const QString &deviceName)
+int DeviceManager::get_output_port_number(const QString &deviceName)
 {
-	QStringList portsList = GetOutPortsList();
+	QStringList portsList = get_output_ports_list();
 	if (portsList.contains(deviceName)) {
 		return portsList.indexOf(deviceName);
 	} else {
 		return -1;
 	}
 }
-QVector<MidiAgent *> DeviceManager::GetActiveMidiDevices()
+QVector<MidiAgent *> DeviceManager::get_active_midi_devices()
 {
 	return midiAgents;
 }
-MidiAgent *DeviceManager::GetMidiDeviceByName(const QString &deviceName)
+MidiAgent *DeviceManager::get_midi_device(const QString &deviceName)
 {
 	MidiAgent *returndevice = nullptr;
 	for (auto midiAgent : midiAgents) {
@@ -121,10 +121,10 @@ MidiAgent *DeviceManager::GetMidiDeviceByName(const QString &deviceName)
 	}
 	return returndevice;
 }
-QVector<MidiHook *> DeviceManager::GetMidiHooksByDeviceName(const QString &deviceName)
+QVector<MidiHook *> DeviceManager::get_midi_hooks(const QString &deviceName)
 {
 	if (deviceName != QString("No Devices Available")) {
-		auto device = GetMidiDeviceByName(deviceName);
+		auto device = get_midi_device(deviceName);
 		if (device != nullptr) {
 			return device->GetMidiHooks();
 		} else {
@@ -136,7 +136,7 @@ QVector<MidiHook *> DeviceManager::GetMidiHooksByDeviceName(const QString &devic
 /* Registers a midi device.
  * Will create, store and enable a midi device.
  */
-MidiAgent *DeviceManager::RegisterMidiDevice(const int &port, const int &outport)
+MidiAgent *DeviceManager::register_midi_device(const int &port, const int &outport)
 {
 	MidiAgent *midiA = new MidiAgent(port, outport);
 	midiA->set_enabled(true);

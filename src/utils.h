@@ -108,6 +108,7 @@ public:
 	Q_ENUM(Actions)
 	enum class obs_event_type {
 		SourceDestroyed,
+		SourceRemoved, 
 		SceneChanged,
 		SceneListChanged,
 		SceneCollectionChanged,
@@ -226,10 +227,9 @@ QStringList get_filter_names(const QString &Source);
 QStringList get_transition_names();
 QString untranslate(const QString &tstring);
 QStringList get_browser_sources();
-const QList<ActionsClass::Actions> AllActions_raw = {ActionsClass::Actions::Disable_Preview,
+const QList<ActionsClass::Actions> AllActions_raw = {
 						     ActionsClass::Actions::Disable_Source_Filter,
 						     ActionsClass::Actions::Do_Transition,
-						     ActionsClass::Actions::Enable_Preview,
 						     ActionsClass::Actions::Enable_Source_Filter,
 						     ActionsClass::Actions::Move_T_Bar,
 						     ActionsClass::Actions::Next_Media,
@@ -241,9 +241,7 @@ const QList<ActionsClass::Actions> AllActions_raw = {ActionsClass::Actions::Disa
 						     ActionsClass::Actions::Restart_Media,
 						     ActionsClass::Actions::Resume_Recording,
 						     ActionsClass::Actions::Save_Replay_Buffer,
-						     ActionsClass::Actions::Set_Current_Scene,
 						     ActionsClass::Actions::Set_Current_Transition,
-						     ActionsClass::Actions::Set_Preview_Scene,
 						     ActionsClass::Actions::Set_Scene_Transition_Override,
 						     ActionsClass::Actions::Set_Volume,
 						     ActionsClass::Actions::Start_Recording,

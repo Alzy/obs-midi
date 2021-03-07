@@ -15,9 +15,24 @@ on:
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 jobs:
+  release:
+    name: 'Generate Filename'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+        with:
+          path: ${{ github.workspace }}/
+      - uses: avakar/derive-version@v1
+        id: version
+        with:
+          path: ${{ github.workspace }}/
+      - run: |
+          echo "${{ steps.version.outputs.version }}"
   windows:
     name: 'Windows 64-bit'
     runs-on: [windows-latest]
+    needs: [release]
     if: contains(github.event.head_commit.message, '[skip ci]') != true
     env:
       QT_VERSION: '5.15.2'
@@ -27,6 +42,14 @@ jobs:
       ACTIONS_ALLOW_UNSECURE_COMMANDS: true
       isCI: true
     steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+        with:
+          path: ${{ github.workspace }}/
+      - uses: avakar/derive-version@v1
+        id: version
+        with:
+          path: ${{ github.workspace }}/
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.0.0
       - name: 'Checkout'
@@ -37,6 +60,7 @@ jobs:
       - name: 'Get OBS-Studio latest tag'
         shell: bash
         run: |
+          echo ::set-env name=VERSION::${{ steps.version.outputs.version }}
           echo ::set-env name=OBS_GIT_TAG::$(git -c 'versionsort.suffix=-' ls-remote --exit-code --refs --tags --sort='v:refname' https://github.com/obsproject/obs-studio.git '*.*.*'|tail -n 1|cut -d / -f 3)
       - name: 'Restore OBS 64-bit build v${{ env.OBS_GIT_TAG }} from cache'
         id: build-cache-obs-64
@@ -135,7 +159,7 @@ jobs:
       - name: 'Set release filename'
         shell: bash
         run: |
-          FILENAME="obs-midi-${{ env.GIT_HASH }}-Windows"
+          FILENAME="obs-midi-${{ steps.version.outputs.version }}-Windows"
           echo "::set-env name=WIN_FILENAME::$FILENAME"
       - name: 'Package obs-midi'
         working-directory: ${{ github.workspace }}/obs-midi
@@ -148,21 +172,30 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
-          name: '${{ env.GIT_HASH }}-Windows'
+          name: '${{ steps.version.outputs.version }}-Windows'
           path: ${{ github.workspace }}/obs-midi/package/*.zip
       - name: 'Publish ${{ env.WIN_FILENAME }}-Installer.exe'
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
-          name: '${{ env.GIT_HASH }}-Windows-Installer'
+          name: '${{ steps.version.outputs.version }}}-Windows-Installer'
           path: ${{ github.workspace }}/obs-midi/package/*.exe
   ubuntu64:
     name: "Linux/Ubuntu 64-bit"
     runs-on: [ubuntu-latest]
+    needs: [release]
     env:
       isCI: true
     if: contains(github.event.head_commit.message, '[skip ci]') != true
     steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+        with:
+          path: ${{ github.workspace }}/
+      - uses: avakar/derive-version@v1
+        id: version
+        with:
+          path: ${{ github.workspace }}/
       - name: 'Checkout'
         uses: actions/checkout@v2
         with:
@@ -283,17 +316,17 @@ jobs:
       - name: 'Set release filename'
         shell: bash
         run: |
-          FILENAME="obs-midi-0${{ env.GIT_HASH }}-1_amd64.deb"
+          FILENAME="obs-midi-${{ steps.version.outputs.version }}-1_amd64.deb"
           echo "::set-env name=LINUX_FILENAME::$FILENAME"
       - name: 'Package ${{ env.LINUX_FILENAME }}'
         if: success()
         working-directory: ${{ github.workspace }}/obs-midi
         shell: bash
         run: |
-          VERSION="${{ env.GIT_HASH }}"
+          VERSION="${{ steps.version.outputs.version }}"
           cd ./build
           sudo checkinstall -y --type=debian --fstrans=no -nodoc \
-              --backup=no --deldoc=yes --install=no --pkgname=obs-midi --pkgversion=0$VERSION \
+              --backup=no --deldoc=yes --install=no --pkgname=obs-midi --pkgversion=$VERSION \
               --pkglicense="GPLv2.0" --maintainer="${{ github.event.pusher.email }}" --pkggroup="video" \
               --pkgsource="${{ github.event.repository.html_url }}" \
               --requires="obs-studio,libqt5core5a,libqt5widgets5,qt5-image-formats-plugins" \
@@ -305,28 +338,29 @@ jobs:
         working-directory: ${{ github.workspace }}/obs-midi
         shell: bash
         run: |
-          VERSION="${{ env.GIT_HASH }}"
+          VERSION="${{ steps.version.outputs.version }}"
           cd ./build
           mkdir -p obs-studio/plugins/obs-midi/bin/64bit/
           cp ./obs-midi.so obs-studio/plugins/obs-midi/bin/64bit/
-          tar -czvf obs-midi-Linux-${{ env.GIT_HASH }}-x64.tar.gz obs-studio
+          tar -czvf obs-midi-Linux-${{ steps.version.outputs.version }}-x64.tar.gz obs-studio
           pwd
 
       - name: 'Publish Deb'
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
-          name: '${{ env.GIT_HASH }}-linux'
+          name: '${{ steps.version.outputs.version }}-linux'
           path: '${{ github.workspace }}/obs-midi/package/*.deb'
       - name: 'Publish Tar'
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
-          name: '${{ env.GIT_HASH }}-linux'
+          name: '${{ steps.version.outputs.version }}-linux'
           path: '${{ github.workspace }}/obs-midi/build/*.tar.gz'
   macos64:
     name: "macOS 64-bit"
     runs-on: [macos-latest]
+    needs: [release]
     env:
       MACOS_DEPS_VERSION: '2021-02-28'
       QT_VERSION: '5.15.2'
@@ -334,6 +368,14 @@ jobs:
       hbc: '6'
     if: contains(github.event.head_commit.message, '[skip ci]') != true
     steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+        with:
+          path: ${{ github.workspace }}/
+      - uses: avakar/derive-version@v1
+        id: version
+        with:
+          path: ${{ github.workspace }}/
       - name: 'Checkout OBS-MIDI'
         uses: actions/checkout@v2
         with:
@@ -467,8 +509,8 @@ jobs:
         if: success()
         shell: bash
         run: |
-          FILENAME_UNSIGNED="obs-midi-${{ env.GIT_HASH }}-macOS-Unsigned.pkg"
-          FILENAME="obs-midi-${{ env.GIT_HASH }}-macOS.pkg"
+          FILENAME_UNSIGNED="obs-midi-${{ steps.version.outputs.version }}-macOS-Unsigned.pkg"
+          FILENAME="obs-midi-${{ steps.version.outputs.version }}-macOS.pkg"
           echo "::set-env name=MAC_FILENAME_UNSIGNED::$FILENAME_UNSIGNED"
           echo "::set-env name=MAC_FILENAME::$FILENAME"
       - name: 'Fix linked dynamic library paths'
@@ -531,6 +573,14 @@ jobs:
       - name: 'Checkout'
         uses: actions/checkout@v2
         with:
+          path: ${{ github.workspace }}/
+      - uses: avakar/derive-version@v1
+        id: version
+        with:
+          path: ${{ github.workspace }}/
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+        with:
           path: ${{ github.workspace }}/obs-midi
       - name: Changelog
         uses: scottbrenner/generate-changelog-action@master
@@ -547,14 +597,14 @@ jobs:
         shell: bash
         id: get_version
         run: |
-          echo ::set-env name=TAG_VERSION::${GITHUB_REF/refs\/tags\//}
+          echo ::set-env name=TAG_VERSION::${{ steps.version.outputs.version }}
       - name: 'Create Release'
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: tag-${{ env.GIT_HASH }}
+          tag_name: tag-${{ steps.version.outputs.version }}
           body: |
             # OBS-MIDI
             Use MIDI devices to trigger events in OBS and visa versa.
@@ -571,7 +621,7 @@ jobs:
             * [MIDItoOBS](https://github.com/lebaston100/MIDItoOBS) Where I got my start playing with this
             # Changes
             ${{ steps.Changelog.outputs.changelog }}
-          release_name: obs-midi ALPHA 2 ${{ env.GIT_HASH }}
+          release_name: obs-midi ALPHA 2 ${{ steps.version.outputs.version }}
           draft: false
           prerelease: false
       - name: 'Download release artifacts'
@@ -582,8 +632,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/${{ env.GIT_HASH }}-Windows/obs-midi-${{ env.GIT_HASH }}-Windows.zip
-          asset_name: obs-midi-${{ env.GIT_HASH }}-Windows.zip
+          asset_path: ${{ github.workspace }}/${{ steps.version.outputs.version }}-Windows/obs-midi-${{ steps.version.outputs.version }}-Windows.zip
+          asset_name: obs-midi-${{ steps.version.outputs.version }}-Windows.zip
           asset_content_type: application/zip
       - name: 'Upload Windows .exe artifact to release'
         uses: actions/upload-release-asset@v1
@@ -591,8 +641,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/${{ env.GIT_HASH}}-Windows-Installer/obs-midi-${{ env.GIT_HASH }}-Windows-Installer.exe
-          asset_name: obs-midi-${{ env.GIT_HASH }}-Windows-Installer.exe
+          asset_path: ${{ github.workspace }}/${{ steps.version.outputs.version }}-Windows-Installer/obs-midi-${{ steps.version.outputs.version }}-Windows-Installer.exe
+          asset_name: obs-midi-${{ steps.version.outputs.version }}-Windows-Installer.exe
           asset_content_type: application/zip
       - name: 'check out directories'
         shell: bash
@@ -600,19 +650,19 @@ jobs:
         run: |
           cd ${{ github.workspace }}
           ls -la
-          echo ${{ github.workspace }}/${{ env.GIT_HASH }}-linux
-          ls -la ${{ github.workspace }}/${{ env.GIT_HASH }}-linux
-          echo ${{ github.workspace }}/${{ env.GIT_HASH }}-macOS
-          ls -la ${{ github.workspace }}/${{ env.GIT_HASH }}-macOS
-          mv ${{ github.workspace }}/${{ env.GIT_HASH }}-linux/*.deb ${{ github.workspace }}/${{ env.GIT_HASH }}-linux/obs-midi-${{ env.GIT_HASH }}-1_amd64.deb
+          echo ${{ github.workspace }}/${{ steps.version.outputs.version }}-linux
+          ls -la ${{ github.workspace }}/${{ steps.version.outputs.version }}-linux
+          echo ${{ github.workspace }}/${{ steps.version.outputs.version }}-macOS
+          ls -la ${{ github.workspace }}/${{ steps.version.outputs.version }}-macOS
+          mv ${{ github.workspace }}/${{ steps.version.outputs.version }}-linux/*.deb ${{ github.workspace }}/${{ steps.version.outputs.version }}-linux/obs-midi-${{ steps.version.outputs.version }}-1_amd64.deb
       - name: 'Upload macOS artifact to release'
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/${{ env.GIT_HASH }}-macOS/obs-midi-${{ env.GIT_HASH }}-macOS.pkg
-          asset_name: obs-midi-${{ env.GIT_HASH }}-macOS.pkg
+          asset_path: ${{ github.workspace }}/${{ steps.version.outputs.version }}-macOS/obs-midi-${{ steps.version.outputs.version }}-macOS.pkg
+          asset_name: obs-midi-${{ steps.version.outputs.version }}-macOS.pkg
           asset_content_type: application/octet-stream
       - name: 'Upload Linux artifact to release'
         uses: actions/upload-release-asset@v1
@@ -620,8 +670,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/${{ env.GIT_HASH }}-linux/obs-midi-${{ env.GIT_HASH }}-1_amd64.deb
-          asset_name: obs-midi-${{ env.GIT_HASH }}-1_amd64.deb
+          asset_path: ${{ github.workspace }}/$${{ steps.version.outputs.version }}-linux/obs-midi-${{ steps.version.outputs.version }}-1_amd64.deb
+          asset_name: obs-midi-${{ steps.version.outputs.version }}-1_amd64.deb
           asset_content_type: application/octet-stream
       - name: 'Upload Linux tar artifact to release'
         uses: actions/upload-release-asset@v1
@@ -629,8 +679,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/${{ env.GIT_HASH }}-linux/obs-midi-Linux-${{ env.GIT_HASH }}-x64.tar.gz
-          asset_name: obs-midi-Linux-${{ env.GIT_HASH }}-x64.tar.gz
+          asset_path: ${{ github.workspace }}/${{ steps.version.outputs.version }}-linux/obs-midi-Linux-${{ steps.version.outputs.version }}-x64.tar.gz
+          asset_name: obs-midi-Linux-${{ steps.version.outputs.version }}-x64.tar.gz
           asset_content_type: application/octet-stream
       - name: 'Clean old releases'
         uses: dev-drprasad/delete-older-releases@v0.1.0

@@ -144,6 +144,7 @@ private:
 	static void OnSourceRename(void *param, calldata_t *data);
 
 	static void OnSourceFilterAdded(void *param, calldata_t *data);
+	static void OnSourceRemoved(void *param, calldata_t *data);
 	static void OnSourceFilterRemoved(void *param, calldata_t *data);
 	static void OnSourceFilterVisibilityChanged(void *param, calldata_t *data);
 	static void OnSourceFilterOrderChanged(void *param, calldata_t *data);

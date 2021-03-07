@@ -259,21 +259,33 @@ void OBSController::ResetSceneItem()
  * transitionDuration is optional. (milliseconds)
  */
 void OBSController::TransitionToProgram()
-{	
+{
+	if (state::transitioning)
+		return;
 	state()._CurrentTransitionDuration=obs_frontend_get_transition_duration();
 	obs_source_t *transition = obs_frontend_get_current_transition();
+	QString scenename;
 	/**
 	 * If Transition from hook is not Current Transition, and if it is not an empty Value, then set current transition
 	 */
-	if ((hook->transition != "Current Transition")) {
+	if ((hook->transition != "Current Transition")&& !hook->transition.isEmpty()&&!hook->transition.isNull()) {
 		Utils::SetTransitionByName(hook->transition);
 		state()._TransitionWasCalled=true;
+	}
+	if ((hook->scene != "Preview Scene") && !hook->scene.isEmpty() && !hook->scene.isNull()) {
+		state()._TransitionWasCalled = true;
+	}
+	if (hook->scene == "Preview Scene") {
+		obs_source_t *source = obs_frontend_get_current_scene();
+		hook->scene = QString(obs_source_get_name(source));
+		state()._TransitionWasCalled = true;
+
 	}
 	if (hook->int_override && *hook->int_override >0) {
 		obs_frontend_set_transition_duration(*hook->int_override);
 		state()._TransitionWasCalled=true;
 	}
-	obs_frontend_preview_program_trigger_transition();
+	(obs_frontend_preview_program_mode_active()) ? obs_frontend_preview_program_trigger_transition(): SetCurrentScene();
 	
 	state()._CurrentTransition=QString(obs_source_get_name(transition));
 	

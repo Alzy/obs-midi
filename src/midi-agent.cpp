@@ -88,7 +88,7 @@ MidiAgent::~MidiAgent()
 bool MidiAgent::is_device_attached(const char *incoming_data)
 {
 	obs_data_t *data = obs_data_create_from_json(incoming_data);
-	int minput_port = DeviceManager().GetPortNumberByDeviceName(obs_data_get_string(data, "name"));
+	int minput_port = DeviceManager().get_input_port_number(obs_data_get_string(data, "name"));
 	obs_data_release(data);
 	return (minput_port != -1);
 }
@@ -104,8 +104,8 @@ void MidiAgent::Load(const char *incoming_data)
 	obs_data_set_default_bool(data, "bidirectional", false);
 	midi_input_name = QString(obs_data_get_string(data, "name"));
 	midi_output_name = QString(obs_data_get_string(data, "outname"));
-	input_port = DeviceManager().GetPortNumberByDeviceName(midi_input_name);
-	output_port = DeviceManager().GetOutPortNumberByDeviceName(midi_output_name);
+	input_port = DeviceManager().get_input_port_number(midi_input_name);
+	output_port = DeviceManager().get_output_port_number(midi_output_name);
 	enabled = obs_data_get_bool(data, "enabled");
 	bidirectional = obs_data_get_bool(data, "bidirectional");
 	obs_data_array_t *hooksData = obs_data_get_array(data, "hooks");
@@ -635,10 +635,12 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 		case ActionsClass::obs_event_type::SwitchScenes:
 			Macro::swap_buttons(this, message, state::previous_scene_norc, hook->norc);
 			state::previous_scene_norc = hook->norc;
+			blog(LOG_DEBUG,"Switch Scenes %s",obs_data_get_string(event.additionalFields(),"scene-name"));
 			break;
 		case ActionsClass::obs_event_type::PreviewSceneChanged:
 			Macro::swap_buttons(this, message, state::previous_preview_scene_norc, hook->norc);
 			state::previous_preview_scene_norc = hook->norc;
+			blog(LOG_DEBUG, "Scene Preview Changed");
 			break;
 		case ActionsClass::obs_event_type::SourceMuteStateChanged:
 			Macro::set_on_off(this, message, !obs_data_get_bool(event.additionalFields(), "muted"));
@@ -667,6 +669,12 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 		case ActionsClass::obs_event_type::RecordingStopped:
 			Macro::set_on_off(this, message, false);
 			break;
+		case ActionsClass::obs_event_type::SceneChanged:
+			Macro::swap_buttons(this, message, state::previous_scene_norc, hook->norc);
+			state::previous_scene_norc = hook->norc;
+			blog(LOG_DEBUG, "Scene Changed");
+			break;
+
 		}
 
 		delete (message);
@@ -675,7 +683,6 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 		/// Events that dont need a hook
 		/// </summary>
 		/// <param name="event"></param>
-
 		switch (ActionsClass::string_to_event(event.updateType())) {
 		case ActionsClass::obs_event_type::FinishedLoading:
 			startup();
@@ -684,14 +691,18 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 			rename_source(event);
 			break;
 		case ActionsClass::obs_event_type::Exiting:
-			closing = true;
+			state::closing = true;
 			break;
-		case ActionsClass::obs_event_type::SourceDestroyed:
+		case ActionsClass::obs_event_type::SourceRemoved:
 			remove_source(event);
 			break;
 		case ActionsClass::obs_event_type::ProfileChanged:
+			GetDeviceManager().get()->reload();
+			break;
 		case ActionsClass::obs_event_type::SceneCollectionChanged:
 			GetDeviceManager().get()->reload();
+			break;
+		case ActionsClass::obs_event_type::TransitionBegin:
 			break;
 		}
 	}
@@ -702,7 +713,7 @@ void MidiAgent::handle_obs_event(const RpcEvent &event)
 /// <param name="event">Incoming RpcEvent</param>
 void MidiAgent::remove_source(const RpcEvent &event)
 {
-	if (closing)
+	if (state::closing)
 		return;
 
 	QString from = obs_data_get_string(event.additionalFields(), "sourceName");
@@ -720,7 +731,8 @@ void MidiAgent::remove_source(const RpcEvent &event)
 /// <param name="event">incoming RpcEvent</param>
 void MidiAgent::rename_source(const RpcEvent &event)
 {
-
+	blog(LOG_DEBUG, "Rename source %s to %s", obs_data_get_string(event.additionalFields(), "previousName"),
+	     obs_data_get_string(event.additionalFields(), "newName"));
 	QString from = obs_data_get_string(event.additionalFields(), "previousName");
 	for (int i = 0; i < this->midiHooks.size(); i++) {
 		if (this->midiHooks.at(i)->scene == from) {
@@ -786,5 +798,5 @@ void MidiAgent::set_current_volumes()
 void MidiAgent::startup()
 {
 	// set_current_scene();
-	set_current_volumes();
+	//set_current_volumes();
 }

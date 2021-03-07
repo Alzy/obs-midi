@@ -670,7 +670,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/$${{ steps.version.outputs.version }}-linux/obs-midi-${{ steps.version.outputs.version }}-1_amd64.deb
+          asset_path: ${{ github.workspace }}/${{ steps.version.outputs.version }}-linux/obs-midi-${{ steps.version.outputs.version }}-1_amd64.deb
           asset_name: obs-midi-${{ steps.version.outputs.version }}-1_amd64.deb
           asset_content_type: application/octet-stream
       - name: 'Upload Linux tar artifact to release'

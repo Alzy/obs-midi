@@ -546,6 +546,14 @@ jobs:
       - name: 'Checkout'
         uses: actions/checkout@v2
         with:
+          path: ${{ github.workspace }}/
+      - uses: avakar/derive-version@v1
+        id: version
+        with:
+          path: ${{ github.workspace }}/
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+        with:
           path: ${{ github.workspace }}/obs-midi
       - name: Changelog
         uses: scottbrenner/generate-changelog-action@master

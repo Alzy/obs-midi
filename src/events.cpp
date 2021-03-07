@@ -27,7 +27,7 @@
 #include "config.h"
 #include "utils.h"
 #include "forms/settings-dialog.h"
-
+#include "macro-helpers.h"
 #define STATUS_INTERVAL 2000
 
 const char *sourceTypeToString(obs_source_type type)
@@ -57,64 +57,53 @@ const char *calldata_get_string(const calldata_t *data, const char *name)
 	calldata_get_string(data, name, &value);
 	return value;
 }
-Events::Events(DeviceManagerPtr srv)
-	: _srv(srv), _streamStarttime(0), _lastBytesSent(0), _lastBytesSentTime(0), HeartbeatIsActive(false), pulse(false)
+Events::Events() : _streamStarttime(0), _lastBytesSent(0), _lastBytesSentTime(0), HeartbeatIsActive(false), pulse(false)
 {
 	this->setParent(plugin_window);
 	//_srv = GetDeviceManager();
-    obs_frontend_add_event_callback(Events::FrontendEventHandler, this);
-
 }
-Events::~Events()
+Events::~Events() {}
+void Events::startup()
 {
+	// Connect to signals of all existing sources
+	obs_enum_sources(
+		[](void *param, obs_source_t *source) {
+			auto self = reinterpret_cast<Events *>(param);
+			self->connectSourceSignals(source);
+			return true;
+		},
+		this);
+	signal_handler_t *coreSignalHandler = obs_get_signal_handler();
+	if (coreSignalHandler) {
+		signal_handler_connect(coreSignalHandler, "source_create", OnSourceCreate, this);
+		signal_handler_connect(coreSignalHandler, "source_destroy", OnSourceDestroy, this);
+	}
+	hookTransitionPlaybackEvents();
 }
-void Events::startup(){
-    // Connect to signals of all existing sources
-    obs_enum_sources(
-        [](void *param, obs_source_t *source) {
-            auto self = reinterpret_cast<Events *>(param);
-            self->connectSourceSignals(source);
-            return true;
-        },
-        this);
-    signal_handler_t *coreSignalHandler = obs_get_signal_handler();
-    if (coreSignalHandler) {
-        signal_handler_connect(coreSignalHandler, "source_create", OnSourceCreate, this);
-        signal_handler_connect(coreSignalHandler, "source_destroy", OnSourceDestroy, this);
-    }
-    connect(this, &Events::obsEvent, _srv.get(), &DeviceManager::obsEvent);
-}
-void Events::shutdown(){
-    signal_handler_t *coreSignalHandler = obs_get_signal_handler();
-    if (coreSignalHandler) {
-        signal_handler_disconnect(coreSignalHandler, "source_destroy", OnSourceDestroy, this);
-        signal_handler_disconnect(coreSignalHandler, "source_create", OnSourceCreate, this);
-    }
-    // Disconnect from signals of all existing sources
-    obs_enum_sources(
-        [](void *param, obs_source_t *source) {
-            auto self = reinterpret_cast<Events *>(param);
-            self->disconnectSourceSignals(source);
-            return true;
-        },
-        this);
-    obs_frontend_remove_event_callback(Events::FrontendEventHandler, this);
+void Events::shutdown()
+{
+	signal_handler_t *coreSignalHandler = obs_get_signal_handler();
+	if (coreSignalHandler) {
+		signal_handler_disconnect(coreSignalHandler, "source_destroy", OnSourceDestroy, this);
+		signal_handler_disconnect(coreSignalHandler, "source_create", OnSourceCreate, this);
+	}
+	// Disconnect from signals of all existing sources
+	obs_enum_sources(
+		[](void *param, obs_source_t *source) {
+			auto self = reinterpret_cast<Events *>(param);
+			self->disconnectSourceSignals(source);
+			return true;
+		},
+		this);
+	obs_frontend_remove_event_callback(Events::FrontendEventHandler, this);
 }
 void Events::FrontendEventHandler(enum obs_frontend_event event, void *private_data)
 {
 	auto owner = reinterpret_cast<Events *>(private_data);
-	if (!owner->_srv) {
-		return;
-	}
-    if (event == OBS_FRONTEND_EVENT_FINISHED_LOADING){
-        owner->hookTransitionPlaybackEvents();
-        owner->startup();
-        owner->started=true;
-    }
-    if (owner->started){
+
 	switch (event) {
 	case OBS_FRONTEND_EVENT_FINISHED_LOADING:
-
+		owner->FinishedLoading();
 		break;
 	case OBS_FRONTEND_EVENT_SCENE_CHANGED:
 		owner->OnSceneChange();
@@ -200,21 +189,19 @@ void Events::FrontendEventHandler(enum obs_frontend_event event, void *private_d
 		owner->unhookTransitionPlaybackEvents();
 		owner->OnExit();
 		break;
-    case OBS_FRONTEND_EVENT_TRANSITION_STOPPED:
-            
-        break;
-    case OBS_FRONTEND_EVENT_SCENE_COLLECTION_CLEANUP:
-        
-        break;
-    case OBS_FRONTEND_EVENT_TRANSITION_DURATION_CHANGED:
-        
-        break;
-    case OBS_FRONTEND_EVENT_REPLAY_BUFFER_SAVED:
-        
-        break;
+	case OBS_FRONTEND_EVENT_TRANSITION_STOPPED:
 
-}
-    }
+		break;
+	case OBS_FRONTEND_EVENT_SCENE_COLLECTION_CLEANUP:
+
+		break;
+	case OBS_FRONTEND_EVENT_TRANSITION_DURATION_CHANGED:
+
+		break;
+	case OBS_FRONTEND_EVENT_REPLAY_BUFFER_SAVED:
+
+		break;
+	}
 }
 void Events::broadcastUpdate(const char *updateType, obs_data_t *additionalFields = nullptr)
 {
@@ -384,6 +371,13 @@ void Events::OnSceneChange()
 	// data will be copyed (int RcpEvent constructor)
 	broadcastUpdate("SwitchScenes", data);
 	obs_data_release(data);
+}
+void Events::FinishedLoading()
+{
+    hookTransitionPlaybackEvents();
+    startup();
+    started=true;
+	broadcastUpdate("FinishedLoading");
 }
 /**
  * The scene list has been modified.
@@ -672,8 +666,8 @@ void Events::OnReplayStopped()
  */
 void Events::OnExit()
 {
-	this->disconnect();
 	broadcastUpdate("Exiting");
+	this->disconnect();
 }
 /**
  * Emit every 2 seconds.

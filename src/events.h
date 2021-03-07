@@ -42,16 +42,14 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "device-manager.h"
 #include "rpc/RpcEvent.h"
 
-
-class Events : public QObject
-{
+class Events : public QObject {
 	Q_OBJECT
 
 public:
-	explicit Events(DeviceManagerPtr srv);
+	explicit Events();
 	~Events() override;
-    void startup();
-    void shutdown();
+	void startup();
+	void shutdown();
 	void connectSourceSignals(obs_source_t *source);
 	void disconnectSourceSignals(obs_source_t *source);
 
@@ -82,21 +80,21 @@ private slots:
 	void TransitionDurationChanged(int ms);
 
 private:
-	DeviceManagerPtr _srv;
-    uint64_t _streamStarttime;
+	uint64_t _streamStarttime;
 
-    uint64_t _lastBytesSent;
-    uint64_t _lastBytesSentTime;
+	uint64_t _lastBytesSent;
+	uint64_t _lastBytesSentTime;
 	QTimer streamStatusTimer;
 	QTimer heartbeatTimer;
 
 	bool pulse;
 
-    bool started=false;
+	bool started = false;
 
 	void broadcastUpdate(const char *updateType, obs_data_t *additionalFields);
 
 	void OnSceneChange();
+	void FinishedLoading();
 	void OnSceneListChange();
 	void OnSceneCollectionChange();
 	void OnSceneCollectionListChange();

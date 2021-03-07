@@ -79,7 +79,8 @@ list(APPEND obs-midi_HEADERS
 	src/obs-midi.h
 	src/events.h
 	src/rpc/RpcEvent.h
-	src/forms/Macros.h)
+	src/forms/Macros.h
+	src/macro-helpers.h)
 
 add_library(obs-midi MODULE
 	${obs-midi_SOURCES}

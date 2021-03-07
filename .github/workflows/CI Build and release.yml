@@ -21,9 +21,9 @@ jobs:
       - uses: avakar/derive-version@v1
         id: version
       - run: |
-        mkdir _build
-        cd _build
-        cmake .. -DVERSION="${{ steps.version.outputs.version }}"
+          mkdir _build
+          cd _build
+          cmake .. -DVERSION="${{ steps.version.outputs.version }}"
       - uses: avakar/tag-and-release@v1
         with:
           tag_name: ${{ steps.version.outputs.version }}

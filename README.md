@@ -13,6 +13,8 @@ Those two guys are
 [![Crowdin](https://badges.crowdin.net/obs-midi/localized.svg)](https://crowdin.com/project/obs-midi)
 [![CodeFactor](https://www.codefactor.io/repository/github/cpyarger/obs-midi/badge/master)](https://www.codefactor.io/repository/github/cpyarger/obs-midi/overview/master)
 
+Currently runs on Windows and Linux, and MAC
+
 # Installing
 
 
@@ -30,17 +32,20 @@ Those two guys are
 - If you are unable to see obs-midi in the tools you will need to install jack
 - https://jackaudio.org/downloads/
 
-# Ubuntu specifics - SNAP Release
-Due to specific ALSA permissions not being set on the ubuntu snap craft package, OBS-MIDI will not work on the snap version of obs-studio
+# Installing Extra Steps - Ubuntu SNAP
+- If you install OBS Studio via snap you will need to run the following command to give permissions for OBS to access the raw MIDI devices through ALSA
 
+```bash
+sudo snap connect obs-studio:alsa
+```
 
-Currently runs on Windows and Linux, and is partly tested on MAC
 
  # Special thanks to the following projects
  * [RTMidi17](https://github.com/jcelerier/RtMidi17) An amazing modernized RTMIDI library
  * [OBSWebsocket](https://github.com/Palakis/obs-websocket/) from which much code was borrowed for interfacing with OBS
  * [Midi2OBS](https://github.com/lebaston100/MIDItoOBS) Where I got my start playing with this
-
+ * [Deleaker](https://www.deleaker.com/) Without which, finding memory leaks would have been near impossible. 
+ 
 # Build Instructions
 [Build instructions can be found here](build.md)
 

@@ -41,9 +41,11 @@ private slots:
 	void on_source_change(const QString &newsource);
 	void add_new_mapping();
 	void add_row_from_hook(MidiHook *hook);
+	void set_all_cell_colors(int row);
 	void tab_changed(int i);
 	void clear_table();
 	void load_table();
+	void removeHook(MidiHook *hook);
 	void delete_mapping();
 	void edit_mapping();
 	void set_cell_colors(const QColor &color, QTableWidgetItem *item);

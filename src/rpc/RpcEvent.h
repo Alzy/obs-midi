@@ -36,7 +36,7 @@ public:
 
 	const std::optional<uint64_t> &recordingTime() const { return _recordingTime; }
 
-	OBSData additionalFields() const { return std::move(OBSData(_additionalFields)); }
+	OBSData additionalFields() const { return OBSData(_additionalFields); }
 
 private:
 	QString _updateType;

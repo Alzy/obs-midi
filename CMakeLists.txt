@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 project(obs-midi VERSION 0.9.0)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}" external)
+set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
+
 set(CMAKE_PREFIX_PATH "${QTDIR}")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
@@ -7,32 +10,10 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DASIO_STANDALONE)
+
 if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
     set(CMAKE_CXX_FLAGS "-mfpu=neon")
 endif()
-if (WIN32 OR APPLE)
-	include(external/FindLibObs.cmake)
-endif()
-find_package(LibObs REQUIRED)
-find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
-# Version bits
-execute_process(
-  COMMAND git rev-parse --abbrev-ref HEAD
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  OUTPUT_VARIABLE GIT_BRANCH
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-# Get the latest abbreviated commit hash of the working branch
-execute_process(
-  COMMAND git log -1 --format=%h
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  OUTPUT_VARIABLE GIT_COMMIT_HASH
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/version.h.in
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/version.h
-)
 ##################
 # THE GOOD STUFF #
 ##################
@@ -40,6 +21,29 @@ configure_file(
 add_subdirectory(src/RtMidi17)
 set(obs-midi_DEPS RtMidi17)
 include_directories(src/RtMidi17)
+include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/UI/obs-frontend-api")
+include_directories(${CMAKE_PACKAGE_PREFIX})
+
+if (((WIN32) AND (NOT COMMAND install_obs_plugin_with_data)) OR APPLE)
+	include(external/FindLibObs.cmake)
+	find_package(LibObs REQUIRED)
+else()
+	find_package(LibObs)
+endif()
+
+find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
+# Version bits
+execute_process(
+  COMMAND git describe --abbrev=0 --tags 
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  OUTPUT_VARIABLE GIT_TAG
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/version.h.in
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/version.h
+)
+
 include_directories(
 	"${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api"
         SYSTEM
@@ -55,7 +59,9 @@ set(obs-midi_SOURCES
 	src/forms/settings-dialog.cpp
 	src/obs-midi.cpp
 	src/events.cpp
-	src/rpc/RpcEvent.cpp)
+	src/rpc/RpcEvent.cpp
+	src/forms/Macros.cpp)
+
 list(APPEND obs-midi_HEADERS
 	src/utils.h
 	src/config.h
@@ -65,25 +71,36 @@ list(APPEND obs-midi_HEADERS
 	src/forms/settings-dialog.h
 	src/obs-midi.h
 	src/events.h
-	src/rpc/RpcEvent.h)
+	src/rpc/RpcEvent.h
+	src/forms/Macros.h
+	src/macro-helpers.h)
+
 add_library(obs-midi MODULE
 	${obs-midi_SOURCES}
 	${obs-midi_HEADERS})
 include_directories(
 	"${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api"
+
 	${Qt5Core_INCLUDES}
 	${Qt5Widgets_INCLUDES}
 	"${CMAKE_SOURCE_DIR}/deps/asio/asio/include")
 if(LINUX)
 	include_directories(/usr/include/obs)
 	target_link_libraries(obs-midi
-		"${OBS_FRONTEND_LIB}"
+		obs-frontend-api
 		${obs-midi_DEPS}
 		Qt5::Core
 		Qt5::Widgets
 		libobs.so)
-else()
+elseif(NOT DEFINED OBS_FRONTEND_LIB)
 	target_link_libraries(obs-midi
+		obs-frontend-api
+		${obs-midi_DEPS}
+		Qt5::Core
+		Qt5::Widgets
+		libobs)
+else()
+target_link_libraries(obs-midi
 		"${OBS_FRONTEND_LIB}"
 		${obs-midi_DEPS}
 		Qt5::Core
@@ -92,10 +109,7 @@ else()
 endif()
 # --- Windows-specific build settings and tasks ---
 if(WIN32)
-	if(NOT DEFINED OBS_FRONTEND_LIB)
-		set(OBS_FRONTEND_LIB "OBS_FRONTEND_LIB-NOTFOUND" CACHE FILEPATH "OBS frontend library")
-		message(FATAL_ERROR "Could not find OBS Frontend API's library !")
-	endif()
+
     if(MSVC)
         # Enable Multicore Builds and disable FH4 (to not depend on VCRUNTIME140_1.DLL)
 	    add_definitions(/MP /d2FH4-)
@@ -111,8 +125,14 @@ if(WIN32)
 	include_directories(
 		"${LIBOBS_INCLUDE_DIR}/../${OBS_BUILDDIR_ARCH}/UI"
 	)
-	target_link_libraries(obs-midi
+	if(NOT DEFINED OBS_FRONTEND_LIB)
+		target_link_libraries(obs-midi
+		obs-frontend-api)
+	else()
+		target_link_libraries(obs-midi
 		"${OBS_FRONTEND_LIB}")
+	endif()
+
 	# --- Release package helper ---
 	# The "release" folder has a structure similar OBS' one on Windows
 	set(RELEASE_DIR "${PROJECT_SOURCE_DIR}/release")
@@ -164,6 +184,7 @@ if(UNIX AND NOT APPLE)
 	include(GNUInstallDirs)
 	set_target_properties(obs-midi PROPERTIES PREFIX "")
 	target_link_libraries(obs-midi obs-frontend-api)
+
 	file(GLOB locale_files data/locale/*.ini)
         set(CMAKE_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
 		OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
@@ -172,7 +193,9 @@ if(UNIX AND NOT APPLE)
 	OUTPUT_VARIABLE LSB_RELEASE_ID_SHORT
 	OUTPUT_STRIP_TRAILING_WHITESPACE
 	)
-	if(${LSB_RELEASE_ID_SHORT} STREQUAL "Ubuntu")
+	if(COMMAND install_obs_plugin_with_data)
+	message(STATUS "in tree mode")
+	elseif(${LSB_RELEASE_ID_SHORT} STREQUAL "Ubuntu")
 		install(TARGETS obs-midi LIBRARY
 			DESTINATION "/usr/lib/obs-plugins"
 			PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
@@ -189,13 +212,18 @@ if(APPLE)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -fvisibility=default")
 	set(CMAKE_SKIP_RPATH TRUE)
 	set_target_properties(obs-midi PROPERTIES PREFIX "")
-	target_link_libraries(obs-midi "${OBS_FRONTEND_LIB}")
+	if(NOT DEFINED OBS_FRONTEND_LIB)
+		target_link_libraries(obs-midi
+		obs-frontend-api)
+	else()
+		target_link_libraries(obs-midi
+		"${OBS_FRONTEND_LIB}")
+	endif()
 endif()
 # -- End of section --
-if (DEFINED $ENV{isCI})
+if (COMMAND install_obs_plugin_with_data)
 install_obs_plugin_with_data(obs-midi data)
 endif()
 set_target_properties(obs-midi PROPERTIES FOLDER "plugins/obs-midi")
 #set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/external" ${CMAKE_MODULE_PATH})
-# Documentation Generation
-#add_subdirectory ("docs")
+

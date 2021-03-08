@@ -4,3 +4,5 @@
 
 /.vs/obs-midi/v16
 /release/*
+src/RtMidi17
+src/version.h

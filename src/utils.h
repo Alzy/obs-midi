@@ -23,7 +23,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <cstdio>
 #include <iostream>
 #include <vector>
-
 #include <obs.hpp>
 #include <obs-module.h>
 #include <util/config-file.h>
@@ -40,29 +39,38 @@ typedef void (*PauseRecordingFunction)(bool);
 typedef bool (*RecordingPausedFunction)();
 
 enum class Pairs { Scene, Source, Item, Transition, Audio, Media, Filter, String, Integer, Boolean };
+enum class Speed { Slow, Medium, Fast };
 class ActionsClass : public QObject {
 	Q_OBJECT
 public:
 	enum class Actions {
 		Disable_Preview,
 		Disable_Source_Filter,
+		Do_Transition,
 		Enable_Preview,
 		Enable_Source_Filter,
+		Move_T_Bar,
 		Next_Media,
 		Pause_Recording,
 		Play_Pause_Media,
 		Previous_Media,
+		Reload_Browser_Source,
 		Reset_Scene_Item,
 		Reset_Stats,
 		Restart_Media,
+		Resume_Recording,
+		Save_Replay_Buffer,
 		Scrub_Media,
 		Set_Audio_Monitor_Type,
+		Set_Browser_Source_URL,
+		Set_Current_Profile,
 		Set_Current_Scene,
 		Set_Current_Scene_Collection,
 		Set_Current_Transition,
 		Set_Gain_Filter,
 		Set_Media_Time,
 		Set_Mute,
+		Set_Opacity,
 		Set_Preview_Scene,
 		Set_Scene_Item_Crop,
 		Set_Scene_Item_Position,
@@ -71,8 +79,12 @@ public:
 		Set_Scene_Transition_Override,
 		Set_Source_Filter_Visibility,
 		Set_Source_Name,
+		Set_Source_Position,
+		Set_Source_Rotation,
+		Set_Source_Scale,
 		Set_Source_Settings,
 		Set_Sync_Offset,
+		Set_Text_GDIPlus_Text,
 		Set_Transition_Duration,
 		Set_Volume,
 		Start_Recording,
@@ -83,30 +95,20 @@ public:
 		Stop_Replay_Buffer,
 		Stop_Streaming,
 		Studio_Mode,
+		Take_Screenshot,
 		Take_Source_Screenshot,
 		Toggle_Mute,
 		Toggle_Source_Filter,
-		Toggle_Start_Stop_Streaming,
+		Toggle_Source_Visibility,
 		Toggle_Start_Stop_Recording,
 		Toggle_Start_Stop_Replay_Buffer,
-		Do_Transition,
-		Unpause_Recording,
-		Resume_Recording,
-		Save_Replay_Buffer,
-		Set_Current_Profile,
-		Set_Text_GDIPlus_Text,
-		Set_Browser_Source_URL,
-		Reload_Browser_Source,
-		Set_Source_Scale,
-		Set_Source_Rotation,
-		Set_Source_Position,
-		Set_Opacity,
-		Move_T_Bar,
-		Toggle_Source_Visibility
+		Toggle_Start_Stop_Streaming,
+		Unpause_Recording
 	};
 	Q_ENUM(Actions)
 	enum class obs_event_type {
 		SourceDestroyed,
+		SourceRemoved,
 		SceneChanged,
 		SceneListChanged,
 		SceneCollectionChanged,
@@ -132,6 +134,7 @@ public:
 		StudioModeSwitched,
 		PreviewSceneChanged,
 		Exiting,
+		FinishedLoading,
 		FrontendEventHandler,
 		TransitionBegin,
 		TransitionEnd,
@@ -154,7 +157,8 @@ public:
 		SceneItemLockChanged,
 		SceneItemTransform,
 		SceneItemSelected,
-		SceneItemDeselected
+		SceneItemDeselected,
+		SwitchScenes
 	};
 	Q_ENUM(obs_event_type)
 	static QString action_to_string(const Actions &enumval);
@@ -176,11 +180,11 @@ QStringList GetMediaSourceNames();
 QStringList GetAudioSourceNames();
 QString nsToTimestamp(uint64_t ns);
 obs_data_array_t *StringListToArray(char **strings, const char *key);
-obs_data_array_t *GetSceneItems(obs_source_t *source);
+QString GetSceneItems(obs_source_t *source);
 QStringList GetSceneItemsBySource(obs_source_t *source);
 obs_data_t *GetSceneItemData(obs_sceneitem_t *item);
-OBSDataArrayAutoRelease GetSourceArray();
-OBSDataArrayAutoRelease GetSceneArray(const QString &name = "");
+QString GetSourceArray();
+QString GetSceneArray(const QString &name = "");
 // These functions support nested lookup into groups
 obs_sceneitem_t *GetSceneItemFromName(obs_scene_t *scene, const QString &name);
 obs_sceneitem_t *GetSceneItemFromId(obs_scene_t *scene, int64_t id);
@@ -192,7 +196,7 @@ obs_data_t *GetSourceFilterInfo(obs_source_t *filter, bool includeSettings);
 obs_data_array_t *GetSourceFiltersList(obs_source_t *source, bool includeSettings);
 bool IsValidAlignment(uint32_t alignment);
 obs_data_array_t *GetScenes();
-obs_data_t *GetSceneData(obs_source_t *source);
+QString GetSceneData(obs_source_t *source);
 // TODO contribute a proper frontend API method for this to OBS and remove this hack
 int GetTransitionDuration(obs_source_t *transition);
 obs_source_t *GetTransitionFromName(const QString &transitionName);
@@ -222,22 +226,26 @@ QStringList get_source_names(const QString &scene);
 QStringList get_filter_names(const QString &Source);
 QStringList get_transition_names();
 QString untranslate(const QString &tstring);
-const QList<ActionsClass::Actions> AllActions_raw = {ActionsClass::Actions::Disable_Preview,
+QStringList get_browser_sources();
+const QList<ActionsClass::Actions> AllActions_raw = {
+						     ActionsClass::Actions::Do_Transition,
+						     ActionsClass::Actions::Set_Volume,
+						     ActionsClass::Actions::Toggle_Mute,
+						     ActionsClass::Actions::Set_Preview_Scene,
 						     ActionsClass::Actions::Disable_Source_Filter,
-						     ActionsClass::Actions::Enable_Preview,
 						     ActionsClass::Actions::Enable_Source_Filter,
+						     ActionsClass::Actions::Move_T_Bar,
 						     ActionsClass::Actions::Next_Media,
 						     ActionsClass::Actions::Pause_Recording,
 						     ActionsClass::Actions::Play_Pause_Media,
 						     ActionsClass::Actions::Previous_Media,
+						     ActionsClass::Actions::Reload_Browser_Source,
 						     ActionsClass::Actions::Reset_Scene_Item,
-						     ActionsClass::Actions::Toggle_Source_Visibility,
 						     ActionsClass::Actions::Restart_Media,
-						     ActionsClass::Actions::Set_Current_Scene,
+						     ActionsClass::Actions::Resume_Recording,
+						     ActionsClass::Actions::Save_Replay_Buffer,
 						     ActionsClass::Actions::Set_Current_Transition,
-						     ActionsClass::Actions::Set_Preview_Scene,
 						     ActionsClass::Actions::Set_Scene_Transition_Override,
-						     ActionsClass::Actions::Set_Volume,
 						     ActionsClass::Actions::Start_Recording,
 						     ActionsClass::Actions::Start_Replay_Buffer,
 						     ActionsClass::Actions::Start_Streaming,
@@ -245,19 +253,15 @@ const QList<ActionsClass::Actions> AllActions_raw = {ActionsClass::Actions::Disa
 						     ActionsClass::Actions::Stop_Recording,
 						     ActionsClass::Actions::Stop_Replay_Buffer,
 						     ActionsClass::Actions::Stop_Streaming,
+						     ActionsClass::Actions::Studio_Mode,
+						     ActionsClass::Actions::Take_Screenshot,
 						     ActionsClass::Actions::Take_Source_Screenshot,
-						     ActionsClass::Actions::Toggle_Mute,
 						     ActionsClass::Actions::Toggle_Source_Filter,
-						     ActionsClass::Actions::Toggle_Start_Stop_Streaming,
+						     ActionsClass::Actions::Toggle_Source_Visibility,
 						     ActionsClass::Actions::Toggle_Start_Stop_Recording,
 						     ActionsClass::Actions::Toggle_Start_Stop_Replay_Buffer,
-						     ActionsClass::Actions::Do_Transition,
-						     ActionsClass::Actions::Unpause_Recording,
-						     ActionsClass::Actions::Resume_Recording,
-						     ActionsClass::Actions::Save_Replay_Buffer,
-						     ActionsClass::Actions::Reload_Browser_Source,
-						     ActionsClass::Actions::Move_T_Bar,
-						     ActionsClass::Actions::Studio_Mode};
+						     ActionsClass::Actions::Toggle_Start_Stop_Streaming,
+						     ActionsClass::Actions::Unpause_Recording};
 const QList<ActionsClass::Actions> not_ready_actions{
 	ActionsClass::Actions::Set_Current_Scene_Collection,
 	ActionsClass::Actions::Reset_Stats,
@@ -280,7 +284,7 @@ const QList<ActionsClass::Actions> not_ready_actions{
 	ActionsClass::Actions::Set_Scene_Item_Render,
 	ActionsClass::Actions::Set_Scene_Item_Transform,
 	ActionsClass::Actions::Set_Text_GDIPlus_Text,
-	// ActionsClass::Actions::Set_Opacity,
+	ActionsClass::Actions::Set_Opacity,
 	ActionsClass::Actions::Set_Browser_Source_URL,
 };
 void alert_popup(const QString &message);
@@ -288,6 +292,7 @@ QString translate_action(ActionsClass::Actions action);
 };
 /*Midi Message Structure*/
 typedef struct MidiMessage {
+public:
 	MidiMessage() = default;
 	void set_message(const rtmidi::message &message)
 	{
@@ -301,6 +306,7 @@ typedef struct MidiMessage {
 	int channel = 0;
 	int NORC = 0;
 	int value = 0;
+	inline bool isNote() { return (message_type == "Note On" || message_type == "Note Off") ? true : false; };
 	MidiMessage get() { return (MidiMessage) * this; }
 } MidiMessage;
 Q_DECLARE_METATYPE(MidiMessage);
@@ -326,8 +332,9 @@ public:
 	QString scene_collection;
 	QString profile;
 	QString string_override;
-	bool bool_override = false;
-	int int_override = -1;
+	std::optional<bool> bool_override;
+	std::optional<int> int_override;
+	bool value_as_filter = false;
 	int value = -1;
 	MidiMessage *get_message_from_hook() const
 	{
@@ -356,8 +363,10 @@ public:
 		scene_collection = obs_data_get_string(data, "scene_collection");
 		profile = obs_data_get_string(data, "profile");
 		string_override = obs_data_get_string(data, "string_override");
-		bool_override = obs_data_get_bool(data, "bool_override");
-		int_override = obs_data_get_int(data, "int_override");
+		bool_override.emplace(obs_data_get_bool(data, "bool_override"));
+		int_override.emplace(obs_data_get_int(data, "int_override"));
+		value_as_filter = obs_data_get_bool(data, "value_as_filter");
+		value = obs_data_get_int(data, "value");
 	}
 
 	QString GetData()
@@ -401,12 +410,16 @@ public:
 		if (!string_override.isEmpty()) {
 			obs_data_set_string(data, "string_override", string_override.toStdString().c_str());
 		}
-		if (bool_override != NULL) {
-			obs_data_set_bool(data, "bool_override", bool_override);
+		if (bool_override) {
+			obs_data_set_bool(data, "bool_override", *bool_override);
 		}
-		if (int_override != -1) {
-			obs_data_set_int(data, "int_override", int_override);
+		if (int_override) {
+			obs_data_set_int(data, "int_override", *int_override);
 		}
+		if (value_as_filter) {
+			obs_data_set_int(data, "value", value);
+		}
+		obs_data_set_bool(data, "value_as_filter", value_as_filter);
 		QString hookdata(obs_data_get_json(data));
 		blog(LOG_DEBUG, "Midi Hook JSON = %s", hookdata.toStdString().c_str());
 		obs_data_release(data);

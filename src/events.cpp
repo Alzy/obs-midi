@@ -27,7 +27,7 @@
 #include "config.h"
 #include "utils.h"
 #include "forms/settings-dialog.h"
-
+#include "macro-helpers.h"
 #define STATUS_INTERVAL 2000
 
 const char *sourceTypeToString(obs_source_type type)
@@ -57,13 +57,16 @@ const char *calldata_get_string(const calldata_t *data, const char *name)
 	calldata_get_string(data, name, &value);
 	return value;
 }
-Events::Events(DeviceManagerPtr srv)
-	: _srv(std::move(srv)), _streamStarttime(0), _lastBytesSent(0), _lastBytesSentTime(0), HeartbeatIsActive(false), pulse(false)
+Events::Events() : _streamStarttime(0), _lastBytesSent(0), _lastBytesSentTime(0), HeartbeatIsActive(false), pulse(false)
 {
-	this->setParent(GetDeviceManager().get());
-	//_srv = GetDeviceManager();
-	cpuUsageInfo = os_cpu_usage_info_start();
 	obs_frontend_add_event_callback(Events::FrontendEventHandler, this);
+	this->setParent(plugin_window);
+}
+Events::~Events() {}
+void Events::startup()
+{
+	
+
 	// Connect to signals of all existing sources
 	obs_enum_sources(
 		[](void *param, obs_source_t *source) {
@@ -77,9 +80,9 @@ Events::Events(DeviceManagerPtr srv)
 		signal_handler_connect(coreSignalHandler, "source_create", OnSourceCreate, this);
 		signal_handler_connect(coreSignalHandler, "source_destroy", OnSourceDestroy, this);
 	}
-	connect(this, &Events::obsEvent, _srv.get(), &DeviceManager::obsEvent);
+	hookTransitionPlaybackEvents();
 }
-Events::~Events()
+void Events::shutdown()
 {
 	signal_handler_t *coreSignalHandler = obs_get_signal_handler();
 	if (coreSignalHandler) {
@@ -95,18 +98,17 @@ Events::~Events()
 		},
 		this);
 	obs_frontend_remove_event_callback(Events::FrontendEventHandler, this);
-	os_cpu_usage_info_destroy(cpuUsageInfo);
 }
 void Events::FrontendEventHandler(enum obs_frontend_event event, void *private_data)
 {
 	auto owner = reinterpret_cast<Events *>(private_data);
-	if (!owner->_srv) {
-		return;
+	if (event == OBS_FRONTEND_EVENT_FINISHED_LOADING) {
+		owner->started = true;
+		owner->FinishedLoading();
 	}
+	if (!owner->started)
+		return;
 	switch (event) {
-	case OBS_FRONTEND_EVENT_FINISHED_LOADING:
-		owner->hookTransitionPlaybackEvents();
-		break;
 	case OBS_FRONTEND_EVENT_SCENE_CHANGED:
 		owner->OnSceneChange();
 		break;
@@ -191,6 +193,18 @@ void Events::FrontendEventHandler(enum obs_frontend_event event, void *private_d
 		owner->unhookTransitionPlaybackEvents();
 		owner->OnExit();
 		break;
+	case OBS_FRONTEND_EVENT_TRANSITION_STOPPED:
+
+		break;
+	case OBS_FRONTEND_EVENT_SCENE_COLLECTION_CLEANUP:
+
+		break;
+	case OBS_FRONTEND_EVENT_TRANSITION_DURATION_CHANGED:
+
+		break;
+	case OBS_FRONTEND_EVENT_REPLAY_BUFFER_SAVED:
+
+		break;
 	}
 }
 void Events::broadcastUpdate(const char *updateType, obs_data_t *additionalFields = nullptr)
@@ -205,7 +219,7 @@ void Events::broadcastUpdate(const char *updateType, obs_data_t *additionalField
 	}
 	{
 		RpcEvent *event = new RpcEvent(QString(updateType), streamTime, recordingTime, additionalFields);
-		emit obsEvent((RpcEvent)*event);
+		emit this->obsEvent((RpcEvent)*event);
 		delete (event);
 	}
 }
@@ -218,6 +232,7 @@ void Events::connectSourceSignals(obs_source_t *source)
 	disconnectSourceSignals(source);
 	obs_source_type sourceType = obs_source_get_type(source);
 	signal_handler_t *sh = obs_source_get_signal_handler(source);
+	signal_handler_connect(sh, "remove", OnSourceRemoved, this);
 	signal_handler_connect(sh, "rename", OnSourceRename, this);
 	signal_handler_connect(sh, "mute", OnSourceMuteStateChange, this);
 	signal_handler_connect(sh, "volume", OnSourceVolumeChange, this);
@@ -243,6 +258,7 @@ void Events::disconnectSourceSignals(obs_source_t *source)
 		return;
 	}
 	signal_handler_t *sh = obs_source_get_signal_handler(source);
+	signal_handler_disconnect(sh, "remove", OnSourceRemoved, this);
 	signal_handler_disconnect(sh, "rename", OnSourceRename, this);
 	signal_handler_disconnect(sh, "mute", OnSourceMuteStateChange, this);
 	signal_handler_disconnect(sh, "volume", OnSourceVolumeChange, this);
@@ -330,11 +346,11 @@ uint64_t Events::getRecordingTime()
 }
 QString Events::getStreamingTimecode()
 {
-	return std::move(Utils::nsToTimestamp(getStreamingTime()));
+	return Utils::nsToTimestamp(getStreamingTime());
 }
 QString Events::getRecordingTimecode()
 {
-	return std::move(Utils::nsToTimestamp(getRecordingTime()));
+	return Utils::nsToTimestamp(getRecordingTime());
 }
 /**
  * Indicates a scene change.
@@ -350,7 +366,9 @@ QString Events::getRecordingTimecode()
 void Events::OnSceneChange()
 {
 	OBSSourceAutoRelease currentScene = obs_frontend_get_current_scene();
-	OBSDataArrayAutoRelease sceneItems = Utils::GetSceneItems(currentScene);
+	obs_data_t *idata = obs_data_create_from_json(Utils::GetSceneItems(currentScene).toStdString().c_str());
+	OBSDataArrayAutoRelease sceneItems = obs_data_get_array(idata, "array");
+	obs_data_release(idata);
 	obs_data_t *data = obs_data_create();
 	obs_data_set_string(data, "scene-name", obs_source_get_name(currentScene));
 	obs_data_set_array(data, "sources", sceneItems);
@@ -359,6 +377,13 @@ void Events::OnSceneChange()
 	// data will be copyed (int RcpEvent constructor)
 	broadcastUpdate("SwitchScenes", data);
 	obs_data_release(data);
+}
+void Events::FinishedLoading()
+{
+    hookTransitionPlaybackEvents();
+    startup();
+    started=true;
+	broadcastUpdate("FinishedLoading");
 }
 /**
  * The scene list has been modified.
@@ -647,8 +672,9 @@ void Events::OnReplayStopped()
  */
 void Events::OnExit()
 {
-	this->disconnect();
+	state::closing = true;
 	broadcastUpdate("Exiting");
+	this->disconnect();
 }
 /**
  * Emit every 2 seconds.
@@ -839,14 +865,25 @@ void Events::OnTransitionBegin(void *param, calldata_t *data)
  */
 void Events::OnTransitionEnd(void *param, calldata_t *data)
 {
+	state::transitioning = false;
 	auto instance = reinterpret_cast<Events *>(param);
 	OBSSource transition = calldata_get_pointer<obs_source_t>(data, "source");
+	
 	if (!transition) {
 		return;
 	}
+	if (state()._TransitionWasCalled) {
+		obs_frontend_set_transition_duration(state()._CurrentTransitionDuration);
+		auto t =Utils::GetTransitionFromName(state()._CurrentTransition);
+		obs_frontend_set_current_transition(t);
+		obs_source_release(t);
+		state()._TransitionWasCalled = false;
+	}
 	obs_data_t *fields = Utils::GetTransitionData(transition);
+	blog(LOG_DEBUG, "transition %s ended - to scene %s", obs_data_get_string(fields, "name"), obs_data_get_string(fields, "to-scene"));
 	instance->broadcastUpdate("TransitionEnd", fields);
 	obs_data_release(fields);
+	
 }
 /**
  * A stinger transition has finished playing its video.
@@ -864,6 +901,7 @@ void Events::OnTransitionEnd(void *param, calldata_t *data)
  */
 void Events::OnTransitionVideoEnd(void *param, calldata_t *data)
 {
+
 	auto instance = reinterpret_cast<Events *>(param);
 	OBSSource transition = calldata_get_pointer<obs_source_t>(data, "source");
 	if (!transition) {
@@ -1131,6 +1169,18 @@ void Events::OnSourceFilterAdded(void *param, calldata_t *data)
  * @category sources
  * @since 4.6.0
  */
+void Events::OnSourceRemoved(void *param, calldata_t *data) {
+	auto self = reinterpret_cast<Events *>(param);
+
+	obs_source_t *source = calldata_get_pointer<obs_source_t>(data, "source");
+	if (!source) {
+		return;
+	}
+	obs_data_t *fields = obs_data_create();
+	obs_data_set_string(fields, "sourceName", obs_source_get_name(source));
+	self->broadcastUpdate("SourceRemoved", fields);
+	obs_data_release(fields);
+}
 void Events::OnSourceFilterRemoved(void *param, calldata_t *data)
 {
 	auto self = reinterpret_cast<Events *>(param);
@@ -1478,7 +1528,9 @@ void Events::OnPreviewSceneChanged()
 		OBSSourceAutoRelease scene = obs_frontend_get_current_preview_scene();
 		if (!scene)
 			return;
-		OBSDataArrayAutoRelease sceneItems = Utils::GetSceneItems(scene);
+		obs_data_t *idata = obs_data_create_from_json(Utils::GetSceneItems(scene).toStdString().c_str());
+		OBSDataArrayAutoRelease sceneItems = obs_data_get_array(idata, "array");
+		obs_data_release(idata);
 		obs_data_t *data = obs_data_create();
 		obs_data_set_string(data, "scene-name", obs_source_get_name(scene));
 		obs_data_set_array(data, "sources", sceneItems);
@@ -1537,7 +1589,6 @@ void Events::OnBroadcastCustomMessage(const QString &realm, obs_data_t *data)
 obs_data_t *Events::GetStats()
 {
 	obs_data_t *stats = obs_data_create();
-	double cpuUsage = os_cpu_usage_info_query(cpuUsageInfo);
 	double memoryUsage = (double)os_get_proc_resident_size() / (1024.0 * 1024.0);
 	video_t *mainVideo = obs_get_video();
 	uint32_t outputTotalFrames = video_output_get_total_frames(mainVideo);
@@ -1554,7 +1605,6 @@ obs_data_t *Events::GetStats()
 	obs_data_set_int(stats, "output-total-frames", outputTotalFrames);
 	obs_data_set_int(stats, "output-skipped-frames", outputSkippedFrames);
 	obs_data_set_double(stats, "average-frame-time", averageFrameTime);
-	obs_data_set_double(stats, "cpu-usage", cpuUsage);
 	obs_data_set_double(stats, "memory-usage", memoryUsage);
 	obs_data_set_double(stats, "free-disk-space", freeDiskSpace);
 	return stats;

@@ -42,15 +42,14 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "device-manager.h"
 #include "rpc/RpcEvent.h"
 
-
-class Events : public QObject
-{
+class Events : public QObject {
 	Q_OBJECT
 
 public:
-	explicit Events(DeviceManagerPtr srv);
+	explicit Events();
 	~Events() override;
-
+	void startup();
+	void shutdown();
 	void connectSourceSignals(obs_source_t *source);
 	void disconnectSourceSignals(obs_source_t *source);
 
@@ -71,6 +70,7 @@ public:
 	void OnBroadcastCustomMessage(const QString &realm, obs_data_t *data);
 
 	bool HeartbeatIsActive;
+
 signals:
 	void obsEvent(const RpcEvent &event);
 
@@ -80,21 +80,21 @@ private slots:
 	void TransitionDurationChanged(int ms);
 
 private:
-	DeviceManagerPtr _srv;
-	QTimer streamStatusTimer;
-	QTimer heartbeatTimer;
-	os_cpu_usage_info_t *cpuUsageInfo;
-
-	bool pulse;
-
 	uint64_t _streamStarttime;
 
 	uint64_t _lastBytesSent;
 	uint64_t _lastBytesSentTime;
+	QTimer streamStatusTimer;
+	QTimer heartbeatTimer;
+
+	bool pulse;
+
+	bool started = false;
 
 	void broadcastUpdate(const char *updateType, obs_data_t *additionalFields);
 
 	void OnSceneChange();
+	void FinishedLoading();
 	void OnSceneListChange();
 	void OnSceneCollectionChange();
 	void OnSceneCollectionListChange();
@@ -144,6 +144,7 @@ private:
 	static void OnSourceRename(void *param, calldata_t *data);
 
 	static void OnSourceFilterAdded(void *param, calldata_t *data);
+	static void OnSourceRemoved(void *param, calldata_t *data);
 	static void OnSourceFilterRemoved(void *param, calldata_t *data);
 	static void OnSourceFilterVisibilityChanged(void *param, calldata_t *data);
 	static void OnSourceFilterOrderChanged(void *param, calldata_t *data);

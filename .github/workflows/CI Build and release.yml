@@ -15,18 +15,41 @@ on:
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 jobs:
+  release:
+    name: 'Generate Filename'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+        with:
+          path: ${{ github.workspace }}/
+      - uses: avakar/derive-version@v1
+        id: version
+        with:
+          path: ${{ github.workspace }}/
+      - run: |
+          echo "${{ steps.version.outputs.version }}" 
   windows:
-    name: 'Windows 32+64bit'
+    name: 'Windows 64-bit'
     runs-on: [windows-latest]
+    needs: [release]
     if: contains(github.event.head_commit.message, '[skip ci]') != true
     env:
-      QT_VERSION: '5.10.1'
-      WINDOWS_DEPS_VERSION: '2017'
+      QT_VERSION: '5.15.2'
+      WINDOWS_DEPS_VERSION: '2019'
       CMAKE_GENERATOR: "Visual Studio 16 2019"
       CMAKE_SYSTEM_VERSION: "10.0"
       ACTIONS_ALLOW_UNSECURE_COMMANDS: true
       isCI: true
     steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+        with:
+          path: ${{ github.workspace }}/
+      - uses: avakar/derive-version@v1
+        id: version
+        with:
+          path: ${{ github.workspace }}/
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.0.0
       - name: 'Checkout'
@@ -34,13 +57,28 @@ jobs:
         with:
           path: ${{ github.workspace }}/obs-midi
           submodules: 'recursive'
+      - name: 'Get OBS-Studio latest tag'
+        shell: bash
+        run: |
+          echo ::set-env name=VERSION::${{ steps.version.outputs.version }}
+          echo ::set-env name=OBS_GIT_TAG::$(git -c 'versionsort.suffix=-' ls-remote --exit-code --refs --tags --sort='v:refname' https://github.com/obsproject/obs-studio.git '*.*.*'|tail -n 1|cut -d / -f 3)
+      - name: 'Restore OBS 64-bit build v${{ env.OBS_GIT_TAG }} from cache'
+        id: build-cache-obs-64
+        uses: actions/cache@v2
+        env:
+          CACHE_NAME: 'build-cache-obs-64'
+        with:
+          path: ${{ github.workspace }}/obs-studio
+          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.OBS_GIT_TAG }}
       - name: 'Checkout OBS'
+        if: steps.build-cache-obs-64.outputs.cache-hit != 'true'
         uses: actions/checkout@v2
         with:
           repository: obsproject/obs-studio
           path: ${{ github.workspace }}/obs-studio
           submodules: 'recursive'
       - name: 'Get OBS-Studio git info'
+        if: steps.build-cache-obs-64.outputs.cache-hit != 'true'
         shell: bash
         working-directory: ${{ github.workspace }}/obs-studio
         run: |
@@ -48,7 +86,15 @@ jobs:
           echo ::set-env name=OBS_GIT_BRANCH::$(git rev-parse --abbrev-ref HEAD)
           echo ::set-env name=OBS_GIT_HASH::$(git rev-parse --short HEAD)
           echo ::set-env name=OBS_GIT_TAG::$(git describe --tags --abbrev=0)
+      - name: 'Get OBS-Studio git info'
+        shell: bash
+        working-directory: ${{ github.workspace }}/obs-studio
+        run: |
+          echo ::set-env name=OBS_GIT_BRANCH::$(git rev-parse --abbrev-ref HEAD)
+          echo ::set-env name=OBS_GIT_HASH::$(git rev-parse --short HEAD)
+          echo ::set-env name=OBS_GIT_TAG::$(git describe --tags --abbrev=0)
       - name: 'Checkout last OBS-Studio release (${{ env.OBS_GIT_TAG }})'
+        if: steps.build-cache-obs-64.outputs.cache-hit != 'true'
         shell: bash
         working-directory: ${{ github.workspace }}/obs-studio
         run: |
@@ -58,58 +104,43 @@ jobs:
         shell: bash
         working-directory: ${{ github.workspace }}/obs-midi
         run: |
-          git fetch --prune --unshallow
+          git fetch --prune
           echo ::set-env name=GIT_BRANCH::${{ github.event.pull_request.head.ref }}
           echo ::set-env name=GIT_HASH::$(git rev-parse --short HEAD)
           echo ::set-env name=GIT_TAG::$(git describe --tags --abbrev=0)
-      - name: 'Install prerequisite: QT'
+      - name: 'Restore QT from Cache: QT'
+        uses: actions/cache@v2
+        env: 
+          CACHE_NAME: 'deps-cache-qt'
+        id: deps-cache-qt
+        with:
+          path: ${{ github.workspace }}\cmbuild\QT
+          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.QT_VERSION }}
+      - name: 'Set QT to Cache: QT'
+        if: steps.deps-cache-qt.outputs.cache-hit != 'true'
         run: |
           curl -kLO https://cdn-fastly.obsproject.com/downloads/Qt_${{ env.QT_VERSION }}.7z -f --retry 5 -C -
           7z x Qt_${{ env.QT_VERSION }}.7z -o"${{ github.workspace }}\cmbuild\QT"
+      - name: 'Restore OBSDeps from Cache:'
+        uses: actions/cache@v2
+        id: deps-cache-deps
+        env: 
+          CACHE_NAME: 'deps-cache-deps'
+        with:
+          path: ${{ github.workspace }}\cmbuild\deps
+          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.WINDOWS_DEPS_VERSION }}
       - name: 'Install prerequisite: Pre-built OBS dependencies'
+        if: steps.deps-cache-deps.outputs.cache-hit != 'true'
         run: |
           curl -kLO https://cdn-fastly.obsproject.com/downloads/dependencies${{ env.WINDOWS_DEPS_VERSION }}.zip -f --retry 5 -C -
           7z x dependencies${{ env.WINDOWS_DEPS_VERSION }}.zip -o"${{ github.workspace }}\cmbuild\deps"
-      - name: 'Restore OBS 32-bit build v${{ env.OBS_GIT_TAG }} from cache'
-        id: build-cache-obs-32
-        uses: actions/cache@v1
-        env:
-          CACHE_NAME: 'build-cache-obs-32'
-        with:
-          path: ${{ github.workspace }}/obs-studio/build32
-          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.OBS_GIT_TAG }}
-          restore-keys: |
-            ${{ runner.os }}-${{ env.CACHE_NAME }}-
-      - name: 'Configure OBS 32-bit'
-        if: steps.build-cache-obs-32.outputs.cache-hit != 'true'
-        working-directory: ${{ github.workspace }}/obs-studio
-        run: |
-          mkdir .\build32
-          cd .\build32
-          cmake -G "${{ env.CMAKE_GENERATOR }}" -A Win32 -DCMAKE_SYSTEM_VERSION="${{ env.CMAKE_SYSTEM_VERSION }}" -DQTDIR="${{ github.workspace }}\cmbuild\QT\${{ env.QT_VERSION }}\msvc2017" -DDepsPath="${{ github.workspace }}\cmbuild\deps\win32" -DCOPIED_DEPENDENCIES=NO -DCOPY_DEPENDENCIES=YES ..
-      - name: 'Build OBS-Studio 32-bit'
-        if: steps.build-cache-obs-32.outputs.cache-hit != 'true'
-        working-directory: ${{ github.workspace }}/obs-studio
-        run: |
-          msbuild /m /p:Configuration=RelWithDebInfo .\build32\libobs\libobs.vcxproj
-          msbuild /m /p:Configuration=RelWithDebInfo .\build32\UI\obs-frontend-api\obs-frontend-api.vcxproj
-      - name: 'Restore OBS 64-bit build v${{ env.OBS_GIT_TAG }} from cache'
-        id: build-cache-obs-64
-        uses: actions/cache@v1
-        env:
-          CACHE_NAME: 'build-cache-obs-64'
-        with:
-          path: ${{ github.workspace }}/obs-studio/build64
-          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.OBS_GIT_TAG }}
-          restore-keys: |
-            ${{ runner.os }}-${{ env.CACHE_NAME }}-
       - name: 'Configure OBS 64-bit'
         if: steps.build-cache-obs-64.outputs.cache-hit != 'true'
         working-directory: ${{ github.workspace }}/obs-studio
         run: |
           mkdir .\build64
           cd .\build64
-          cmake -G "${{ env.CMAKE_GENERATOR }}" -A x64 -DCMAKE_SYSTEM_VERSION="${{ env.CMAKE_SYSTEM_VERSION }}" -DQTDIR="${{ github.workspace }}\cmbuild\QT\${{ env.QT_VERSION }}\msvc2017_64" -DDepsPath="${{ github.workspace }}\cmbuild\deps\win64" -DCOPIED_DEPENDENCIES=NO -DCOPY_DEPENDENCIES=YES ..
+          cmake -G "${{ env.CMAKE_GENERATOR }}" -A x64 -DCMAKE_SYSTEM_VERSION="${{ env.CMAKE_SYSTEM_VERSION }}" -DQTDIR="${{ github.workspace }}\cmbuild\QT\${{ env.QT_VERSION }}\msvc2019_64" -DDepsPath="${{ github.workspace }}\cmbuild\deps\win64" -DCOPIED_DEPENDENCIES=NO -DCOPY_DEPENDENCIES=YES ..
       - name: 'Build OBS-Studio 64-bit'
         if: steps.build-cache-obs-64.outputs.cache-hit != 'true'
         working-directory: ${{ github.workspace }}/obs-studio
@@ -121,23 +152,14 @@ jobs:
         run: |
           mkdir .\build64
           cd .\build64
-          cmake -G "${{ env.CMAKE_GENERATOR }}" -A x64 -DCMAKE_SYSTEM_VERSION="${{ env.CMAKE_SYSTEM_VERSION }}" -DQTDIR="${{ github.workspace }}\cmbuild\QT\${{ env.QT_VERSION }}\msvc2017_64" -DLibObs_DIR="${{ github.workspace }}\obs-studio\build64\libobs" -DLIBOBS_INCLUDE_DIR="${{ github.workspace }}\obs-studio\libobs" -DLIBOBS_LIB="${{ github.workspace }}\obs-studio\build64\libobs\RelWithDebInfo\obs.lib" -DOBS_FRONTEND_LIB="${{ github.workspace }}\obs-studio\build64\UI\obs-frontend-api\RelWithDebInfo\obs-frontend-api.lib" ..
-      - name: 'Configure obs-midi 32-bit'
-        working-directory: ${{ github.workspace }}/obs-midi
-        run: |
-          mkdir .\build32
-          cd .\build32
-          cmake -G "${{ env.CMAKE_GENERATOR }}" -A Win32 -DCMAKE_SYSTEM_VERSION="${{ env.CMAKE_SYSTEM_VERSION }}" -DQTDIR="${{ github.workspace }}\cmbuild\QT\${{ env.QT_VERSION }}\msvc2017" -DLibObs_DIR="${{ github.workspace }}\obs-studio\build32\libobs" -DLIBOBS_INCLUDE_DIR="${{ github.workspace }}\obs-studio\libobs" -DLIBOBS_LIB="${{ github.workspace }}\obs-studio\build32\libobs\RelWithDebInfo\obs.lib" -DOBS_FRONTEND_LIB="${{ github.workspace }}\obs-studio\build32\UI\obs-frontend-api\RelWithDebInfo\obs-frontend-api.lib" ..
+          cmake -G "${{ env.CMAKE_GENERATOR }}" -A x64 -DCMAKE_SYSTEM_VERSION="${{ env.CMAKE_SYSTEM_VERSION }}" -DQTDIR="${{ github.workspace }}\cmbuild\QT\${{ env.QT_VERSION }}\msvc2019_64" -DLibObs_DIR="${{ github.workspace }}\obs-studio\build64\libobs" -DLIBOBS_INCLUDE_DIR="${{ github.workspace }}\obs-studio\libobs" -DLIBOBS_LIB="${{ github.workspace }}\obs-studio\build64\libobs\RelWithDebInfo\obs.lib" -DOBS_FRONTEND_LIB="${{ github.workspace }}\obs-studio\build64\UI\obs-frontend-api\RelWithDebInfo\obs-frontend-api.lib" ..
       - name: 'Build obs-midi 64-bit'
         working-directory: ${{ github.workspace }}/obs-midi
         run: msbuild /m /p:Configuration=RelWithDebInfo .\build64\obs-midi.sln
-      - name: 'Build obs-midi 32-bit'
-        working-directory: ${{ github.workspace }}/obs-midi
-        run: msbuild /m /p:Configuration=RelWithDebInfo .\build32\obs-midi.sln
       - name: 'Set release filename'
         shell: bash
         run: |
-          FILENAME="obs-midi-${{ env.GIT_HASH }}-Windows"
+          FILENAME="obs-midi-${{ steps.version.outputs.version }}-Windows"
           echo "::set-env name=WIN_FILENAME::$FILENAME"
       - name: 'Package obs-midi'
         working-directory: ${{ github.workspace }}/obs-midi
@@ -150,21 +172,30 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
-          name: '${{ env.GIT_HASH }}-Windows'
+          name: '${{ steps.version.outputs.version }}-Windows'
           path: ${{ github.workspace }}/obs-midi/package/*.zip
       - name: 'Publish ${{ env.WIN_FILENAME }}-Installer.exe'
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
-          name: '${{ env.GIT_HASH }}-Windows-Installer'
+          name: '${{ steps.version.outputs.version }}-Windows-Installer'
           path: ${{ github.workspace }}/obs-midi/package/*.exe
   ubuntu64:
     name: "Linux/Ubuntu 64-bit"
     runs-on: [ubuntu-latest]
+    needs: [release]
     env:
       isCI: true
     if: contains(github.event.head_commit.message, '[skip ci]') != true
     steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+        with:
+          path: ${{ github.workspace }}/
+      - uses: avakar/derive-version@v1
+        id: version
+        with:
+          path: ${{ github.workspace }}/
       - name: 'Checkout'
         uses: actions/checkout@v2
         with:
@@ -285,17 +316,17 @@ jobs:
       - name: 'Set release filename'
         shell: bash
         run: |
-          FILENAME="obs-midi-0${{ env.GIT_HASH }}-1_amd64.deb"
+          FILENAME="obs-midi-${{ steps.version.outputs.version }}-1_amd64.deb"
           echo "::set-env name=LINUX_FILENAME::$FILENAME"
       - name: 'Package ${{ env.LINUX_FILENAME }}'
         if: success()
         working-directory: ${{ github.workspace }}/obs-midi
         shell: bash
         run: |
-          VERSION="${{ env.GIT_HASH }}"
+          VERSION="${{ steps.version.outputs.version }}"
           cd ./build
           sudo checkinstall -y --type=debian --fstrans=no -nodoc \
-              --backup=no --deldoc=yes --install=no --pkgname=obs-midi --pkgversion=0$VERSION \
+              --backup=no --deldoc=yes --install=no --pkgname=obs-midi --pkgversion=$VERSION \
               --pkglicense="GPLv2.0" --maintainer="${{ github.event.pusher.email }}" --pkggroup="video" \
               --pkgsource="${{ github.event.repository.html_url }}" \
               --requires="obs-studio,libqt5core5a,libqt5widgets5,qt5-image-formats-plugins" \
@@ -307,46 +338,71 @@ jobs:
         working-directory: ${{ github.workspace }}/obs-midi
         shell: bash
         run: |
-          VERSION="${{ env.GIT_HASH }}"
+          VERSION="${{ steps.version.outputs.version }}"
           cd ./build
           mkdir -p obs-studio/plugins/obs-midi/bin/64bit/
           cp ./obs-midi.so obs-studio/plugins/obs-midi/bin/64bit/
-          tar -czvf obs-midi-Linux-${{ env.GIT_HASH }}-x64.tar.gz obs-studio
+          tar -czvf obs-midi-Linux-${{ steps.version.outputs.version }}-x64.tar.gz obs-studio
           pwd
 
       - name: 'Publish Deb'
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
-          name: '${{ env.GIT_HASH }}-linux'
+          name: '${{ steps.version.outputs.version }}-linux'
           path: '${{ github.workspace }}/obs-midi/package/*.deb'
       - name: 'Publish Tar'
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
-          name: '${{ env.GIT_HASH }}-linux'
+          name: '${{ steps.version.outputs.version }}-linux'
           path: '${{ github.workspace }}/obs-midi/build/*.tar.gz'
   macos64:
     name: "macOS 64-bit"
     runs-on: [macos-latest]
+    needs: [release]
     env:
-      MACOS_DEPS_VERSION: '2020-04-18'
-      QT_VERSION: '5.14.1'
+      MACOS_DEPS_VERSION: '2021-02-28'
+      QT_VERSION: '5.15.2'
       isCI: true
+      hbc: '6'
     if: contains(github.event.head_commit.message, '[skip ci]') != true
     steps:
       - name: 'Checkout'
         uses: actions/checkout@v2
         with:
+          path: ${{ github.workspace }}/
+      - uses: avakar/derive-version@v1
+        id: version
+        with:
+          path: ${{ github.workspace }}/
+      - name: 'Checkout OBS-MIDI'
+        uses: actions/checkout@v2
+        with:
           path: ${{ github.workspace }}/obs-midi
           submodules: 'recursive'
+      - name: 'Get OBS-Studio latest tag'
+        shell: bash
+        run: |
+          echo ::set-env name=OBS_GIT_TAG::$(git -c 'versionsort.suffix=-' ls-remote --exit-code --refs --tags --sort='v:refname' https://github.com/obsproject/obs-studio.git '*.*.*'|tail -n 1|cut -d /  -f 3)
+      - name: 'Restore obs-studio Cache v ${{ env.OBS_GIT_TAG }}'
+        uses: actions/cache@v2
+        env: 
+          CACHE_NAME: 'macos-obs-studio'
+        id: macos-obs-studio
+        with:
+          path: |
+               ${{ github.workspace }}/obs-studio
+          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.OBS_GIT_TAG }}
       - name: 'Checkout OBS'
+        if: steps.macos-obs-studio.outputs.cache-hit != 'true'
         uses: actions/checkout@v2
         with:
           repository: obsproject/obs-studio
           path: ${{ github.workspace }}/obs-studio
           submodules: 'recursive'
       - name: 'Get OBS-Studio git info'
+        if: steps.macos-obs-studio.outputs.cache-hit != 'true'
         shell: bash
         working-directory: ${{ github.workspace }}/obs-studio
         run: |
@@ -354,6 +410,12 @@ jobs:
           echo ::set-env name=OBS_GIT_BRANCH::$(git rev-parse --abbrev-ref HEAD)
           echo ::set-env name=OBS_GIT_HASH::$(git rev-parse --short HEAD)
           echo ::set-env name=OBS_GIT_TAG::$(git describe --tags --abbrev=0)
+      - name: 'Get OBS-Studio git info'
+        shell: bash
+        working-directory: ${{ github.workspace }}/obs-studio
+        run: |
+          echo ::set-env name=OBS_GIT_BRANCH::$(git rev-parse --abbrev-ref HEAD)
+          echo ::set-env name=OBS_GIT_HASH::$(git rev-parse --short HEAD)
       - name: 'Checkout last OBS-Studio release (${{ env.OBS_GIT_TAG }})'
         shell: bash
         working-directory: ${{ github.workspace }}/obs-studio
@@ -367,43 +429,76 @@ jobs:
           echo ::set-env name=GIT_BRANCH::${{ github.event.pull_request.head.ref }}
           echo ::set-env name=GIT_HASH::$(git rev-parse --short HEAD)
           echo ::set-env name=GIT_TAG::$(git describe --tags --abbrev=0)
+      - name: 'Restore Homebrew Cellar Cache'
+        uses: actions/cache@v2
+        env: 
+          CACHE_NAME: 'obs-homebrew-cache'
+        id: homebrew-cache
+        with:
+          path: |
+            /usr/local/Cellar/libsamplerate
+            /usr/local/Cellar/aften
+            /usr/local/Cellar/jack
+            /usr/local/Cellar/speexdsp
+            /usr/local/Cellar/fdk-aac
+            /usr/local/Cellar/xcnotary
+            
+          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.hbc }}
       - name: 'Install prerequisites (Homebrew)'
+        if: steps.homebrew-cache.outputs.cache-hit != 'true'
         shell: bash
         run: |
-          brew bundle --file ${{ github.workspace }}/obs-midi/CI/macos/Brewfile
+          brew install jack
+          brew install speexdsp
+          brew install fdk-aac
+          brew install akeru-inc/tap/xcnotary
+          chmod 777 /tmp/obsdeps
+      - name: 'Restore /tmp/obsdeps Cache'
+        uses: actions/cache@v2
+        env: 
+          CACHE_NAME: 'macos-obs-deps-cache'
+        id: macos-deps
+        with:
+          path: /tmp/obsdeps
+          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.MACOS_DEPS_VERSION }}-qt-${{ env.QT_VERSION }}
       - name: 'Install prerequisite: Pre-built OBS dependencies'
+        if: steps.macos-deps.outputs.cache-hit != 'true'
         shell: bash
         run: |
-          curl -L -O https://github.com/obsproject/obs-deps/releases/download/${{ env.MACOS_DEPS_VERSION }}/osx-deps-${{ env.MACOS_DEPS_VERSION }}.tar.gz
-          tar -xf ${{ github.workspace }}/osx-deps-${{ env.MACOS_DEPS_VERSION }}.tar.gz -C "/tmp"
+          curl -L -O https://github.com/obsproject/obs-deps/releases/download/${{ env.MACOS_DEPS_VERSION }}/macos-deps-${{ env.MACOS_DEPS_VERSION }}.tar.gz
+          tar -xf ${{ github.workspace }}/macos-deps-${{ env.MACOS_DEPS_VERSION }}.tar.gz -C /tmp
+          curl -L -C - -O https://github.com/obsproject/obs-deps/releases/download/${{ env.MACOS_DEPS_VERSION }}/macos-qt-${{ env.QT_VERSION }}-${{ env.MACOS_DEPS_VERSION }}.tar.gz
+          tar -xf ./macos-qt-${{ env.QT_VERSION }}-${{ env.MACOS_DEPS_VERSION }}.tar.gz -C /tmp
       - name: 'Configure OBS Studio'
         shell: bash
         working-directory: ${{ github.workspace }}/obs-studio
         run: |
-          mkdir build
+          
+          [ -d build ] ||mkdir build
           cd build
-          cmake -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11 -DENABLE_SCRIPTING=NO -DDepsPath=/tmp/obsdeps -DCMAKE_PREFIX_PATH=/usr/local/Cellar/qt/${{ env.QT_VERSION }}/lib/cmake ..
+          rm -rf ./*
+          cmake -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DENABLE_SCRIPTING=NO -DDepsPath=/tmp/obsdeps -DQTDIR=/tmp/obsdeps ..
       - name: 'Build OBS Studio libraries'
         working-directory: ${{ github.workspace }}/obs-studio
         shell: bash
         run: |
           set -e
           cd ./build
-          make -j4 libobs obs-frontend-api
+          make -j12 libobs obs-frontend-api
       - name: 'Configure obs-midi'
         working-directory: ${{ github.workspace }}/obs-midi
         shell: bash
         run: |
           mkdir build
           cd build
-          cmake -DQTDIR=/usr/local/Cellar/qt/${{ env.QT_VERSION }} -DLIBOBS_INCLUDE_DIR=${{ github.workspace }}/obs-studio/libobs -DLIBOBS_LIB=${{ github.workspace }}/obs-studio/libobs -DOBS_FRONTEND_LIB="${{ github.workspace }}/obs-studio/build/UI/obs-frontend-api/libobs-frontend-api.dylib" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr ..
+          cmake -DQTDIR=/tmp/obsdeps -DLIBOBS_INCLUDE_DIR=${{ github.workspace }}/obs-studio/libobs -DLIBOBS_LIB=${{ github.workspace }}/obs-studio/libobs -DOBS_FRONTEND_LIB="${{ github.workspace }}/obs-studio/build/UI/obs-frontend-api/libobs-frontend-api.dylib" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr ..
       - name: 'Build obs-midi'
         working-directory: ${{ github.workspace }}/obs-midi
         shell: bash
         run: |
           set -e
           cd ./build
-          make -j4
+          make -j12
       - name: 'Install prerequisite: Packages app'
         if: success()
         shell: bash
@@ -414,18 +509,18 @@ jobs:
         if: success()
         shell: bash
         run: |
-          FILENAME_UNSIGNED="obs-midi-${{ env.GIT_HASH }}-macOS-Unsigned.pkg"
-          FILENAME="obs-midi-${{ env.GIT_HASH }}-macOS.pkg"
+          FILENAME_UNSIGNED="obs-midi-${{ steps.version.outputs.version }}-macOS-Unsigned.pkg"
+          FILENAME="obs-midi-${{ steps.version.outputs.version }}-macOS.pkg"
           echo "::set-env name=MAC_FILENAME_UNSIGNED::$FILENAME_UNSIGNED"
           echo "::set-env name=MAC_FILENAME::$FILENAME"
       - name: 'Fix linked dynamic library paths'
         if: success()
         working-directory: ${{ github.workspace }}/obs-midi
         shell: bash
-        run: |
-          install_name_tool -change /usr/local/opt/qt/lib/QtWidgets.framework/Versions/5/QtWidgets @executable_path/../Frameworks/QtWidgets.framework/Versions/5/QtWidgets ./build/obs-midi.so
-          install_name_tool -change /usr/local/opt/qt/lib/QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui ./build/obs-midi.so
-          install_name_tool -change /usr/local/opt/qt/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore ./build/obs-midi.so
+        run: | 
+          install_name_tool -change /tmp/obsdeps/lib/QtWidgets.framework/Versions/5/QtWidgets @executable_path/../Frameworks/QtWidgets.framework/Versions/5/QtWidgets ./build/obs-midi.so
+          install_name_tool -change /tmp/obsdeps/lib/QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui ./build/obs-midi.so
+          install_name_tool -change /tmp/obsdeps/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore ./build/obs-midi.so
           install_name_tool -change /usr/local/opt/jack/lib/libjack.0.dylib /usr/local/lib/libjack.0.dylib ./build/obs-midi.so
           echo "Dependencies for obs-midi"
           otool -L ./build/obs-midi.so
@@ -454,7 +549,7 @@ jobs:
         shell: bash
         run: |
           set -e
-          echo "store password"
+          brew link xcnotary
 
           xcrun altool  --store-password-in-keychain-item "AC_PASSWORD" -u "${{ secrets.MACOS_IDENT_USER }}" -p "${{ secrets.MACOS_AC_PASS  }}"
           echo "xcnotary precheck"
@@ -466,7 +561,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
-          name: '${{ env.GIT_HASH }}-macOS'
+          name: '${{ steps.version.outputs.version }}-macOS'
           path: ${{ github.workspace }}/obs-midi/release/*.pkg
 
   make-release:
@@ -478,7 +573,18 @@ jobs:
       - name: 'Checkout'
         uses: actions/checkout@v2
         with:
+          path: ${{ github.workspace }}/
+      - uses: avakar/derive-version@v1
+        id: version
+        with:
+          path: ${{ github.workspace }}/
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+        with:
           path: ${{ github.workspace }}/obs-midi
+      - name: Changelog
+        uses: scottbrenner/generate-changelog-action@master
+        id: Changelog
       - name: 'Get obs-midi git info'
         shell: bash
         working-directory: ${{ github.workspace }}/obs-midi
@@ -491,16 +597,31 @@ jobs:
         shell: bash
         id: get_version
         run: |
-          echo ::set-env name=TAG_VERSION::${GITHUB_REF/refs\/tags\//}
+          echo ::set-env name=TAG_VERSION::${{ steps.version.outputs.version }}
       - name: 'Create Release'
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: tag-${{ env.GIT_HASH }}
-          body_path: ${{ github.workspace }}/obs-midi/docs/releasehead.md
-          release_name: obs-midi ALPHA 2 ${{ env.GIT_HASH }}
+          tag_name: tag-${{ steps.version.outputs.version }}
+          body: |
+            # OBS-MIDI
+            Use MIDI devices to trigger events in OBS and visa versa.
+
+            # More information
+
+            Take a look at the base repo for More information
+
+            # Currently a WIP
+            Windows and Linux are tested working. Mac has not been tested
+            # Special thanks to the following projects
+            * [RTMidi17](https://github.com/jcelerier/RtMidi17) An amazing modernized RTMIDI library
+            * [OBSWebsocket](https://github.com/Palakis/obs-websocket/) from which much code was borrowed for interfacing with OBS
+            * [MIDItoOBS](https://github.com/lebaston100/MIDItoOBS) Where I got my start playing with this
+            # Changes
+            ${{ steps.Changelog.outputs.changelog }}
+          release_name: obs-midi ${{ steps.version.outputs.version }}
           draft: false
           prerelease: false
       - name: 'Download release artifacts'
@@ -511,8 +632,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/${{ env.GIT_HASH }}-Windows/obs-midi-${{ env.GIT_HASH }}-Windows.zip
-          asset_name: obs-midi-${{ env.GIT_HASH }}-Windows.zip
+          asset_path: ${{ github.workspace }}/${{ steps.version.outputs.version }}-Windows/obs-midi-${{ steps.version.outputs.version }}-Windows.zip
+          asset_name: obs-midi-${{ steps.version.outputs.version }}-Windows.zip
           asset_content_type: application/zip
       - name: 'Upload Windows .exe artifact to release'
         uses: actions/upload-release-asset@v1
@@ -520,8 +641,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/${{ env.GIT_HASH}}-Windows-Installer/obs-midi-${{ env.GIT_HASH }}-Windows-Installer.exe
-          asset_name: obs-midi-${{ env.GIT_HASH }}-Windows-Installer.exe
+          asset_path: ${{ github.workspace }}/${{ steps.version.outputs.version }}-Windows-Installer/obs-midi-${{ steps.version.outputs.version }}-Windows-Installer.exe
+          asset_name: obs-midi-${{ steps.version.outputs.version }}-Windows-Installer.exe
           asset_content_type: application/zip
       - name: 'check out directories'
         shell: bash
@@ -529,19 +650,19 @@ jobs:
         run: |
           cd ${{ github.workspace }}
           ls -la
-          echo ${{ github.workspace }}/${{ env.GIT_HASH }}-linux
-          ls -la ${{ github.workspace }}/${{ env.GIT_HASH }}-linux
-          echo ${{ github.workspace }}/${{ env.GIT_HASH }}-macOS
-          ls -la ${{ github.workspace }}/${{ env.GIT_HASH }}-macOS
-          mv ${{ github.workspace }}/${{ env.GIT_HASH }}-linux/*.deb ${{ github.workspace }}/${{ env.GIT_HASH }}-linux/obs-midi-${{ env.GIT_HASH }}-1_amd64.deb
+          echo ${{ github.workspace }}/${{ steps.version.outputs.version }}-linux
+          ls -la ${{ github.workspace }}/${{ steps.version.outputs.version }}-linux
+          echo ${{ github.workspace }}/${{ steps.version.outputs.version }}-macOS
+          ls -la ${{ github.workspace }}/${{ steps.version.outputs.version }}-macOS
+          mv ${{ github.workspace }}/${{ steps.version.outputs.version }}-linux/*.deb ${{ github.workspace }}/${{ steps.version.outputs.version }}-linux/obs-midi-${{ steps.version.outputs.version }}-1_amd64.deb
       - name: 'Upload macOS artifact to release'
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/${{ env.GIT_HASH }}-macOS/obs-midi-${{ env.GIT_HASH }}-macOS.pkg
-          asset_name: obs-midi-${{ env.GIT_HASH }}-macOS.pkg
+          asset_path: ${{ github.workspace }}/${{ steps.version.outputs.version }}-macOS/obs-midi-${{ steps.version.outputs.version }}-macOS.pkg
+          asset_name: obs-midi-${{ steps.version.outputs.version }}-macOS.pkg
           asset_content_type: application/octet-stream
       - name: 'Upload Linux artifact to release'
         uses: actions/upload-release-asset@v1
@@ -549,8 +670,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/${{ env.GIT_HASH }}-linux/obs-midi-${{ env.GIT_HASH }}-1_amd64.deb
-          asset_name: obs-midi-${{ env.GIT_HASH }}-1_amd64.deb
+          asset_path: ${{ github.workspace }}/${{ steps.version.outputs.version }}-linux/obs-midi-${{ steps.version.outputs.version }}-1_amd64.deb
+          asset_name: obs-midi-${{ steps.version.outputs.version }}-1_amd64.deb
           asset_content_type: application/octet-stream
       - name: 'Upload Linux tar artifact to release'
         uses: actions/upload-release-asset@v1
@@ -558,8 +679,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/${{ env.GIT_HASH }}-linux/obs-midi-Linux-${{ env.GIT_HASH }}-x64.tar.gz
-          asset_name: obs-midi-Linux-${{ env.GIT_HASH }}-x64.tar.gz
+          asset_path: ${{ github.workspace }}/${{ steps.version.outputs.version }}-linux/obs-midi-Linux-${{ steps.version.outputs.version }}-x64.tar.gz
+          asset_name: obs-midi-Linux-${{ steps.version.outputs.version }}-x64.tar.gz
           asset_content_type: application/octet-stream
       - name: 'Clean old releases'
         uses: dev-drprasad/delete-older-releases@v0.1.0

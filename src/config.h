@@ -29,7 +29,7 @@ class Config : QObject {
 public:
 	Config();
 	~Config() override;
-
+	bool DebugMode;
 public slots:
 	void Load();
 	void Save();

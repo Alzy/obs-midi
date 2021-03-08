@@ -48,15 +48,15 @@ public:
 	void Load(QString datastring);
 	void Unload();
 
-	QStringList GetPortsList();
-	int GetPortNumberByDeviceName(const QString &deviceName);
-	QStringList GetOutPortsList();
-	int GetOutPortNumberByDeviceName(const QString &deviceName);
+	QStringList get_input_ports_list();
+	int get_input_port_number(const QString &deviceName);
+	QStringList get_output_ports_list();
+	int get_output_port_number(const QString &deviceName);
 
-	QVector<MidiAgent *> GetActiveMidiDevices();
-	MidiAgent *GetMidiDeviceByName(const QString &deviceName);
-	QVector<MidiHook *> GetMidiHooksByDeviceName(const QString &deviceName);
-	MidiAgent *RegisterMidiDevice(const int &port, const int &outport);
+	QVector<MidiAgent *> get_active_midi_devices();
+	MidiAgent *get_midi_device(const QString &deviceName);
+	QVector<MidiHook *> get_midi_hooks(const QString &deviceName);
+	MidiAgent *register_midi_device(const int &port, std::optional<int> outport = std::nullopt);
 
 	QString GetData();
 	void reload();

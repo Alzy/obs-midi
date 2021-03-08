@@ -12,7 +12,7 @@ You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>
 */
 #include "obs-controller.h"
-
+#include "macro-helpers.h"
 ////////////////////
 // BUTTON ACTIONS //
 ////////////////////
@@ -163,6 +163,15 @@ OBSController::OBSController(MidiHook *incoming_hook, int incoming_midi_value)
 	case ActionsClass::Actions::Toggle_Source_Visibility:
 		this->ToggleSourceVisibility();
 		break;
+	case ActionsClass::Actions::Take_Screenshot:
+		this->TakeScreenshot();
+		break;
+	case ActionsClass::Actions::Disable_Preview:
+		this->DisablePreview();
+		break;
+	case ActionsClass::Actions::Enable_Preview:
+		this->EnablePreview();
+		break;
 	default:
 		blog(LOG_DEBUG, "Action %s Does not exist", incoming_hook->action.toStdString().c_str());
 		break;
@@ -184,14 +193,36 @@ void OBSController::SetCurrentScene()
 void OBSController::SetPreviewScene()
 {
 	if (!obs_frontend_preview_program_mode_active()) {
-		blog(LOG_DEBUG, "studio mode not enabled");
+		blog(LOG_INFO, "Can Not Set Preview scene -- studio mode not enabled");
 	}
 	OBSScene scene = Utils::GetSceneFromNameOrCurrent(hook->scene);
 	if (!scene) {
 		blog(LOG_DEBUG, "specified scene doesn't exist");
 	}
-	OBSSourceAutoRelease source = obs_scene_get_source(scene);
+	obs_source_t * source = obs_scene_get_source(scene);
 	obs_frontend_set_current_preview_scene(source);
+}
+void OBSController::DisablePreview()
+{
+	obs_queue_task(
+		OBS_TASK_UI,
+		[](void *param) {
+			if (obs_frontend_preview_enabled()) {
+				obs_frontend_set_preview_enabled(false);
+			}
+			(void)param;
+		},
+		nullptr, true);
+}
+void OBSController::EnablePreview()
+{
+	obs_queue_task(
+		OBS_TASK_UI,
+		[](void *param) {
+			obs_frontend_set_preview_enabled(true);
+			(void)param;
+		},
+		nullptr, true);
 }
 /**
  * Change the active scene collection.
@@ -229,18 +260,36 @@ void OBSController::ResetSceneItem()
  */
 void OBSController::TransitionToProgram()
 {
-	if (!obs_frontend_preview_program_mode_active()) {
-		blog(LOG_DEBUG, "studio mode not enabled");
+	if (state::transitioning)
+		return;
+	state()._CurrentTransitionDuration=obs_frontend_get_transition_duration();
+	obs_source_t *transition = obs_frontend_get_current_transition();
+	QString scenename;
+	/**
+	 * If Transition from hook is not Current Transition, and if it is not an empty Value, then set current transition
+	 */
+	if ((hook->transition != "Current Transition")&& !hook->transition.isEmpty()&&!hook->transition.isNull()) {
+		Utils::SetTransitionByName(hook->transition);
+		state()._TransitionWasCalled=true;
 	}
-	if (hook->transition.isEmpty()) {
-		blog(LOG_DEBUG, "transition name can not be empty");
+	if ((hook->scene != "Preview Scene") && !hook->scene.isEmpty() && !hook->scene.isNull()) {
+		state()._TransitionWasCalled = true;
 	}
-	bool success = Utils::SetTransitionByName(hook->transition);
-	if (!success) {
-		blog(LOG_DEBUG, "specified transition doesn't exist");
+	if (hook->scene == "Preview Scene") {
+		obs_source_t *source = obs_frontend_get_current_scene();
+		hook->scene = QString(obs_source_get_name(source));
+		state()._TransitionWasCalled = true;
+
 	}
-	obs_frontend_set_transition_duration(hook->duration);
-	obs_frontend_preview_program_trigger_transition();
+	if (hook->int_override && *hook->int_override >0) {
+		obs_frontend_set_transition_duration(*hook->int_override);
+		state()._TransitionWasCalled=true;
+	}
+	(obs_frontend_preview_program_mode_active()) ? obs_frontend_preview_program_trigger_transition(): SetCurrentScene();
+	
+	state()._CurrentTransition=QString(obs_source_get_name(transition));
+	
+	obs_source_release(transition);
 }
 /**
  * Set the active transition.
@@ -259,7 +308,13 @@ void OBSController::SetTransitionDuration()
 void OBSController::SetSourceVisibility()
 {
 	obs_sceneitem_set_visible(Utils::GetSceneItemFromName(Utils::GetSceneFromNameOrCurrent(hook->scene), hook->source), midi_value);
-} // DOESNT EXIST
+}
+/**
+*
+* Toggles the source's visibility
+* seems to stop audio from playing as well
+* 
+*/
 void OBSController::ToggleSourceVisibility()
 {
 	auto scene = Utils::GetSceneItemFromName(Utils::GetSceneFromNameOrCurrent(hook->scene), hook->source);
@@ -268,7 +323,7 @@ void OBSController::ToggleSourceVisibility()
 	} else {
 		obs_sceneitem_set_visible(scene, true);
 	}
-} // DOESNT EXIST
+} 
 /**
  * Inverts the mute status of a specified source.
  */
@@ -373,6 +428,10 @@ void OBSController::ResumeRecording()
  */
 void OBSController::StartStopReplayBuffer()
 {
+	if (!Utils::ReplayBufferEnabled()) {
+		Utils::alert_popup("replay buffer disabled in settings");
+		return;
+	}
 	if (obs_frontend_replay_buffer_active()) {
 		obs_frontend_replay_buffer_stop();
 	} else {
@@ -400,6 +459,10 @@ void OBSController::StartReplayBuffer()
  */
 void OBSController::StopReplayBuffer()
 {
+	if (!Utils::ReplayBufferEnabled()) {
+		Utils::alert_popup("replay buffer disabled in settings");
+		return;
+	}
 	if (obs_frontend_replay_buffer_active()) {
 		obs_frontend_replay_buffer_stop();
 	}
@@ -411,6 +474,10 @@ void OBSController::StopReplayBuffer()
  */
 void OBSController::SaveReplayBuffer()
 {
+	if (!Utils::ReplayBufferEnabled()) {
+		Utils::alert_popup("replay buffer disabled in settings");
+		return;
+	}
 	if (!obs_frontend_replay_buffer_active()) {
 		Utils::alert_popup("replay buffer not active");
 		return;
@@ -449,7 +516,15 @@ void OBSController::ReloadBrowserSource()
 	obs_property_button_clicked(property, source); // This returns a boolean but we ignore it because the browser plugin always returns `false`.
 	obs_properties_destroy(sourceProperties);
 }
-void OBSController::TakeSourceScreenshot() {}
+void OBSController::TakeScreenshot()
+{
+	obs_frontend_take_screenshot();
+}
+void OBSController::TakeSourceScreenshot()
+{
+	OBSSourceAutoRelease source = obs_get_source_by_name(hook->scene.toUtf8());
+	obs_frontend_take_source_screenshot(source);
+}
 void OBSController::EnableSourceFilter()
 {
 	OBSSourceAutoRelease source = obs_get_source_by_name(hook->source.toUtf8());
@@ -512,6 +587,16 @@ void OBSController::play_pause_media_source()
 		break;
 	case obs_media_state::OBS_MEDIA_STATE_ENDED:
 		obs_source_media_restart(source);
+		break;
+	case OBS_MEDIA_STATE_NONE:
+		break;
+	case OBS_MEDIA_STATE_OPENING:
+		break;
+	case OBS_MEDIA_STATE_BUFFERING:
+		break;
+	case OBS_MEDIA_STATE_STOPPED:
+		break;
+	case OBS_MEDIA_STATE_ERROR:
 		break;
 	}
 }

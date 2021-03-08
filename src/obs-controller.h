@@ -53,6 +53,8 @@ private:
 	*/
 	void SetCurrentScene();
 	void SetPreviewScene();
+	void DisablePreview();
+	void EnablePreview();
 	void SetCurrentSceneCollection();
 	void ResetSceneItem();
 	void TransitionToProgram();
@@ -78,6 +80,7 @@ private:
 	void SetTextGDIPlusText();
 	void SetBrowserSourceURL();
 	void ReloadBrowserSource();
+	void TakeScreenshot();
 	void TakeSourceScreenshot();
 	void EnableSourceFilter();
 	void DisableSourceFilter();

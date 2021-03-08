@@ -40,6 +40,7 @@ PluginWindow::PluginWindow(QWidget *parent) : QDialog(parent, Qt::Dialog), ui(ne
 	hide_all_pairs();
 	connect_ui_signals();
 	starting = false;
+	
 }
 void PluginWindow::configure_table()
 {

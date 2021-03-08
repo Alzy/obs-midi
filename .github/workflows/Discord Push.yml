@@ -1,7 +1,9 @@
-name: Discord Webhook Messages
+
+name: Discord Push Messages
 on:
-  release:
-    types: [published]
+  push:
+    branches: 
+      - '*'
 jobs:
   run:
     runs-on: ubuntu-latest
@@ -11,4 +13,4 @@ jobs:
         uses: bythope/discord-webhook-messages@v1.1.0
         with:
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
-          handler: 'release'
+          handler: 'push'

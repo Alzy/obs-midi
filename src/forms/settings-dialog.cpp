@@ -46,6 +46,7 @@ void PluginWindow::configure_table()
 	ui->table_mapping->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
 	ui->table_mapping->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
 	ui->table_mapping->insertColumn(10);
+	
 }
 void PluginWindow::set_title_window()
 {
@@ -630,6 +631,8 @@ void PluginWindow::add_new_mapping()
 		GetDeviceManager().get()->get_midi_device(ui->mapping_lbl_device_name->text())->add_MidiHook(newmh);
 		GetConfig().get()->Save();
 		ui->table_mapping->selectRow(row);
+		this->ui->table_mapping->resizeColumnsToContents();
+
 	} else {
 		if (ui->sb_channel->value()) {
 			Utils::alert_popup("Can Not Map Channel 0. \nPlease Click Listen One or Listen Many to listen for MIDI Event to map");
@@ -702,6 +705,7 @@ void PluginWindow::set_cell_colors(const QColor &color, QTableWidgetItem *item)
 	txcolor.black();
 	item->setBackground(txcolor);
 	item->setForeground(color);
+	item->setTextAlignment(Qt::AlignCenter);
 }
 void PluginWindow::tab_changed(int tab)
 {
@@ -760,6 +764,7 @@ void PluginWindow::delete_mapping()
 				
 			}
 		}
+		this->ui->table_mapping->resizeColumnsToContents();
 	}
 }
 void PluginWindow::edit_mapping()

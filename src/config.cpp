@@ -39,7 +39,6 @@ void Config::Load()
 	auto deviceManager = GetDeviceManager();
 	deviceManager->Load(GetConfigStore());
 	blog(LOG_DEBUG, "Config::Load");
-
 }
 
 /* Save the configuration to the OBS Config Store
@@ -57,11 +56,11 @@ void Config::Save()
 	obs_data_release(newmidi);
 	blog(LOG_DEBUG, "Config::Save");
 }
-QString Config::get_file_name()
+QString Config::get_file_name(std::optional<QString> prepend)
 {
 	char *current_profile = obs_frontend_get_current_profile();
 	char *current_sc = obs_frontend_get_current_scene_collection();
-	QString file("obs-midi_");
+	QString file = (prepend) ? prepend.value() : "obs-midi_";
 	file += current_profile;
 	file += "_";
 	file += current_sc;
@@ -70,18 +69,18 @@ QString Config::get_file_name()
 	bfree(current_sc);
 	return file;
 }
-QString Config::GetConfigStore()
+QString Config::GetConfigStore(std::optional<QString> prepend)
 {
 	auto path = obs_module_config_path(NULL);
 	os_mkdirs(path);
 	bfree(path);
-
-	auto filepath = obs_module_config_path(get_file_name().toStdString().c_str());
+	
+	auto filepath = (prepend) ? obs_module_config_path(get_file_name(prepend).toStdString().c_str()) :obs_module_config_path(get_file_name().toStdString().c_str());
 	obs_data_t *midiConfig = os_file_exists(filepath) ? obs_data_create_from_json_file(filepath) : obs_data_create();
 	if (!os_file_exists(filepath)) {
 		obs_data_save_json_safe(midiConfig, filepath, ".tmp", ".bkp");
 	}
-	DebugMode= obs_data_get_bool(midiConfig, "debug_mode");
+	DebugMode = obs_data_get_bool(midiConfig, "debug_mode");
 	bfree(filepath);
 	QString conf(obs_data_get_json(midiConfig));
 	obs_data_release(midiConfig);

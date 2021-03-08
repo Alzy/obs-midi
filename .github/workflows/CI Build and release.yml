@@ -525,13 +525,13 @@ jobs:
           echo "Dependencies for obs-midi"
           otool -L ./build/obs-midi.so
       - name: 'Install Apple Developer Certificate'
-        if: success()
+        if: success() &&  github.ref == 'refs/heads/release'
         uses: apple-actions/import-codesign-certs@253ddeeac23f2bdad1646faac5c8c2832e800071
         with:
           p12-file-base64: ${{ secrets.MACOS_CERT_CODESIGN }}
           p12-password: ${{ secrets.MACOS_CERT_PASS }}
       - name: 'Code signing'
-        if: success()
+        if: success() &&  github.ref == 'refs/heads/release'
         working-directory: ./obs-midi
         shell: bash
         run: |
@@ -542,7 +542,6 @@ jobs:
           mv ./release/obs-midi.pkg ./release/${{ env.MAC_FILENAME_UNSIGNED }}
           productsign --sign "${{ secrets.MACOS_IDENT_INSTALLER }}" ./release/${{ env.MAC_FILENAME_UNSIGNED }} ./release/${{ env.MAC_FILENAME }}
           rm ./release/${{ env.MAC_FILENAME_UNSIGNED }}
-
       - name: 'Notarization'
         if: success() &&  github.ref == 'refs/heads/release'
         working-directory: ./obs-midi
@@ -556,7 +555,14 @@ jobs:
           xcnotary precheck ./release/${{ env.MAC_FILENAME }}
           echo "xcnotary notarize Currently enabled"
           if [ "$?" -eq 0 ]; then xcnotary notarize ./release/${{ env.MAC_FILENAME }} -d "cpyarger@gmail.com" -k "AC_PASSWORD"; fi
-
+      - name: 'move files for upload'
+        if: success() &&  github.ref != 'refs/heads/release'
+        working-directory: ./obs-midi
+        shell: bash
+        run: |
+          set -e
+           packagesbuild ./CI/macos/obs-midi.pkgproj
+           mv ./release/obs-midi.pkg ./release/${{ env.MAC_FILENAME }}
       - name: 'Publish ${{ env.MAC_FILENAME }} artifact'
         if: success()
         uses: actions/upload-artifact@v2-preview

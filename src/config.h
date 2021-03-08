@@ -29,14 +29,10 @@ class Config : QObject {
 public:
 	Config();
 	~Config() override;
+	QString get_file_name(std::optional<QString> prepend = std::nullopt);
+	QString GetConfigStore(std::optional<QString> prepend = std::nullopt);
 	bool DebugMode;
 public slots:
 	void Load();
 	void Save();
-
-	
-
-private:
-	QString get_file_name();
-	QString GetConfigStore();
 };

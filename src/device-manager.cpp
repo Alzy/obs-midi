@@ -136,7 +136,7 @@ QVector<MidiHook *> DeviceManager::get_midi_hooks(const QString &deviceName)
 /* Registers a midi device.
  * Will create, store and enable a midi device.
  */
-MidiAgent *DeviceManager::register_midi_device(const int &port, const int &outport)
+MidiAgent *DeviceManager::register_midi_device(const int &port, std::optional<int> outport)
 {
 	MidiAgent *midiA = new MidiAgent(port, outport);
 	midiA->set_enabled(true);

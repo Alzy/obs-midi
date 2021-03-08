@@ -32,10 +32,10 @@ using namespace std;
 /// </summary>
 /// <param name="in_port">Input Port number of MIDI Device</param>
 /// <param name="out_port">Output Port number of MIDI Device</param>
-MidiAgent::MidiAgent(const int &in_port, const int &out_port)
+MidiAgent::MidiAgent(const int &in_port, std::optional<int> out_port)
 {
 	set_input_port(in_port);
-	set_output_port(out_port);
+	if(out_port)set_output_port(out_port.value());
 	this->setParent(GetDeviceManager().get());
 	set_callbacks();
 }

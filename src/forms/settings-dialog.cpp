@@ -138,7 +138,7 @@ void PluginWindow::on_check_enabled_state_changed(int state)
 		int devicePort = GetDeviceManager()->get_input_port_number(selectedDeviceName.c_str());
 		int deviceOutPort = GetDeviceManager()->get_output_port_number(selectedOutDeviceName.c_str());
 		if (device == NULL) {
-			device = GetDeviceManager()->register_midi_device(devicePort, deviceOutPort);
+			device = (ui->bidirectional->isChecked()) ? GetDeviceManager()->register_midi_device(devicePort, deviceOutPort):GetDeviceManager()->register_midi_device(devicePort);
 		}
 		device->open_midi_input_port();
 		device->open_midi_output_port();

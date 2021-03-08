@@ -36,7 +36,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 class MidiAgent : public QObject {
 	Q_OBJECT
 public:
-	MidiAgent(const int &in_port, const int &out_port);
+	MidiAgent(const int &in_port, std::optional<int> out_port=std::nullopt);
 	MidiAgent(const char *data);
 	~MidiAgent();
 	bool is_device_attached(const char *idata);

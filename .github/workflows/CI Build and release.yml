@@ -452,6 +452,7 @@ jobs:
           brew install speexdsp
           brew install fdk-aac
           brew install akeru-inc/tap/xcnotary
+          [ -d /tmp/obsdeps ] ||mkdir -p /tmp/obsdeps
           chmod 777 /tmp/obsdeps
       - name: 'Restore /tmp/obsdeps Cache'
         uses: actions/cache@v2

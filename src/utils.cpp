@@ -223,7 +223,7 @@ obs_sceneitem_t *Utils::GetSceneItemFromName(obs_scene_t *scene, const QString &
 	}
 	struct current_search {
 		QString query;
-		obs_sceneitem_t *result;
+		OBSSceneItemAutoRelease result;
 		bool (*enumCallback)(obs_scene_t *, obs_sceneitem_t *, void *);
 	};
 	current_search search;

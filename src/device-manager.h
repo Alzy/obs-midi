@@ -56,7 +56,7 @@ public:
 	QVector<MidiAgent *> get_active_midi_devices();
 	MidiAgent *get_midi_device(const QString &deviceName);
 	QVector<MidiHook *> get_midi_hooks(const QString &deviceName);
-	MidiAgent *register_midi_device(const int &port, const int &outport);
+	MidiAgent *register_midi_device(const int &port, std::optional<int> outport = std::nullopt);
 
 	QString GetData();
 	void reload();

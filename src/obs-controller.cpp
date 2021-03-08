@@ -193,13 +193,13 @@ void OBSController::SetCurrentScene()
 void OBSController::SetPreviewScene()
 {
 	if (!obs_frontend_preview_program_mode_active()) {
-		blog(LOG_DEBUG, "studio mode not enabled");
+		blog(LOG_INFO, "Can Not Set Preview scene -- studio mode not enabled");
 	}
 	OBSScene scene = Utils::GetSceneFromNameOrCurrent(hook->scene);
 	if (!scene) {
 		blog(LOG_DEBUG, "specified scene doesn't exist");
 	}
-	OBSSourceAutoRelease source = obs_scene_get_source(scene);
+	obs_source_t * source = obs_scene_get_source(scene);
 	obs_frontend_set_current_preview_scene(source);
 }
 void OBSController::DisablePreview()

@@ -227,8 +227,12 @@ QStringList get_filter_names(const QString &Source);
 QStringList get_transition_names();
 QString untranslate(const QString &tstring);
 QStringList get_browser_sources();
-const QList<ActionsClass::Actions> AllActions_raw = {ActionsClass::Actions::Disable_Source_Filter,
+const QList<ActionsClass::Actions> AllActions_raw = {
 						     ActionsClass::Actions::Do_Transition,
+						     ActionsClass::Actions::Set_Volume,
+						     ActionsClass::Actions::Toggle_Mute,
+						     ActionsClass::Actions::Set_Preview_Scene,
+						     ActionsClass::Actions::Disable_Source_Filter,
 						     ActionsClass::Actions::Enable_Source_Filter,
 						     ActionsClass::Actions::Move_T_Bar,
 						     ActionsClass::Actions::Next_Media,
@@ -242,7 +246,6 @@ const QList<ActionsClass::Actions> AllActions_raw = {ActionsClass::Actions::Disa
 						     ActionsClass::Actions::Save_Replay_Buffer,
 						     ActionsClass::Actions::Set_Current_Transition,
 						     ActionsClass::Actions::Set_Scene_Transition_Override,
-						     ActionsClass::Actions::Set_Volume,
 						     ActionsClass::Actions::Start_Recording,
 						     ActionsClass::Actions::Start_Replay_Buffer,
 						     ActionsClass::Actions::Start_Streaming,
@@ -253,7 +256,6 @@ const QList<ActionsClass::Actions> AllActions_raw = {ActionsClass::Actions::Disa
 						     ActionsClass::Actions::Studio_Mode,
 						     ActionsClass::Actions::Take_Screenshot,
 						     ActionsClass::Actions::Take_Source_Screenshot,
-						     ActionsClass::Actions::Toggle_Mute,
 						     ActionsClass::Actions::Toggle_Source_Filter,
 						     ActionsClass::Actions::Toggle_Source_Visibility,
 						     ActionsClass::Actions::Toggle_Start_Stop_Recording,

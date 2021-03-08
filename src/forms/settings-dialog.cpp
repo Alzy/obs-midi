@@ -710,6 +710,7 @@ void PluginWindow::tab_changed(int tab)
 		ui->mapping_lbl_device_name->setText(ui->list_midi_dev->currentItem()->text());
 	clear_table();
 	load_table();
+	this->ui->table_mapping->resizeColumnsToContents();
 }
 void PluginWindow::clear_table()
 {

@@ -12,3 +12,19 @@ jobs:
         with:
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
           handler: 'release'
+
+name: Discord Push Messages
+on:
+  push:
+    branches: 
+      - '*'
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run Discord Webhook
+        uses: bythope/discord-webhook-messages@v1.1.0
+        with:
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          handler: 'push'
